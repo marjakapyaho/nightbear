@@ -56,7 +56,8 @@ MBG ~= "Metered Blood Glucose".
 
 ## Calibration data from Dexcom
 
-```POST /api/v1/entries
+```
+POST /api/v1/entries
 {
     "device": "dexcom",
     "scale": 1,
