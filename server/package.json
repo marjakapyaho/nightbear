@@ -2,6 +2,9 @@
   "name": "nightbear-server",
   "version": "0.0.1",
   "description": "",
+  "engines" : {
+    "node" : ">=5.1"
+  },
   "main": "index.js",
   "scripts": {
     "start": "babel-node index",
