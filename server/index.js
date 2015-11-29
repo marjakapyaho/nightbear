@@ -4,15 +4,18 @@ import * as api from './api';
 import * as analyser from './analyser';
 
 const app = express().use(bodyParser.json());
+const MIN_IN_MILLIS = 60 * 1000;
 
 app.post('/api/v1/entries', function(req, res) {
+    analyser.analyseData(getProfile(), getTestData(), getTestCal());
+
     api.nightscoutUploaderPost(req.body).then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
     );
 });
 
-// LEGACY URL
+// LEGACY URLS
 app.get('/api/entries', function(req, res) {
     api.getLegacyEntries().then(
         data => res.status(200).send(data || null),
@@ -20,11 +23,45 @@ app.get('/api/entries', function(req, res) {
     );
 });
 
-const server = app.listen(3000, function() {
-    console.log('result of hc analysis:');
-    console.log(analyser.analyseData(getTestData(), getTestCal()));
-    console.log('nightbear server listening on port %s', server.address().port);
+app.post('/api/entries', function(req, res) {
+    api.legacyPost(req.body).then(
+        data => res.status(200).send(data || null),
+        err => res.status(500).send({ error: err && err.message || true })
+    );
 });
+
+const server = app.listen(3000, function() {
+    console.log('nightbear server listening on port %s', server.address().port);
+    initAnalysis();
+});
+
+function initAnalysis() {
+    setInterval(function() {
+        analyser.analyseData(getProfile(), getTestData(), getTestCal());
+    }, 5 * MIN_IN_MILLIS);
+}
+
+function getProfile() {
+
+    if (new Date().getHours() > 9) { // DAY
+        return {
+            HIGH_LEVEL_REL: 10,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 7,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 20 * MIN_IN_MILLIS
+        };
+    }
+    else { // NIGHT
+        return {
+            HIGH_LEVEL_REL: 13,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 6,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 30 * MIN_IN_MILLIS
+        };
+    }
+}
 
 function getTestData() {
     return [

@@ -1,13 +1,8 @@
 import _ from 'lodash';
 
-const HIGH_LEVEL_REL = 10;
-const HIGH_LEVEL_ABS = 16;
-const LOW_LEVEL_REL = 7;
-const LOW_LEVEL_ABS = 4;
-const HEAVY_NOISE_LIMIT = 3; // Switch to raw
-const TIME_SINCE_SGV_LIMIT = 20 * 60 * 1000; // 20 min in milliseconds
+const HEAVY_NOISE_LIMIT = 3; // Switches to raw (set in Dexcom)
 
-export function analyseData(data, latestCal) {
+export function analyseData(profile, data, latestCal) {
 
     if (data.length < 1) {
         return 'outdated';
@@ -19,19 +14,19 @@ export function analyseData(data, latestCal) {
     let latestSGV = changeSGVUnit(latestNoise < HEAVY_NOISE_LIMIT ? latestDataPoint.sgv : calculateRaw(latestDataPoint, latestCal));
     let latestDirection = latestDataPoint.direction;
 
-    if (Date.now() - latestTime > TIME_SINCE_SGV_LIMIT) {
+    if (Date.now() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
         return 'outdated';
     }
-    else if (latestSGV > HIGH_LEVEL_ABS) {
+    else if (latestSGV > profile.HIGH_LEVEL_ABS) {
         return 'high';
     }
-    else if (latestSGV < LOW_LEVEL_ABS) {
+    else if (latestSGV < profile.LOW_LEVEL_ABS) {
         return 'low';
     }
-    else if (latestSGV > HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
+    else if (latestSGV > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
         return 'rising';
     }
-    else if (latestSGV < LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
+    else if (latestSGV < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
         return 'falling';
     }
     else {
@@ -45,16 +40,16 @@ function calculateRaw(dataPoint, calData) {
 
 function detectDirection(direction) {
     if (direction === 'DoubleUp' ||
-        direction === 'SingleUp' ||
-        direction === 'FortyFiveUp') {
+        direction === 'SingleUp') {
         return 'up';
     }
     else if (direction === 'DoubleDown' ||
-             direction === 'SingleDown' ||
-             direction === 'FortyFiveDown') {
+             direction === 'SingleDown') {
         return 'down';
     }
-    else if (direction === 'Flat') {
+    else if (direction === 'Flat' ||
+             direction === 'FortyFiveUp' ||
+             direction === 'FortyFiveDown') {
         return 'flat';
     }
     else {

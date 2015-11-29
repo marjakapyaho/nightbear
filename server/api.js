@@ -1,7 +1,7 @@
 export function nightscoutUploaderPost(data) {
     console.log('nightscoutUploaderPost()', data);
 
-    var type = data.type;
+    let type = data.type;
 
     if (type === 'sgv') {
         // Save data to sgv
@@ -41,4 +41,19 @@ export function getLegacyEntries() {
             "sugar": "15.5"
         }
     ]);
+}
+
+export function legacyPost(data) {
+
+    let entry = {
+        "eventType": "Note",
+        "created_at": new Date().toISOString()
+    };
+
+    if (data.insulin) { entry.insulin = data.insulin; }
+    if (data.carbs) { entry.carbs = data.carbs; }
+
+    // Save data to treatments
+
+    return Promise.resolve();
 }
