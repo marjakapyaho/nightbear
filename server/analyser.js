@@ -1,11 +1,18 @@
 import _ from 'lodash';
 
+export const STATUS_OUTDATED = 'outdated';
+export const STATUS_HIGH = 'high';
+export const STATUS_LOW = 'low';
+export const STATUS_RISING = 'rising';
+export const STATUS_FALLING = 'falling';
+export const STATUS_OK = 'ok';
+
 const HEAVY_NOISE_LIMIT = 3; // Switches to raw (set in Dexcom)
 
 export function analyseData(profile, data, latestCal) {
 
     if (data.length < 1) {
-        return 'outdated';
+        return STATUS_OUTDATED;
     }
 
     let latestDataPoint = _.sortBy(data, 'date')[0];
@@ -15,22 +22,22 @@ export function analyseData(profile, data, latestCal) {
     let latestDirection = latestDataPoint.direction;
 
     if (Date.now() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
-        return 'outdated';
+        return STATUS_OUTDATED;
     }
     else if (latestSGV > profile.HIGH_LEVEL_ABS) {
-        return 'high';
+        return STATUS_HIGH;
     }
     else if (latestSGV < profile.LOW_LEVEL_ABS) {
-        return 'low';
+        return STATUS_LOW;
     }
     else if (latestSGV > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
-        return 'rising';
+        return STATUS_RISING;
     }
     else if (latestSGV < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
-        return 'falling';
+        return STATUS_FALLING;
     }
     else {
-        return 'ok';
+        return STATUS_OK;
     }
 }
 

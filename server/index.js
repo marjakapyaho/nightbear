@@ -2,15 +2,19 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import * as api from './api';
 import * as analyser from './analyser';
+import * as alarms from './alarms';
 
 const STATIC_ASSETS_PATH = '/legacy-client-dist';
 
 const app = express().use(bodyParser.json());
 const MIN_IN_MILLIS = 60 * 1000;
 
-app.post('/api/v1/entries', function(req, res) {
-    analyser.analyseData(getProfile(), getTestData(), getTestCal());
+export function runChecks() {
+    alarms.sendAlarm(analyser.analyseData(getProfile(), getTestData(), getTestCal()));
+}
 
+app.post('/api/v1/entries', function(req, res) {
+    runChecks();
     api.nightscoutUploaderPost(req.body).then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
@@ -53,14 +57,8 @@ if (process.env.NODE_ENV === 'production') {
 
 const server = app.listen(3000, function() {
     console.log('nightbear server listening on port %s', server.address().port);
-    initAnalysis();
+    setInterval(runChecks, 5 * MIN_IN_MILLIS);
 });
-
-function initAnalysis() {
-    setInterval(function() {
-        analyser.analyseData(getProfile(), getTestData(), getTestCal());
-    }, 5 * MIN_IN_MILLIS);
-}
 
 function getProfile() {
 
