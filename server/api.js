@@ -1,19 +1,28 @@
+import _ from 'lodash';
+import PouchDB from 'pouchdb';
+
+const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
+
+// @example timestamp(1448805744000) => "2015-11-29T14:02:24Z"
+function timestamp(timeInMs) {
+    return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
+}
+
+// @example dbPUT('sensor-entries', { ... }) => Promise
+function dbPUT(collection, data) {
+    const object = _.extend({ _id: collection + '/' + timestamp(data.date) }, data);
+    return db.put(object).then(
+        success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
+        failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+    );
+}
+
 export function nightscoutUploaderPost(data) {
-    console.log('nightscoutUploaderPost()', data);
-
-    let type = data.type;
-
-    if (type === 'sgv') {
-        // Save data to sgv
-    }
-    else if (type === 'mbg') {
-        // Save data to mbg
-    }
-    else if (type === 'cal') {
-        // Save data to cal
-    }
-
-    return Promise.resolve();
+    const type = data.type;
+    if (type === 'sgv') return dbPUT('sensor-entries', data);
+    else if (type === 'mbg') return dbPUT('meter-entries', data);
+    else if (type === 'cal') return dbPUT('calibrations', data);
+    return Promise.reject('Unknown data type');
 }
 
 export function setStatus(data) {

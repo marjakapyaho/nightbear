@@ -2,8 +2,8 @@
   "name": "nightbear-server",
   "version": "0.0.1",
   "description": "",
-  "engines" : {
-    "node" : ">=5.1"
+  "engines": {
+    "node": ">=5.1"
   },
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "babel": "^5.8.29",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "pouchdb": "^5.1.0"
   }
 }
