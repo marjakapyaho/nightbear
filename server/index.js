@@ -17,6 +17,20 @@ app.post('/api/v1/entries', function(req, res) {
     );
 });
 
+app.get('/api/v1/status', function(req, res) {
+    api.getStatus().then(
+        data => res.status(200).send(data || null),
+        err => res.status(500).send({ error: err && err.message || true })
+    );
+});
+
+app.post('/api/v1/status', function(req, res) {
+    api.setStatus(req.body).then(
+        data => res.status(200).send(data || null),
+        err => res.status(500).send({ error: err && err.message || true })
+    );
+});
+
 // LEGACY URLS
 app.get('/api/entries', function(req, res) {
     api.getLegacyEntries().then(

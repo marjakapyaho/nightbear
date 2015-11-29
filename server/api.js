@@ -16,6 +16,20 @@ export function nightscoutUploaderPost(data) {
     return Promise.resolve();
 }
 
+export function setStatus(data) {
+
+    // Set status to ack = true
+
+    return Promise.resolve();
+}
+
+export function getStatus() {
+    return Promise.resolve({
+        'status': 'outdated',
+        'ack': true
+    });
+}
+
 export function getLegacyEntries() {
 
     // Get real data from sgv & treatments (12h)
