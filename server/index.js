@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 import * as api from './api';
 import * as analyser from './analyser';
 
+const STATIC_ASSETS_PATH = '/legacy-client-dist';
+
 const app = express().use(bodyParser.json());
 
 app.post('/api/v1/entries', function(req, res) {
@@ -19,6 +21,11 @@ app.get('/api/entries', function(req, res) {
         err => res.status(500).send({ error: err && err.message || true })
     );
 });
+
+if (process.env.NODE_ENV === 'production') {
+    console.log('Serving static assets from: ' + STATIC_ASSETS_PATH);
+    app.use('/', express.static(STATIC_ASSETS_PATH));
+}
 
 const server = app.listen(3000, function() {
     console.log('result of hc analysis:');
