@@ -86,21 +86,30 @@ GET /api/v1/treatments
 
 [
     {
-        "_id": "5659bcd3f04deb0100a7b083",
-        "enteredBy": "Someone",
-        "eventType": "Carb Correction",
-        "carbs": 45,
-        "created_at": "2015-11-28T14:40:19.912Z"
-    },
-    {
-        "_id": "5659bd92f04deb0100a7b085",
+        "_id": "5662e432a99d8a010010c3a2",
         "enteredBy": "Someone",
         "eventType": "BG Check",
-        "glucose": 13.5,
+        "glucose": 17.5,
         "glucoseType": "Finger",
-        "insulin": 6,
+        "notes": "(testing bg)",
         "units": "mmol",
-        "created_at": "2015-11-28T12:45:00.000Z"
+        "created_at": "2015-12-05T13:18:42.202Z"
+    },
+    {
+        "_id": "5662e3dfa99d8a010010c3a1",
+        "enteredBy": "Someone",
+        "eventType": "Correction Bolus",
+        "insulin": 3,
+        "notes": "(testing insulin)",
+        "created_at": "2015-12-05T12:30:00.000Z"
+    },
+    {
+        "_id": "5662e35ba99d8a010010c39f",
+        "enteredBy": "Someone",
+        "eventType": "Carb Correction",
+        "carbs": 50,
+        "notes": "(testing carbs)",
+        "created_at": "2015-12-05T11:30:00.000Z"
     }
 ]
 ```
