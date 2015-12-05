@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
+import { changeSGVUnit } from './analyser';
 
+const HOUR = 1000 * 60 * 60;
 const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
 
 // @example timestamp(1448805744000) => "2015-11-29T14:02:24Z"
-function timestamp(timeInMs) {
+function timestamp(timeInMs = Date.now()) {
     return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
 }
 
@@ -40,30 +42,16 @@ export function getStatus() {
 }
 
 export function getLegacyEntries() {
-
-    // Get real data from sgv & treatments (12h)
-
-    // Change format to legacy
-
-    return Promise.resolve([
-        {
-            "time": 1448816243000,
-            "insulin": 4,
-            "carbs": 30
-        },
-        {
-            "time": 1448816543000,
-            "sugar": "15.5"
-        },
-        {
-            "time": 1448816843000,
-            "sugar": "15.5"
-        },
-        {
-            "time": 1448817143000,
-            "sugar": "15.5"
-        }
-    ]);
+    return db.allDocs({
+        startkey: 'sensor-entries/' + timestamp(Date.now() - HOUR),
+        endkey: 'sensor-entries/' + timestamp(),
+        include_docs: true
+    }).then(res => (
+        res.rows.map(row => ({
+            time: row.doc.date,
+            sugar: changeSGVUnit(row.doc.sgv) + '' // "sugar" as in "blood sugar"
+        }))
+    ));
 }
 
 export function legacyPost(data) {

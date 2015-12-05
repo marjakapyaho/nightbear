@@ -64,7 +64,9 @@ function detectDirection(direction) {
     }
 }
 
-function changeSGVUnit(sgv) {
+// Converts blood glucose values from mg/dL (used by Dexcom) to mmol/L (used in Europe), and rounds to 1 decimal
+// @example changeSGVUnit(68) => 3.8
+export function changeSGVUnit(sgv) {
     return Math.round((sgv / 18) * 10) / 10;
 }
 
