@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
+import * as data from './data';
 
 const HOUR = 1000 * 60 * 60;
 const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
@@ -22,18 +23,16 @@ export function nightscoutUploaderPost(data) {
     return Promise.reject('Unknown data type');
 }
 
-export function setStatus(data) {
-
-    // Set status to ack = true
-
+export function ackAlarm(data) {
+    // Find alarm with id in db and
+    // Set ack timestamp
+    var timestamp = Date.now();
     return Promise.resolve();
 }
 
-export function getStatus() {
-    return Promise.resolve({
-        'status': 'outdated',
-        'ack': true
-    });
+export function getAlarms() {
+    var activeAlarms = data.getActiveAlarms();
+    return Promise.resolve(activeAlarms);
 }
 
 export function getLegacyEntries() {

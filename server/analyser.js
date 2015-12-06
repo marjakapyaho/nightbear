@@ -21,22 +21,44 @@ export function analyseData(data) {
     let latestDirection = latestDataPoint.direction;
 
     if (Date.now() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
-        return STATUS_OUTDATED;
+        return { status: STATUS_OUTDATED, data: latestDataPoint };
     }
     else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
-        return STATUS_HIGH;
+        return { status: STATUS_HIGH, data: latestDataPoint };
     }
     else if (latestGlucoseValue < profile.LOW_LEVEL_ABS) {
-        return STATUS_LOW;
+        return { status: STATUS_LOW, data: latestDataPoint };
     }
     else if (latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
-        return STATUS_RISING;
+        return { status: STATUS_RISING, data: latestDataPoint };
     }
     else if (latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
-        return STATUS_FALLING;
+        return { status: STATUS_FALLING, data: latestDataPoint };
     }
     else {
-        return STATUS_OK;
+        return { status: STATUS_OK, data: latestDataPoint };
+    }
+}
+
+export function getProfile() {
+
+    if (new Date().getHours() > 9) { // DAY
+        return {
+            HIGH_LEVEL_REL: 10,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 7,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MILLIS
+        };
+    }
+    else { // NIGHT
+        return {
+            HIGH_LEVEL_REL: 13,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 6,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 30 * helpers.MIN_IN_MILLIS
+        };
     }
 }
 
@@ -56,27 +78,5 @@ function detectDirection(direction) {
     }
     else {
         return undefined;
-    }
-}
-
-function getProfile() {
-
-    if (new Date().getHours() > 9) { // DAY
-        return {
-            HIGH_LEVEL_REL: 10,
-            HIGH_LEVEL_ABS: 16,
-            LOW_LEVEL_REL: 7,
-            LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MILLIS
-        };
-    }
-    else { // NIGHT
-        return {
-            HIGH_LEVEL_REL: 13,
-            HIGH_LEVEL_ABS: 16,
-            LOW_LEVEL_REL: 6,
-            LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 30 * helpers.MIN_IN_MILLIS
-        };
     }
 }

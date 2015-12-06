@@ -34,3 +34,7 @@ export function getActiveAlarms() {
 export function createAlarm() {
     return true;
 }
+
+export function updateAlarm() {
+    return true;
+}
