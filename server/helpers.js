@@ -1,10 +1,12 @@
 import * as data from './data';
 
-export const MIN_IN_MILLIS = 60 * 1000;
+export const MIN_IN_MS = 60 * 1000;
+export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const HEAVY_NOISE_LIMIT = 3; // Switches to raw (set in Dexcom)
 
-export function detectActualGlucose(entry) {
-    entry.nb_glucose_value = changeSGVUnit(entry.noise < HEAVY_NOISE_LIMIT ? entry.sgv : calculateRaw(entry, data.getLatestCalibration()));
+// Updates the given entry by interpreting RAW data where necessary, and converting units
+export function setActualGlucose(entry, latestCalibration) {
+    entry.nb_glucose_value = changeSGVUnit(entry.noise < HEAVY_NOISE_LIMIT ? entry.sgv : calculateRaw(entry, latestCalibration));
     return entry;
 }
 
