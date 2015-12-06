@@ -1,19 +1,46 @@
-import {
-    STATUS_OUTDATED,
-    STATUS_HIGH,
-    STATUS_LOW,
-    STATUS_RISING,
-    STATUS_FALLING
-} from './analyser';
+import * as helpers from './helpers';
+import * as analyser from './analyser';
+import * as data from './data';
 
-export function sendAlarm(type) {
+export function initAlarms() {
+    setInterval(runChecks, 5 * helpers.MIN_IN_MILLIS);
+}
 
-    if (type === STATUS_HIGH || type === STATUS_LOW) { // LEVEL 1
-        console.log('Send out level 1 alarm (Pebble, Pushover');
+export function runChecks() {
+
+    // Analyse current status
+    var status = analyser.analyseData(data.getDataForAnalysis());
+
+    // Get active alarms from db
+    var activeAlarms = data.getActiveAlarms();
+
+    // If current status OK, set past alarms to inactive state
+    if (status === analyser.STATUS_OK) {
+
     }
-    else if (type === STATUS_OUTDATED || // LEVEL 2
-             type === STATUS_RISING ||
-             type === STATUS_FALLING) {
-        console.log('Send out level 2 alarm (only Pebble)');
+
+    // If current status gives alarm, check if there is already one in db
+
+    // Check if there are any other alarms that should be set inactive
+
+    // If pre-existing alarm, check if level should be changed
+
+    // Send out alarms according to level
+    sendAlarm(1);
+}
+
+export function sendAlarm(level) {
+
+    if (level === 1) {
+        return; // Pebble will fetch
+    }
+    else if (level === 2) {
+        // Send out pushover level 2
+    }
+    else if (level === 3) {
+        // Send out pushover level 3
+    }
+    else if (level === 4) {
+        // Send out pushover level 4
     }
 }

@@ -9,3 +9,24 @@ export function getLatestCalibration() {
         "slope": 846.2368050082694
     };
 }
+
+export function getDataForAnalysis() {
+    return [
+        {
+            "unfiltered": 158880,
+            "filtered": 156608,
+            "direction": "Flat",
+            "device": "dexcom",
+            "rssi": 168,
+            "sgv": 300,
+            "dateString": "Sun Nov 22 23:27:50 EET 2015",
+            "type": "sgv",
+            "date": Date.now(),
+            "noise": 1
+        }
+    ];
+}
+
+export function getActiveAlarms() {
+    return [];
+}

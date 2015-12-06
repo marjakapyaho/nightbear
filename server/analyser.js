@@ -8,7 +8,8 @@ export const STATUS_RISING = 'rising';
 export const STATUS_FALLING = 'falling';
 export const STATUS_OK = 'ok';
 
-export function analyseData(profile, data) {
+export function analyseData(data) {
+    var profile = getProfile();
 
     if (data.length < 1) {
         return STATUS_OUTDATED;
@@ -58,3 +59,24 @@ function detectDirection(direction) {
     }
 }
 
+function getProfile() {
+
+    if (new Date().getHours() > 9) { // DAY
+        return {
+            HIGH_LEVEL_REL: 10,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 7,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MILLIS
+        };
+    }
+    else { // NIGHT
+        return {
+            HIGH_LEVEL_REL: 13,
+            HIGH_LEVEL_ABS: 16,
+            LOW_LEVEL_REL: 6,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 30 * helpers.MIN_IN_MILLIS
+        };
+    }
+}

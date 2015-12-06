@@ -1,5 +1,6 @@
 import * as data from './data';
 
+export const MIN_IN_MILLIS = 60 * 1000;
 export const HEAVY_NOISE_LIMIT = 3; // Switches to raw (set in Dexcom)
 
 export function detectActualGlucose(entry) {
@@ -21,3 +22,4 @@ export function calculateRaw(dataPoint, calData) {
 export function changeSGVUnit(sgv) {
     return Math.round((sgv / 18) * 10) / 10;
 }
+
