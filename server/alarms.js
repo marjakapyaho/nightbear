@@ -1,9 +1,10 @@
 import * as helpers from './helpers';
 import * as analyser from './analyser';
 import * as data from './data';
+import _ from 'lodash';
 
 export function initAlarms() {
-    setInterval(runChecks, 5 * helpers.MIN_IN_MILLIS);
+    setInterval(runChecks, 5 * helpers.MIN_IN_MS);
 }
 
 export function runChecks() {

@@ -4,6 +4,7 @@ import * as helpers from './helpers';
 import * as data from './data';
 
 const HOUR = 1000 * 60 * 60;
+const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
 const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
 
 // @example dbPUT('sensor-entries', { ... }) => Promise
@@ -16,11 +17,20 @@ function dbPUT(collection, data) {
 }
 
 export function nightscoutUploaderPost(data) {
-    const type = data.type;
-    if (type === 'sgv') return dbPUT('sensor-entries', helpers.detectActualGlucose(data));
-    else if (type === 'mbg') return dbPUT('meter-entries', data);
-    else if (type === 'cal') return dbPUT('calibrations', data);
-    return Promise.reject('Unknown data type');
+    if (data.type === 'sgv') {
+        return data.getLatestCalibration()
+            .then(cal => helpers.setActualGlucose(data, cal))
+            .then(data => dbPUT('sensor-entries', data));
+    }
+    else if (data.type === 'mbg') {
+        return dbPUT('meter-entries', data);
+    }
+    else if (data.type === 'cal') {
+        return dbPUT('calibrations', data);
+    }
+    else {
+        return Promise.reject('Unknown data type');
+    }
 }
 
 export function ackAlarm(data) {
@@ -43,22 +53,28 @@ export function getLegacyEntries() {
     }).then(res => (
         res.rows.map(row => ({
             time: row.doc.date,
-            sugar: helpers.changeSGVUnit(row.doc.sgv) + '' // "sugar" = "blood sugar"
+            sugar: helpers.changeSGVUnit(row.doc.sgv).toFixed(1) + '' // "sugar" as in "blood sugar"; send as string
         }))
     ));
 }
 
 export function legacyPost(data) {
-
-    let entry = {
-        "eventType": "Note",
-        "created_at": new Date().toISOString()
-    };
-
-    if (data.insulin) { entry.insulin = data.insulin; }
-    if (data.carbs) { entry.carbs = data.carbs; }
-
-    // Save data to treatments
-
-    return Promise.resolve();
+    console.log('legacyPost()', 'Incoming data:', data);
+    return db.get('treatments/' + timestamp(data.time))
+        .catch(() => {
+            console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
+            const timestamp = new Date();
+            return {
+                eventType: DEFAULT_TREATMENT_TYPE,
+                created_at: timestamp.toISOString(),
+                date: timestamp.getTime(), // NOTE: This is a NON-STANDARD field, only used by Nightbear
+                enteredBy: 'Nightbear Web UI'
+            };
+        })
+        .then(doc => {
+            if (data.insulin) doc.insulin = data.insulin; else delete doc.insulin;
+            if (data.carbs) doc.carbs = data.carbs; else delete doc.carbs;
+            // TODO: if (data.sugar)..?
+            return dbPUT('treatments', doc);
+        });
 }
