@@ -9,27 +9,34 @@ export function initAlarms() {
 export function runChecks() {
 
     // Analyse current status
-    var status = analyser.analyseData(data.getDataForAnalysis());
+    var currentStatus = analyser.analyseData(data.getDataForAnalysis());
 
     // Get active alarms from db
     var activeAlarms = data.getActiveAlarms();
 
-    // If current status OK, set past alarms to inactive state
-    if (status === analyser.STATUS_OK) {
+    // Analyse each active alarm in regards to their clear conditions and current status
+    var matchingAlarmFound = false;
 
+    _.each(activeAlarms, function(alarm) {
+        if (currentStatus = alarm.type) {
+            matchingAlarmFound = true;
+            // Same alarm still, increase level if needed
+        }
+        else {
+            // Check if clear conditions are met and update
+        }
+    });
+
+    // There there was no previous matching alarm, create one
+    if (!matchingAlarmFound) {
+        data.createAlarm();
     }
 
-    // If current status gives alarm, check if there is already one in db
-
-    // Check if there are any other alarms that should be set inactive
-
-    // If pre-existing alarm, check if level should be changed
-
     // Send out alarms according to level
-    sendAlarm(1);
+    sendAlarms(1);
 }
 
-export function sendAlarm(level) {
+export function sendAlarms(level) {
 
     if (level === 1) {
         return; // Pebble will fetch

@@ -30,3 +30,7 @@ export function getDataForAnalysis() {
 export function getActiveAlarms() {
     return [];
 }
+
+export function createAlarm() {
+    return true;
+}
