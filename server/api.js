@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
-import * as data from './data';
+import { getLatestCalibration } from './data';
 
 const HOUR = 1000 * 60 * 60;
 const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
@@ -18,7 +18,7 @@ function dbPUT(collection, data) {
 
 export function nightscoutUploaderPost(data) {
     if (data.type === 'sgv') {
-        return data.getLatestCalibration()
+        return getLatestCalibration()
             .then(cal => helpers.setActualGlucose(data, cal))
             .then(data => dbPUT('sensor-entries', data));
     }
@@ -60,7 +60,7 @@ export function getLegacyEntries() {
 
 export function legacyPost(data) {
     console.log('legacyPost()', 'Incoming data:', data);
-    return db.get('treatments/' + timestamp(data.time))
+    return db.get('treatments/' + helpers.timestamp(data.time))
         .catch(() => {
             console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
             const timestamp = new Date();
