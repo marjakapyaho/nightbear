@@ -1,18 +1,13 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
-import { changeSGVUnit } from './analyser';
+import * as helpers from './helpers';
 
 const HOUR = 1000 * 60 * 60;
 const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
 
-// @example timestamp(1448805744000) => "2015-11-29T14:02:24Z"
-function timestamp(timeInMs = Date.now()) {
-    return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
-}
-
 // @example dbPUT('sensor-entries', { ... }) => Promise
 function dbPUT(collection, data) {
-    const object = _.extend({ _id: collection + '/' + timestamp(data.date) }, data);
+    const object = _.extend({ _id: collection + '/' + helpers.timestamp(data.date) }, data);
     return db.put(object).then(
         success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
         failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
@@ -21,7 +16,7 @@ function dbPUT(collection, data) {
 
 export function nightscoutUploaderPost(data) {
     const type = data.type;
-    if (type === 'sgv') return dbPUT('sensor-entries', data);
+    if (type === 'sgv') return dbPUT('sensor-entries', helpers.detectActualGlucose(data));
     else if (type === 'mbg') return dbPUT('meter-entries', data);
     else if (type === 'cal') return dbPUT('calibrations', data);
     return Promise.reject('Unknown data type');
@@ -43,13 +38,13 @@ export function getStatus() {
 
 export function getLegacyEntries() {
     return db.allDocs({
-        startkey: 'sensor-entries/' + timestamp(Date.now() - HOUR),
-        endkey: 'sensor-entries/' + timestamp(),
+        startkey: 'sensor-entries/' + helpers.timestamp(Date.now() - HOUR),
+        endkey: 'sensor-entries/' + helpers.timestamp(),
         include_docs: true
     }).then(res => (
         res.rows.map(row => ({
             time: row.doc.date,
-            sugar: changeSGVUnit(row.doc.sgv) + '' // "sugar" as in "blood sugar"
+            sugar: helpers.changeSGVUnit(row.doc.sgv) + '' // "sugar" = "blood sugar"
         }))
     ));
 }

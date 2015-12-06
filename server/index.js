@@ -10,11 +10,10 @@ const app = express().use(bodyParser.json());
 const MIN_IN_MILLIS = 60 * 1000;
 
 export function runChecks() {
-    alarms.sendAlarm(analyser.analyseData(getProfile(), getTestData(), getTestCal()));
+    alarms.sendAlarm(analyser.analyseData(getProfile(), getTestData()));
 }
 
 app.post('/api/v1/entries', function(req, res) {
-    runChecks();
     api.nightscoutUploaderPost(req.body).then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
@@ -97,16 +96,4 @@ function getTestData() {
             "noise": 1
         }
     ];
-}
-
-function getTestCal() {
-    return {
-        "device": "dexcom",
-        "scale": 1,
-        "dateString": "Sat Nov 28 13:42:28 EET 2015",
-        "date": Date.now(),
-        "type": "cal",
-        "intercept": 30923.080292889048,
-        "slope": 846.2368050082694
-    };
 }
