@@ -34,7 +34,7 @@ app.post('/api/v1/status', function(req, res) {
 
 // LEGACY URLS
 app.get('/api/entries', function(req, res) {
-    api.getLegacyEntries().then(
+    api.getLegacyEntries(req.query.hours ? parseFloat(req.query.hours) : undefined).then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
     );

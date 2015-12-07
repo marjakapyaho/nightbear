@@ -45,9 +45,9 @@ export function getAlarms() {
     return Promise.resolve(activeAlarms);
 }
 
-export function getLegacyEntries() {
+export function getLegacyEntries(hours = 12) {
     return db.allDocs({
-        startkey: 'sensor-entries/' + helpers.timestamp(Date.now() - HOUR),
+        startkey: 'sensor-entries/' + helpers.timestamp(Date.now() - hours * HOUR),
         endkey: 'sensor-entries/' + helpers.timestamp(),
         include_docs: true
     }).then(res => (
