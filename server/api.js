@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
-import { getLatestCalibration } from './data';
+import { getLatestCalibration, getLatestEntries, getLatestTreatments } from './data';
 
 const HOUR = 1000 * 60 * 60;
 const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
@@ -46,17 +46,22 @@ export function getAlarms() {
 }
 
 export function getLegacyEntries(hours = 12) {
-    return db.allDocs({
-        startkey: 'sensor-entries/' + helpers.timestamp(Date.now() - hours * HOUR),
-        endkey: 'sensor-entries/' + helpers.timestamp(),
-        include_docs: true
-    }).then(res => (
-        res.rows.map(row => ({
-            time: row.doc.date,
-            sugar: row.doc.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
-            is_raw: row.doc.noise >= helpers.HEAVY_NOISE_LIMIT
-        }))
-    ));
+    return Promise.all([
+        getLatestEntries(hours * HOUR),
+        getLatestTreatments(hours * HOUR)
+    ]).then(([ entries, treatments ]) =>
+        _(entries.concat(treatments))
+            .groupBy(entry => entry.date)
+            .map(group => _.merge.apply(_, group)) // if there's multiple entries/treatments with the same timestamp, merge them into one
+            .map(entry => ({
+                time: entry.date,
+                carbs: entry.carbs,
+                insulin: entry.insulin,
+                sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
+                is_raw: entry.nb_glucose_value && entry.noise >= helpers.HEAVY_NOISE_LIMIT
+            }))
+            .value()
+    );
 }
 
 export function legacyPost(data) {
