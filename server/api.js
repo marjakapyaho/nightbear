@@ -53,7 +53,8 @@ export function getLegacyEntries(hours = 12) {
     }).then(res => (
         res.rows.map(row => ({
             time: row.doc.date,
-            sugar: row.doc.nb_glucose_value.toFixed(1) + '' // "sugar" as in "blood sugar"; send as string
+            sugar: row.doc.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
+            is_raw: row.doc.noise >= helpers.HEAVY_NOISE_LIMIT
         }))
     ));
 }
