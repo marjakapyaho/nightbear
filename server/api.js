@@ -53,7 +53,7 @@ export function getLegacyEntries() {
     }).then(res => (
         res.rows.map(row => ({
             time: row.doc.date,
-            sugar: helpers.changeSGVUnit(row.doc.sgv).toFixed(1) + '' // "sugar" as in "blood sugar"; send as string
+            sugar: row.doc.nb_glucose_value.toFixed(1) + '' // "sugar" as in "blood sugar"; send as string
         }))
     ));
 }
