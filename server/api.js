@@ -69,11 +69,10 @@ export function legacyPost(data) {
     return db.get('treatments/' + helpers.timestamp(data.time))
         .catch(() => {
             console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
-            const timestamp = new Date();
             return {
                 eventType: DEFAULT_TREATMENT_TYPE,
-                created_at: timestamp.toISOString(),
-                date: timestamp.getTime(), // NOTE: This is a NON-STANDARD field, only used by Nightbear
+                created_at: new Date(data.time).toISOString(),
+                date: data.time, // NOTE: This is a NON-STANDARD field, only used by Nightbear
                 enteredBy: 'Nightbear Web UI'
             };
         })
