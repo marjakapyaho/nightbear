@@ -16,7 +16,7 @@ export function getLatestCalibration() {
 }
 
 // Promises entries from the last durationMs
-function getLatestEntries(durationMs) {
+export function getLatestEntries(durationMs) {
     return db.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
         startkey: 'sensor-entries/' + timestamp(Date.now() - durationMs),
@@ -26,7 +26,7 @@ function getLatestEntries(durationMs) {
 }
 
 // Promises treatments from the last durationMs
-function getLatestTreatments(durationMs) {
+export function getLatestTreatments(durationMs) {
     return db.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
         startkey: 'treatments/' + timestamp(Date.now() - durationMs),

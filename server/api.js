@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
-import * as data from './data';
+import { getLatestCalibration, getLatestEntries, getLatestTreatments } from './data';
 
 const HOUR = 1000 * 60 * 60;
 const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
@@ -18,7 +18,7 @@ function dbPUT(collection, data) {
 
 export function nightscoutUploaderPost(data) {
     if (data.type === 'sgv') {
-        return data.getLatestCalibration()
+        return getLatestCalibration()
             .then(cal => helpers.setActualGlucose(data, cal))
             .then(data => dbPUT('sensor-entries', data));
     }
@@ -45,29 +45,35 @@ export function getAlarms() {
     return Promise.resolve(activeAlarms);
 }
 
-export function getLegacyEntries() {
-    return db.allDocs({
-        startkey: 'sensor-entries/' + helpers.timestamp(Date.now() - HOUR),
-        endkey: 'sensor-entries/' + helpers.timestamp(),
-        include_docs: true
-    }).then(res => (
-        res.rows.map(row => ({
-            time: row.doc.date,
-            sugar: helpers.changeSGVUnit(row.doc.sgv).toFixed(1) + '' // "sugar" as in "blood sugar"; send as string
-        }))
-    ));
+export function getLegacyEntries(hours = 12) {
+    return Promise.all([
+        getLatestEntries(hours * HOUR),
+        getLatestTreatments(hours * HOUR)
+    ]).then(([ entries, treatments ]) =>
+        _(entries.concat(treatments))
+            .groupBy(entry => entry.date)
+            .map(group => _.merge.apply(_, group)) // if there's multiple entries/treatments with the same timestamp, merge them into one
+            .map(entry => ({
+                time: entry.date,
+                carbs: entry.carbs,
+                insulin: entry.insulin,
+                sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
+                is_raw: entry.nb_glucose_value && entry.noise >= helpers.HEAVY_NOISE_LIMIT
+            }))
+            .sortBy(entry => entry.time) // return in chronological order
+            .value()
+    );
 }
 
 export function legacyPost(data) {
     console.log('legacyPost()', 'Incoming data:', data);
-    return db.get('treatments/' + timestamp(data.time))
+    return db.get('treatments/' + helpers.timestamp(data.time))
         .catch(() => {
             console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
-            const timestamp = new Date();
             return {
                 eventType: DEFAULT_TREATMENT_TYPE,
-                created_at: timestamp.toISOString(),
-                date: timestamp.getTime(), // NOTE: This is a NON-STANDARD field, only used by Nightbear
+                created_at: new Date(data.time).toISOString(),
+                date: data.time, // NOTE: This is a NON-STANDARD field, only used by Nightbear
                 enteredBy: 'Nightbear Web UI'
             };
         })

@@ -2,7 +2,7 @@ import * as data from './data';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
-export const HEAVY_NOISE_LIMIT = 3; // Switches to raw (set in Dexcom)
+export const HEAVY_NOISE_LIMIT = 4; // when noise is >= this, use raw sensor data instead
 
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {
