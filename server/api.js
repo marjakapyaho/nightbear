@@ -62,10 +62,16 @@ export function getLegacyEntries(hours = 12) {
             }))
             .sortBy(entry => entry.time) // return in chronological order
             .value()
-    ).then(data => {
-        console.log('getLegacyEntries()', 'Returning', data.length);
-        return data;
-    });
+    ).then(
+        data => {
+            console.log('getLegacyEntries()', 'Returning:', data.length);
+            return data;
+        },
+        err => {
+            console.log('getLegacyEntries()', 'Failed:', err);
+            return Promise.reject(err);
+        }
+    );
 }
 
 export function legacyPost(data) {
