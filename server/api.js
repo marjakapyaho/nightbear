@@ -33,16 +33,16 @@ export function nightscoutUploaderPost(data) {
     }
 }
 
+export function getAlarms() {
+    var activeAlarms = data.getActiveAlarms();
+    return Promise.resolve(activeAlarms);
+}
+
 export function ackAlarm(data) {
     // Find alarm with id in db and
     // Set ack timestamp
     var timestamp = Date.now();
     return Promise.resolve();
-}
-
-export function getAlarms() {
-    var activeAlarms = data.getActiveAlarms();
-    return Promise.resolve(activeAlarms);
 }
 
 export function getLegacyEntries(hours = 12) {

@@ -5,6 +5,7 @@ var Vibe = require('ui/vibe');
 var Accel = require('ui/accel');
 
 var BEAR_URL = 'http://nightbear.jrw.fi/api/entries?hours=3';
+var BEAR_BASE_URL = 'http://nightbear.jrw.fi/api/v1';
 var HALF_WINDOW_HEIGHT = 84;
 var TEXT_POSITION = 20;
 var X_START = 0;
@@ -96,36 +97,15 @@ function initApp() {
 
     // Init data fetch
     fetchNewData();
-    setInterval(fetchNewData, 60000);
+    setInterval(fetchNewData, 60000); // 1 min
 
-    // Init test fetch
-    sendTestPing();
-    setInterval(sendTestPing, 60000);
+    // Init status check
+    //checkAlarmStatus();
+    //setInterval(checkAlarmStatus, 300000); // 5 min
 }
 
 
 /** Helpers **/
-
-function sendTestPing() {
-    console.log('Sending test ping');
-    ajax({ url: 'http://nightproxy.jrw.fi/ping-from-pebble' }, function(data) {
-        console.log('Ping success');
-    }, function(err) {
-        console.log('Ping err', err);
-    });
-    console.log('Still here');
-}
-
-function range(num) {
-    return new Array(num + 1)
-        .join(' ')
-        .split('')
-        .map(function(value, key) { return key; });
-}
-
-function addToWindow(el) {
-    bearWindow.add(el);
-}
 
 function initAlarms() {
     var shakeLatest = 0;
@@ -146,13 +126,63 @@ function initAlarms() {
 
         alarmCleared = true;
 
+        // Send alarm cleared ajax call
+        clearAlarmOnServer();
+
         setTimeout(function() {
             alarmCleared = false;
         }, 3600000); // 60 min
 
         Pebble.showSimpleNotificationOnPebble('Alarm cleared', '');
     }
+}
 
+function checkAlarmStatus() {
+    ajax({ url: BEAR_BASE_URL + '/status', type: 'json', headers: { 'accept': 'application/json' } },
+        function(alarms) {
+            console.log('Server has', alarms.length, ' alarms');
+
+            var validAlarms = 0;
+            alarms.forEach(function(alarm) {
+                if (!alarm.ack) {
+                    validAlarms++;
+                }
+            });
+
+            if (validAlarms > 0) {
+                Vibe.vibrate('double');
+                alarmOn = true;
+            }
+            else {
+                alarmOn = false;
+            }
+        },
+        function(err) {
+            console.log('Error', err);
+        }
+    );
+}
+
+function clearAlarmOnServer() {
+    ajax({ url: BEAR_BASE_URL + '/status', method: 'post', type: 'json', headers: { 'accept': 'application/json' } },
+        function(data) {
+            console.log('Successfully cleared alarm from server');
+        },
+        function(err) {
+            console.log('Error', err);
+        }
+    );
+}
+
+function range(num) {
+    return new Array(num + 1)
+        .join(' ')
+        .split('')
+        .map(function(value, key) { return key; });
+}
+
+function addToWindow(el) {
+    bearWindow.add(el);
 }
 
 function drawGraph(data) {
@@ -160,6 +190,11 @@ function drawGraph(data) {
 
     // Clear larger circles
     largerCircles.forEach(function(circle) {
+        circle.position(new Vector2(0, -100));
+    });
+
+    // Clear small circles
+    circles.forEach(function(circle) {
         circle.position(new Vector2(0, -100));
     });
 

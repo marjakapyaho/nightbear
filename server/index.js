@@ -19,14 +19,14 @@ app.post('/api/v1/entries', function(req, res) {
 });
 
 app.get('/api/v1/status', function(req, res) {
-    api.getStatus().then(
+    api.getAlarms().then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
     );
 });
 
 app.post('/api/v1/status', function(req, res) {
-    api.setStatus(req.body).then(
+    api.ackAlarm(req.body).then(
         data => res.status(200).send(data || null),
         err => res.status(500).send({ error: err && err.message || true })
     );
