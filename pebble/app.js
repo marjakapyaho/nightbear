@@ -100,8 +100,8 @@ function initApp() {
     setInterval(fetchNewData, 60000); // 1 min
 
     // Init status check
-    //checkAlarmStatus();
-    //setInterval(checkAlarmStatus, 300000); // 5 min
+    checkAlarmStatus();
+    setInterval(checkAlarmStatus, 300000); // 5 min
 }
 
 

@@ -8,14 +8,30 @@ export function initAlarms() {
 }
 
 export function runChecks() {
+    Promise.all([
+        data.getDataForAnalysis(),
+        data.getActiveAlarms()
+    ]).then(
+        function(res) {
+            var entries = res[0] ? res[0][0] : [];
+            var treatments = res[0] ? res[0][1] : [];
+            var alarms = res[1] || [];
+
+            doChecks(entries, treatments, alarms);
+        },
+        function(err) {
+            console.log('Failed with error', err);
+        }
+    );
+}
+
+// TODO: use treatments in analysis
+function doChecks(entries, treatments, activeAlarms) {
 
     // Analyse current status
-    var analysisResults =  analyser.analyseData(data.getDataForAnalysis());
+    var analysisResults =  analyser.analyseData(entries);
     var currentStatus = analysisResults.status;
     var latestDataPoint = analysisResults.data;
-
-    // Get active alarms from db
-    var activeAlarms = data.getActiveAlarms();
 
     // Analyse each active alarm in regards to their clear conditions and current status
     var matchingAlarmFound = false;
