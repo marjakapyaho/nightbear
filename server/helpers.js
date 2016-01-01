@@ -2,11 +2,11 @@ import * as data from './data';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
-export const HEAVY_NOISE_LIMIT = 4; // when noise is >= this, use raw sensor data instead
+export const DIRECTION_NOT_COMPUTABLE = 'NOT COMPUTABLE'; // when direction not computable, use raw sensor data instead
 
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {
-    entry.nb_glucose_value = changeSGVUnit(entry.noise < HEAVY_NOISE_LIMIT ? entry.sgv : calculateRaw(entry, latestCalibration));
+    entry.nb_glucose_value = changeSGVUnit(entry.direction !== DIRECTION_NOT_COMPUTABLE ? entry.sgv : calculateRaw(entry, latestCalibration));
     return entry;
 }
 

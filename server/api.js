@@ -58,7 +58,7 @@ export function getLegacyEntries(hours = 12) {
                 carbs: entry.carbs,
                 insulin: entry.insulin,
                 sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
-                is_raw: entry.nb_glucose_value && entry.noise >= helpers.HEAVY_NOISE_LIMIT
+                is_raw: entry.nb_glucose_value && entry.direction === helpers.DIRECTION_NOT_COMPUTABLE
             }))
             .sortBy(entry => entry.time) // return in chronological order
             .value()
