@@ -47,8 +47,18 @@ export function getActiveAlarms() {
     return Promise.resolve(); // TODO
 }
 
-export function createAlarm() {
-    return Promise.resolve(); // TODO
+export function createAlarm(type, level) {
+    let newAlarm = {
+        _id: 'alarms/' + timestamp(),
+        type: type, // analyser status constants
+        level: level,
+        ack: false // Date.now()
+    };
+
+    return db.put(newAlarm).then(
+        success => console.log('createAlarm()', newAlarm, '=>', success), // resolve with undefined
+        failure => console.log('createAlarm()', newAlarm, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+    );
 }
 
 export function updateAlarm() {

@@ -59,17 +59,13 @@ function doChecks(entries, treatments, activeAlarms) {
 
     // There there was no previous matching alarm, create one
     if (!matchingAlarmFound) {
-        data.createAlarm();
-        sendAlarm(1);
+        var initialLevel = 1;
+        data.createAlarm(currentStatus, initialLevel);
     }
 }
 
 export function sendAlarm(level) {
-
-    if (level === 1) {
-        return; // Pebble will fetch
-    }
-    else if (level === 2) {
+    if (level === 2) {
         // Send out pushover level 2
     }
     else if (level === 3) {
