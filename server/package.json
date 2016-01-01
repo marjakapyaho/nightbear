@@ -9,7 +9,7 @@
   "scripts": {
     "start": "babel-node index",
     "watch": "nodemon --watch . --exec babel-node -- index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_PATH=.. mocha --compilers js:babel/register --reporter spec test/"
   },
   "author": "Jarno Rantanen <jarno@jrw.fi>",
   "license": "AGPL",
@@ -20,5 +20,10 @@
     "lodash": "^3.10.1",
     "nodemon": "^1.8.1",
     "pouchdb": "^5.1.0"
+  },
+  "devDependencies": {
+    "axios": "^0.8.1",
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
   }
 }
