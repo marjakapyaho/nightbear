@@ -34,8 +34,7 @@ export function nightscoutUploaderPost(data) {
 }
 
 export function getAlarms() {
-    var activeAlarms = data.getActiveAlarms();
-    return Promise.resolve(activeAlarms);
+    return Promise.resolve(data.getActiveAlarms());
 }
 
 export function ackAlarm(data) {

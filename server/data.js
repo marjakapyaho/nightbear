@@ -44,13 +44,20 @@ export function getDataForAnalysis() {
 }
 
 export function getActiveAlarms() {
-    return Promise.resolve(); // TODO
+    // TODO HERE
+    return db.allDocs({
+            include_docs: true,
+            startkey: 'alarms/' + timestamp(Date.now() - durationMs),
+            endkey: 'alarms/' + timestamp()
+        })
+        .then(res => res.rows.map(row => row.doc));
 }
 
 export function createAlarm(type, level) {
     let newAlarm = {
         _id: 'alarms/' + timestamp(),
         type: type, // analyser status constants
+        status: 'active',
         level: level,
         ack: false // Date.now()
     };
