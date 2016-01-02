@@ -38,10 +38,7 @@ export function getAlarms() {
 }
 
 export function ackAlarm(data) {
-    // Find alarm with id in db and
-    // Set ack timestamp
-    var timestamp = Date.now();
-    return Promise.resolve();
+    return Promise.resolve(data.updateAlarm());
 }
 
 export function getLegacyEntries(hours = 12) {
