@@ -5,10 +5,7 @@ import createAppInstance from './app';
 const STATIC_ASSETS_PATH = process.env.NODE_ENV === 'production' ? '/legacy-client-dist' : null;
 
 const pouchDB = new PouchDB(process.env.DB_URL, { skip_setup: true });
-
 const app = createAppInstance(pouchDB, Date.now);
 
-const server = app.server.createExpressServer(STATIC_ASSETS_PATH).listen(3001, function() {
-    console.log('nightbear server listening on port %s', server.address().port);
-    app.alarms.initAlarms();
-});
+app.server.createExpressServer(3001, STATIC_ASSETS_PATH);
+app.alarms.initAlarms();

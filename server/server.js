@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-export function createExpressServer({ data }, staticAssetsPath) {
+export function createExpressServer({ data }, port = 0, staticAssetsPath = null) {
 
     const server = express().use(bodyParser.json());
 
@@ -47,6 +47,12 @@ export function createExpressServer({ data }, staticAssetsPath) {
         server.use('/', express.static(staticAssetsPath));
     }
 
-    return server;
+    return new Promise(function(resolve) {
+        const binding = server.listen(port, function() {
+            const port = binding.address().port;
+            console.log('Listening on port %s', port);
+            resolve(port);
+        });
+    });
 
 }

@@ -27,12 +27,8 @@ export function createTestApp() {
     let httpHostPrefix;
     app.__test = { // attach some helpful utilities for interacting with the test app we created
         createTestServer() {
-            return new Promise(function(resolve) {
-                const server = app.server.createExpressServer().listen(0, function() {
-                    httpHostPrefix = 'http://localhost:' + server.address().port; // expose the OS-assigned random port for the rest of the test suite
-                    resolve(httpHostPrefix);
-                });
-            });
+            return app.server.createExpressServer()
+                .then(randomPort => httpHostPrefix = 'http://localhost:' + randomPort); // expose the OS-assigned random port for the rest of the test suite
         },
         setCurrentTime: newTime => fakeCurrentTime = newTime,
         get: url => axios.get(httpHostPrefix + url).then(res => res.data),
