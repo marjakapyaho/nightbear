@@ -49,7 +49,7 @@ var clock = new UI.Text({
     position: new Vector2(0, 0),
     size: new Vector2(144, 14),
     text: '--:--',
-    font: 'GOTHIC_14',
+    font: 'GOTHIC_14_BOLD',
     color:'white',
     textOverflow:'fill',
     textAlign:'center'
@@ -124,7 +124,7 @@ function checkAlarmStatus() {
             }
         },
         function(err) {
-            console.log('Alarm status error', err);
+            console.log('Alarm status error:', err);
             checkIfDisconnected();
         }
     );
