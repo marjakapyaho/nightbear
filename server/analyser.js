@@ -9,7 +9,7 @@ export const STATUS_FALLING = 'falling';
 export const STATUS_OK = 'ok';
 
 export function analyseData({ currentTime }, entries) {
-    var profile = getProfile();
+    var profile = getProfile({ currentTime });
 
     if (entries.length < 1) {
         return STATUS_OUTDATED;
@@ -40,9 +40,9 @@ export function analyseData({ currentTime }, entries) {
     }
 }
 
-export function getProfile() {
+export function getProfile({ currentTime }) {
 
-    if (new Date().getHours() > 9) { // DAY
+    if (new Date(currentTime()).getHours() > 9) { // DAY
         return {
             HIGH_LEVEL_REL: 10,
             HIGH_LEVEL_ABS: 16,
