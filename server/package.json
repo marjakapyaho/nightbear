@@ -9,7 +9,8 @@
   "scripts": {
     "start": "babel-node index",
     "watch": "nodemon --watch . --exec babel-node -- index",
-    "test": "NODE_PATH=.. mocha --compilers js:babel/register --reporter spec test/"
+    "test": "NODE_PATH=.. mocha --compilers js:babel/register --reporter spec test/",
+    "test-watch": "NODE_PATH=.. mocha --watch --compilers js:babel/register --reporter spec test/"
   },
   "author": "Jarno Rantanen <jarno@jrw.fi>",
   "license": "AGPL",
