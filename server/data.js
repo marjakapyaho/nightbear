@@ -87,18 +87,18 @@ export function createAlarm({ pouchDB, currentTime }, type, level) {
     );
 }
 
-export function updateAlarm({ pouchDB }, alarmData) {
-
-    // Upsert alarm with given alarm data
-
-    return true;
+export function updateAlarm({ pouchDB }, alarmDoc) {
+    return pouchDB.put(alarmDoc);
 }
 
-export function ackLatestAlarm({ pouchDB }) {
-
-    // Ack latest alarm in DB
-
-    return true;
+export function ackLatestAlarm({ pouchDB, data, currentTime }) {
+    data.getActiveAlarms()
+        .then(docs => docs[0])
+        .then(function(doc) {
+            if (!doc) return;
+            doc.ack = currentTime();
+            return data.updateAlarm(doc);
+        });
 }
 
 export function legacyPost({ pouchDB }, data) {
