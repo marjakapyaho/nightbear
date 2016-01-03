@@ -1,7 +1,7 @@
 import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
 
-xdescribe('entries input and output', () => {
+describe('entries input and output', () => {
 
     const { assertEqual, serially } = testUtils;
     let app, get, post;
@@ -17,8 +17,8 @@ xdescribe('entries input and output', () => {
     it('interprets sensor change correctly', () => {
         return serially(ENTRIES.map(data => () => post('/api/v1/entries', data)))
             .then(() => get('/api/entries'))
-            .then(res => assertEqual(
-                res.data,
+            .then(entries => assertEqual(
+                entries,
                 [
                     { time: 1451470224000, sugar: '7.6', is_raw: false },
                     { time: 1451470524000, sugar: '7.7', is_raw: false },
