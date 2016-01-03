@@ -60,7 +60,7 @@ var circles = range(45).map(function() {
     return new UI.Circle({
         position: new Vector2(0, -5),
         radius: 1,
-        backgroundColor: 'white',
+        backgroundColor: 'white'
     });
 });
 
@@ -68,7 +68,7 @@ var largerCircles = range(30).map(function() {
     return new UI.Circle({
         position: new Vector2(0, -5),
         radius: 4,
-        backgroundColor: 'white',
+        backgroundColor: 'white'
     });
 });
 
