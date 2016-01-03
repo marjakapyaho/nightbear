@@ -1,8 +1,7 @@
-import * as data from './data';
-
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const DIRECTION_NOT_COMPUTABLE = 'NOT COMPUTABLE'; // when direction not computable, use raw sensor data instead
+export const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
 
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {

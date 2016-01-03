@@ -1,26 +1,26 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-export function createExpressServer({ api }, staticAssetsPath) {
+export function createExpressServer({ data }, staticAssetsPath) {
 
     const server = express().use(bodyParser.json());
 
     server.post('/api/v1/entries', function(req, res) {
-        api.nightscoutUploaderPost(req.body).then(
+        data.nightscoutUploaderPost(req.body).then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );
     });
 
     server.get('/api/v1/status', function(req, res) {
-        api.getAlarms().then(
+        data.getActiveAlarms().then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );
     });
 
     server.post('/api/v1/status', function(req, res) {
-        api.ackAlarm(req.body).then(
+        data.ackLatestAlarm(req.body).then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );
@@ -29,14 +29,14 @@ export function createExpressServer({ api }, staticAssetsPath) {
     // LEGACY URLS
 
     server.get('/api/entries', function(req, res) {
-        api.getLegacyEntries(req.query.hours ? parseFloat(req.query.hours) : undefined).then(
+        data.getLegacyEntries(req.query.hours ? parseFloat(req.query.hours) : undefined).then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );
     });
 
     server.post('/api/entries', function(req, res) {
-        api.legacyPost(req.body).then(
+        data.legacyPost(req.body).then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );

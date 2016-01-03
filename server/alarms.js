@@ -1,6 +1,5 @@
 import * as helpers from './helpers';
 import * as analyser from './analyser';
-import * as data from './data';
 import _ from 'lodash';
 
 export const ALARM_SNOOZE_TIMES = {
@@ -22,7 +21,7 @@ export function runChecks({ data, currentTime }) {
         data.getActiveAlarms(true) // include acknowledged alarms
     ]).then(
         function([ entries, treatments, alarms ]) {
-            doChecks(entries, treatments, alarms, currentTime);
+            doChecks(entries, treatments, alarms, currentTime, data);
         },
         function(err) {
             console.log('Failed with error', err);
@@ -31,7 +30,7 @@ export function runChecks({ data, currentTime }) {
 }
 
 // TODO: use treatments in analysis
-function doChecks(entries, treatments, activeAlarms, currentTime) {
+function doChecks(entries, treatments, activeAlarms, currentTime, data) {
 
     // Analyse current status
     var analysisResults =  analyser.analyseData(entries);

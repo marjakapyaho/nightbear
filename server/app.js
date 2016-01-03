@@ -1,6 +1,6 @@
-import * as api from './api';
 import * as data from './data';
 import * as server from './server';
+import * as alarms from './alarms';
 import _ from 'lodash';
 
 function bind(module, app) {
@@ -19,7 +19,7 @@ export default function(pouchDB, currentTime) {
         currentTime // currentTime() == Date.now()
     };
     app.data = bind(data, app);
-    app.api = bind(api, app);
     app.server = bind(server, app);
+    app.alarms = bind(alarms, app);
     return app;
 }

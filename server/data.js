@@ -1,5 +1,31 @@
 import PouchDB from 'pouchdb';
-import { isoTimestamp, HOUR_IN_MS } from './helpers';
+import * as helpers from './helpers';
+
+// @example dbPUT('sensor-entries', { ... }) => Promise
+function dbPUT(pouchDB, collection, data) {
+    const object = _.extend({ _id: collection + '/' + helpers.isoTimestamp(data.date) }, data);
+    return pouchDB.put(object).then(
+        success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
+        failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+    );
+}
+
+export function nightscoutUploaderPost({ pouchDB, data }, datum) {
+    if (datum.type === 'sgv') {
+        return data.getLatestCalibration()
+            .then(cal => helpers.setActualGlucose(datum, cal))
+            .then(data => dbPUT(pouchDB, 'sensor-entries', data));
+    }
+    else if (datum.type === 'mbg') {
+        return dbPUT(pouchDB, 'meter-entries', datum);
+    }
+    else if (datum.type === 'cal') {
+        return dbPUT(pouchDB, 'calibrations', datum);
+    }
+    else {
+        return Promise.reject('Unknown data type');
+    }
+}
 
 // Promises the single latest calibration doc
 export function getLatestCalibration({ pouchDB }) {
@@ -17,8 +43,8 @@ export function getLatestCalibration({ pouchDB }) {
 export function getLatestEntries({ pouchDB, currentTime }, durationMs) {
     return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
-        startkey: 'sensor-entries/' + isoTimestamp(currentTime() - durationMs),
-        endkey: 'sensor-entries/' + isoTimestamp(currentTime())
+        startkey: 'sensor-entries/' + helpers.isoTimestamp(currentTime() - durationMs),
+        endkey: 'sensor-entries/' + helpers.isoTimestamp(currentTime())
     })
     .then(res => res.rows.map(row => row.doc));
 }
@@ -27,8 +53,8 @@ export function getLatestEntries({ pouchDB, currentTime }, durationMs) {
 export function getLatestTreatments({ pouchDB, currentTime }, durationMs) {
     return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
-        startkey: 'treatments/' + isoTimestamp(currentTime() - durationMs),
-        endkey: 'treatments/' + isoTimestamp(currentTime())
+        startkey: 'treatments/' + helpers.isoTimestamp(currentTime() - durationMs),
+        endkey: 'treatments/' + helpers.isoTimestamp(currentTime())
     })
     .then(res => res.rows.map(row => row.doc));
 }
@@ -47,7 +73,7 @@ export function getActiveAlarms({ pouchDB }, includeAcks) {
 
 export function createAlarm({ pouchDB, currentTime }, type, level) {
     let newAlarm = {
-        _id: 'alarms/' + isoTimestamp(currentTime()),
+        _id: 'alarms/' + helpers.isoTimestamp(currentTime()),
         type: type, // analyser status constants
         status: 'active',
         level: level,
@@ -72,4 +98,53 @@ export function ackLatestAlarm({ pouchDB }) {
     // Ack latest alarm in DB
 
     return true;
+}
+
+export function legacyPost({ pouchDB }, data) {
+    console.log('legacyPost()', 'Incoming data:', data);
+    return pouchDB.get('treatments/' + helpers.isoTimestamp(data.time))
+        .catch(() => {
+            console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
+            return {
+                eventType: helpers.DEFAULT_TREATMENT_TYPE,
+                created_at: new Date(data.time).toISOString(),
+                date: data.time, // NOTE: This is a NON-STANDARD field, only used by Nightbear
+                enteredBy: 'Nightbear Web UI'
+            };
+        })
+        .then(doc => {
+            if (data.insulin) doc.insulin = data.insulin; else delete doc.insulin;
+            if (data.carbs) doc.carbs = data.carbs; else delete doc.carbs;
+            // TODO: if (data.sugar)..?
+            return dbPUT(pouchDB, 'treatments', doc);
+        });
+}
+
+export function getLegacyEntries({ data }, hours = 12) {
+    return Promise.all([
+        data.getLatestEntries(hours * helpers.HOUR_IN_MS),
+        data.getLatestTreatments(hours * helpers.HOUR_IN_MS)
+    ]).then(([ entries, treatments ]) =>
+        _(entries.concat(treatments))
+            .groupBy(entry => entry.date)
+            .map(group => _.merge.apply(_, group)) // if there's multiple entries/treatments with the same timestamp, merge them into one
+            .map(entry => ({
+                time: entry.date,
+                carbs: entry.carbs,
+                insulin: entry.insulin,
+                sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
+                is_raw: entry.nb_glucose_value && entry.direction === helpers.DIRECTION_NOT_COMPUTABLE
+            }))
+            .sortBy(entry => entry.time) // return in chronological order
+            .value()
+    ).then(
+        data => {
+            console.log('getLegacyEntries()', 'Returning:', data.length);
+            return data;
+        },
+        err => {
+            console.log('getLegacyEntries()', 'Failed:', err);
+            return Promise.reject(err);
+        }
+    );
 }
