@@ -10,11 +10,13 @@ export const ALARM_SNOOZE_TIMES = {
     [analyser.STATUS_FALLING]: 10
 };
 
-export function initAlarms() {
-    setInterval(runChecks, 5 * helpers.MIN_IN_MS);
+export function initAlarms({ alarms }) {
+    alarms.runChecks();
+    setInterval(alarms.runChecks, 5 * helpers.MIN_IN_MS);
 }
 
 export function runChecks({ data, currentTime }) {
+    console.log('Running alarm checks');
     Promise.all([
         data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
         data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
@@ -41,6 +43,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
     var matchingAlarmFound = false;
 
     _.each(activeAlarms, function(alarm) {
+        console.log('Found active alarm:', alarm);
         alarm.level = alarm.level++;
 
         // Are we still having the same alarm
@@ -68,6 +71,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
 
     // There there was no previous matching alarm, create new one
     if (!matchingAlarmFound) {
+        console.log('Create new alarm with status', currentStatus);
         data.createAlarm(currentStatus, 1); // Initial alarm level
     }
 }
