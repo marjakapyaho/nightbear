@@ -2,5 +2,5 @@ language: node_js
 node_js:
   - "4.1"
 
-install: cd server && npm install
-script: cd server && npm test
+# https://docs.travis-ci.com/user/customizing-the-build/#The-Build-Lifecycle
+before_install: cd server
