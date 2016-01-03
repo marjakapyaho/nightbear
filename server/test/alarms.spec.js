@@ -78,6 +78,14 @@ describe('basic alarm checks', () => {
                 "status": "active",
                 "type": "falling"
             }]))
+
+            // Alarm cleared
+            .then(() => post('/api/v1/entries', ENTRIES[9]))
+            .then(() => post('/api/v1/entries', ENTRIES[10]))
+            .then(() => setCurrentTime(ENTRIES[10].date + 1000))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(alarms => assertEqual(stripMetaFields(alarms), []))
     });
 
 });

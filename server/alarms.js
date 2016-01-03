@@ -115,15 +115,15 @@ function clearAlarmOfType(type, latestDataPoint) {
             return true;
         }
     }
-    else if( type === analyser.STATUS_LOW) {
+    else if (type === analyser.STATUS_LOW) {
         if (latestDataPoint > analyser.getProfile().LOW_LEVEL_ABS + 2) {
             return true;
         }
     }
-    else if( type === analyser.STATUS_RISING) {
+    else if (type === analyser.STATUS_RISING) {
         return true;
     }
-    else if( type === analyser.STATUS_FALLING) {
+    else if(type === analyser.STATUS_FALLING) {
         return true;
     }
 
