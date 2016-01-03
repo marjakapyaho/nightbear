@@ -8,14 +8,14 @@ export const STATUS_RISING = 'rising';
 export const STATUS_FALLING = 'falling';
 export const STATUS_OK = 'ok';
 
-export function analyseData(data) {
+export function analyseData({ currentTime }, entries) {
     var profile = getProfile();
 
-    if (data.length < 1) {
+    if (entries.length < 1) {
         return STATUS_OUTDATED;
     }
 
-    let latestDataPoint = _.sortBy(data, 'date')[0];
+    let latestDataPoint = _.sortBy(entries, 'date')[entries.length - 1];
     let latestTime = latestDataPoint.date;
     let latestGlucoseValue = latestDataPoint.nb_glucose_value;
     let latestDirection = latestDataPoint.direction;

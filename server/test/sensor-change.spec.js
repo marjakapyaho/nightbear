@@ -1,7 +1,7 @@
 import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
 
-describe('entries input and output', () => {
+xdescribe('entries input and output', () => {
 
     const { assertEqual, serially } = testUtils;
     let app, get, post;

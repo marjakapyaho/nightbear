@@ -5,10 +5,10 @@ import _ from 'lodash';
 // @example dbPUT('sensor-entries', { ... }) => Promise
 function dbPUT(pouchDB, collection, data) {
     const object = _.extend({ _id: collection + '/' + helpers.isoTimestamp(data.date) }, data);
-    return pouchDB.put(object).then(
+    return pouchDB.put(object)/*.then(
         success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
         failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
-    );
+    );*/
 }
 
 export function nightscoutUploaderPost({ pouchDB, data }, datum) {
@@ -92,7 +92,7 @@ export function updateAlarm({ pouchDB }, alarmDoc) {
 }
 
 export function ackLatestAlarm({ pouchDB, data, currentTime }) {
-    data.getActiveAlarms()
+    return data.getActiveAlarms()
         .then(docs => docs[0])
         .then(function(doc) {
             if (!doc) return;

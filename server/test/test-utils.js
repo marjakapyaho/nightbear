@@ -35,8 +35,8 @@ export function createTestApp() {
             });
         },
         setCurrentTime: newTime => fakeCurrentTime = newTime,
-        get: url => axios.get(httpHostPrefix + url),
-        post: (url, data) => axios.post(httpHostPrefix + url, data)
+        get: url => axios.get(httpHostPrefix + url).then(res => res.data),
+        post: (url, data) => axios.post(httpHostPrefix + url, data).then(res => res.data)
     };
     return app;
 }

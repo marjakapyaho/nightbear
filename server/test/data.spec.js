@@ -2,7 +2,7 @@ import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
 import * as analyser from '../analyser';
 
-describe('data', () => {
+xdescribe('data', () => {
 
     const { assertEqual, stripMetaFields } = testUtils;
     let app;

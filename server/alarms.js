@@ -17,13 +17,13 @@ export function initAlarms({ alarms }) {
 
 export function runChecks({ data, currentTime }) {
     console.log('Running alarm checks');
-    Promise.all([
+    return Promise.all([
         data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
         data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
         data.getActiveAlarms(true) // include acknowledged alarms
     ]).then(
         function([ entries, treatments, alarms ]) {
-            doChecks(entries, treatments, alarms, currentTime, data);
+            return doChecks(entries, treatments, alarms, currentTime, data);
         },
         function(err) {
             console.log('Failed with error', err);
@@ -34,17 +34,23 @@ export function runChecks({ data, currentTime }) {
 // TODO: use treatments in analysis
 function doChecks(entries, treatments, activeAlarms, currentTime, data) {
 
+    let operations = [];
+
     // Analyse current status
-    var analysisResults =  analyser.analyseData(entries);
-    var currentStatus = analysisResults.status;
-    var latestDataPoint = analysisResults.data;
+    let analysisResults = analyser.analyseData({ currentTime }, entries);
+    let currentStatus = analysisResults.status;
+    let latestDataPoint = analysisResults.data;
 
     // Analyse each active alarm in regards to their clear conditions and current status
-    var matchingAlarmFound = false;
+    let matchingAlarmFound = false;
 
     _.each(activeAlarms, function(alarm) {
         console.log('Found active alarm:', alarm);
-        alarm.level = alarm.level++;
+
+        // Advance alarm level if alarm not acknowledged
+        if (!alarm.ack) {
+            alarm.level++;
+        }
 
         // Are we still having the same alarm
         if (currentStatus === alarm.type) {
@@ -57,10 +63,11 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
         // Release ack lock if enough time has passed
         if(unAckAlarm(alarm.type, alarm.ack, currentTime)) {
             alarm.ack = false;
+            alarm.level = 1;
         }
 
         // Update alarm in DB to match new level (and possibly status and ack)
-        data.updateAlarm(alarm);
+        operations.push(data.updateAlarm(alarm));
 
         // If alarm is not acknowledged and is still active,
         // send alarm according to new updated level
@@ -70,10 +77,12 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
     });
 
     // There there was no previous matching alarm, create new one
-    if (!matchingAlarmFound) {
+    if (!matchingAlarmFound && currentStatus !== analyser.STATUS_OK) {
         console.log('Create new alarm with status', currentStatus);
-        data.createAlarm(currentStatus, 1); // Initial alarm level
+        operations.push(data.createAlarm(currentStatus, 1)); // Initial alarm level
     }
+
+    return Promise.all(operations);
 }
 
 export function sendAlarm(level) {

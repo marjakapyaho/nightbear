@@ -1,6 +1,7 @@
 import * as data from './data';
 import * as server from './server';
 import * as alarms from './alarms';
+import * as analyser from './analyser';
 import _ from 'lodash';
 
 function bind(module, app) {
@@ -21,5 +22,6 @@ export default function(pouchDB, currentTime) {
     app.data = bind(data, app);
     app.server = bind(server, app);
     app.alarms = bind(alarms, app);
+    app.analyser = bind(analyser, app);
     return app;
 }
