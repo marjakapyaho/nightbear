@@ -15,7 +15,7 @@ export function initAlarms({ alarms }) {
     setInterval(alarms.runChecks, 5 * helpers.MIN_IN_MS);
 }
 
-export function runChecks({ data, currentTime }) {
+export function runChecks({ data, currentTime, pushover }) {
     console.log('Running alarm checks');
     return Promise.all([
         data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
@@ -23,7 +23,7 @@ export function runChecks({ data, currentTime }) {
         data.getActiveAlarms(true) // include acknowledged alarms
     ]).then(
         function([ entries, treatments, alarms ]) {
-            return doChecks(entries, treatments, alarms, currentTime, data);
+            return doChecks(entries, treatments, alarms, currentTime, data, pushover);
         },
         function(err) {
             console.log('Failed with error', err);
@@ -31,8 +31,7 @@ export function runChecks({ data, currentTime }) {
     );
 }
 
-// TODO: use treatments in analysis
-function doChecks(entries, treatments, activeAlarms, currentTime, data) {
+function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover) {
 
     let operations = [];
 
@@ -72,7 +71,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
         // If alarm is not acknowledged and is still active,
         // send alarm according to new updated level
         if (!alarm.ack && alarm.status === 'active') {
-            sendAlarm(alarm.level);
+            sendAlarm(pushover, alarm.level, alarm.type);
         }
     });
 
@@ -85,16 +84,33 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data) {
     return Promise.all(operations);
 }
 
-export function sendAlarm(level) {
+function sendAlarm(pushover, level, type) {
+    let msg = {
+        message: type,
+        title: "NightBear alert",
+        sound: 'persistent',
+        device: process.env['PUSHOVER_LEVEL_1'],
+        priority: 2,
+        retry: 60, // TODO 30?
+        expire: 3600
+    };
+
     if (level === 2) {
-        // Send out pushover level 2
+        msg.device = process.env['PUSHOVER_LEVEL_1'];
     }
     else if (level === 3) {
-        // Send out pushover level 3
+        msg.device = process.env['PUSHOVER_LEVEL_2'];
     }
     else if (level === 4) {
-        // Send out pushover level 4
+        msg.device = process.env['PUSHOVER_LEVEL_3'];
     }
+
+    pushover.send(msg, function(err, result) {
+        if ( err ) {
+            throw err;
+        }
+        console.log(result);
+    });
 }
 
 function unAckAlarm(type, ack, currentTime) {

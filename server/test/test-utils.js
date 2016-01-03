@@ -23,7 +23,12 @@ export function createTestApp() {
     const currentTime = () => fakeCurrentTime;
     const dbName = Date.now() + ''; // even though the in-memory DB's get dumped when the test suite exits, DB's with the same name will SHARE data during runtime
     const pouchDB = new PouchDB(dbName, { db: MemDOWN }); // http://pouchdb.com/adapters.html#pouchdb_in_node_js
-    const app = createAppInstance(pouchDB, currentTime);
+    const fakePushover = {
+        send: function(data) {
+            console.log('Sent PUSHOVER alert with data', data);
+        }
+    };
+    const app = createAppInstance(pouchDB, currentTime, fakePushover);
     let httpHostPrefix;
     app.__test = { // attach some helpful utilities for interacting with the test app we created
         createTestServer() {

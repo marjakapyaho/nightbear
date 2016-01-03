@@ -14,10 +14,11 @@ function bind(module, app) {
     });
 }
 
-export default function(pouchDB, currentTime) {
+export default function(pouchDB, currentTime, pushover) {
     const app = {
         pouchDB,
-        currentTime // currentTime() == Date.now()
+        currentTime, // currentTime() == Date.now()
+        pushover
     };
     app.data = bind(data, app);
     app.server = bind(server, app);
