@@ -1,33 +1,23 @@
 import ENTRIES from './sensor-change.json';
-import createAppInstance from '../app';
-import axios from 'axios';
-import PouchDB from 'pouchdb';
-import MemDOWN from 'memdown';
-import { assert } from 'chai';
+import * as testUtils from './test-utils';
 
 describe('entries input and output', () => {
 
-    let app, port;
+    const { assertEqual, serially } = testUtils;
+    let app, get, post;
 
-    const currentTime = () => 1451472024000 + 1000; // 1 sec after the last entry in ENTRIES
-
-    beforeEach(function(done) {
-        const pouchDB = new PouchDB('test', { db: MemDOWN }); // http://pouchdb.com/adapters.html#pouchdb_in_node_js
-        app = createAppInstance(pouchDB, currentTime);
-        const server = app.server.createExpressServer().listen(0, function() {
-            port = server.address().port; // expose the OS-assigned random port for the rest of the test suite
-            done();
-        });
+    beforeEach(function() {
+        app = testUtils.createTestApp();
+        app.__test.setCurrentTime(1451472024000 + 1000); // 1 sec after the last entry in ENTRIES
+        get = app.__test.get;
+        post = app.__test.post;
+        return app.__test.createTestServer();
     });
-
-    const get = url => axios.get('http://localhost:' + port + url);
-    const post = (url, data) => axios.post('http://localhost:' + port + url, data);
-    const serially = callbacks => callbacks.reduce((prev, next) => prev.then(next), Promise.resolve());
 
     it('interprets sensor change correctly', () => {
         return serially(ENTRIES.map(data => () => post('/api/v1/entries', data)))
             .then(() => get('/api/entries'))
-            .then(res => assert.deepEqual(
+            .then(res => assertEqual(
                 res.data,
                 [
                     { time: 1451470224000, sugar: '7.6', is_raw: false },
