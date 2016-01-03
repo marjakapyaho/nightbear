@@ -1,11 +1,9 @@
 import PouchDB from 'pouchdb';
 import { timestamp, HOUR_IN_MS } from './helpers';
 
-const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
-
 // Promises the single latest calibration doc
-export function getLatestCalibration() {
-    return db.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+export function getLatestCalibration({ pouchDB }) {
+    return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
         descending: true,
         startkey: 'calibrations/_',
@@ -16,8 +14,8 @@ export function getLatestCalibration() {
 }
 
 // Promises entries from the last durationMs
-export function getLatestEntries(durationMs) {
-    return db.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+export function getLatestEntries({ pouchDB }, durationMs) {
+    return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
         startkey: 'sensor-entries/' + timestamp(Date.now() - durationMs),
         endkey: 'sensor-entries/' + timestamp()
@@ -26,8 +24,8 @@ export function getLatestEntries(durationMs) {
 }
 
 // Promises treatments from the last durationMs
-export function getLatestTreatments(durationMs) {
-    return db.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+export function getLatestTreatments({ pouchDB }, durationMs) {
+    return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
         startkey: 'treatments/' + timestamp(Date.now() - durationMs),
         endkey: 'treatments/' + timestamp()
@@ -36,16 +34,16 @@ export function getLatestTreatments(durationMs) {
 }
 
 // Promises two arrays, of most recent entries & treatments
-export function getDataForAnalysis() {
+export function getDataForAnalysis(app) {
     return Promise.all([
-        getLatestEntries(HOUR_IN_MS * 0.5),
-        getLatestTreatments(HOUR_IN_MS * 3)
+        getLatestEntries(app, HOUR_IN_MS * 0.5),
+        getLatestTreatments(app, HOUR_IN_MS * 3)
     ]);
 }
 
-export function getActiveAlarms() {
+export function getActiveAlarms({ pouchDB }) {
     // TODO HERE
-    return db.allDocs({
+    return pouchDB.allDocs({
             include_docs: true,
             startkey: 'alarms/' + timestamp(Date.now() - durationMs),
             endkey: 'alarms/' + timestamp()
@@ -53,7 +51,7 @@ export function getActiveAlarms() {
         .then(res => res.rows.map(row => row.doc));
 }
 
-export function createAlarm(type, level) {
+export function createAlarm({ pouchDB }, type, level) {
     let newAlarm = {
         _id: 'alarms/' + timestamp(),
         type: type, // analyser status constants
@@ -62,12 +60,12 @@ export function createAlarm(type, level) {
         ack: false // Date.now()
     };
 
-    return db.put(newAlarm).then(
+    return pouchDB.put(newAlarm).then(
         success => console.log('createAlarm()', newAlarm, '=>', success), // resolve with undefined
         failure => console.log('createAlarm()', newAlarm, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
     );
 }
 
-export function updateAlarm() {
+export function updateAlarm({ pouchDB }) {
     return true;
 }

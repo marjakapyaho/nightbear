@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
-import { getLatestCalibration, getLatestEntries, getLatestTreatments } from './data';
 
 const HOUR = 1000 * 60 * 60;
 const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
@@ -16,17 +15,17 @@ function dbPUT(collection, data) {
     );
 }
 
-export function nightscoutUploaderPost(data) {
-    if (data.type === 'sgv') {
+export function nightscoutUploaderPost(app, datum) {
+    if (datum.type === 'sgv') {
         return getLatestCalibration()
-            .then(cal => helpers.setActualGlucose(data, cal))
+            .then(cal => helpers.setActualGlucose(datum, cal))
             .then(data => dbPUT('sensor-entries', data));
     }
-    else if (data.type === 'mbg') {
-        return dbPUT('meter-entries', data);
+    else if (datum.type === 'mbg') {
+        return dbPUT('meter-entries', datum);
     }
-    else if (data.type === 'cal') {
-        return dbPUT('calibrations', data);
+    else if (datum.type === 'cal') {
+        return dbPUT('calibrations', datum);
     }
     else {
         return Promise.reject('Unknown data type');
@@ -41,10 +40,10 @@ export function ackAlarm(data) {
     return Promise.resolve(data.updateAlarm());
 }
 
-export function getLegacyEntries(hours = 12) {
+export function getLegacyEntries({ data }, hours = 12) {
     return Promise.all([
-        getLatestEntries(hours * HOUR),
-        getLatestTreatments(hours * HOUR)
+        data.getLatestEntries(hours * HOUR),
+        data.getLatestTreatments(hours * HOUR)
     ]).then(([ entries, treatments ]) =>
         _(entries.concat(treatments))
             .groupBy(entry => entry.date)

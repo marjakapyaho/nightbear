@@ -1,13 +1,17 @@
 import ENTRIES from './sensor-change.json';
-import createExpressServer from '../server';
+import createAppInstance from '../app';
 import axios from 'axios';
+import PouchDB from 'pouchdb';
+import MemDOWN from 'memdown';
 
 describe('entries input and output', () => {
 
-    let port;
+    let app, port;
 
     beforeEach(function(done) {
-        const server = createExpressServer().listen(0, function() {
+        const pouchDB = new PouchDB('test', { db: MemDOWN }); // http://pouchdb.com/adapters.html#pouchdb_in_node_js
+        app = createAppInstance(pouchDB);
+        const server = app.server.createExpressServer().listen(0, function() {
             port = server.address().port; // expose the OS-assigned random port for the rest of the test suite
             done();
         });
