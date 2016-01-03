@@ -1,3 +1,4 @@
+import PouchDB from 'pouchdb';
 import createAppInstance from './app';
 
 // TODO: Remove this conditional once we've settled on a UI hosting solution
