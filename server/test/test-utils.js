@@ -4,6 +4,7 @@ import axios from 'axios';
 import PouchDB from 'pouchdb';
 import MemDOWN from 'memdown';
 import { assert } from 'chai';
+import _ from 'lodash';
 
 export function serially(callbacks) {
     return callbacks.reduce((prev, next) => prev.then(next), Promise.resolve());
@@ -11,6 +12,10 @@ export function serially(callbacks) {
 
 export function assertEqual(actual, expected) {
     return assert.deepEqual(actual, expected);
+}
+
+export function stripMetaFields(doc) {
+    return _.isArray(doc) ? doc.map(stripMetaFields) : _.omit(doc, '_id', '_rev');
 }
 
 export function createTestApp() {

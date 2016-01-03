@@ -33,13 +33,14 @@ export function getLatestTreatments({ pouchDB, currentTime }, durationMs) {
     .then(res => res.rows.map(row => row.doc));
 }
 
-export function getActiveAlarms({ pouchDB, currentTime }, includeAcks) {
-    // TODO HERE
+const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
+
+export function getActiveAlarms({ pouchDB }, includeAcks) {
     // includeAcks --> if true include those with ack = TIMESTAMP
     return pouchDB.allDocs({
             include_docs: true,
-            startkey: 'alarms/' + isoTimestamp(currentTime() - durationMs),
-            endkey: 'alarms/' + isoTimestamp(currentTime())
+            startkey: 'alarms/',
+            endkey: 'alarms/' + END
         })
         .then(res => res.rows.map(row => row.doc));
 }
