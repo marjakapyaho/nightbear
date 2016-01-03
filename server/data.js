@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb';
 import * as helpers from './helpers';
+import _ from 'lodash';
 
 // @example dbPUT('sensor-entries', { ... }) => Promise
 function dbPUT(pouchDB, collection, data) {
