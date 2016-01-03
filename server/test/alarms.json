@@ -1,0 +1,102 @@
+[
+    {
+        "device": "dexcom",
+        "dateString": "Sun Jan 03 12:01:02 EET 2016",
+        "mbg": 220,
+        "date": 1451815262000,
+        "type": "mbg"
+    },
+    {
+        "device": "dexcom",
+        "scale": 1,
+        "dateString": "Sun Jan 03 12:10:08 EET 2016",
+        "date": 1451815808000,
+        "type": "cal",
+        "intercept": 30000,
+        "slope": 788.8442542907525
+    },
+    {
+        "unfiltered": 160096,
+        "filtered": 174752,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 174,
+        "sgv": 178,
+        "dateString": "Sun Jan 03 15:30:08 EET 2016",
+        "type": "sgv",
+        "date": 1451827808000,
+        "noise": 2
+    },
+    {
+        "unfiltered": 146080,
+        "filtered": 166432,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 174,
+        "sgv": 167,
+        "dateString": "Sun Jan 03 15:35:08 EET 2016",
+        "type": "sgv",
+        "date": 1451828108000,
+        "noise": 2
+    },
+    {
+        "unfiltered": 134368,
+        "filtered": 154912,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 423,
+        "sgv": 153,
+        "dateString": "Sun Jan 03 15:40:08 EET 2016",
+        "type": "sgv",
+        "date": 1451828408000,
+        "noise": 2
+    },
+    {
+        "unfiltered": 125376,
+        "filtered": 142016,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 176,
+        "sgv": 115,
+        "dateString": "Sun Jan 03 15:45:08 EET 2016",
+        "type": "sgv",
+        "date": 1451828708000,
+        "noise": 1
+    },
+    {
+        "unfiltered": 112080,
+        "filtered": 129488,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 425,
+        "sgv": 99,
+        "dateString": "Sun Jan 03 15:50:08 EET 2016",
+        "type": "sgv",
+        "date": 1451829008000,
+        "noise": 1
+    }
+    {
+        "unfiltered": 104176,
+        "filtered": 118368,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 161,
+        "sgv": 89,
+        "dateString": "Sun Jan 03 15:55:08 EET 2016",
+        "type": "sgv",
+        "date": 1451829308000,
+        "noise": 1
+    },
+    {
+        "unfiltered": 105376,
+        "filtered": 109696,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 168,
+        "sgv": 96,
+        "dateString": "Sun Jan 03 16:00:08 EET 2016",
+        "type": "sgv",
+        "date": 1451829608000,
+        "noise": 2
+    }
+]
