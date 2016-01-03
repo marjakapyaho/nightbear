@@ -36,8 +36,8 @@ export function getAlarms() {
     return Promise.resolve(data.getActiveAlarms());
 }
 
-export function ackAlarm(data) {
-    return Promise.resolve(data.updateAlarm());
+export function ackAlarm() {
+    return Promise.resolve(data.ackLatestAlarm());
 }
 
 export function getLegacyEntries({ data }, hours = 12) {

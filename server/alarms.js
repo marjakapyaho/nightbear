@@ -3,21 +3,26 @@ import * as analyser from './analyser';
 import * as data from './data';
 import _ from 'lodash';
 
+export const ALARM_SNOOZE_TIMES = {
+    [analyser.STATUS_OUTDATED]: 60,
+    [analyser.STATUS_HIGH]: 60,
+    [analyser.STATUS_LOW]: 15,
+    [analyser.STATUS_RISING]: 30,
+    [analyser.STATUS_FALLING]: 10
+};
+
 export function initAlarms() {
     setInterval(runChecks, 5 * helpers.MIN_IN_MS);
 }
 
-export function runChecks() {
+export function runChecks({ data, currentTime }) {
     Promise.all([
-        data.getDataForAnalysis(),
-        data.getActiveAlarms()
+        data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
+        data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
+        data.getActiveAlarms(true) // include acknowledged alarms
     ]).then(
-        function(res) {
-            var entries = res[0] ? res[0][0] : [];
-            var treatments = res[0] ? res[0][1] : [];
-            var alarms = res[1] || [];
-
-            doChecks(entries, treatments, alarms);
+        function([ entries, treatments, alarms ]) {
+            doChecks(entries, treatments, alarms, currentTime);
         },
         function(err) {
             console.log('Failed with error', err);
@@ -26,7 +31,7 @@ export function runChecks() {
 }
 
 // TODO: use treatments in analysis
-function doChecks(entries, treatments, activeAlarms) {
+function doChecks(entries, treatments, activeAlarms, currentTime) {
 
     // Analyse current status
     var analysisResults =  analyser.analyseData(entries);
@@ -39,16 +44,21 @@ function doChecks(entries, treatments, activeAlarms) {
     _.each(activeAlarms, function(alarm) {
         alarm.level = alarm.level++;
 
-        if (currentStatus = alarm.type) {
+        // Are we still having the same alarm
+        if (currentStatus === alarm.type) {
             matchingAlarmFound = true;
         }
-        else if(currentStatus !== analyser.STATUS_OUTDATED) {
-            // Check if clear conditions are met and clear if needed
-            if(clearAlarmOfType(alarm.type, latestDataPoint)) {
-                alarm.status = 'inactive';
-                data.updateAlarm(alarm);
-            }
+        else if(clearAlarmOfType(alarm.type, latestDataPoint)) { // or not
+            alarm.status = 'inactive';
         }
+
+        // Release ack lock if enough time has passed
+        if(unAckAlarm(alarm.type, alarm.ack, currentTime)) {
+            alarm.ack = false;
+        }
+
+        // Update alarm in DB to match new level (and possibly status and ack)
+        data.updateAlarm(alarm);
 
         // If alarm is not acknowledged and is still active,
         // send alarm according to new updated level
@@ -57,10 +67,9 @@ function doChecks(entries, treatments, activeAlarms) {
         }
     });
 
-    // There there was no previous matching alarm, create one
+    // There there was no previous matching alarm, create new one
     if (!matchingAlarmFound) {
-        var initialLevel = 1;
-        data.createAlarm(currentStatus, initialLevel);
+        data.createAlarm(currentStatus, 1); // Initial alarm level
     }
 }
 
@@ -76,11 +85,20 @@ export function sendAlarm(level) {
     }
 }
 
+function unAckAlarm(type, ack, currentTime) {
+    if (!ack) return;
+
+    let ackTimeInMillis = ALARM_SNOOZE_TIMES[type] * helpers.HOUR_IN_MS;
+
+    // If more time has passed since ack then this type allows, return true
+    return currentTime() - ack >= ackTimeInMillis;
+}
+
 function clearAlarmOfType(type, latestDataPoint) {
     if( type === analyser.STATUS_OUTDATED) {
         return true; // Always clear if current status is no longer outdated
     }
-    else if( type === analyser.STATUS_HIGH) {
+    else if (type === analyser.STATUS_HIGH) {
         if (latestDataPoint < analyser.getProfile().HIGH_LEVEL_ABS - 2) {
             return true;
         }

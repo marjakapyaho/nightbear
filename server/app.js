@@ -16,7 +16,7 @@ function bind(module, app) {
 export default function(pouchDB, currentTime) {
     const app = {
         pouchDB,
-        currentTime
+        currentTime // currentTime() == Date.now()
     };
     app.data = bind(data, app);
     app.api = bind(api, app);

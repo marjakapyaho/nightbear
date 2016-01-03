@@ -33,16 +33,9 @@ export function getLatestTreatments({ pouchDB, currentTime }, durationMs) {
     .then(res => res.rows.map(row => row.doc));
 }
 
-// Promises two arrays, of most recent entries & treatments
-export function getDataForAnalysis(app) {
-    return Promise.all([
-        getLatestEntries(app, HOUR_IN_MS * 0.5),
-        getLatestTreatments(app, HOUR_IN_MS * 3)
-    ]);
-}
-
-export function getActiveAlarms({ pouchDB, currentTime }) {
+export function getActiveAlarms({ pouchDB, currentTime }, includeAcks) {
     // TODO HERE
+    // includeAcks --> if true include those with ack = TIMESTAMP
     return pouchDB.allDocs({
             include_docs: true,
             startkey: 'alarms/' + isoTimestamp(currentTime() - durationMs),
@@ -66,6 +59,16 @@ export function createAlarm({ pouchDB, currentTime }, type, level) {
     );
 }
 
-export function updateAlarm({ pouchDB }) {
+export function updateAlarm({ pouchDB }, alarmData) {
+
+    // Upsert alarm with given alarm data
+
+    return true;
+}
+
+export function ackLatestAlarm({ pouchDB }) {
+
+    // Ack latest alarm in DB
+
     return true;
 }
