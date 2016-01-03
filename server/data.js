@@ -62,14 +62,18 @@ export function getLatestTreatments({ pouchDB, currentTime }, durationMs) {
 
 const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 
-export function getActiveAlarms({ pouchDB }, includeAcks) {
-    // includeAcks --> if true include those with ack = TIMESTAMP
+export function getActiveAlarms({ pouchDB }, includeAcks = false) {
     return pouchDB.allDocs({
             include_docs: true,
             startkey: 'alarms/',
             endkey: 'alarms/' + END
         })
-        .then(res => res.rows.map(row => row.doc));
+        .then(res => res.rows.map(row => row.doc))
+        .then(docs => docs.filter(doc => ( // TODO: Move this filtering into a db.find(), this is wildly inefficient on larger datasets!
+            (!doc.ack || doc.ack && includeAcks)
+            &&
+            doc.status === 'active'
+        )));
 }
 
 export function createAlarm({ pouchDB, currentTime }, type, level) {
