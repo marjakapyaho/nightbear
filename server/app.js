@@ -13,8 +13,11 @@ function bind(module, app) {
     });
 }
 
-export default function(pouchDB) {
-    const app = { pouchDB };
+export default function(pouchDB, currentTime) {
+    const app = {
+        pouchDB,
+        currentTime
+    };
     app.data = bind(data, app);
     app.api = bind(api, app);
     app.server = bind(server, app);

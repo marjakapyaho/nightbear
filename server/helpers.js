@@ -10,8 +10,8 @@ export function setActualGlucose(entry, latestCalibration) {
     return entry;
 }
 
-// @example timestamp(1448805744000) => "2015-11-29T14:02:24Z"
-export function timestamp(timeInMs = Date.now()) {
+// @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
+export function isoTimestamp(timeInMs) {
     return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
 }
 

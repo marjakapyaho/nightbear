@@ -1,5 +1,5 @@
 import PouchDB from 'pouchdb';
-import { timestamp, HOUR_IN_MS } from './helpers';
+import { isoTimestamp, HOUR_IN_MS } from './helpers';
 
 // Promises the single latest calibration doc
 export function getLatestCalibration({ pouchDB }) {
@@ -14,21 +14,21 @@ export function getLatestCalibration({ pouchDB }) {
 }
 
 // Promises entries from the last durationMs
-export function getLatestEntries({ pouchDB }, durationMs) {
+export function getLatestEntries({ pouchDB, currentTime }, durationMs) {
     return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
-        startkey: 'sensor-entries/' + timestamp(Date.now() - durationMs),
-        endkey: 'sensor-entries/' + timestamp()
+        startkey: 'sensor-entries/' + isoTimestamp(currentTime() - durationMs),
+        endkey: 'sensor-entries/' + isoTimestamp(currentTime())
     })
     .then(res => res.rows.map(row => row.doc));
 }
 
 // Promises treatments from the last durationMs
-export function getLatestTreatments({ pouchDB }, durationMs) {
+export function getLatestTreatments({ pouchDB, currentTime }, durationMs) {
     return pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
         include_docs: true,
-        startkey: 'treatments/' + timestamp(Date.now() - durationMs),
-        endkey: 'treatments/' + timestamp()
+        startkey: 'treatments/' + isoTimestamp(currentTime() - durationMs),
+        endkey: 'treatments/' + isoTimestamp(currentTime())
     })
     .then(res => res.rows.map(row => row.doc));
 }
@@ -41,19 +41,19 @@ export function getDataForAnalysis(app) {
     ]);
 }
 
-export function getActiveAlarms({ pouchDB }) {
+export function getActiveAlarms({ pouchDB, currentTime }) {
     // TODO HERE
     return pouchDB.allDocs({
             include_docs: true,
-            startkey: 'alarms/' + timestamp(Date.now() - durationMs),
-            endkey: 'alarms/' + timestamp()
+            startkey: 'alarms/' + isoTimestamp(currentTime() - durationMs),
+            endkey: 'alarms/' + isoTimestamp(currentTime())
         })
         .then(res => res.rows.map(row => row.doc));
 }
 
-export function createAlarm({ pouchDB }, type, level) {
+export function createAlarm({ pouchDB, currentTime }, type, level) {
     let newAlarm = {
-        _id: 'alarms/' + timestamp(),
+        _id: 'alarms/' + isoTimestamp(currentTime()),
         type: type, // analyser status constants
         status: 'active',
         level: level,

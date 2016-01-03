@@ -7,25 +7,25 @@ const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but 
 const db = new PouchDB(process.env.DB_URL, { skip_setup: true });
 
 // @example dbPUT('sensor-entries', { ... }) => Promise
-function dbPUT(collection, data) {
-    const object = _.extend({ _id: collection + '/' + helpers.timestamp(data.date) }, data);
-    return db.put(object).then(
+function dbPUT(pouchDB, collection, data) {
+    const object = _.extend({ _id: collection + '/' + helpers.isoTimestamp(data.date) }, data);
+    return pouchDB.put(object).then(
         success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
         failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
     );
 }
 
-export function nightscoutUploaderPost(app, datum) {
+export function nightscoutUploaderPost({ pouchDB, data }, datum) {
     if (datum.type === 'sgv') {
-        return getLatestCalibration()
+        return data.getLatestCalibration()
             .then(cal => helpers.setActualGlucose(datum, cal))
-            .then(data => dbPUT('sensor-entries', data));
+            .then(data => dbPUT(pouchDB, 'sensor-entries', data));
     }
     else if (datum.type === 'mbg') {
-        return dbPUT('meter-entries', datum);
+        return dbPUT(pouchDB, 'meter-entries', datum);
     }
     else if (datum.type === 'cal') {
-        return dbPUT('calibrations', datum);
+        return dbPUT(pouchDB, 'calibrations', datum);
     }
     else {
         return Promise.reject('Unknown data type');
@@ -69,9 +69,9 @@ export function getLegacyEntries({ data }, hours = 12) {
     );
 }
 
-export function legacyPost(data) {
+export function legacyPost({ pouchDB }, data) {
     console.log('legacyPost()', 'Incoming data:', data);
-    return db.get('treatments/' + helpers.timestamp(data.time))
+    return pouchDB.get('treatments/' + helpers.isoTimestamp(data.time))
         .catch(() => {
             console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
             return {
@@ -85,6 +85,6 @@ export function legacyPost(data) {
             if (data.insulin) doc.insulin = data.insulin; else delete doc.insulin;
             if (data.carbs) doc.carbs = data.carbs; else delete doc.carbs;
             // TODO: if (data.sugar)..?
-            return dbPUT('treatments', doc);
+            return dbPUT(pouchDB, 'treatments', doc);
         });
 }

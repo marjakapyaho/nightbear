@@ -20,7 +20,7 @@ export function analyseData(data) {
     let latestGlucoseValue = latestDataPoint.nb_glucose_value;
     let latestDirection = latestDataPoint.direction;
 
-    if (Date.now() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
+    if (currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
         return { status: STATUS_OUTDATED, data: latestDataPoint };
     }
     else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
