@@ -98,5 +98,29 @@
         "type": "sgv",
         "date": 1451829608000,
         "noise": 2
+    },
+    {
+        "unfiltered": 98816,
+        "filtered": 103744,
+        "direction": "SingleDown",
+        "device": "dexcom",
+        "rssi": 170,
+        "sgv": 88,
+        "dateString": "Sun Jan 03 16:05:08 EET 2016",
+        "type": "sgv",
+        "date": 1451829908000,
+        "noise": 2
+    },
+    {
+        "unfiltered": 99888,
+        "filtered": 100640,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 176,
+        "sgv": 84,
+        "dateString": "Sun Jan 03 16:10:08 EET 2016",
+        "type": "sgv",
+        "date": 1451830208000,
+        "noise": 2
     }
 ]
