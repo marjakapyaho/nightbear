@@ -13,9 +13,11 @@ var X_WIDTH = 144;
 var Y_START = 160;
 var PIXELS_PER_MS = X_WIDTH / (3 * 60 * 60 * 1000); // 3 hours
 var PIXELS_PER_MMOL = 4;
+var DISCONNECT_ALARM_TRESHOLD = 10;
 
 var alarmCleared = false;
 var alarmOn = false;
+var disconnectedRounds = 0;
 
 var bearWindow = new UI.Window({
     fullscreen: true
@@ -105,6 +107,94 @@ function initApp() {
 }
 
 
+/** API calls **/
+
+function checkAlarmStatus() {
+    ajax({ url: BEAR_BASE_URL + '/status', type: 'json', headers: { 'accept': 'application/json' } },
+        function(alarms) {
+            console.log('Server returned', alarms.length, ' alarms');
+            disconnectedRounds = 0;
+
+            if (alarms.length > 0) {
+                Vibe.vibrate('double');
+                alarmOn = true;
+            }
+            else {
+                alarmOn = false;
+            }
+        },
+        function(err) {
+            console.log('Alarm status error', err);
+            checkIfDisconnected();
+        }
+    );
+}
+
+function clearAlarmOnServer() {
+    ajax({ url: BEAR_BASE_URL + '/status', method: 'post', type: 'json', headers: { 'accept': 'application/json' } },
+        function(data) {
+            console.log('Successfully cleared alarm from server');
+            disconnectedRounds = 0;
+        },
+        function(err) {
+            console.log('Alarm clear error:', err);
+            checkIfDisconnected();
+        }
+    );
+}
+
+function fetchNewData() {
+    console.log('Fetching new data');
+
+    ajax(
+        {
+            url: BEAR_URL,
+            type: 'json',
+            headers: {
+                'accept': 'application/json'
+            }
+        },
+        function(data) {
+            console.log('Successfully fetched bear data!');
+            disconnectedRounds = 0;
+
+            var sugarValue, bgColor;
+            var oneMinuteInMillis = 60*1000;
+            var lastDataPoint = data[data.length - 1];
+            var dataAge = (Date.now() - lastDataPoint.time) / oneMinuteInMillis;
+
+            // If data is fresh (less than two missed readings)
+            if (dataAge < 12) {
+                if (lastDataPoint.sugar) {
+                    sugarValue = lastDataPoint.sugar;
+                    bgColor = evaluateColor(parseInt(sugarValue, 10));
+                    upperRect.backgroundColor(bgColor);
+                }
+            }
+            else { // If data is outdated
+                sugarValue = '-';
+            }
+
+            // Only replace if we have something new or data is outdated
+            if (sugarValue) {
+                text.text(sugarValue);
+            }
+
+            // Draw new graph in any case
+            drawGraph(data);
+
+        },
+        function(error) {
+            console.log('Data fetch error: ' + error);
+
+            // Update text to show server connection fail
+            text.text(':(');
+
+            checkIfDisconnected();
+        }
+    );
+}
+
 /** Helpers **/
 
 function initAlarms() {
@@ -118,7 +208,6 @@ function initAlarms() {
         if (shakeLatest - shakePrevious < 10000) { // 30 sec
             clearAlarm();
         }
-
     });
 
     function clearAlarm() {
@@ -135,43 +224,6 @@ function initAlarms() {
 
         Pebble.showSimpleNotificationOnPebble('Alarm cleared', '');
     }
-}
-
-function checkAlarmStatus() {
-    ajax({ url: BEAR_BASE_URL + '/status', type: 'json', headers: { 'accept': 'application/json' } },
-        function(alarms) {
-            console.log('Server has', alarms.length, ' alarms');
-
-            var validAlarms = 0;
-            alarms.forEach(function(alarm) {
-                if (!alarm.ack) {
-                    validAlarms++;
-                }
-            });
-
-            if (validAlarms > 0) {
-                Vibe.vibrate('double');
-                alarmOn = true;
-            }
-            else {
-                alarmOn = false;
-            }
-        },
-        function(err) {
-            console.log('Error', err);
-        }
-    );
-}
-
-function clearAlarmOnServer() {
-    ajax({ url: BEAR_BASE_URL + '/status', method: 'post', type: 'json', headers: { 'accept': 'application/json' } },
-        function(data) {
-            console.log('Successfully cleared alarm from server');
-        },
-        function(err) {
-            console.log('Error', err);
-        }
-    );
 }
 
 function range(num) {
@@ -230,94 +282,15 @@ function drawGraph(data) {
     });
 }
 
-function fetchNewData() {
-    console.log('Fetching new data');
+function checkIfDisconnected() {
+    disconnectedRounds++;
 
-    ajax(
-        {
-            url: BEAR_URL,
-            type: 'json',
-            headers: {
-                'accept': 'application/json'
-            }
-        },
-        function(data) {
-            console.log('Successfully fetched bear data!');
-
-            var sugarValue = ':(';
-            var circleColor = 'darkGray';
-
-            var oneMinuteInMillis = 60*1000;
-            var lastDataPoint = data[data.length - 1];
-
-            var dataAge = (Date.now() - lastDataPoint.time) / oneMinuteInMillis;
-
-            // If data is fresh
-            if (dataAge < 11) {
-                if (lastDataPoint.sugar) {
-                    sugarValue = lastDataPoint.sugar;
-                    circleColor = evaluateColor(parseInt(sugarValue, 10));
-
-                    upperRect.backgroundColor(circleColor);
-
-                    if (shouldAlarm(lastDataPoint.sugar)) {
-                        Vibe.vibrate('double');
-                    }
-                }
-            }
-            else { // If data is outdated
-                sugarValue = '-';
-                alarmOn = true;
-                if (!alarmCleared) {
-                    Vibe.vibrate('double');
-                }
-            }
-
-            text.text(sugarValue);
-
-            drawGraph(data);
-
-        },
-        function(error) {
-            console.log('Failed fetching bear data: ' + error);
-            text.text('-');
-            alarmOn = true;
-            if (!alarmCleared) {
-                Vibe.vibrate('double');
-            }
-        }
-    );
-}
-
-// Used until server does this
-function shouldAlarm(value) {
-    var sugar = parseInt(value, 10);
-    var timeHours = new Date().getHours();
-    var mode = timeHours < 9 ? 'night' : 'day';
-    var upperLimit, lowerLimit;
-
-    if (mode === 'day') {
-        upperLimit = 14;
-        lowerLimit = 5.5;
-    }
-    else {
-        upperLimit = 17;
-        lowerLimit = 4.0;
-    }
-
-    if (sugar < lowerLimit || sugar > upperLimit) {
+    if (disconnectedRounds > DISCONNECT_ALARM_TRESHOLD) {
         alarmOn = true;
         if (!alarmCleared) {
-            console.log('send out alarm');
-            return true;
+            Vibe.vibrate('double');
         }
     }
-    else {
-        alarmOn = false;
-    }
-
-    console.log('no alarm given');
-    return false;
 }
 
 function startClock() {
