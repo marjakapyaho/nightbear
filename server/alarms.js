@@ -59,8 +59,8 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover
             alarm.status = 'inactive';
         }
 
-        // Release ack lock if enough time has passed
-        if(unAckAlarm(alarm.type, alarm.ack, currentTime)) {
+        // Release ack lock if enough time has passed and alarm is still active
+        if(alarm.status === 'active' && unAckAlarm(alarm.type, alarm.ack, currentTime)) {
             alarm.ack = false;
             alarm.level = 1;
         }
@@ -127,12 +127,12 @@ function clearAlarmOfType(type, latestDataPoint) {
         return true; // Always clear if current status is no longer outdated
     }
     else if (type === analyser.STATUS_HIGH) {
-        if (latestDataPoint < analyser.getProfile().HIGH_LEVEL_ABS - 2) {
+        if (latestDataPoint.nb_glucose_value < analyser.getProfile().HIGH_LEVEL_ABS - 2) {
             return true;
         }
     }
     else if (type === analyser.STATUS_LOW) {
-        if (latestDataPoint > analyser.getProfile().LOW_LEVEL_ABS + 2) {
+        if (latestDataPoint.nb_glucose_value > analyser.getProfile().LOW_LEVEL_ABS + 2) {
             return true;
         }
     }
