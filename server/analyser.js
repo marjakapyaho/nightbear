@@ -20,6 +20,15 @@ export function analyseData({ currentTime }, entries) {
     let latestGlucoseValue = latestDataPoint.nb_glucose_value;
     let latestDirection = latestDataPoint.direction;
 
+    // If we have no direction, calculate one
+    console.log('----------------------------------');
+    if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
+        latestDirection = calculateDirection(entries);
+        console.log('CALCULATED THIS:', latestDirection);
+    }
+
+    console.log('date', latestDataPoint.dateString)
+    console.log('LATEST', latestGlucoseValue);
     if (currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
         return { status: STATUS_OUTDATED, data: latestDataPoint };
     }
@@ -60,6 +69,57 @@ export function getProfile({ currentTime }) {
             TIME_SINCE_SGV_LIMIT: 30 * helpers.MIN_IN_MS
         };
     }
+}
+
+function calculateSlope(older, newer) {
+    return ((newer.nb_glucose_value - older.nb_glucose_value) / (newer.date - older.date)) * helpers.MIN_IN_MS * 5;
+}
+
+function calculateDirection(entries) {
+    let latest = _.slice(_.sortBy(entries, 'date'), -3);
+    let finalSlope, direction, slope1, slope2;
+
+    // If we have over one entry
+    if (latest.length === 2) {
+        slope1 = calculateSlope(latest[0], latest[1]);
+    }
+    else if (latest.length === 3) {
+        slope1 = calculateSlope(latest[0], latest[1]);
+        slope2 = calculateSlope(latest[1], latest[2]);
+
+        finalSlope = (slope1 + slope2) / 2; // TODO: do weighted average
+    }
+    else {
+        return helpers.DIRECTION_NOT_COMPUTABLE;
+    }
+
+    let limit1 = 0.3;
+    let limit2 = 0.7;
+    let limit3 = 1.3;
+
+    if (Math.abs(finalSlope) <= limit1) {
+        direction = 'Flat';
+    }
+    else if (finalSlope < -(limit1) && finalSlope >= -(limit2)) {
+        direction = 'FortyFiveDown';
+    }
+    else if (finalSlope > limit1 && finalSlope <= limit2) {
+        direction = 'FortyFiveUp';
+    }
+    else if (finalSlope < -(limit2) && finalSlope >= -(limit3)) {
+        direction = 'SingleDown';
+    }
+    else if (finalSlope > limit2 && finalSlope <= limit3) {
+        direction = 'SingleUp';
+    }
+    else if (finalSlope < -(limit3)) {
+        direction = 'DoubleDown';
+    }
+    else if (finalSlope > limit3) {
+        direction = 'DoubleUp';
+    }
+
+    return direction;
 }
 
 function detectDirection(direction) {

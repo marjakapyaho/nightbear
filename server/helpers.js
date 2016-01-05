@@ -1,11 +1,12 @@
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
+export const NOISE_LEVEL_LIMIT = 4;
 export const DIRECTION_NOT_COMPUTABLE = 'NOT COMPUTABLE'; // when direction not computable, use raw sensor data instead
 export const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
 
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {
-    entry.nb_glucose_value = changeSGVUnit(entry.direction !== DIRECTION_NOT_COMPUTABLE ? entry.sgv : calculateRaw(entry, latestCalibration));
+    entry.nb_glucose_value = changeSGVUnit(entry.noise < NOISE_LEVEL_LIMIT ? entry.sgv : calculateRaw(entry, latestCalibration));
     return entry;
 }
 

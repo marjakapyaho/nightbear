@@ -44,7 +44,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover
     let matchingAlarmFound = false;
 
     _.each(activeAlarms, function(alarm) {
-        console.log('Found active alarm:', alarm);
+        console.log('Found active alarm:', alarm.type);
 
         // Advance alarm level if alarm not acknowledged
         if (!alarm.ack) {

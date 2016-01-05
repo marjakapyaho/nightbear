@@ -7,12 +7,9 @@ This is the documentation for nightbear which includes code for:
 * Pebble watchface
 * React UI with (possible upcoming) wrappers for iOS and Android
 
-## Development requirements
+## Getting test data from Nightscout
 
-## Incoming API
+start = new Date(2016, 0, 5, 10, 49, 0).getTime()
+end = new Date(2016, 0, 5, 11, 49, 0).getTime()
 
-`POST /api/v1/entries`
-
-## Outgoing API
-
-`GET /api/v1/entries`
+YOUR_NIGHTSCOUT_BASE_URL/api/v1/entries.json?count=20&find[date][$gte]=start&find[date][$lte]=end
