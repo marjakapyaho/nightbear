@@ -8,7 +8,6 @@ describe('basic alarm checks', () => {
 
     beforeEach(function() {
         app = testUtils.createTestApp();
-        //app.__test.setCurrentTime(1451827808000 + 1000); // 1 sec after the first entry in ENTRIES
         setCurrentTime = app.__test.setCurrentTime;
         get = app.__test.get;
         post = app.__test.post;
