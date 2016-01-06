@@ -122,16 +122,16 @@ function unAckAlarm(type, ack, currentTime) {
 }
 
 function clearAlarmOfType(type, latestDataPoint, currentTime) {
-    if( type === analyser.STATUS_OUTDATED) {
+    if(latestDataPoint && type === analyser.STATUS_OUTDATED) {
         return true; // Always clear if current status is no longer outdated
     }
     else if (type === analyser.STATUS_HIGH) {
-        if (latestDataPoint.nb_glucose_value < analyser.getProfile({ currentTime }).HIGH_LEVEL_ABS - 2) {
+        if (latestDataPoint && latestDataPoint.nb_glucose_value < analyser.getProfile({ currentTime }).HIGH_LEVEL_ABS - 2) {
             return true;
         }
     }
     else if (type === analyser.STATUS_LOW) {
-        if (latestDataPoint.nb_glucose_value > analyser.getProfile({ currentTime }).LOW_LEVEL_ABS + 2) {
+        if (latestDataPoint && latestDataPoint.nb_glucose_value > analyser.getProfile({ currentTime }).LOW_LEVEL_ABS + 2) {
             return true;
         }
     }

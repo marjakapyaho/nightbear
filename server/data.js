@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 // @example dbPUT('sensor-entries', { ... }) => Promise
 function dbPUT(pouchDB, collection, data) {
-    const object = _.extend({ _id: collection + '/' + helpers.isoTimestamp(data.date) }, data);
+    const object = _.extend({}, data, { _id: collection + '/' + helpers.isoTimestamp(data.date) });
     return pouchDB.put(object).then(
         success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
         failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected

@@ -12,7 +12,7 @@ export function analyseData({ currentTime }, entries) {
     var profile = getProfile({ currentTime });
 
     if (entries.length < 1) {
-        return STATUS_OUTDATED;
+        return { status: STATUS_OUTDATED, data: null };
     }
 
     let latestDataPoint = _.sortBy(entries, 'date')[entries.length - 1];
@@ -50,7 +50,7 @@ export function getProfile({ currentTime }) {
     if (new Date(currentTime()).getHours() > 9) { // DAY
         return {
             HIGH_LEVEL_REL: 12,
-            HIGH_LEVEL_ABS: 16,
+            HIGH_LEVEL_ABS: 15,
             LOW_LEVEL_REL: 8,
             LOW_LEVEL_ABS: 4,
             TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS
@@ -59,7 +59,7 @@ export function getProfile({ currentTime }) {
     else { // NIGHT
         return {
             HIGH_LEVEL_REL: 13,
-            HIGH_LEVEL_ABS: 16,
+            HIGH_LEVEL_ABS: 15,
             LOW_LEVEL_REL: 6,
             LOW_LEVEL_ABS: 4,
             TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS
