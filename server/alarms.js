@@ -3,10 +3,10 @@ import * as analyser from './analyser';
 import _ from 'lodash';
 
 export const ALARM_SNOOZE_TIMES = {
-    [analyser.STATUS_OUTDATED]: 60,
+    [analyser.STATUS_OUTDATED]: 120,
     [analyser.STATUS_HIGH]: 90,
     [analyser.STATUS_LOW]: 15,
-    [analyser.STATUS_RISING]: 30,
+    [analyser.STATUS_RISING]: 20,
     [analyser.STATUS_FALLING]: 10
 };
 
@@ -16,7 +16,6 @@ export function initAlarms({ alarms }) {
 }
 
 export function runChecks({ data, currentTime, pushover }) {
-    console.log('Running alarm checks');
     return Promise.all([
         data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
         data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
@@ -55,7 +54,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover
         if (currentStatus === alarm.type) {
             matchingAlarmFound = true;
         }
-        else if(clearAlarmOfType(alarm.type, latestDataPoint)) { // or not
+        else if(clearAlarmOfType(alarm.type, latestDataPoint, currentTime)) { // or not
             alarm.status = 'inactive';
         }
 
@@ -122,17 +121,17 @@ function unAckAlarm(type, ack, currentTime) {
     return currentTime() - ack >= ackTimeInMillis;
 }
 
-function clearAlarmOfType(type, latestDataPoint) {
+function clearAlarmOfType(type, latestDataPoint, currentTime) {
     if( type === analyser.STATUS_OUTDATED) {
         return true; // Always clear if current status is no longer outdated
     }
     else if (type === analyser.STATUS_HIGH) {
-        if (latestDataPoint.nb_glucose_value < analyser.getProfile().HIGH_LEVEL_ABS - 2) {
+        if (latestDataPoint.nb_glucose_value < analyser.getProfile({ currentTime }).HIGH_LEVEL_ABS - 2) {
             return true;
         }
     }
     else if (type === analyser.STATUS_LOW) {
-        if (latestDataPoint.nb_glucose_value > analyser.getProfile().LOW_LEVEL_ABS + 2) {
+        if (latestDataPoint.nb_glucose_value > analyser.getProfile({ currentTime }).LOW_LEVEL_ABS + 2) {
             return true;
         }
     }

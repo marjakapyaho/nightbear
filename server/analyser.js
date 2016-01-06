@@ -21,14 +21,10 @@ export function analyseData({ currentTime }, entries) {
     let latestDirection = latestDataPoint.direction;
 
     // If we have no direction, calculate one
-    console.log('----------------------------------');
     if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
         latestDirection = calculateDirection(entries);
-        console.log('CALCULATED THIS:', latestDirection);
     }
 
-    console.log('date', latestDataPoint.dateString)
-    console.log('LATEST', latestGlucoseValue);
     if (currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
         return { status: STATUS_OUTDATED, data: latestDataPoint };
     }
@@ -53,9 +49,9 @@ export function getProfile({ currentTime }) {
 
     if (new Date(currentTime()).getHours() > 9) { // DAY
         return {
-            HIGH_LEVEL_REL: 10,
+            HIGH_LEVEL_REL: 12,
             HIGH_LEVEL_ABS: 16,
-            LOW_LEVEL_REL: 7,
+            LOW_LEVEL_REL: 8,
             LOW_LEVEL_ABS: 4,
             TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS
         };
@@ -66,7 +62,7 @@ export function getProfile({ currentTime }) {
             HIGH_LEVEL_ABS: 16,
             LOW_LEVEL_REL: 6,
             LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 30 * helpers.MIN_IN_MS
+            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS
         };
     }
 }
