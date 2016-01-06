@@ -13,7 +13,7 @@ export function createExpressServer({ data }, port = 0, staticAssetsPath = null)
     });
 
     server.get('/api/v1/status', function(req, res) {
-        data.getActiveAlarms().then(
+        data.getStatus().then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );
@@ -21,6 +21,14 @@ export function createExpressServer({ data }, port = 0, staticAssetsPath = null)
 
     server.post('/api/v1/status', function(req, res) {
         data.ackLatestAlarm(req.body).then(
+            data => res.status(200).send(data || null),
+            err => res.status(500).send({ error: err && err.message || true })
+        );
+    });
+
+    // Rig battery status
+    server.post('/api/v1/devicestatus', function(req, res) {
+        data.createDeviceStatus(req.body).then(
             data => res.status(200).send(data || null),
             err => res.status(500).send({ error: err && err.message || true })
         );

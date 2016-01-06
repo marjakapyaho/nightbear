@@ -16,6 +16,7 @@ describe('basic alarm checks', () => {
         return app.__test.createTestServer();
     });
 
+
     it('works with FALLING status + ACK', () => {
 
         return post('/api/v1/entries', ENTRIES[0])
@@ -28,7 +29,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES[4].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, []))
+            .then(status => assertEqual(status.alarms, []))
 
 
             // Should alarm falling
@@ -36,7 +37,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES[5].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 1,
                 "status": "active",
@@ -48,7 +49,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES[6].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 2,
                 "status": "active",
@@ -61,7 +62,7 @@ describe('basic alarm checks', () => {
             .then(() => post('/api/v1/status')) // ack latest alarm
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, [])) // the HTTP endpoint won't return ack'ed alarms
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint won't return ack'ed alarms
             .then(() => app.data.getActiveAlarms(true)) // but the internal API will
             .then(alarms => assertEqual(stripMetaFields(alarms), [{
                 "ack": ENTRIES[7].date + 1000,
@@ -88,7 +89,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES[10].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, [])) // the HTTP endpoint gives all clear
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
             .then(alarms => assertEqual(alarms, []));
     });
@@ -103,7 +104,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES2[2].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, []))
+            .then(status => assertEqual(status.alarms, []))
 
 
             // Should alarm falling
@@ -112,7 +113,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES2[4].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 1,
                 "status": "active",
@@ -125,7 +126,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES2[6].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 1,
                 "status": "active",
@@ -140,7 +141,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES2[10].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, [])) // the HTTP endpoint gives all clear
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
             .then(alarms => assertEqual(alarms, []));
     });
@@ -155,7 +156,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES3[2].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, []))
+            .then(status => assertEqual(status.alarms, []))
 
 
             // Should alarm rising
@@ -163,7 +164,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES3[3].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 1,
                 "status": "active",
@@ -177,7 +178,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES3[6].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "ack": false,
                 "level": 1,
                 "status": "active",
@@ -198,7 +199,7 @@ describe('basic alarm checks', () => {
             .then(() => setCurrentTime(ENTRIES3[15].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
-            .then(alarms => assertEqual(alarms, [])) // the HTTP endpoint gives all clear
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
             .then(alarms => assertEqual(alarms, []));
     });

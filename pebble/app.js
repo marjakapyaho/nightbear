@@ -111,8 +111,13 @@ function initApp() {
 
 function checkAlarmStatus() {
     ajax({ url: BEAR_BASE_URL + '/status', type: 'json', headers: { 'accept': 'application/json' } },
-        function(alarms) {
+        function(data) {
+            var alarms = data.alarms;
+            var battery = data.deviceStatus.uploaderBattery
+
             console.log('Server returned', alarms.length, ' alarms');
+            console.log('Battery status is', battery);
+
             disconnectedRounds = 0;
 
             if (alarms.length > 0) {

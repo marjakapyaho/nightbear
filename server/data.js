@@ -105,6 +105,47 @@ export function ackLatestAlarm({ pouchDB, data, currentTime }) {
         });
 }
 
+export function getStatus({ data }) {
+    return Promise.all([
+        data.getActiveAlarms(),
+        data.getLatestDeviceStatus(),
+    ]).then(
+        function([ alarms, deviceStatus ]) {
+            return {
+                alarms: alarms,
+                deviceStatus: deviceStatus
+            };
+        },
+        function(err) {
+            console.log('Failed with error', err);
+        }
+    );
+}
+
+export function createDeviceStatus({ pouchDB, currentTime }, postData) {
+    let deviceStatus = {
+        _id: 'device-status/' + helpers.isoTimestamp(currentTime()),
+        uploaderBattery: postData.uploaderBattery
+    };
+
+    return pouchDB.put(deviceStatus).then(
+        success => console.log('createDeviceStatus()', deviceStatus, '=>', success),
+        failure => console.log('createDeviceStatus()', deviceStatus, '=> FAILURE:', failure) || Promise.reject(failure)
+    );
+}
+
+// Promises the single latest calibration doc
+export function getLatestDeviceStatus({ pouchDB }) {
+    return pouchDB.allDocs({
+        include_docs: true,
+        descending: true,
+        startkey: 'device-status/_',
+        endkey: 'device-status/',
+        limit: 1
+    })
+    .then(res => res.rows[0] ? res.rows[0].doc : { uploaderBattery: null });
+}
+
 export function legacyPost({ pouchDB }, data) {
     console.log('legacyPost()', 'Incoming data:', data);
     return pouchDB.get('treatments/' + helpers.isoTimestamp(data.time))
