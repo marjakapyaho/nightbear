@@ -15,7 +15,6 @@ var PIXELS_PER_MS = X_WIDTH / (3 * 60 * 60 * 1000); // 3 hours
 var PIXELS_PER_MMOL = 4;
 var DISCONNECT_ALARM_TRESHOLD = 10;
 
-var alarmCleared = false;
 var alarmOn = false;
 var disconnectedRounds = 0;
 
@@ -55,6 +54,16 @@ var clock = new UI.Text({
     textAlign:'center'
 });
 
+var batteryInfo = new UI.Text({
+    position: new Vector2(5, 0),
+    size: new Vector2(136, 14),
+    text: '-',
+    font: 'GOTHIC_14',
+    color:'white',
+    textOverflow:'fill',
+    textAlign:'left'
+});
+
 // In 3 hours there's about 36 5 hour intervals (+ some extra)
 var circles = range(45).map(function() {
     return new UI.Circle({
@@ -85,6 +94,7 @@ function initApp() {
     bearWindow.add(upperRect);
     bearWindow.add(text);
     bearWindow.add(clock);
+    bearWindow.add(batteryInfo);
     circles.forEach(addToWindow);
     largerCircles.forEach(addToWindow);
 
@@ -118,6 +128,8 @@ function checkAlarmStatus() {
             console.log('Server returned', alarms.length, ' alarms');
             console.log('Battery status is', battery);
 
+            batteryInfo.text(battery + '%');
+
             disconnectedRounds = 0;
 
             if (alarms.length > 0) {
@@ -140,6 +152,7 @@ function clearAlarmOnServer() {
         function(data) {
             console.log('Successfully cleared alarm from server');
             disconnectedRounds = 0;
+            alarmOn = false;
         },
         function(err) {
             console.log('Alarm clear error:', err);
@@ -216,17 +229,8 @@ function initAlarms() {
     });
 
     function clearAlarm() {
-        if (!alarmOn || alarmCleared) { return; }
-
-        alarmCleared = true;
-
-        // Send alarm cleared ajax call
+        if (!alarmOn) { return; }
         clearAlarmOnServer();
-
-        setTimeout(function() {
-            alarmCleared = false;
-        }, 3600000); // 60 min
-
         Pebble.showSimpleNotificationOnPebble('Alarm cleared', '');
     }
 }
@@ -291,10 +295,7 @@ function checkIfDisconnected() {
     disconnectedRounds++;
 
     if (disconnectedRounds > DISCONNECT_ALARM_TRESHOLD) {
-        alarmOn = true;
-        if (!alarmCleared) {
-            Vibe.vibrate('double');
-        }
+        Pebble.showSimpleNotificationOnPebble('Disconnected from API', '');
     }
 }
 
