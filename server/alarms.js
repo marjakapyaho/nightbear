@@ -19,10 +19,11 @@ export function runChecks({ data, currentTime, pushover }) {
     return Promise.all([
         data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
         data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
-        data.getActiveAlarms(true) // include acknowledged alarms
+        data.getActiveAlarms(true), // include acknowledged alarms
+        data.getLatestDeviceStatus()
     ]).then(
-        function([ entries, treatments, alarms ]) {
-            return doChecks(entries, treatments, alarms, currentTime, data, pushover);
+        function([ entries, treatments, alarms, deviceStatus ]) {
+            return doChecks(entries, treatments, alarms, deviceStatus, currentTime, data, pushover);
         },
         function(err) {
             console.log('Failed with error', err);
@@ -30,14 +31,15 @@ export function runChecks({ data, currentTime, pushover }) {
     );
 }
 
-function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover) {
+function doChecks(entries, treatments, activeAlarms, deviceStatus, currentTime, data, pushover) {
 
     let operations = [];
 
     // Analyse current status
-    let analysisResults = analyser.analyseData({ currentTime }, entries);
+    let analysisResults = analyser.analyseData({ currentTime }, entries, deviceStatus);
     let currentStatus = analysisResults.status;
     let latestDataPoint = analysisResults.data;
+    let batteryAlarm = analysisResults.batteryAlarm;
 
     // Analyse each active alarm in regards to their clear conditions and current status
     let matchingAlarmFound = false;
@@ -54,7 +56,7 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover
         if (currentStatus === alarm.type) {
             matchingAlarmFound = true;
         }
-        else if(clearAlarmOfType(alarm.type, latestDataPoint, currentTime)) { // or not
+        else if(clearAlarmOfType(alarm.type, latestDataPoint, currentTime, batteryAlarm)) { // or not
             alarm.status = 'inactive';
         }
 
@@ -78,6 +80,9 @@ function doChecks(entries, treatments, activeAlarms, currentTime, data, pushover
     if (!matchingAlarmFound && currentStatus !== analyser.STATUS_OK) {
         console.log('Create new alarm with status', currentStatus);
         operations.push(data.createAlarm(currentStatus, 1)); // Initial alarm level
+    }
+    else if(batteryAlarm) {
+        operations.push(data.createAlarm(analyser.STATUS_BATTERY, 1)); // Initial alarm level
     }
 
     return Promise.all(operations);
@@ -121,7 +126,7 @@ function unAckAlarm(type, ack, currentTime) {
     return currentTime() - ack >= ackTimeInMillis;
 }
 
-function clearAlarmOfType(type, latestDataPoint, currentTime) {
+function clearAlarmOfType(type, latestDataPoint, currentTime, batteryAlarm) {
     if(latestDataPoint && type === analyser.STATUS_OUTDATED) {
         return true; // Always clear if current status is no longer outdated
     }
@@ -139,6 +144,9 @@ function clearAlarmOfType(type, latestDataPoint, currentTime) {
         return true;
     }
     else if(type === analyser.STATUS_FALLING) {
+        return true;
+    }
+    else if(type === analyser.STATUS_BATTERY && !batteryAlarm) {
         return true;
     }
 

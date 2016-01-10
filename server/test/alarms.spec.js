@@ -17,7 +17,7 @@ describe('basic alarm checks', () => {
     });
 
 
-    it('works with FALLING status + ACK', () => {
+    it('works with FALLING status + ACK + battery alarm', () => {
 
         return post('/api/v1/entries', ENTRIES[0])
             .then(() => post('/api/v1/entries', ENTRIES[1]))
@@ -30,7 +30,6 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, []))
-
 
             // Should alarm falling
             .then(() => post('/api/v1/entries', ENTRIES[5]))
@@ -91,7 +90,29 @@ describe('basic alarm checks', () => {
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
-            .then(alarms => assertEqual(alarms, []));
+            .then(alarms => assertEqual(alarms, []))
+
+            // Uploader battery should alarm if too low
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 90 }))
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.deviceStatus), { "uploaderBattery": 90 }))
+            .then(() => setCurrentTime(ENTRIES[10].date + 2000))
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 20 }))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
+                "ack": false,
+                "level": 1,
+                "status": "active",
+                "type": "battery"
+            }]))
+
+            // Clear battery alarm
+            .then(() => setCurrentTime(ENTRIES[10].date + 3000))
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 30 }))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), []))
     });
 
     it('works with FALLING + LOW status', () => {

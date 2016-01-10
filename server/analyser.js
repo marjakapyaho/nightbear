@@ -6,10 +6,13 @@ export const STATUS_HIGH = 'high';
 export const STATUS_LOW = 'low';
 export const STATUS_RISING = 'rising';
 export const STATUS_FALLING = 'falling';
+export const STATUS_BATTERY = 'battery';
 export const STATUS_OK = 'ok';
 
-export function analyseData({ currentTime }, entries) {
+export function analyseData({ currentTime }, entries, deviceStatus) {
+    var status = 'ok'; // OK if not proven otherwise
     var profile = getProfile({ currentTime });
+    var batteryAlarm = (deviceStatus.uploaderBattery || deviceStatus.uploaderBattery === 0) ? deviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
 
     if (entries.length < 1) {
         return { status: STATUS_OUTDATED, data: null };
@@ -26,23 +29,22 @@ export function analyseData({ currentTime }, entries) {
     }
 
     if (currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
-        return { status: STATUS_OUTDATED, data: latestDataPoint };
+        status = STATUS_OUTDATED;
     }
     else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
-        return { status: STATUS_HIGH, data: latestDataPoint };
+        status = STATUS_HIGH;
     }
     else if (latestGlucoseValue < profile.LOW_LEVEL_ABS) {
-        return { status: STATUS_LOW, data: latestDataPoint };
+        status = STATUS_LOW;
     }
     else if (latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
-        return { status: STATUS_RISING, data: latestDataPoint };
+        status = STATUS_RISING;
     }
     else if (latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
-        return { status: STATUS_FALLING, data: latestDataPoint };
+        status = STATUS_FALLING;
     }
-    else {
-        return { status: STATUS_OK, data: latestDataPoint };
-    }
+
+    return { status: status, data: latestDataPoint, batteryAlarm: batteryAlarm };
 }
 
 export function getProfile({ currentTime }) {
@@ -53,7 +55,8 @@ export function getProfile({ currentTime }) {
             HIGH_LEVEL_ABS: 15,
             LOW_LEVEL_REL: 8,
             LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS
+            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
+            BATTERY_LIMIT: 30
         };
     }
     else { // NIGHT
@@ -62,7 +65,8 @@ export function getProfile({ currentTime }) {
             HIGH_LEVEL_ABS: 15,
             LOW_LEVEL_REL: 6,
             LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS
+            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
+            BATTERY_LIMIT: 10
         };
     }
 }

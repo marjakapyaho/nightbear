@@ -44,12 +44,4 @@ describe('data', () => {
             .then(() => app.data.getActiveAlarms(false)) // includeAcks = false
             .then(alarms => assertEqual(alarms, []));
     });
-
-    it('creates and returns rig battery status', () => {
-        setCurrentTime(NOW);
-        return post('/api/v1/devicestatus', { "uploaderBattery": 90 })
-            .then(() => get('/api/v1/status'))
-            .then(status => assertEqual(stripMetaFields(status.deviceStatus), { "uploaderBattery": 90 }))
-    });
-
 });
