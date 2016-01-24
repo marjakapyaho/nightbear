@@ -1,7 +1,5 @@
 server:
   build: server/
-  volumes:
-    - ./legacy-client-dist:/legacy-client-dist
   environment:
     - NODE_ENV=production
     - VIRTUAL_HOST=nightbear.jrw.fi
