@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Nightbear</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link href='http://fonts.googleapis.com/css?family=Lato:100,300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+        <style>
+            body {
+                font-family: 'Lato', sans-serif;
+                font-size: 1em;
+                color: #000;
+                background: #fafafa;
+                font-weight: 300;
+                overflow: hidden;
+                text-rendering: optimizelegibility;
+                margin: 0;
+                padding: 0 30px;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            ul {
+                list-style: none;
+                margin: 0;
+                padding: 50px 0;
+            }
+
+            li {
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+
+            li div {
+                float: left;
+                width: 33%;
+                border-top: 1px solid #ebebeb;
+                border-bottom: 1px solid #ebebeb;
+                padding: 20px 0;
+            }
+
+            form {
+                width: 100%;
+                padding: 50px 0;
+                clear: both;
+            }
+
+            button {
+                font-family: 'Lato', sans-serif;
+                cursor: pointer;
+                font-size: 14px;
+                border: 1px solid #e82851;
+                background: #F42A56;
+                border-radius: 6px;
+                width: 200px;
+                margin: 0 auto;
+                padding: 30px;
+                text-align: center;
+                color: white;
+                display: block;
+            }
+
+            .alarms {
+                width: 100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <ul class="alarms"></ul>
+        <form action="http://nightbear.jrw.fi/api/v1/status">
+            <button>Acknowledge alarm</button>
+        </form>
+
+        <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+        <script>
+            $(function() {
+                $.getJSON( "/api/v1/status", function(data) {
+                    var alarms = data.alarms;
+
+                    if (alarms.length === 0) {
+                        $('button').hide();
+                        $('.alarms').html('<li>No alarms</li>');
+                    }
+                    else {
+                        $('button').show();
+                        $('.alarms').html(''); // Wipe previous
+                    }
+
+                    $.each(alarms, function(key, alarm) {
+                        var wasAck = alarm.ack ? 'Ack' : 'Not ack';
+                        $('.alarms').append("<li><div>" + alarm.type + "</div><div>" + alarm.level + "</div><div>" + wasAck + "</div></li>");
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
