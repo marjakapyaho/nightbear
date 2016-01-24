@@ -54,7 +54,7 @@
                 clear: both;
             }
 
-            button {
+            input {
                 font-family: 'Lato', sans-serif;
                 cursor: pointer;
                 font-size: 14px;
@@ -77,8 +77,8 @@
 
     <body>
         <ul class="alarms"></ul>
-        <form action="http://nightbear.jrw.fi/api/v1/status">
-            <button>Acknowledge alarm</button>
+        <form>
+            <input value="Acknowledge alarm" />
         </form>
 
         <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -89,17 +89,23 @@
                     var alarms = data.alarms;
 
                     if (alarms.length === 0) {
-                        $('button').hide();
+                        $('input').hide();
                         $('.alarms').html('<li>No alarms</li>');
                     }
                     else {
-                        $('button').show();
+                        $('input').show();
                         $('.alarms').html(''); // Wipe previous
                     }
 
                     $.each(alarms, function(key, alarm) {
                         var wasAck = alarm.ack ? 'Ack' : 'Not ack';
                         $('.alarms').append("<li><div>" + alarm.type + "</div><div>" + alarm.level + "</div><div>" + wasAck + "</div></li>");
+                    });
+                });
+
+                $('input').on('click', function() {
+                    $.post( "/api/v1/status", function() {
+                        $('input').val('Acknowledged');
                     });
                 });
             });
