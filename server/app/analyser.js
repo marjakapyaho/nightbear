@@ -9,134 +9,140 @@ export const STATUS_FALLING = 'falling';
 export const STATUS_BATTERY = 'battery';
 export const STATUS_OK = 'ok';
 
-export function analyseData({ currentTime }, entries, deviceStatus) {
-    var status = 'ok'; // OK if not proven otherwise
-    var profile = getProfile({ currentTime });
-    var batteryAlarm = (deviceStatus.uploaderBattery || deviceStatus.uploaderBattery === 0) ? deviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
+export default app => {
 
-    if (entries.length < 1) {
-        return { status: STATUS_OUTDATED, data: null };
-    }
+    return {
+        analyseData,
+        getProfile
+    };
 
-    let latestDataPoint = _.sortBy(entries, 'date')[entries.length - 1];
-    let latestTime = latestDataPoint.date;
-    let latestGlucoseValue = latestDataPoint.nb_glucose_value;
-    let latestDirection = latestDataPoint.direction;
+    function analyseData(entries, deviceStatus) {
+        var status = 'ok'; // OK if not proven otherwise
+        var profile = getProfile();
+        var batteryAlarm = (deviceStatus.uploaderBattery || deviceStatus.uploaderBattery === 0) ? deviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
 
-    // If we have no direction, calculate one
-    if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
-        latestDirection = calculateDirection(entries);
-    }
+        if (entries.length < 1) {
+            return { status: STATUS_OUTDATED, data: null };
+        }
 
-    if (currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
-        status = STATUS_OUTDATED;
-    }
-    else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
-        status = STATUS_HIGH;
-    }
-    else if (latestGlucoseValue < profile.LOW_LEVEL_ABS) {
-        status = STATUS_LOW;
-    }
-    else if (latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
-        status = STATUS_RISING;
-    }
-    else if (latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
-        status = STATUS_FALLING;
-    }
+        let latestDataPoint = _.sortBy(entries, 'date')[entries.length - 1];
+        let latestTime = latestDataPoint.date;
+        let latestGlucoseValue = latestDataPoint.nb_glucose_value;
+        let latestDirection = latestDataPoint.direction;
 
-    return { status: status, data: latestDataPoint, batteryAlarm: batteryAlarm };
-}
+        // If we have no direction, calculate one
+        if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
+            latestDirection = calculateDirection(entries);
+        }
 
-export function getProfile({ currentTime }) {
+        if (app.currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
+            status = STATUS_OUTDATED;
+        }
+        else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
+            status = STATUS_HIGH;
+        }
+        else if (latestGlucoseValue < profile.LOW_LEVEL_ABS) {
+            status = STATUS_LOW;
+        }
+        else if (latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
+            status = STATUS_RISING;
+        }
+        else if (latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
+            status = STATUS_FALLING;
+        }
 
-    if (new Date(currentTime()).getHours() > 9) { // DAY
-        return {
-            HIGH_LEVEL_REL: 12,
-            HIGH_LEVEL_ABS: 15,
-            LOW_LEVEL_REL: 8,
-            LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
-            BATTERY_LIMIT: 30
-        };
-    }
-    else { // NIGHT
-        return {
-            HIGH_LEVEL_REL: 13,
-            HIGH_LEVEL_ABS: 15,
-            LOW_LEVEL_REL: 6,
-            LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
-            BATTERY_LIMIT: 10
-        };
-    }
-}
-
-function calculateSlope(older, newer) {
-    return ((newer.nb_glucose_value - older.nb_glucose_value) / (newer.date - older.date)) * helpers.MIN_IN_MS * 5;
-}
-
-function calculateDirection(entries) {
-    let latest = _.slice(_.sortBy(entries, 'date'), -3);
-    let finalSlope, direction, slope1, slope2;
-
-    // If we have over one entry
-    if (latest.length === 2) {
-        slope1 = calculateSlope(latest[0], latest[1]);
-    }
-    else if (latest.length === 3) {
-        slope1 = calculateSlope(latest[0], latest[1]);
-        slope2 = calculateSlope(latest[1], latest[2]);
-
-        finalSlope = (slope1 + slope2) / 2; // TODO: do weighted average
-    }
-    else {
-        return helpers.DIRECTION_NOT_COMPUTABLE;
+        return { status: status, data: latestDataPoint, batteryAlarm: batteryAlarm };
     }
 
-    let limit1 = 0.3;
-    let limit2 = 0.7;
-    let limit3 = 1.3;
+    function getProfile() {
 
-    if (Math.abs(finalSlope) <= limit1) {
-        direction = 'Flat';
-    }
-    else if (finalSlope < -(limit1) && finalSlope >= -(limit2)) {
-        direction = 'FortyFiveDown';
-    }
-    else if (finalSlope > limit1 && finalSlope <= limit2) {
-        direction = 'FortyFiveUp';
-    }
-    else if (finalSlope < -(limit2) && finalSlope >= -(limit3)) {
-        direction = 'SingleDown';
-    }
-    else if (finalSlope > limit2 && finalSlope <= limit3) {
-        direction = 'SingleUp';
-    }
-    else if (finalSlope < -(limit3)) {
-        direction = 'DoubleDown';
-    }
-    else if (finalSlope > limit3) {
-        direction = 'DoubleUp';
+        if (new Date(app.currentTime()).getHours() > 9) { // DAY
+            return {
+                HIGH_LEVEL_REL: 12,
+                HIGH_LEVEL_ABS: 15,
+                LOW_LEVEL_REL: 8,
+                LOW_LEVEL_ABS: 4,
+                TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
+                BATTERY_LIMIT: 30
+            };
+        }
+        else { // NIGHT
+            return {
+                HIGH_LEVEL_REL: 13,
+                HIGH_LEVEL_ABS: 15,
+                LOW_LEVEL_REL: 6,
+                LOW_LEVEL_ABS: 4,
+                TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
+                BATTERY_LIMIT: 10
+            };
+        }
     }
 
-    return direction;
-}
+    function calculateSlope(older, newer) {
+        return ((newer.nb_glucose_value - older.nb_glucose_value) / (newer.date - older.date)) * helpers.MIN_IN_MS * 5;
+    }
 
-function detectDirection(direction) {
-    if (direction === 'DoubleUp' ||
-        direction === 'SingleUp') {
-        return 'up';
+    function calculateDirection(entries) {
+        let latest = _.slice(_.sortBy(entries, 'date'), -3);
+        let finalSlope, direction, slope1, slope2;
+
+        // If we have over one entry
+        if (latest.length === 2) {
+            slope1 = calculateSlope(latest[0], latest[1]);
+        }
+        else if (latest.length === 3) {
+            slope1 = calculateSlope(latest[0], latest[1]);
+            slope2 = calculateSlope(latest[1], latest[2]);
+
+            finalSlope = (slope1 + slope2) / 2; // TODO: do weighted average
+        }
+        else {
+            return helpers.DIRECTION_NOT_COMPUTABLE;
+        }
+
+        let limit1 = 0.3;
+        let limit2 = 0.7;
+        let limit3 = 1.3;
+
+        if (Math.abs(finalSlope) <= limit1) {
+            direction = 'Flat';
+        }
+        else if (finalSlope < -(limit1) && finalSlope >= -(limit2)) {
+            direction = 'FortyFiveDown';
+        }
+        else if (finalSlope > limit1 && finalSlope <= limit2) {
+            direction = 'FortyFiveUp';
+        }
+        else if (finalSlope < -(limit2) && finalSlope >= -(limit3)) {
+            direction = 'SingleDown';
+        }
+        else if (finalSlope > limit2 && finalSlope <= limit3) {
+            direction = 'SingleUp';
+        }
+        else if (finalSlope < -(limit3)) {
+            direction = 'DoubleDown';
+        }
+        else if (finalSlope > limit3) {
+            direction = 'DoubleUp';
+        }
+
+        return direction;
     }
-    else if (direction === 'DoubleDown' ||
-             direction === 'SingleDown') {
-        return 'down';
+
+    function detectDirection(direction) {
+        if (direction === 'DoubleUp' ||
+            direction === 'SingleUp') {
+            return 'up';
+        }
+        else if (direction === 'DoubleDown' ||
+                 direction === 'SingleDown') {
+            return 'down';
+        }
+        else if (direction === 'Flat' ||
+                 direction === 'FortyFiveUp' ||
+                 direction === 'FortyFiveDown') {
+            return 'flat';
+        }
     }
-    else if (direction === 'Flat' ||
-             direction === 'FortyFiveUp' ||
-             direction === 'FortyFiveDown') {
-        return 'flat';
-    }
-    else {
-        return undefined;
-    }
-}
+
+};

@@ -1,5 +1,5 @@
 import ENTRIES from './sensor-change.json';
-import createAppInstance from '../app';
+import createAppInstance from '../app/';
 import axios from 'axios';
 import PouchDB from 'pouchdb';
 import MemDOWN from 'memdown';
@@ -20,15 +20,16 @@ export function stripMetaFields(doc) {
 
 export function createTestApp() {
     let fakeCurrentTime = Date.now(); // any time-sensitive tests will likely want to change this
-    const currentTime = () => fakeCurrentTime;
     const dbName = Date.now() + ''; // even though the in-memory DB's get dumped when the test suite exits, DB's with the same name will SHARE data during runtime
-    const pouchDB = new PouchDB(dbName, { db: MemDOWN }); // http://pouchdb.com/adapters.html#pouchdb_in_node_js
-    const fakePushover = {
-        send: function(data) {
-            console.log('Sent PUSHOVER alert with data', data);
+    const app = createAppInstance({
+        currentTime: () => fakeCurrentTime,
+        pouchDB: new PouchDB(dbName, { db: MemDOWN }), // http://pouchdb.com/adapters.html#pouchdb_in_node_js
+        pushover: {
+            send(data) {
+                console.log('Sent PUSHOVER alert with data', data);
+            }
         }
-    };
-    const app = createAppInstance(pouchDB, currentTime, fakePushover);
+    });
     let httpHostPrefix;
     app.__test = { // attach some helpful utilities for interacting with the test app we created
         createTestServer() {

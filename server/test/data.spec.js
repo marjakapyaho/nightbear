@@ -1,6 +1,6 @@
 import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
-import * as analyser from '../analyser';
+import * as analyser from '../app/analyser';
 
 const NOW = 1451846139373; // arbitrary but known
 
