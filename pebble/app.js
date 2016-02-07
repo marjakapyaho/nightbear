@@ -15,6 +15,7 @@ var PIXELS_PER_MS = X_WIDTH / (3 * 60 * 60 * 1000); // 3 hours
 var PIXELS_PER_MMOL = 4;
 var DISCONNECT_ALARM_TRESHOLD = 10;
 
+var battery;
 var alarmOn = false;
 var disconnectedRounds = 0;
 
@@ -64,6 +65,16 @@ var batteryInfo = new UI.Text({
     textAlign:'left'
 });
 
+var alarmInfo = new UI.Text({
+    position: new Vector2(0, 0),
+    size: new Vector2(140, 14),
+    text: '',
+    font: 'GOTHIC_14',
+    color:'white',
+    textOverflow:'fill',
+    textAlign:'right'
+});
+
 // In 3 hours there's about 36 5 hour intervals (+ some extra)
 var circles = range(45).map(function() {
     return new UI.Circle({
@@ -95,6 +106,7 @@ function initApp() {
     bearWindow.add(text);
     bearWindow.add(clock);
     bearWindow.add(batteryInfo);
+    bearWindow.add(alarmInfo);
     circles.forEach(addToWindow);
     largerCircles.forEach(addToWindow);
 
@@ -113,7 +125,7 @@ function initApp() {
 
     // Init status check
     checkAlarmStatus();
-    setInterval(checkAlarmStatus, 300000); // 5 min
+    setInterval(checkAlarmStatus, 60000); // 1 min
 }
 
 
@@ -123,22 +135,16 @@ function checkAlarmStatus() {
     ajax({ url: BEAR_BASE_URL + '/status', type: 'json', headers: { 'accept': 'application/json' } },
         function(data) {
             var alarms = data.alarms;
-            var battery = data.deviceStatus.uploaderBattery
+            var newBattery = data.deviceStatus.uploaderBattery;
 
-            console.log('Server returned', alarms.length, ' alarms');
-            console.log('Battery status is', battery);
-
-            batteryInfo.text(battery + '%');
+            if (battery !== newBattery) {
+                battery = newBattery;
+                batteryInfo.text(battery + '%');
+            }
 
             disconnectedRounds = 0;
 
-            if (alarms.length > 0) {
-                Vibe.vibrate('double');
-                alarmOn = true;
-            }
-            else {
-                alarmOn = false;
-            }
+            toggleAlarm(alarms.length > 0);
         },
         function(err) {
             console.log('Alarm status error:', err);
@@ -147,12 +153,28 @@ function checkAlarmStatus() {
     );
 }
 
+function toggleAlarm(isOn) {
+    if (isOn === alarmOn) {
+        return;
+    }
+
+    if (isOn) {
+        Vibe.vibrate('double');
+        alarmOn = true;
+        alarmInfo.text('ALARM');
+    }
+    else {
+        alarmOn = false;
+        alarmInfo.text('');
+    }
+}
+
 function clearAlarmOnServer() {
     ajax({ url: BEAR_BASE_URL + '/status', method: 'post', type: 'json', headers: { 'accept': 'application/json' } },
         function(data) {
             console.log('Successfully cleared alarm from server');
             disconnectedRounds = 0;
-            alarmOn = false;
+            toggleAlarm(false);
         },
         function(err) {
             console.log('Alarm clear error:', err);

@@ -53,7 +53,7 @@ function doChecks(entries, treatments, activeAlarms, deviceStatus, currentTime, 
         }
 
         // Are we still having the same alarm
-        if (currentStatus === alarm.type) {
+        if (currentStatus === alarm.type || (batteryAlarm && alarm.type === 'battery')) {
             matchingAlarmFound = true;
         }
         else if(clearAlarmOfType(alarm.type, latestDataPoint, currentTime, batteryAlarm)) { // or not
@@ -81,7 +81,7 @@ function doChecks(entries, treatments, activeAlarms, deviceStatus, currentTime, 
         console.log('Create new alarm with status', currentStatus);
         operations.push(data.createAlarm(currentStatus, 1)); // Initial alarm level
     }
-    else if(batteryAlarm) {
+    else if(!matchingAlarmFound && batteryAlarm) {
         operations.push(data.createAlarm(analyser.STATUS_BATTERY, 1)); // Initial alarm level
     }
 
@@ -95,8 +95,8 @@ function sendAlarm(pushover, level, type) {
         sound: 'persistent',
         device: process.env['PUSHOVER_LEVEL_1'],
         priority: 2,
-        retry: 60, // TODO 30?
-        expire: 3600
+        retry: 120,
+        expire: 60
     };
 
     if (level === 2) {
