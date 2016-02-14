@@ -49,24 +49,21 @@
             }
 
             form {
-                width: 100%;
-                padding: 50px 0;
                 clear: both;
             }
 
-            input {
-                font-family: 'Lato', sans-serif;
+            .ack-alarm {
+                clear: both;
                 cursor: pointer;
                 font-size: 14px;
                 border: 1px solid #e82851;
                 background: #F42A56;
                 border-radius: 6px;
                 width: 200px;
-                margin: 0 auto;
+                margin: 50px auto;
                 padding: 30px;
                 text-align: center;
                 color: white;
-                display: block;
             }
 
             .alarms {
@@ -77,35 +74,38 @@
 
     <body>
         <ul class="alarms"></ul>
-        <form>
-            <input value="Acknowledge alarm" />
-        </form>
+        <div class="ack-alarm">Acknowledge alarm</div>
 
         <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 
         <script>
             $(function() {
-                $.getJSON( "/api/v1/status", function(data) {
-                    var alarms = data.alarms;
 
-                    if (alarms.length === 0) {
-                        $('input').hide();
-                        $('.alarms').html('<li>No alarms</li>');
-                    }
-                    else {
-                        $('input').show();
-                        $('.alarms').html(''); // Wipe previous
-                    }
+                function getStatus() {
+                    $.getJSON( "/api/v1/status", function(data) {
+                        var alarms = data.alarms;
 
-                    $.each(alarms, function(key, alarm) {
-                        var wasAck = alarm.ack ? 'Ack' : 'Not ack';
-                        $('.alarms').append("<li><div>" + alarm.type + "</div><div>" + alarm.level + "</div><div>" + wasAck + "</div></li>");
+                        if (alarms.length === 0) {
+                            $('.ack-alarm').hide();
+                            $('.alarms').html('<li>No alarms</li>');
+                        }
+                        else {
+                            $('.ack-alarm').show();
+                            $('.alarms').html(''); // Wipe previous
+                        }
+
+                        $.each(alarms, function(key, alarm) {
+                            var wasAck = alarm.ack ? 'Ack' : 'Not ack';
+                            $('.alarms').append("<li><div>" + alarm.type + "</div><div>" + alarm.level + "</div><div>" + wasAck + "</div></li>");
+                        });
                     });
-                });
+                }
 
-                $('input').on('click', function() {
+                getStatus();
+
+                $('.ack-alarm').on('click', function() {
                     $.post( "/api/v1/status", function() {
-                        $('input').val('Acknowledged');
+                        getStatus();
                     });
                 });
             });
