@@ -6,17 +6,14 @@ const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 export default app => {
 
     return {
+        getTimelineContent,
         nightscoutUploaderPost,
-        getLatestCalibration,
-        getLatestEntries,
-        getLatestTreatments,
         getActiveAlarms,
         createAlarm,
         updateAlarm,
         ackLatestAlarm,
         getStatus,
         createDeviceStatus,
-        getLatestDeviceStatus,
         legacyPost,
         getLegacyEntries
     };
@@ -45,6 +42,19 @@ export default app => {
         else {
             return Promise.reject('Unknown data type');
         }
+    }
+
+    // Promises an object with a snapshot of the current timeline content (which can then be analysed, rendered etc)
+    function getTimelineContent() {
+        return Promise.all([
+            getLatestEntries(helpers.HOUR_IN_MS * 0.5),
+            getLatestTreatments(helpers.HOUR_IN_MS * 3),
+            getLatestDeviceStatus()
+        ]).then(([ latestEntries, latestTreatments, latestDeviceStatus ]) => ({
+            latestEntries,
+            latestTreatments,
+            latestDeviceStatus
+        }));
     }
 
     // Promises the single latest calibration doc
@@ -124,8 +134,8 @@ export default app => {
 
     function getStatus() {
         return Promise.all([
-            app.data.getActiveAlarms(),
-            app.data.getLatestDeviceStatus(),
+            getActiveAlarms(),
+            getLatestDeviceStatus()
         ]).then(
             function([ alarms, deviceStatus ]) {
                 return {
@@ -185,8 +195,8 @@ export default app => {
 
     function getLegacyEntries(hours = 12) {
         return Promise.all([
-            app.data.getLatestEntries(hours * helpers.HOUR_IN_MS),
-            app.data.getLatestTreatments(hours * helpers.HOUR_IN_MS)
+            getLatestEntries(hours * helpers.HOUR_IN_MS),
+            getLatestTreatments(hours * helpers.HOUR_IN_MS)
         ]).then(([ entries, treatments ]) =>
             _(entries.concat(treatments))
                 .groupBy(entry => entry.date)

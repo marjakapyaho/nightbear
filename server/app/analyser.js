@@ -16,23 +16,24 @@ export default app => {
         getProfile
     };
 
-    function analyseData(entries, deviceStatus) {
+    function analyseData(timelineContent, activeAlarms) {
         var status = 'ok'; // OK if not proven otherwise
         var profile = getProfile();
-        var batteryAlarm = (deviceStatus.uploaderBattery || deviceStatus.uploaderBattery === 0) ? deviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
+        var { latestEntries, latestTreatments, latestDeviceStatus } = timelineContent;
+        var batteryAlarm = (latestDeviceStatus.uploaderBattery || latestDeviceStatus.uploaderBattery === 0) ? latestDeviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
 
-        if (entries.length < 1) {
+        if (latestEntries.length < 1) {
             return { status: STATUS_OUTDATED, data: null };
         }
 
-        let latestDataPoint = _.sortBy(entries, 'date')[entries.length - 1];
+        let latestDataPoint = _.sortBy(latestEntries, 'date')[latestEntries.length - 1];
         let latestTime = latestDataPoint.date;
         let latestGlucoseValue = latestDataPoint.nb_glucose_value;
         let latestDirection = latestDataPoint.direction;
 
         // If we have no direction, calculate one
         if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
-            latestDirection = calculateDirection(entries);
+            latestDirection = calculateDirection(latestEntries);
         }
 
         if (app.currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {

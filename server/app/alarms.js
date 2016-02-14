@@ -28,13 +28,11 @@ export default app => {
 
     function runChecks() {
         return Promise.all([
-            app.data.getLatestEntries(helpers.HOUR_IN_MS * 0.5),
-            app.data.getLatestTreatments(helpers.HOUR_IN_MS * 3),
-            app.data.getActiveAlarms(true), // include acknowledged alarms
-            app.data.getLatestDeviceStatus()
+            app.data.getTimelineContent(),
+            app.data.getActiveAlarms(true) // include acknowledged alarms
         ]).then(
-            function([ entries, treatments, alarms, deviceStatus ]) {
-                return doChecks(entries, treatments, alarms, deviceStatus);
+            function([ timelineContent, activeAlarms ]) {
+                doChecks(timelineContent, activeAlarms);
             },
             function(err) {
                 console.log('Failed with error', err);
@@ -42,12 +40,12 @@ export default app => {
         );
     }
 
-    function doChecks(entries, treatments, activeAlarms, deviceStatus) {
+    function doChecks(timelineContent, activeAlarms) {
 
         let operations = [];
 
         // Analyse current status
-        let analysisResults = app.analyser.analyseData(entries, deviceStatus);
+        let analysisResults = app.analyser.analyseData(timelineContent, activeAlarms);
         let currentStatus = analysisResults.status;
         let latestDataPoint = analysisResults.data;
         let batteryAlarm = analysisResults.batteryAlarm;
