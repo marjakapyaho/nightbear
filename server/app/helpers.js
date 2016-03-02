@@ -30,4 +30,3 @@ export function calculateRaw(dataPoint, calData) {
 export function changeSGVUnit(sgv) {
     return Math.round((sgv / 18) * 10) / 10;
 }
-

@@ -5,6 +5,8 @@ const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 
 export default app => {
 
+    const log = app.logger(__filename);
+
     return {
         getTimelineContent,
         nightscoutUploaderPost,
@@ -22,8 +24,8 @@ export default app => {
     function dbPUT(collection, data) {
         const object = _.extend({}, data, { _id: collection + '/' + helpers.isoTimestamp(data.date) });
         return app.pouchDB.put(object).then(
-            success => console.log('dbPUT()', object, '=>', success), // resolve with undefined
-            failure => console.log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+            success => log('dbPUT()', object, '=>', success), // resolve with undefined
+            failure => log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
         );
     }
 
@@ -113,8 +115,8 @@ export default app => {
         };
 
         return app.pouchDB.put(newAlarm).then(
-            success => console.log('createAlarm()', newAlarm, '=>', success), // resolve with undefined
-            failure => console.log('createAlarm()', newAlarm, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+            success => log('createAlarm()', newAlarm, '=>', success), // resolve with undefined
+            failure => log('createAlarm()', newAlarm, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
         );
     }
 
@@ -144,7 +146,7 @@ export default app => {
                 };
             },
             function(err) {
-                console.log('Failed with error', err);
+                log('Failed with error:', err);
             }
         );
     }
@@ -156,8 +158,8 @@ export default app => {
         };
 
         return app.pouchDB.put(deviceStatus).then(
-            success => console.log('createDeviceStatus()', deviceStatus, '=>', success),
-            failure => console.log('createDeviceStatus()', deviceStatus, '=> FAILURE:', failure) || Promise.reject(failure)
+            success => log('createDeviceStatus()', deviceStatus, '=>', success),
+            failure => log('createDeviceStatus()', deviceStatus, '=> FAILURE:', failure) || Promise.reject(failure)
         );
     }
 
@@ -174,10 +176,10 @@ export default app => {
     }
 
     function legacyPost(data) {
-        console.log('legacyPost()', 'Incoming data:', data);
+        log('legacyPost()', 'Incoming data:', data);
         return app.pouchDB.get('treatments/' + helpers.isoTimestamp(data.time))
             .catch(() => {
-                console.log('legacyPost()', 'Existing treatment not found with time ' + data.time);
+                log('legacyPost()', 'Existing treatment not found with time:', data.time);
                 return {
                     eventType: helpers.DEFAULT_TREATMENT_TYPE,
                     created_at: new Date(data.time).toISOString(),
@@ -212,11 +214,11 @@ export default app => {
                 .value()
         ).then(
             data => {
-                console.log('getLegacyEntries()', 'Returning:', data.length);
+                log('getLegacyEntries()', 'Returning:', data.length);
                 return data;
             },
             err => {
-                console.log('getLegacyEntries()', 'Failed:', err);
+                log('getLegacyEntries()', 'Failed:', err);
                 return Promise.reject(err);
             }
         );

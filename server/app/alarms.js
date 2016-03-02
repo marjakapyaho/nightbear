@@ -12,6 +12,8 @@ export const ALARM_SNOOZE_TIMES = {
 
 export default app => {
 
+    const log = app.logger(__filename);
+
     return {
         initAlarms,
         runChecks,
@@ -35,7 +37,7 @@ export default app => {
                 doChecks(timelineContent, activeAlarms);
             },
             function(err) {
-                console.log('Failed with error', err);
+                log.error('Checks failed with error', err);
             }
         );
     }
@@ -54,7 +56,7 @@ export default app => {
         let matchingAlarmFound = false;
 
         _.each(activeAlarms, function(alarm) {
-            console.log('Found active alarm:', alarm.type);
+            log('Found active alarm:', alarm.type);
 
             // Advance alarm level if alarm not acknowledged
             if (!alarm.ack) {
@@ -87,7 +89,7 @@ export default app => {
 
         // There there was no previous matching alarm, create new one
         if (!matchingAlarmFound && currentStatus !== analyser.STATUS_OK) {
-            console.log('Create new alarm with status', currentStatus);
+            log('Create new alarm with status:', currentStatus);
             operations.push(app.data.createAlarm(currentStatus, 1)); // Initial alarm level
         }
         else if (!matchingAlarmFound && batteryAlarm) {
@@ -122,7 +124,7 @@ export default app => {
             if (err) {
                 throw err;
             }
-            console.log(result);
+            log('Pushover result:', result);
         });
     }
 

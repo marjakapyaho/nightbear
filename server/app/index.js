@@ -4,6 +4,7 @@ import data from './data';
 import server from './server';
 
 const modules = {
+    logger: null,
     currentTime: null,
     pouchDB: null,
     pushover: null,

@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 
 export default app => {
 
+    const log = app.logger(__filename);
+
     return {
         createExpressServer(port = 0, staticAssetsPath = null) {
 
@@ -54,14 +56,14 @@ export default app => {
             });
 
             if (staticAssetsPath) {
-                console.log('Serving static assets from: ' + staticAssetsPath);
+                log('Serving static assets from: ' + staticAssetsPath);
                 server.use('/', express.static(staticAssetsPath));
             }
 
             return new Promise(function(resolve) {
                 const binding = server.listen(port, function() {
                     const port = binding.address().port;
-                    console.log('Listening on port %s', port);
+                    log('Listening on port:', port);
                     resolve(port);
                 });
             });
