@@ -5,6 +5,7 @@ import PouchDB from 'pouchdb';
 import MemDOWN from 'memdown';
 import { assert } from 'chai';
 import _ from 'lodash';
+import Logger from '../utils/Logger';
 
 export function serially(callbacks) {
     return callbacks.reduce((prev, next) => prev.then(next), Promise.resolve());
@@ -22,6 +23,7 @@ export function createTestApp() {
     let fakeCurrentTime = Date.now(); // any time-sensitive tests will likely want to change this
     const dbName = Date.now() + ''; // even though the in-memory DB's get dumped when the test suite exits, DB's with the same name will SHARE data during runtime
     const app = createAppInstance({
+        logger: new Logger(false), // no transports enabled
         currentTime: () => fakeCurrentTime,
         pouchDB: new PouchDB(dbName, { db: MemDOWN }), // http://pouchdb.com/adapters.html#pouchdb_in_node_js
         pushover: {
