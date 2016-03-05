@@ -41,7 +41,7 @@ export default function(consoleOutput = true, papertrailUrl = null) {
 
         const label = rawLabel.replace(/.*\/([\w-]+).*/, '$1');  // e.g. "/path/to/MyComponent.js" becomes "MyComponent"
         const flatten = ctx => ctx.length === 0 ? null : (ctx.length === 1 ? ctx[0] : ctx);
-        const internal = (level, message, ...context) => logger.log(level, `[${label}] ${message}`, flatten(context));
+        const internal = (level, message, ...context) => { logger.log(level, `[${label}] ${message}`, flatten(context)); };
 
         return _.extend(internal.bind(null, 'info'), {
             error: internal.bind(null, 'error')
