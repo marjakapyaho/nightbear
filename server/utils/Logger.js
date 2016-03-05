@@ -27,7 +27,8 @@ export default function(consoleOutput = true, papertrailUrl = null) {
             host,
             port,
             program: 'nightbear-server',
-            exceptionsLevel: 'error'
+            exceptionsLevel: 'error',
+            colorize: true
         });
         papertrail.exceptionsLevel = 'error'; // @see https://github.com/kenperkins/winston-papertrail/issues/40
 
