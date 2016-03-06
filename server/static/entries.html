@@ -1,0 +1,116 @@
+<!doctype html>
+<html manifest="entries.manifest.appcache">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Nightbear Entries</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <style>
+            body {
+                font-size: 1em;
+                color: #000;
+                background: #fafafa;
+                font-weight: 300;
+                text-rendering: optimizelegibility;
+                margin: 0;
+                padding: 0 30px;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.3.0/pouchdb.js"></script>
+
+        <pre id="status" style="font-weight: bold;">???</pre>
+        <pre id="info">???</pre>
+        <ul></ul>
+        <p>v3</p>
+
+        <script>
+            $(function() {
+                
+                if (!localStorage.dbUrl) {
+                    localStorage.dbUrl = prompt('Enter full DB URL to connect to') || '';
+                }
+
+                if (!localStorage.dbUrl) {
+                    return;
+                }
+
+                console.log('App starting up');
+
+                var local = window.db = new PouchDB('user_marja');
+                var remote = new PouchDB(localStorage.dbUrl);
+
+                // @see http://pouchdb.com/api.html#replication
+                var syncOp = remote.replicate.to(local, {
+                    live: true,
+                    retry: true,
+                    filter: 'replication_filters/filter_current_day',
+                    query_params: {sinceDate: 1457272566000} // 2016-03-06T13:56:06Z
+//                    query_params: { sinceDate: Date.now() - 1000 * 60 * 60 * 3 } // since 3 hours ago
+                });
+
+                var replStartedAt = Date.now();
+
+                syncOp.on('change', function (info) {
+                    console.info('SYNC', 'change', info);
+                }).on('paused', function (x) {
+                    console.info('SYNC', 'paused', x);
+                    $('#status').text('replication paused (took ' + (Date.now() - replStartedAt) + ' ms)');
+                }).on('active', function (x) {
+                    console.info('SYNC', 'active', x);
+                    replStartedAt = Date.now();
+                    $('#status').text('replication ACTIVE');
+                }).on('denied', function (info) {
+                    console.info('SYNC', 'denied', info);
+                }).on('complete', function (info) {
+                    console.info('SYNC', 'complete', info);
+                }).on('error', function (err) {
+                    console.info('SYNC', 'error', err);
+                });
+
+
+                var changes = local.changes({
+                    since: 'now',
+                    live: true,
+                    include_docs: true
+                }).on('change', function(change) {
+                    console.info('CHANGES', 'change', change);
+                    render();
+                }).on('complete', function(info) {
+                    console.info('CHANGES', 'complete', info);
+                }).on('error', function (err) {
+                    console.info('CHANGES', 'error', err);
+                });
+
+                render();
+
+                function render() {
+                    console.log('rendering');
+                    local.info()
+                        .then(function(i) { $('#info').text(JSON.stringify(i, undefined, 4)) });
+                    db.allDocs({ include_docs: true, limit: 10, descending: true, start_key: 'sensor-entries/_' })
+                        .then(function(res) {
+                            $('ul').html('').append(
+                                res.rows.map(function(row) {
+                                    return $('<li>').text(row.doc.dateString)
+                                })
+                            );
+                        })
+                }
+
+            });
+        </script>
+    </body>
+</html>
