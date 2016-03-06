@@ -44,13 +44,22 @@ export default app => {
         if (datum.type === 'sgv') {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
-                .then(data => dbPUT('sensor-entries', data));
+                .then(data => dbPUT('sensor-entries', data))
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'mbg') {
-            return dbPUT('meter-entries', datum);
+            return dbPUT('meter-entries', datum)
+                .catch(err => {
+                    if (err.name !== 'conflict') throw err; // conflict is actually often expected, as the Nightscout Uploader will keep sending the same entries over and over
+                })
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'cal') {
-            return dbPUT('calibrations', datum);
+            return dbPUT('calibrations', datum)
+                .catch(err => {
+                    if (err.name !== 'conflict') throw err; // same as with "meter-entries"
+                })
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else {
             return Promise.reject('Unknown data type');
