@@ -43,13 +43,16 @@ export default app => {
         if (datum.type === 'sgv') {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
-                .then(data => dbPUT('sensor-entries', data));
+                .then(data => dbPUT('sensor-entries', data))
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'mbg') {
-            return dbPUT('meter-entries', datum);
+            return dbPUT('meter-entries', datum)
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'cal') {
-            return dbPUT('calibrations', datum);
+            return dbPUT('calibrations', datum)
+                .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else {
             return Promise.reject('Unknown data type');
