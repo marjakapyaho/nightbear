@@ -36,58 +36,57 @@ export default app => {
     }
 
     function doChecks(timelineContent) {
+        log('Active alarms:', timelineContent.activeAlarms);
 
         let operations = [];
 
         // Analyse current status
-        let analysisResults = app.analyser.analyseData(timelineContent);
-        let currentStatus = analysisResults.status;
-        let latestDataPoint = analysisResults.data;
-        let batteryAlarm = analysisResults.batteryAlarm;
+        const state = app.analyser.analyseData(timelineContent);
 
-        // Analyse each active alarm in regards to their clear conditions and current status
-        let matchingAlarmFound = false;
+        const alarmsToRemove = _.filter(timelineContent.activeAlarms, function(alarm) {
+            return !state[alarm.type];
+        });
 
-        _.each(timelineContent.activeAlarms, function(alarm) {
-            log('Found active alarm:', alarm.type);
+        const alarmsToKeep = _.filter(timelineContent.activeAlarms, function(alarm) {
+            return state[alarm.type];
+        });
 
-            // Advance alarm level if alarm not acknowledged
+        const alarmsToCreate = _.compact(_.map(state, function(value, key) {
+            if (!value) return;
+            if (_.findWhere(alarmsToKeep, { type: key })) return;
+            return key;
+        }));
+
+        _.each(alarmsToRemove, function(alarm) {
+            alarm.status = 'inactive';
+            operations.push(app.data.updateAlarm(alarm));
+        });
+
+        _.each(alarmsToKeep, function(alarm) {
+
+            // Advance alarm level if needed
             if (!alarm.ack) {
                 alarm.level++;
             }
 
-            // Are we still having the same alarm
-            if (currentStatus === alarm.type || (batteryAlarm && alarm.type === 'battery')) {
-                matchingAlarmFound = true;
-            }
-            else if (clearAlarmOfType(alarm.type, latestDataPoint, batteryAlarm)) { // or not
-                alarm.status = 'inactive';
-            }
-
-            // Release ack lock if enough time has passed and alarm is still active
-            if (alarm.status === 'active' && unAckAlarm(alarm.type, alarm.ack)) {
+            if (unAckAlarm(alarm.type, alarm.ack)) {
                 alarm.ack = false;
                 alarm.level = 1;
             }
 
-            // Update alarm in DB to match new level (and possibly status and ack)
-            operations.push(app.data.updateAlarm(alarm));
-
-            // If alarm is not acknowledged and is still active,
+            // If alarm is not acknowledged
             // send alarm according to new updated level
-            if (!alarm.ack && alarm.status === 'active') {
+            if (!alarm.ack) {
                 sendAlarm(alarm.level, alarm.type);
             }
+
+            operations.push(app.data.updateAlarm(alarm));
         });
 
-        // There there was no previous matching alarm, create new one
-        if (!matchingAlarmFound && currentStatus !== analyser.STATUS_OK) {
-            log('Create new alarm with status:', currentStatus);
-            operations.push(app.data.createAlarm(currentStatus, 1)); // Initial alarm level
-        }
-        else if (!matchingAlarmFound && batteryAlarm) {
-            operations.push(app.data.createAlarm(analyser.STATUS_BATTERY, 1)); // Initial alarm level
-        }
+        _.each(alarmsToCreate, function(alarmType) {
+            log('Create new alarm with status:', alarmType);
+            operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
+        });
 
         return Promise.all(operations);
     }
@@ -129,32 +128,4 @@ export default app => {
         // If more time has passed since ack then this type allows, return true
         return app.currentTime() - ack >= ackTimeInMillis;
     }
-
-    function clearAlarmOfType(type, latestDataPoint, batteryAlarm) {
-        if (latestDataPoint && type === analyser.STATUS_OUTDATED) {
-            return true; // Always clear if current status is no longer outdated
-        }
-        else if (type === analyser.STATUS_HIGH) {
-            if (latestDataPoint && latestDataPoint.nb_glucose_value < app.analyser.getProfile().HIGH_LEVEL_ABS - 2) {
-                return true;
-            }
-        }
-        else if (type === analyser.STATUS_LOW) {
-            if (latestDataPoint && latestDataPoint.nb_glucose_value > app.analyser.getProfile().LOW_LEVEL_ABS + 2) {
-                return true;
-            }
-        }
-        else if (type === analyser.STATUS_RISING) {
-            return true;
-        }
-        else if (type === analyser.STATUS_FALLING) {
-            return true;
-        }
-        else if (type === analyser.STATUS_BATTERY && !batteryAlarm) {
-            return true;
-        }
-
-        return false;
-    }
-
 }
