@@ -1,4 +1,5 @@
 import * as helpers from './helpers';
+import * as alarms from './alarms';
 import _ from 'lodash';
 import axios from 'axios';
 
@@ -116,7 +117,7 @@ export default app => {
         .then(res => res.rows.map(row => row.doc));
     }
 
-    function getActiveAlarms(includeAcks = false) {
+    function getActiveAlarms(includeInvalids = false) {
         return app.pouchDB.allDocs({
                 include_docs: true,
                 startkey: 'alarms/',
@@ -124,9 +125,9 @@ export default app => {
             })
             .then(res => res.rows.map(row => row.doc))
             .then(docs => docs.filter(doc => ( // TODO: Move this filtering into a db.find(), this is wildly inefficient on larger datasets!
-                (!doc.ack || doc.ack && includeAcks)
-                &&
                 doc.status === 'active'
+                &&
+                (includeInvalids || !includeInvalids && app.currentTime() >= doc.validAfter)
             )));
     }
 
@@ -136,7 +137,7 @@ export default app => {
             type: type, // analyser status constants
             status: 'active',
             level: level,
-            ack: false // Date.now()
+            validAfter: app.currentTime()
         };
 
         return app.pouchDB.put(newAlarm).then(
@@ -152,10 +153,15 @@ export default app => {
     function ackLatestAlarm() {
         return app.data.getActiveAlarms()
             .then(docs => docs[0])
-            .then(function(doc) {
-                if (!doc) return;
-                doc.ack = app.currentTime();
-                return app.data.updateAlarm(doc);
+            .then(function(alarm) {
+                if (!alarm) return;
+                const snoozeTime = alarms.ALARM_SNOOZE_TIMES[alarm.type];
+                if (!snoozeTime) {
+                    throw new Error('Invalid alarm type');
+                }
+                alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
+                alarm.level = 1; // reset level
+                return app.data.updateAlarm(alarm);
             });
     }
 

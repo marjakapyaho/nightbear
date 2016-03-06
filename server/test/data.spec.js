@@ -24,10 +24,10 @@ describe('data', () => {
             .then(stripMetaFields)
             .then(alarms => assertEqual(alarms, [
                 {
-                    ack: false,
                     level: 1,
                     status: 'active',
-                    type: 'high'
+                    type: 'high',
+                    validAfter: NOW
                 }
             ]))
             .then(() => app.data.ackLatestAlarm())
@@ -35,10 +35,10 @@ describe('data', () => {
             .then(stripMetaFields)
             .then(alarms => assertEqual(alarms, [
                 {
-                    ack: NOW, // has been acknowledged
                     level: 1,
                     status: 'active',
-                    type: 'high'
+                    type: 'high',
+                    validAfter: NOW + 1000 * 60 * 90 // TODO: Get the snooze period from variable
                 }
             ]))
             .then(() => app.data.getActiveAlarms(false)) // includeAcks = false

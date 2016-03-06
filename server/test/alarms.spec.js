@@ -37,22 +37,22 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "falling"
+                "type": "falling",
+                "validAfter": ENTRIES[5].date + 1000
             }]))
 
             // Check that level rises ok
             .then(() => post('/api/v1/entries', ENTRIES[6]))
-            .then(() => setCurrentTime(ENTRIES[6].date + 1000))
+            .then(() => setCurrentTime(ENTRIES[6].date + 1000 * 60 * 4)) // 4 minutes pass // TODO: Get this from variable..?
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 2,
                 "status": "active",
-                "type": "falling"
+                "type": "falling",
+                "validAfter": ENTRIES[5].date + 1000
             }]))
 
             // Acknowledge testing
@@ -64,10 +64,10 @@ describe('basic alarm checks', () => {
             .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint won't return ack'ed alarms
             .then(() => app.data.getActiveAlarms(true)) // but the internal API will
             .then(alarms => assertEqual(stripMetaFields(alarms), [{
-                "ack": ENTRIES[7].date + 1000,
-                "level": 2,
+                "level": 1, // level is reset by the ack operation
                 "status": "active",
-                "type": "falling"
+                "type": "falling",
+                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10 // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
             }]))
 
             // Still snoozing
@@ -76,10 +76,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => app.data.getActiveAlarms(true))
             .then(alarms => assertEqual(stripMetaFields(alarms), [{
-                "ack": ENTRIES[7].date + 1000,
-                "level": 2,
+                "level": 1,
                 "status": "active",
-                "type": "falling"
+                "type": "falling",
+                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10 // see above
             }]))
 
             // Alarm cleared
@@ -101,10 +101,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "battery"
+                "type": "battery",
+                "validAfter": ENTRIES[10].date + 2000
             }]))
 
             // Clear battery alarm
@@ -135,10 +135,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "falling"
+                "type": "falling",
+                "validAfter": ENTRIES2[4].date + 1000
             }]))
 
             // Should change to alarm low
@@ -148,10 +148,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "low"
+                "type": "low",
+                "validAfter": ENTRIES2[6].date + 1000
             }]))
 
             // Alarm cleared
@@ -186,10 +186,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "rising"
+                "type": "rising",
+                "validAfter": ENTRIES3[3].date + 1000
             }]))
 
             //// Should change to alarm high
@@ -200,10 +200,10 @@ describe('basic alarm checks', () => {
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
-                "ack": false,
                 "level": 1,
                 "status": "active",
-                "type": "high"
+                "type": "high",
+                "validAfter": ENTRIES3[6].date + 1000
             }]))
 
             // Alarm cleared

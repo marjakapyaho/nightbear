@@ -10,6 +10,14 @@ export const ALARM_SNOOZE_TIMES = {
     [analyser.STATUS_FALLING]: 10
 };
 
+export const ALARM_LEVEL_UP_TIMES = {
+    [analyser.STATUS_OUTDATED]: [ 10, 20, 20],
+    [analyser.STATUS_HIGH]: [ 10, 20, 20],
+    [analyser.STATUS_LOW]: [ 6, 7, 10],
+    [analyser.STATUS_RISING]: [ 8, 15, 15],
+    [analyser.STATUS_FALLING]: [ 6, 7, 10]
+};
+
 export default app => {
 
     const log = app.logger(__filename);
@@ -64,23 +72,22 @@ export default app => {
 
         _.each(alarmsToKeep, function(alarm) {
 
-            // Advance alarm level if needed
-            if (!alarm.ack) {
-                alarm.level++;
+            if (app.currentTime() <= alarm.validAfter) {
+                return;
             }
 
-            if (unAckAlarm(alarm.type, alarm.ack)) {
-                alarm.ack = false;
-                alarm.level = 1;
-            }
+            const hasBeenValidFor = (app.currentTime() - alarm.validAfter) / helpers.MIN_IN_MS;
+            const levelUpTimes = ALARM_LEVEL_UP_TIMES[alarm.type];
+            const accumulatedTimes = _.map(levelUpTimes, (x, i) => _.sum(_.take(levelUpTimes, i + 1)));
+            const neededLevel = _.findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
 
-            // If alarm is not acknowledged
-            // send alarm according to new updated level
-            if (!alarm.ack) {
+            if (neededLevel !== alarm.level) {
+                log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
+                alarm.level = neededLevel;
+                operations.push(app.data.updateAlarm(alarm));
                 sendAlarm(alarm.level, alarm.type);
             }
 
-            operations.push(app.data.updateAlarm(alarm));
         });
 
         _.each(alarmsToCreate, function(alarmType) {
@@ -118,14 +125,5 @@ export default app => {
             }
             log('Pushover result:', result);
         });
-    }
-
-    function unAckAlarm(type, ack) {
-        if (!ack) return;
-
-        let ackTimeInMillis = ALARM_SNOOZE_TIMES[type] * helpers.HOUR_IN_MS;
-
-        // If more time has passed since ack then this type allows, return true
-        return app.currentTime() - ack >= ackTimeInMillis;
     }
 }
