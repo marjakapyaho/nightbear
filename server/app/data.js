@@ -84,7 +84,7 @@ export default app => {
             endkey: 'calibrations/',
             limit: 1
         })
-        .then(res => res.rows[0].doc);
+        .then(res => res.rows[0] ? res.rows[0].doc : {});
     }
 
     // Promises entries from the last durationMs

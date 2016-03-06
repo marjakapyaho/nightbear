@@ -77,8 +77,11 @@
                 border: 1px solid #ccc;
                 border-radius: 6px;
                 background: white;
-                width: 100%;
-                margin-top: 50px;
+                width: 230px;
+                display: block;
+                margin: 50px auto;
+                padding: 15px;
+                font-size: 14px;
             }
 
             .alarms {
@@ -127,10 +130,16 @@
                     });
                 });
 
-                $('.save-test-data').on('click', { 'name': $('.save-test-data-name').val() }, function() {
-                    $.post( "/api/v1/test-data", function() {
-                        $('.save-test-data').text('Test data saved');
-                        $('.save-test-data-name').val('');
+                $('.save-test-data').on('click', function() {
+                    var data = { 'name': $('.save-test-data-name').val() };
+                    $.ajax("/api/v1/test-data", {
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        type: 'POST',
+                        success: function() {
+                            $('.save-test-data').text('Test data saved');
+                            $('.save-test-data-name').val('');
+                        }
                     });
                 });
             });
