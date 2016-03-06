@@ -33,8 +33,9 @@ export default app => {
     function nightscoutUploaderPost(datum) {
         if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
             const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/entries';
+            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
             log('Sending entry downstream to:', url);
-            axios.post(url, datum).then(
+            axios.post(url, datum, headers).then(
                 success => log('Successfully sent entry downstream'),
                 failure => log('Failed to send entry downstream:', failure)
             )
@@ -164,8 +165,9 @@ export default app => {
 
         if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
             const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/devicestatus';
+            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
             log('Sending devicestatus downstream to:', url);
-            axios.post(url, postData).then(
+            axios.post(url, postData, headers).then(
                 success => log('Successfully sent devicestatus downstream'),
                 failure => log('Failed to send devicestatus downstream:', failure)
             )
