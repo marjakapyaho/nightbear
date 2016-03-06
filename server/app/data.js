@@ -1,5 +1,6 @@
 import * as helpers from './helpers';
 import _ from 'lodash';
+import axios from 'axios';
 
 const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 
@@ -30,6 +31,14 @@ export default app => {
     }
 
     function nightscoutUploaderPost(datum) {
+        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
+            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/entries';
+            log('Sending entry downstream to:', url);
+            axios.post(url, datum).then(
+                success => log('Successfully sent entry downstream'),
+                failure => log('Failed to send entry downstream:', failure)
+            )
+        }
         if (datum.type === 'sgv') {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
@@ -152,6 +161,16 @@ export default app => {
     }
 
     function createDeviceStatus(postData) {
+
+        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
+            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/devicestatus';
+            log('Sending devicestatus downstream to:', url);
+            axios.post(url, postData).then(
+                success => log('Successfully sent devicestatus downstream'),
+                failure => log('Failed to send devicestatus downstream:', failure)
+            )
+        }
+
         let deviceStatus = {
             _id: 'device-status/' + helpers.isoTimestamp(app.currentTime()),
             uploaderBattery: postData.uploaderBattery

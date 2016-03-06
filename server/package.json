@@ -15,6 +15,7 @@
   "author": "Jarno Rantanen <jarno@jrw.fi>",
   "license": "AGPL",
   "dependencies": {
+    "axios": "^0.8.1",
     "babel": "^5.8.29",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
@@ -26,7 +27,6 @@
     "winston-papertrail": "^1.0.2"
   },
   "devDependencies": {
-    "axios": "^0.8.1",
     "chai": "^3.4.1",
     "memdown": "^1.1.0",
     "mocha": "^2.3.4"
