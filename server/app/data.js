@@ -48,10 +48,16 @@ export default app => {
         }
         else if (datum.type === 'mbg') {
             return dbPUT('meter-entries', datum)
+                .catch(err => {
+                    if (err.name !== 'conflict') throw err; // conflict is actually often expected, as the Nightscout Uploader will keep sending the same entries over and over
+                })
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'cal') {
             return dbPUT('calibrations', datum)
+                .catch(err => {
+                    if (err.name !== 'conflict') throw err; // same as with "meter-entries"
+                })
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else {
