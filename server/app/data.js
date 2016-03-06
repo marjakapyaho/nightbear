@@ -17,6 +17,7 @@ export default app => {
         ackLatestAlarm,
         getStatus,
         createDeviceStatus,
+        saveTestData,
         legacyPost,
         getLegacyEntries
     };
@@ -65,16 +66,21 @@ export default app => {
         }
     }
 
-    // Promises an object with a snapshot of the current timeline content (which can then be analysed, rendered etc)
+    // Promises an object with a snapshot of the current timeline content
+    // (which can then be analysed, rendered etc)
     function getTimelineContent() {
         return Promise.all([
             getLatestEntries(helpers.HOUR_IN_MS * 0.5),
-            getLatestTreatments(helpers.HOUR_IN_MS * 3),
-            getLatestDeviceStatus()
-        ]).then(([ latestEntries, latestTreatments, latestDeviceStatus ]) => ({
+            getLatestTreatments(helpers.HOUR_IN_MS * 3.5),
+            getLatestDeviceStatus(),
+            getActiveAlarms(true), // include acknowledged alarms
+            getLatestCalibration()
+        ]).then(([ latestEntries, latestTreatments, latestDeviceStatus, activeAlarms, latestCal ]) => ({
             latestEntries,
             latestTreatments,
-            latestDeviceStatus
+            latestDeviceStatus,
+            activeAlarms,
+            latestCal
         }));
     }
 
@@ -87,7 +93,7 @@ export default app => {
             endkey: 'calibrations/',
             limit: 1
         })
-        .then(res => res.rows[0].doc);
+        .then(res => res.rows[0] ? res.rows[0].doc : {});
     }
 
     // Promises entries from the last durationMs
@@ -203,6 +209,21 @@ export default app => {
             limit: 1
         })
         .then(res => res.rows[0] ? res.rows[0].doc : { uploaderBattery: null });
+    }
+
+    function saveTestData(name) {
+        return app.data.getTimelineContent()
+            .then(function(dataSnapshot) {
+                let testData = {
+                    _id: 'test-data/' + helpers.isoTimestamp(app.currentTime()),
+                    snapshot: dataSnapshot,
+                    name: name || helpers.isoTimestamp(app.currentTime())
+                };
+                return app.pouchDB.put(testData).then(
+                    success => log('saveTestData()', testData, '=>', success),
+                    failure => log('saveTestData()', testData, '=> FAILURE:', failure) || Promise.reject(failure)
+                );
+            });
     }
 
     function legacyPost(data) {

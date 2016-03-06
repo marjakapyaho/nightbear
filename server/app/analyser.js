@@ -16,7 +16,7 @@ export default app => {
         getProfile
     };
 
-    function analyseData(timelineContent, activeAlarms) {
+    function analyseData(timelineContent) {
         var status = 'ok'; // OK if not proven otherwise
         var profile = getProfile();
         var { latestEntries, latestTreatments, latestDeviceStatus } = timelineContent;
