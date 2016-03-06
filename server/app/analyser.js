@@ -11,23 +11,31 @@ export const STATUS_OK = 'ok';
 
 export default app => {
 
+    const log = app.logger(__filename);
+
     return {
         analyseData,
         getProfile
     };
 
     function analyseData(timelineContent) {
-        var status = 'ok'; // OK if not proven otherwise
-        var profile = getProfile();
-        var { latestEntries, latestTreatments, latestDeviceStatus } = timelineContent;
-        var batteryAlarm = (latestDeviceStatus.uploaderBattery || latestDeviceStatus.uploaderBattery === 0) ? latestDeviceStatus.uploaderBattery < profile.BATTERY_LIMIT : false;
+        let state = {};
 
-        if (latestEntries.length < 1) {
-            return { status: STATUS_OUTDATED, data: null };
+        var profile = getProfile();
+        var { latestEntries, latestTreatments, latestDeviceStatus, latestAlarms } = timelineContent;
+
+        // Check battery status
+        state[STATUS_BATTERY] = _.isNumber(latestDeviceStatus.uploaderBattery) && latestDeviceStatus.uploaderBattery < profile.BATTERY_LIMIT;
+
+        // Check we have data points
+        // if not, just return
+        if (latestEntries.length === 0) {
+            state[STATUS_OUTDATED] = true;
+            log('Analysis state:', state);
+            return state;
         }
 
         let latestDataPoint = _.sortBy(latestEntries, 'date')[latestEntries.length - 1];
-        let latestTime = latestDataPoint.date;
         let latestGlucoseValue = latestDataPoint.nb_glucose_value;
         let latestDirection = latestDataPoint.direction;
 
@@ -36,23 +44,14 @@ export default app => {
             latestDirection = calculateDirection(latestEntries);
         }
 
-        if (app.currentTime() - latestTime > profile.TIME_SINCE_SGV_LIMIT) {
-            status = STATUS_OUTDATED;
-        }
-        else if (latestGlucoseValue > profile.HIGH_LEVEL_ABS) {
-            status = STATUS_HIGH;
-        }
-        else if (latestGlucoseValue < profile.LOW_LEVEL_ABS) {
-            status = STATUS_LOW;
-        }
-        else if (latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up') {
-            status = STATUS_RISING;
-        }
-        else if (latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down') {
-            status = STATUS_FALLING;
-        }
+        state[STATUS_OUTDATED] = app.currentTime() - latestDataPoint.date > profile.TIME_SINCE_SGV_LIMIT;
+        state[STATUS_HIGH] = latestGlucoseValue > profile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
+        state[STATUS_LOW] = latestGlucoseValue < profile.LOW_LEVEL_ABS + (_.findWhere(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
+        state[STATUS_RISING] = !state[STATUS_HIGH] && latestGlucoseValue > profile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up';
+        state[STATUS_FALLING] = !state[STATUS_LOW] && latestGlucoseValue < profile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down';
 
-        return { status: status, data: latestDataPoint, batteryAlarm: batteryAlarm };
+        log('Analysis state:', state);
+        return state;
     }
 
     function getProfile() {

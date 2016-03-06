@@ -10,6 +10,14 @@ export const ALARM_SNOOZE_TIMES = {
     [analyser.STATUS_FALLING]: 10
 };
 
+export const ALARM_LEVEL_UP_TIMES = {
+    [analyser.STATUS_OUTDATED]: [ 10, 20, 20],
+    [analyser.STATUS_HIGH]: [ 10, 20, 20],
+    [analyser.STATUS_LOW]: [ 6, 7, 10],
+    [analyser.STATUS_RISING]: [ 8, 15, 15],
+    [analyser.STATUS_FALLING]: [ 6, 7, 10]
+};
+
 export default app => {
 
     const log = app.logger(__filename);
@@ -36,58 +44,56 @@ export default app => {
     }
 
     function doChecks(timelineContent) {
+        log('Active alarms:', timelineContent.activeAlarms);
 
         let operations = [];
 
         // Analyse current status
-        let analysisResults = app.analyser.analyseData(timelineContent);
-        let currentStatus = analysisResults.status;
-        let latestDataPoint = analysisResults.data;
-        let batteryAlarm = analysisResults.batteryAlarm;
+        const state = app.analyser.analyseData(timelineContent);
 
-        // Analyse each active alarm in regards to their clear conditions and current status
-        let matchingAlarmFound = false;
-
-        _.each(timelineContent.activeAlarms, function(alarm) {
-            log('Found active alarm:', alarm.type);
-
-            // Advance alarm level if alarm not acknowledged
-            if (!alarm.ack) {
-                alarm.level++;
-            }
-
-            // Are we still having the same alarm
-            if (currentStatus === alarm.type || (batteryAlarm && alarm.type === 'battery')) {
-                matchingAlarmFound = true;
-            }
-            else if (clearAlarmOfType(alarm.type, latestDataPoint, batteryAlarm)) { // or not
-                alarm.status = 'inactive';
-            }
-
-            // Release ack lock if enough time has passed and alarm is still active
-            if (alarm.status === 'active' && unAckAlarm(alarm.type, alarm.ack)) {
-                alarm.ack = false;
-                alarm.level = 1;
-            }
-
-            // Update alarm in DB to match new level (and possibly status and ack)
-            operations.push(app.data.updateAlarm(alarm));
-
-            // If alarm is not acknowledged and is still active,
-            // send alarm according to new updated level
-            if (!alarm.ack && alarm.status === 'active') {
-                sendAlarm(alarm.level, alarm.type);
-            }
+        const alarmsToRemove = _.filter(timelineContent.activeAlarms, function(alarm) {
+            return !state[alarm.type];
         });
 
-        // There there was no previous matching alarm, create new one
-        if (!matchingAlarmFound && currentStatus !== analyser.STATUS_OK) {
-            log('Create new alarm with status:', currentStatus);
-            operations.push(app.data.createAlarm(currentStatus, 1)); // Initial alarm level
-        }
-        else if (!matchingAlarmFound && batteryAlarm) {
-            operations.push(app.data.createAlarm(analyser.STATUS_BATTERY, 1)); // Initial alarm level
-        }
+        const alarmsToKeep = _.filter(timelineContent.activeAlarms, function(alarm) {
+            return state[alarm.type];
+        });
+
+        const alarmsToCreate = _.compact(_.map(state, function(value, key) {
+            if (!value) return;
+            if (_.findWhere(alarmsToKeep, { type: key })) return;
+            return key;
+        }));
+
+        _.each(alarmsToRemove, function(alarm) {
+            alarm.status = 'inactive';
+            operations.push(app.data.updateAlarm(alarm));
+        });
+
+        _.each(alarmsToKeep, function(alarm) {
+
+            if (app.currentTime() <= alarm.validAfter) {
+                return;
+            }
+
+            const hasBeenValidFor = (app.currentTime() - alarm.validAfter) / helpers.MIN_IN_MS;
+            const levelUpTimes = ALARM_LEVEL_UP_TIMES[alarm.type];
+            const accumulatedTimes = _.map(levelUpTimes, (x, i) => _.sum(_.take(levelUpTimes, i + 1)));
+            const neededLevel = _.findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
+
+            if (neededLevel !== alarm.level) {
+                log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
+                alarm.level = neededLevel;
+                operations.push(app.data.updateAlarm(alarm));
+                sendAlarm(alarm.level, alarm.type);
+            }
+
+        });
+
+        _.each(alarmsToCreate, function(alarmType) {
+            log('Create new alarm with status:', alarmType);
+            operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
+        });
 
         return Promise.all(operations);
     }
@@ -120,41 +126,4 @@ export default app => {
             log('Pushover result:', result);
         });
     }
-
-    function unAckAlarm(type, ack) {
-        if (!ack) return;
-
-        let ackTimeInMillis = ALARM_SNOOZE_TIMES[type] * helpers.HOUR_IN_MS;
-
-        // If more time has passed since ack then this type allows, return true
-        return app.currentTime() - ack >= ackTimeInMillis;
-    }
-
-    function clearAlarmOfType(type, latestDataPoint, batteryAlarm) {
-        if (latestDataPoint && type === analyser.STATUS_OUTDATED) {
-            return true; // Always clear if current status is no longer outdated
-        }
-        else if (type === analyser.STATUS_HIGH) {
-            if (latestDataPoint && latestDataPoint.nb_glucose_value < app.analyser.getProfile().HIGH_LEVEL_ABS - 2) {
-                return true;
-            }
-        }
-        else if (type === analyser.STATUS_LOW) {
-            if (latestDataPoint && latestDataPoint.nb_glucose_value > app.analyser.getProfile().LOW_LEVEL_ABS + 2) {
-                return true;
-            }
-        }
-        else if (type === analyser.STATUS_RISING) {
-            return true;
-        }
-        else if (type === analyser.STATUS_FALLING) {
-            return true;
-        }
-        else if (type === analyser.STATUS_BATTERY && !batteryAlarm) {
-            return true;
-        }
-
-        return false;
-    }
-
 }
