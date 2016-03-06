@@ -16,11 +16,7 @@ export default app => {
 
     return {
         initAlarms,
-        runChecks,
-        doChecks,
-        sendAlarm,
-        unAckAlarm,
-        clearAlarmOfType
+        runChecks
     };
 
     function initAlarms() {
@@ -29,12 +25,9 @@ export default app => {
     }
 
     function runChecks() {
-        return Promise.all([
-            app.data.getTimelineContent(),
-            app.data.getActiveAlarms(true) // include acknowledged alarms
-        ]).then(
-            function([ timelineContent, activeAlarms ]) {
-                doChecks(timelineContent, activeAlarms);
+        return app.data.getTimelineContent().then(
+            function(timelineContent) {
+                doChecks(timelineContent);
             },
             function(err) {
                 log.error('Checks failed with error', err);
@@ -42,12 +35,12 @@ export default app => {
         );
     }
 
-    function doChecks(timelineContent, activeAlarms) {
+    function doChecks(timelineContent) {
 
         let operations = [];
 
         // Analyse current status
-        let analysisResults = app.analyser.analyseData(timelineContent, activeAlarms);
+        let analysisResults = app.analyser.analyseData(timelineContent);
         let currentStatus = analysisResults.status;
         let latestDataPoint = analysisResults.data;
         let batteryAlarm = analysisResults.batteryAlarm;
@@ -55,7 +48,7 @@ export default app => {
         // Analyse each active alarm in regards to their clear conditions and current status
         let matchingAlarmFound = false;
 
-        _.each(activeAlarms, function(alarm) {
+        _.each(timelineContent.activeAlarms, function(alarm) {
             log('Found active alarm:', alarm.type);
 
             // Advance alarm level if alarm not acknowledged

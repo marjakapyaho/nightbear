@@ -39,6 +39,14 @@ export default app => {
                 );
             });
 
+            // Save data for use in tests
+            server.post('/api/v1/test-data', function(req, res) {
+                app.data.saveTestData(req.body.name).then(
+                    data => res.status(200).send(data || null),
+                    err => res.status(500).send({ error: err && err.message || true })
+                );
+            });
+
             // LEGACY URLS
 
             server.get('/api/entries', function(req, res) {

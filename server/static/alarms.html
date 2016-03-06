@@ -52,6 +52,7 @@
                 clear: both;
             }
 
+            .save-test-data,
             .ack-alarm {
                 clear: both;
                 cursor: pointer;
@@ -66,6 +67,20 @@
                 color: white;
             }
 
+            .save-test-data {
+                margin-top: 10px;
+                border: 1px solid #247ca0;
+                background: #2685ab;
+            }
+
+            input {
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: white;
+                width: 100%;
+                margin-top: 50px;
+            }
+
             .alarms {
                 width: 100%;
             }
@@ -75,6 +90,9 @@
     <body>
         <ul class="alarms"></ul>
         <div class="ack-alarm">Acknowledge alarm</div>
+
+        <input class="save-test-data-name" type="text" />
+        <div class="save-test-data">Save test data</div>
 
         <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 
@@ -106,6 +124,13 @@
                 $('.ack-alarm').on('click', function() {
                     $.post( "/api/v1/status", function() {
                         getStatus();
+                    });
+                });
+
+                $('.save-test-data').on('click', { 'name': $('.save-test-data-name').val() }, function() {
+                    $.post( "/api/v1/test-data", function() {
+                        $('.save-test-data').text('Test data saved');
+                        $('.save-test-data-name').val('');
                     });
                 });
             });
