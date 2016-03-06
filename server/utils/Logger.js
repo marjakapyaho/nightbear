@@ -11,29 +11,25 @@ export default function(consoleOutput = true, papertrailUrl = null) {
 
     if (consoleOutput) {
 
-        var console = new winston.transports.Console({
+        logger.add(winston.transports.Console, {
             timestamp: () => new Date().toISOString(),
-            colorize: true
+            colorize: true,
+            handleExceptions: true
         });
-
-        logger.add(() => console);
 
     }
 
     if (papertrailUrl) {
 
-        const [ host, port ] = papertrailUrl.split(':');
-        const papertrail = new winston.transports.Papertrail({ // @see https://github.com/kenperkins/winston-papertrail
-            host,
-            port,
+        logger.add(winston.transports.Papertrail, {
+            host: papertrailUrl.split(':')[0],
+            port: papertrailUrl.split(':')[1],
             program: 'nightbear-server',
-            exceptionsLevel: 'error'
+            colorize: true,
+            handleExceptions: true
         });
-        papertrail.exceptionsLevel = 'error'; // @see https://github.com/kenperkins/winston-papertrail/issues/40
 
-        winston.handleExceptions(papertrail); // @see https://github.com/winstonjs/winston#handling-uncaught-exceptions-with-winston
-
-        logger.add(() => papertrail);
+        logger.transports.Papertrail.exceptionsLevel = 'error'; // @see https://github.com/kenperkins/winston-papertrail/issues/40
 
     }
 
@@ -41,7 +37,7 @@ export default function(consoleOutput = true, papertrailUrl = null) {
 
         const label = rawLabel.replace(/.*\/([\w-]+).*/, '$1');  // e.g. "/path/to/MyComponent.js" becomes "MyComponent"
         const flatten = ctx => ctx.length === 0 ? null : (ctx.length === 1 ? ctx[0] : ctx);
-        const internal = (level, message, ...context) => logger.log(level, `[${label}] ${message}`, flatten(context));
+        const internal = (level, message, ...context) => { logger.log(level, `[${label}] ${message}`, flatten(context)); };
 
         return _.extend(internal.bind(null, 'info'), {
             error: internal.bind(null, 'error')
