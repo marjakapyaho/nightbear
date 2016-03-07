@@ -63,7 +63,9 @@ export default app => {
                 LOW_LEVEL_REL: 8,
                 LOW_LEVEL_ABS: 4,
                 TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
-                BATTERY_LIMIT: 30
+                BATTERY_LIMIT: 30,
+                ALARM_RETRY: 120,
+                ALARM_EXPIRE: 60 * 4
             };
         }
         else { // NIGHT
@@ -73,7 +75,9 @@ export default app => {
                 LOW_LEVEL_REL: 6,
                 LOW_LEVEL_ABS: 4,
                 TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
-                BATTERY_LIMIT: 10
+                BATTERY_LIMIT: 10,
+                ALARM_RETRY: 30,
+                ALARM_EXPIRE: 60 * 120
             };
         }
     }

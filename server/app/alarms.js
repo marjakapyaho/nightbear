@@ -105,8 +105,8 @@ export default app => {
             sound: 'persistent',
             device: process.env['PUSHOVER_LEVEL_1'],
             priority: 2,
-            retry: 120,
-            expire: 60
+            retry: app.analyser.getProfile().ALARM_RETRY,
+            expire: app.analyser.getProfile().ALARM_EXPIRE
         };
 
         if (level === 2) {
