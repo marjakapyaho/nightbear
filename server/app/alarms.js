@@ -106,7 +106,8 @@ export default app => {
             device: process.env['PUSHOVER_LEVEL_1'],
             priority: 2,
             retry: app.analyser.getProfile().ALARM_RETRY,
-            expire: app.analyser.getProfile().ALARM_EXPIRE
+            expire: app.analyser.getProfile().ALARM_EXPIRE,
+            callback: 'http://nightbear.jrw.fi/api/v1/status'
         };
 
         if (level === 2) {
