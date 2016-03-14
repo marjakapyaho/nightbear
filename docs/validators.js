@@ -33,8 +33,11 @@ db.get('_design/nightbear_immutability')
         // For the time being, we also need these as filters
         // See: https://github.com/pouchdb/pouchdb/issues/4970
         doc.filters = {
-            mutable_timeline: function(doc) {
-                return !!doc._id.match(/^(?:alarms|treatments)\/(.+)/);
+            mutable_timeline: function(doc, req) {
+                var match = doc._id.match(/^(?:alarms|treatments)\/(.+)/);
+                if (!match) return false; // this isn't one of the relevant doc types at all
+                if (!req.query.atOrLaterThan) return true; // timestamp filter param wasn't provided -> it's relevant
+                return match[1] >= req.query.atOrLaterThan; // if this falls within our window of interest
             }.toString(),
             immutable_timeline: function(doc) {
                 return !!doc._id.match(/^(?!alarms|treatments).+?\/(.+)/);

@@ -79,11 +79,16 @@
 
                 function start_repl_DOWN() {
 
+                    var filterBackTo = '2016-03-13' //new Date(Date.now() - 1000 * 60 * 60).toISOString();
+
+                    console.info('filterBackTo = ' + filterBackTo);
+
                     // @see http://pouchdb.com/api.html#replication
                     var replDOWN = remote.replicate.to(local, {
                         live: true,
                         retry: true,
-                        filter: 'nightbear_immutability/mutable_timeline'
+                        filter: 'nightbear_immutability/mutable_timeline',
+                        query_params: { atOrLaterThan: filterBackTo }
                     });
 
                     var replDOWNStarted = Date.now();
@@ -92,7 +97,6 @@
                     }).on('paused', function(x) {
                         console.info('[DOWN] SYNC', 'paused', x);
                         $('#status-down').text('replication paused (took ' + (Date.now() - replDOWNStarted) + ' ms)');
-//                        start_repl_UP();
                     }).on('active', function(x) {
                         console.info('[DOWN] SYNC', 'active', x);
                         replDOWNStarted = Date.now();
@@ -107,7 +111,7 @@
 
                 }
 
-                start_repl_UP();
+//                start_repl_UP();
 
                 function start_repl_UP() {
 
