@@ -31,10 +31,11 @@
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.3.0/pouchdb.js"></script>
 
-        <pre id="status" style="font-weight: bold;">???</pre>
+        <pre id="status-down" style="font-weight: bold;">status-down ???</pre>
+        <pre id="status-up" style="font-weight: bold;">status-up ???</pre>
         <pre id="info">???</pre>
         <ul></ul>
-        <p>v3</p>
+        <p>v4</p>
 
         <script>
             $(function() {
@@ -52,41 +53,99 @@
                 var local = window.db = new PouchDB('user_marja');
                 var remote = new PouchDB(localStorage.dbUrl);
 
-                // @see http://pouchdb.com/api.html#replication
-                var syncOp = remote.replicate.to(local, {
-                    live: true,
-                    retry: true,
-                    filter: 'replication_filters/filter_current_day',
-                    query_params: {sinceDate: 1457272566000} // 2016-03-06T13:56:06Z
-//                    query_params: { sinceDate: Date.now() - 1000 * 60 * 60 * 3 } // since 3 hours ago
-                });
+                /*
+                local.put({
+                    _id: '_design/nightbear_immutability',
+                    filters: {
+                        mutable_timeline: function(doc) {
+                            return !!doc._id.match(/^(?:alarms|treatments)\/(.+)/);
+                        }.toString(),
+                        immutable_timeline: function(doc) {
+                            return !!doc._id.match(/^(?!alarms|treatments).+?\/(.+)/);
+                        }.toString()
+                    }
+                }).then(
+                    function(x) {
+                        console.info(x)
+                    },
+                    function(y) {
+                        console.error(y)
+                    }
+                );
+                return;
+                */
 
-                var replStartedAt = Date.now();
+                start_repl_DOWN();
 
-                syncOp.on('change', function (info) {
-                    console.info('SYNC', 'change', info);
-                }).on('paused', function (x) {
-                    console.info('SYNC', 'paused', x);
-                    $('#status').text('replication paused (took ' + (Date.now() - replStartedAt) + ' ms)');
-                }).on('active', function (x) {
-                    console.info('SYNC', 'active', x);
-                    replStartedAt = Date.now();
-                    $('#status').text('replication ACTIVE');
-                }).on('denied', function (info) {
-                    console.info('SYNC', 'denied', info);
-                }).on('complete', function (info) {
-                    console.info('SYNC', 'complete', info);
-                }).on('error', function (err) {
-                    console.info('SYNC', 'error', err);
-                });
+                function start_repl_DOWN() {
 
+                    // @see http://pouchdb.com/api.html#replication
+                    var replDOWN = remote.replicate.to(local, {
+                        live: true,
+                        retry: true,
+                        filter: 'nightbear_immutability/mutable_timeline'
+                    });
+
+                    var replDOWNStarted = Date.now();
+                    replDOWN.on('change', function(info) {
+                        console.info('[DOWN] SYNC', 'change', info);
+                    }).on('paused', function(x) {
+                        console.info('[DOWN] SYNC', 'paused', x);
+                        $('#status-down').text('replication paused (took ' + (Date.now() - replDOWNStarted) + ' ms)');
+//                        start_repl_UP();
+                    }).on('active', function(x) {
+                        console.info('[DOWN] SYNC', 'active', x);
+                        replDOWNStarted = Date.now();
+                        $('#status-down').text('[DOWN] replication ACTIVE');
+                    }).on('denied', function(info) {
+                        console.info('[DOWN] SYNC', 'denied', info);
+                    }).on('complete', function(info) {
+                        console.info('[DOWN] SYNC', 'complete', info);
+                    }).on('error', function(err) {
+                        console.info('[DOWN] SYNC', 'error', err);
+                    });
+
+                }
+
+                start_repl_UP();
+
+                function start_repl_UP() {
+
+                    // @see http://pouchdb.com/api.html#replication
+                    var replUP = local.replicate.to(remote, {
+                        live: true,
+                        retry: true,
+                        filter: function(doc) {
+                            return !!doc._id.match(/^(?:alarms|treatments)\/(.+)/);
+                        }
+                    });
+
+                    var replUPStarted = Date.now();
+                    replUP.on('change', function(info) {
+                        console.info('[UP] SYNC', 'change', info);
+                    }).on('paused', function(x) {
+                        console.info('[UP] SYNC', 'paused', x);
+                        $('#status-up').text('replication paused (took ' + (Date.now() - replUPStarted) + ' ms)');
+                    }).on('active', function(x) {
+                        console.info('[UP] SYNC', 'active', x);
+                        replUPStarted = Date.now();
+                        $('#status-up').text('[UP] replication ACTIVE');
+                    }).on('denied', function(info) {
+                        console.info('[UP] SYNC', 'denied', info);
+                    }).on('complete', function(info) {
+                        console.info('[UP] SYNC', 'complete', info);
+                    }).on('error', function(err) {
+                        console.info('[UP] SYNC', 'error', err);
+                    });
+
+                }
 
                 var changes = local.changes({
                     since: 'now',
                     live: true,
                     include_docs: true
                 }).on('change', function(change) {
-                    console.info('CHANGES', 'change', change);
+//                    console.info('CHANGES', 'change', change);
                     render();
                 }).on('complete', function(info) {
                     console.info('CHANGES', 'complete', info);
@@ -100,11 +159,15 @@
                     console.log('rendering');
                     local.info()
                         .then(function(i) { $('#info').text(JSON.stringify(i, undefined, 4)) });
-                    db.allDocs({ include_docs: true, limit: 10, descending: true, start_key: 'sensor-entries/_' })
+                    db.allDocs({ include_docs: true, limit: 10, descending: true, start_key: 'treatments/_' })
                         .then(function(res) {
                             $('ul').html('').append(
                                 res.rows.map(function(row) {
-                                    return $('<li>').text(row.doc.dateString)
+                                    var doc = row.doc;
+                                    return $('<li>').text(new Date(doc.date) +
+                                        ' ' + (doc.insulin ? 'insulin = ' + doc.insulin : '') +
+                                        ' ' + (doc.carbs ? 'carbs = ' + doc.carbs : '')
+                                    )
                                 })
                             );
                         })

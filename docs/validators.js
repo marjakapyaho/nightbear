@@ -30,6 +30,16 @@ db.get('_design/nightbear_immutability')
                 }.toString()
             }
         };
+        // For the time being, we also need these as filters
+        // See: https://github.com/pouchdb/pouchdb/issues/4970
+        doc.filters = {
+            mutable_timeline: function(doc) {
+                return !!doc._id.match(/^(?:alarms|treatments)\/(.+)/);
+            }.toString(),
+            immutable_timeline: function(doc) {
+                return !!doc._id.match(/^(?!alarms|treatments).+?\/(.+)/);
+            }.toString()
+        };
         return db.put(doc);
     })
     .then(out, out);
