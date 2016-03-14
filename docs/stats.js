@@ -12,14 +12,14 @@ db.get('_design/global_stats')
         doc.views = {
             per_type: {
                 map: function (doc) {
-                    var match = doc._id.match(/(.*)\/(.*)T/);
+                    var match = doc._id.match(/(.+?)\/(.+?)T/);
                     if (match) emit([ match[1] ]); // e.g. [ "calibrations" ]
                 }.toString(),
                 reduce: '_count'
             },
             per_date_and_type: {
                 map: function (doc) {
-                    var match = doc._id.match(/(.*)\/(.*)T/);
+                    var match = doc._id.match(/(.+?)\/(.+?)T/);
                     if (match) emit([ match[2], match[1] ]); // e.g. [ "2015-11-29", "calibrations" ]
                 }.toString(),
                 reduce: '_count'
