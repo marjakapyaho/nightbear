@@ -84,8 +84,15 @@ export default app => {
             if (neededLevel !== alarm.level) {
                 log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
                 alarm.level = neededLevel;
-                operations.push(app.data.updateAlarm(alarm));
-                sendAlarm(alarm.level, alarm.type);
+                operations.push(
+                    sendAlarm(alarm.level, alarm.type) // send out the alarm
+                        .then(receipt => { // and only persist the level upgrade IF the alarm got sent (so we get retries)
+                            alarm.pushoverReceipts = alarm.pushoverReceipts || [];
+                            alarm.pushoverReceipts.push(receipt);
+                            return app.data.updateAlarm(alarm);
+                        })
+                        .catch(err => log.error('Sending alarm failed:', err))
+                );
             }
 
         });
@@ -120,11 +127,18 @@ export default app => {
             msg.device = process.env['PUSHOVER_LEVEL_3'];
         }
 
-        app.pushover.send(msg, function(err, result) {
-            if (err) {
-                throw err;
-            }
-            log('Pushover result:', result);
+        return new Promise(function (resolve, reject) {
+            app.pushover.send(msg, function(err, result) {
+                if (err) {
+                    return reject(err);
+                }
+
+                let resultJSON = JSON.parse(result);
+                let receipt = resultJSON.receipt;
+
+                log('Pushover sent with receipt nro:', receipt);
+                resolve(receipt);
+            });
         });
     }
 }
