@@ -52,7 +52,8 @@ describe('basic alarm checks', () => {
                 "level": 2,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[5].date + 1000
+                "validAfter": ENTRIES[5].date + 1000,
+                "pushoverReceipts": [ "FAKE_PUSHOVER_RECEIPT" ]
             }]))
 
             // Acknowledge testing
@@ -67,7 +68,8 @@ describe('basic alarm checks', () => {
                 "level": 1, // level is reset by the ack operation
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10 // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
+                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10, // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
+                "pushoverReceipts": []
             }]))
 
             // Still snoozing
@@ -79,7 +81,8 @@ describe('basic alarm checks', () => {
                 "level": 1,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10 // see above
+                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10, // see above
+                "pushoverReceipts": []
             }]))
 
             // Alarm cleared

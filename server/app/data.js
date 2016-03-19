@@ -155,16 +155,31 @@ export default app => {
         return app.data.getActiveAlarms()
             .then(docs => docs[0])
             .then(function(alarm) {
+                log('ackLatestAlarm()', alarm);
                 if (!alarm) return;
+
                 const snoozeTime = alarms.ALARM_SNOOZE_TIMES[alarm.type];
                 if (!snoozeTime) {
                     throw new Error('Invalid alarm type');
                 }
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
-                log('ackLatestAlarm()', alarm);
-                return app.data.updateAlarm(alarm);
+
+                return sendPushoverAcks(alarm.pushoverReceipts).then(function() {
+                    alarm.pushoverReceipts = [];
+                    return app.data.updateAlarm(alarm);
+                });
             });
+    }
+
+    function sendPushoverAcks(receipts = []) {
+        return Promise.all(receipts.map(receipt => {
+            let url = 'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json';
+            return axios.post(url, { token: process.env.PUSHOVER_TOKEN }).then(
+                success => log('Pushover ack success:', receipt),
+                failure => log.error('Pushover ack failure:', failure)
+            );
+        }));
     }
 
     function getStatus() {

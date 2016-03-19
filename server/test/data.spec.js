@@ -38,7 +38,8 @@ describe('data', () => {
                     level: 1,
                     status: 'active',
                     type: 'high',
-                    validAfter: NOW + 1000 * 60 * 90 // TODO: Get the snooze period from variable
+                    validAfter: NOW + 1000 * 60 * 90, // TODO: Get the snooze period from variable
+                    pushoverReceipts: []
                 }
             ]))
             .then(() => app.data.getActiveAlarms(false)) // includeAcks = false
