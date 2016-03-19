@@ -147,6 +147,7 @@ export default app => {
     }
 
     function updateAlarm(alarmDoc) {
+        log('updateAlarm()', alarmDoc);
         return app.pouchDB.put(alarmDoc);
     }
 
@@ -161,6 +162,7 @@ export default app => {
                 }
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
+                log('ackLatestAlarm()', alarm);
                 return app.data.updateAlarm(alarm);
             });
     }
