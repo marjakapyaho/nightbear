@@ -29,7 +29,7 @@ export default app => {
 
     function initAlarms() {
         runChecks();
-        setInterval(runChecks, 5 * helpers.MIN_IN_MS);
+        setInterval(runChecks, 1 * helpers.MIN_IN_MS);
     }
 
     function runChecks() {
