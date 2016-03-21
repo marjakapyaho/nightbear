@@ -175,7 +175,9 @@ export default app => {
     function sendPushoverAcks(receipts = []) {
         return Promise.all(receipts.map(receipt => {
             let url = 'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json';
-            return axios.post(url, { token: process.env.PUSHOVER_TOKEN }).then(
+            return axios.post(url, 'token=' + encodeURIComponent(process.env.PUSHOVER_TOKEN), {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(
                 success => log('Pushover ack success:', receipt),
                 failure => log.error('Pushover ack failure:', failure)
             );
