@@ -3,6 +3,7 @@ import * as helpers from './helpers';
 
 export const STATUS_OUTDATED = 'outdated';
 export const STATUS_HIGH = 'high';
+export const STATUS_PERSISTENT_HIGH = 'persistent_high';
 export const STATUS_LOW = 'low';
 export const STATUS_RISING = 'rising';
 export const STATUS_FALLING = 'falling';
@@ -39,10 +40,10 @@ export default app => {
 export function getActiveProfile(currentTimestamp) {
     if (new Date(currentTimestamp).getHours() > 9) { // DAY
         return {
-            HIGH_LEVEL_REL: 12,
+            HIGH_LEVEL_REL: 10,
             HIGH_LEVEL_ABS: 15,
-            LOW_LEVEL_REL: 8,
-            LOW_LEVEL_ABS: 4,
+            LOW_LEVEL_REL: 9,
+            LOW_LEVEL_ABS: 5,
             TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
             BATTERY_LIMIT: 30,
             ALARM_RETRY: 120,
@@ -51,7 +52,7 @@ export function getActiveProfile(currentTimestamp) {
     }
     else { // NIGHT
         return {
-            HIGH_LEVEL_REL: 13,
+            HIGH_LEVEL_REL: 10,
             HIGH_LEVEL_ABS: 15,
             LOW_LEVEL_REL: 6,
             LOW_LEVEL_ABS: 4,
@@ -86,9 +87,15 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
     }
 
     state[STATUS_OUTDATED] = currentTimestamp - latestDataPoint.date > activeProfile.TIME_SINCE_SGV_LIMIT;
+
     state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
+    state[STATUS_PERSISTENT_HIGH] = _.filter(latestEntries, (entry) => entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL).length === 0 &&
+        (latestDirection === 'FortyFiveUp' || detectDirection(latestDirection) === 'Flat');
+
     state[STATUS_LOW] = latestGlucoseValue < activeProfile.LOW_LEVEL_ABS + (_.findWhere(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
+
     state[STATUS_RISING] = !state[STATUS_HIGH] && latestGlucoseValue > activeProfile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up';
+
     state[STATUS_FALLING] = !state[STATUS_LOW] && latestGlucoseValue < activeProfile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down';
 
     return state;

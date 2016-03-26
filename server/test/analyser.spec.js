@@ -72,7 +72,7 @@ describe('analyser', () => {
             [ { glucose: 16, direction: 'SingleUp'   }, analyser.STATUS_HIGH ],
             [ { glucose: 16, direction: 'Flat'       }, analyser.STATUS_HIGH ],
             [ { glucose: 11, direction: 'SingleDown' } ],
-            [ { glucose:  8, direction: 'SingleDown' } ]
+            [ { glucose:  8, direction: 'SingleDown' }, analyser.STATUS_FALLING ]
         );
     });
 
