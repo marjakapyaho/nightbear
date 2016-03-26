@@ -65,7 +65,7 @@ export default app => {
                 TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
                 BATTERY_LIMIT: 30,
                 ALARM_RETRY: 120,
-                ALARM_EXPIRE: 60 * 4
+                ALARM_EXPIRE: 60 * 20 // 20 min
             };
         }
         else { // NIGHT
@@ -77,7 +77,7 @@ export default app => {
                 TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
                 BATTERY_LIMIT: 10,
                 ALARM_RETRY: 30,
-                ALARM_EXPIRE: 60 * 120
+                ALARM_EXPIRE: 60 * 120 // 120 min
             };
         }
     }
