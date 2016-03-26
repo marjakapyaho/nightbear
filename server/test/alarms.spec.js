@@ -23,42 +23,42 @@ describe('basic alarm checks', () => {
             .then(() => post('/api/v1/entries', ENTRIES[1]))
 
             // Should not alarm
+            .then(() => setCurrentTime(ENTRIES[2].date))
             .then(() => post('/api/v1/entries', ENTRIES[2]))
+            .then(() => setCurrentTime(ENTRIES[3].date))
             .then(() => post('/api/v1/entries', ENTRIES[3]))
+            .then(() => setCurrentTime(ENTRIES[4].date))
             .then(() => post('/api/v1/entries', ENTRIES[4]))
-            .then(() => setCurrentTime(ENTRIES[4].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, []))
 
             // Should alarm falling
+            .then(() => setCurrentTime(ENTRIES[5].date))
             .then(() => post('/api/v1/entries', ENTRIES[5]))
-            .then(() => setCurrentTime(ENTRIES[5].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[5].date + 1000
+                "validAfter": ENTRIES[5].date
             }]))
 
             // Check that level rises ok
+            .then(() => setCurrentTime(ENTRIES[6].date))
             .then(() => post('/api/v1/entries', ENTRIES[6]))
-            .then(() => setCurrentTime(ENTRIES[6].date + 1000 * 60 * 4)) // 4 minutes pass // TODO: Get this from variable..?
-            .then(() => app.alarms.runChecks())
+            .then(() => setCurrentTime(ENTRIES[7].date))
+            .then(() => post('/api/v1/entries', ENTRIES[7]))
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 2,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[5].date + 1000,
+                "validAfter": ENTRIES[5].date,
                 "pushoverReceipts": [ "FAKE_PUSHOVER_RECEIPT" ]
             }]))
 
             // Acknowledge testing
-            .then(() => post('/api/v1/entries', ENTRIES[7]))
-            .then(() => setCurrentTime(ENTRIES[7].date + 1000))
             .then(() => post('/api/v1/status')) // ack latest alarm
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
@@ -68,28 +68,27 @@ describe('basic alarm checks', () => {
                 "level": 1, // level is reset by the ack operation
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10, // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
+                "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
                 "pushoverReceipts": []
             }]))
 
             // Still snoozing
+            .then(() => setCurrentTime(ENTRIES[8].date))
             .then(() => post('/api/v1/entries', ENTRIES[8]))
-            .then(() => setCurrentTime(ENTRIES[8].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => app.data.getActiveAlarms(true))
             .then(alarms => assertEqual(stripMetaFields(alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES[7].date + 1000 + 1000 * 60 * 10, // see above
+                "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // see above
                 "pushoverReceipts": []
             }]))
 
             // Alarm cleared
+            .then(() => setCurrentTime(ENTRIES[9].date))
             .then(() => post('/api/v1/entries', ENTRIES[9]))
+            .then(() => setCurrentTime(ENTRIES[10].date))
             .then(() => post('/api/v1/entries', ENTRIES[10]))
-            .then(() => setCurrentTime(ENTRIES[10].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
@@ -123,47 +122,49 @@ describe('basic alarm checks', () => {
         return post('/api/v1/entries', ENTRIES2[0])
 
             // Should not alarm
+            .then(() => setCurrentTime(ENTRIES2[1].date))
             .then(() => post('/api/v1/entries', ENTRIES2[1]))
+            .then(() => setCurrentTime(ENTRIES2[2].date))
             .then(() => post('/api/v1/entries', ENTRIES2[2]))
-            .then(() => setCurrentTime(ENTRIES2[2].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, []))
 
 
             // Should alarm falling
+            .then(() => setCurrentTime(ENTRIES2[3].date))
             .then(() => post('/api/v1/entries', ENTRIES2[3]))
-            .then(() => post('/api/v1/entries', ENTRIES2[4]))
-            .then(() => setCurrentTime(ENTRIES2[4].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "falling",
-                "validAfter": ENTRIES2[4].date + 1000
+                "validAfter": ENTRIES2[3].date
             }]))
 
             // Should change to alarm low
+            .then(() => setCurrentTime(ENTRIES2[4].date))
+            .then(() => post('/api/v1/entries', ENTRIES2[4]))
+            .then(() => setCurrentTime(ENTRIES2[5].date))
             .then(() => post('/api/v1/entries', ENTRIES2[5]))
+            .then(() => setCurrentTime(ENTRIES2[6].date))
             .then(() => post('/api/v1/entries', ENTRIES2[6]))
-            .then(() => setCurrentTime(ENTRIES2[6].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "low",
-                "validAfter": ENTRIES2[6].date + 1000
+                "validAfter": ENTRIES2[6].date
             }]))
 
-            // Alarm cleared
+            //// Alarm cleared
+            .then(() => setCurrentTime(ENTRIES2[7].date))
             .then(() => post('/api/v1/entries', ENTRIES2[7]))
+            .then(() => setCurrentTime(ENTRIES2[8].date))
             .then(() => post('/api/v1/entries', ENTRIES2[8]))
+            .then(() => setCurrentTime(ENTRIES2[9].date))
             .then(() => post('/api/v1/entries', ENTRIES2[9]))
+            .then(() => setCurrentTime(ENTRIES2[10].date))
             .then(() => post('/api/v1/entries', ENTRIES2[10]))
-            .then(() => setCurrentTime(ENTRIES2[10].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
             .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
@@ -175,52 +176,62 @@ describe('basic alarm checks', () => {
         return post('/api/v1/entries', ENTRIES3[0])
 
             // Should not alarm
+            .then(() => setCurrentTime(ENTRIES3[1].date))
             .then(() => post('/api/v1/entries', ENTRIES3[1]))
+            .then(() => setCurrentTime(ENTRIES3[2].date))
             .then(() => post('/api/v1/entries', ENTRIES3[2]))
-            .then(() => setCurrentTime(ENTRIES3[2].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, []))
 
 
             // Should alarm rising
+            .then(() => setCurrentTime(ENTRIES3[3].date))
             .then(() => post('/api/v1/entries', ENTRIES3[3]))
-            .then(() => setCurrentTime(ENTRIES3[3].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "rising",
-                "validAfter": ENTRIES3[3].date + 1000
+                "validAfter": ENTRIES3[3].date
             }]))
 
             //// Should change to alarm high
+            .then(() => setCurrentTime(ENTRIES3[4].date))
             .then(() => post('/api/v1/entries', ENTRIES3[4]))
+            .then(() => setCurrentTime(ENTRIES3[5].date))
             .then(() => post('/api/v1/entries', ENTRIES3[5]))
+            .then(() => setCurrentTime(ENTRIES3[6].date))
             .then(() => post('/api/v1/entries', ENTRIES3[6]))
-            .then(() => setCurrentTime(ENTRIES3[6].date + 1000))
-            .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(stripMetaFields(status.alarms), [{
                 "level": 1,
                 "status": "active",
                 "type": "high",
-                "validAfter": ENTRIES3[6].date + 1000
+                "validAfter": ENTRIES3[6].date
             }]))
 
             // Alarm cleared
             // TODO: Advance to level 2 and test pushover
+            .then(() => setCurrentTime(ENTRIES3[7].date))
             .then(() => post('/api/v1/entries', ENTRIES3[7]))
+            .then(() => setCurrentTime(ENTRIES3[8].date))
             .then(() => post('/api/v1/entries', ENTRIES3[8]))
+            .then(() => setCurrentTime(ENTRIES3[9].date))
             .then(() => post('/api/v1/entries', ENTRIES3[9]))
+            .then(() => setCurrentTime(ENTRIES3[10].date))
             .then(() => post('/api/v1/entries', ENTRIES3[10]))
+            .then(() => setCurrentTime(ENTRIES3[11].date))
             .then(() => post('/api/v1/entries', ENTRIES3[11]))
+            .then(() => setCurrentTime(ENTRIES3[12].date))
             .then(() => post('/api/v1/entries', ENTRIES3[12]))
+            .then(() => setCurrentTime(ENTRIES3[13].date))
             .then(() => post('/api/v1/entries', ENTRIES3[13]))
+            .then(() => setCurrentTime(ENTRIES3[14].date))
             .then(() => post('/api/v1/entries', ENTRIES3[14]))
+            .then(() => setCurrentTime(ENTRIES3[15].date))
             .then(() => post('/api/v1/entries', ENTRIES3[15]))
-            .then(() => setCurrentTime(ENTRIES3[15].date + 1000))
             .then(() => app.alarms.runChecks())
             .then(() => get('/api/v1/status'))
             .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear

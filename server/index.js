@@ -17,4 +17,4 @@ const app = createAppInstance({
 });
 
 app.server.createExpressServer(3001, 'static');
-app.alarms.initAlarms();
+app.alarms.runChecks();
