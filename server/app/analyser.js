@@ -31,34 +31,37 @@ export default app => {
     }
 
     function getProfile() {
-
-        if (new Date(app.currentTime()).getHours() > 9) { // DAY
-            return {
-                HIGH_LEVEL_REL: 12,
-                HIGH_LEVEL_ABS: 15,
-                LOW_LEVEL_REL: 8,
-                LOW_LEVEL_ABS: 4,
-                TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
-                BATTERY_LIMIT: 30,
-                ALARM_RETRY: 120,
-                ALARM_EXPIRE: 60 * 20 // 20 min
-            };
-        }
-        else { // NIGHT
-            return {
-                HIGH_LEVEL_REL: 13,
-                HIGH_LEVEL_ABS: 15,
-                LOW_LEVEL_REL: 6,
-                LOW_LEVEL_ABS: 4,
-                TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
-                BATTERY_LIMIT: 10,
-                ALARM_RETRY: 30,
-                ALARM_EXPIRE: 60 * 120 // 120 min
-            };
-        }
+        return getActiveProfile(app.currentTime());
     }
 
 };
+
+export function getActiveProfile(currentTimestamp) {
+    if (new Date(currentTimestamp).getHours() > 9) { // DAY
+        return {
+            HIGH_LEVEL_REL: 12,
+            HIGH_LEVEL_ABS: 15,
+            LOW_LEVEL_REL: 8,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
+            BATTERY_LIMIT: 30,
+            ALARM_RETRY: 120,
+            ALARM_EXPIRE: 60 * 20 // 20 min
+        };
+    }
+    else { // NIGHT
+        return {
+            HIGH_LEVEL_REL: 13,
+            HIGH_LEVEL_ABS: 15,
+            LOW_LEVEL_REL: 6,
+            LOW_LEVEL_ABS: 4,
+            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
+            BATTERY_LIMIT: 10,
+            ALARM_RETRY: 30,
+            ALARM_EXPIRE: 60 * 120 // 120 min
+        };
+    }
+}
 
 export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, latestEntries, latestTreatments, latestDeviceStatus, latestAlarms }) {
     let state = {};
