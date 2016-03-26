@@ -72,7 +72,7 @@ describe('analyser', () => {
             [ { glucose: 16, direction: 'SingleUp'   }, analyser.STATUS_HIGH ],
             [ { glucose: 16, direction: 'Flat'       }, analyser.STATUS_HIGH ],
             [ { glucose: 11, direction: 'SingleDown' } ],
-            [ { glucose:  8, direction: 'SingleDown' } ],
+            [ { glucose:  8, direction: 'SingleDown' } ]
         );
     });
 
@@ -84,7 +84,7 @@ describe('analyser', () => {
             [ { glucose:  8, direction: 'Flat', battery: 25 }, analyser.STATUS_BATTERY ],
             [ { glucose:  8, direction: 'Flat', battery:  5 }, analyser.STATUS_BATTERY ],
             [ { glucose:  8, direction: 'Flat', battery: 50 } ],
-            [ { glucose:  8, direction: 'Flat', battery: 75 } ],
+            [ { glucose:  8, direction: 'Flat', battery: 75 } ]
         );
     });
 
