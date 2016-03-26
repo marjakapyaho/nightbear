@@ -15,17 +15,29 @@ describe('analyser', () => {
     function assertTimelineAnalysis(startTimestamp, ...expectedTimeline) {
         const actualTimeline = expectedTimeline.map((timelineEntry, i) => {
             const currentTimestamp = startTimestamp + i * TIMELINE_TICK;
+            const entriesThusFar = expectedTimeline.slice(0, i + 1);
             const snapshot = {
                 currentTimestamp,
                 activeProfile: analyser.getActiveProfile(currentTimestamp),
-                latestEntries: expectedTimeline
-                    .slice(0, i + 1) // all entries thus far
-                    .map(([ { nb_glucose_value, direction } ], j) => ({
-                        date: startTimestamp + j * TIMELINE_TICK,
-                        direction,
-                        nb_glucose_value
-                    })),
-                latestTreatments: [],
+                latestEntries: (
+                    entriesThusFar
+                        .map(([ { glucose, direction } ], j) => ({
+                            date: startTimestamp + j * TIMELINE_TICK,
+                            direction,
+                            nb_glucose_value: glucose
+                        }))
+                ),
+                latestTreatments: (
+                    _.compact(
+                        entriesThusFar
+                            .map(([ { insulin, carbs } ], j) => {
+                                const treatment = { date: startTimestamp + j * TIMELINE_TICK };
+                                if (insulin) treatment.insulin = insulin;
+                                if (carbs) treatment.carbs = carbs;
+                                return (insulin || carbs) && treatment; // only create the treatment if it contains either field
+                            })
+                    )
+                ),
                 latestDeviceStatus: [],
                 latestAlarms: []
             };
@@ -54,12 +66,12 @@ describe('analyser', () => {
     it('detects highs', () => {
         assertTimelineAnalysis(
             DAYTIME,
-            [ { nb_glucose_value:  8, direction: 'SingleUp'   } ],
-            [ { nb_glucose_value: 10, direction: 'SingleUp'   } ],
-            [ { nb_glucose_value: 16, direction: 'SingleUp'   }, analyser.STATUS_HIGH ],
-            [ { nb_glucose_value: 16, direction: 'Flat'       }, analyser.STATUS_HIGH ],
-            [ { nb_glucose_value: 11, direction: 'SingleDown' } ],
-            [ { nb_glucose_value:  8, direction: 'SingleDown' } ],
+            [ { glucose:  8, direction: 'SingleUp'   } ],
+            [ { glucose: 10, direction: 'SingleUp'   } ],
+            [ { glucose: 16, direction: 'SingleUp'   }, analyser.STATUS_HIGH ],
+            [ { glucose: 16, direction: 'Flat'       }, analyser.STATUS_HIGH ],
+            [ { glucose: 11, direction: 'SingleDown' } ],
+            [ { glucose:  8, direction: 'SingleDown' } ],
         );
     });
 
