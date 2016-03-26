@@ -38,7 +38,9 @@ describe('analyser', () => {
                             })
                     )
                 ),
-                latestDeviceStatus: [],
+                latestDeviceStatus: {
+                    uploaderBattery: _.get(_.findLast(entriesThusFar, '[0].battery'), '[0].battery') || 100 // repeat the last battery specified in test case, or default to 100 if it's never specified
+                },
                 latestAlarms: []
             };
             const actualSituations = situationObjectToArray(analyser.analyseTimelineSnapshot(snapshot));
@@ -55,7 +57,7 @@ describe('analyser', () => {
                     activeProfile: analyser.getActiveProfile(DAYTIME),
                     latestEntries: [],
                     latestTreatments: [],
-                    latestDeviceStatus: [],
+                    latestDeviceStatus: {},
                     latestAlarms: []
                 })
             ),
@@ -64,14 +66,25 @@ describe('analyser', () => {
     });
 
     it('detects highs', () => {
-        assertTimelineAnalysis(
-            DAYTIME,
+        assertTimelineAnalysis(DAYTIME,
             [ { glucose:  8, direction: 'SingleUp'   } ],
             [ { glucose: 10, direction: 'SingleUp'   } ],
             [ { glucose: 16, direction: 'SingleUp'   }, analyser.STATUS_HIGH ],
             [ { glucose: 16, direction: 'Flat'       }, analyser.STATUS_HIGH ],
             [ { glucose: 11, direction: 'SingleDown' } ],
             [ { glucose:  8, direction: 'SingleDown' } ],
+        );
+    });
+
+    it('detects low battery', () => {
+        assertTimelineAnalysis(DAYTIME,
+            [ { glucose:  8, direction: 'Flat' } ],
+            [ { glucose:  8, direction: 'Flat', battery: 75 } ],
+            [ { glucose:  8, direction: 'Flat', battery: 50 } ],
+            [ { glucose:  8, direction: 'Flat', battery: 25 }, analyser.STATUS_BATTERY ],
+            [ { glucose:  8, direction: 'Flat', battery:  5 }, analyser.STATUS_BATTERY ],
+            [ { glucose:  8, direction: 'Flat', battery: 50 } ],
+            [ { glucose:  8, direction: 'Flat', battery: 75 } ],
         );
     });
 
