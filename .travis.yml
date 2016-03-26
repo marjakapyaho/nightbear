@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "4.1"
+  - "5.1"
 
 # https://docs.travis-ci.com/user/customizing-the-build/#The-Build-Lifecycle
 before_install: cd server
