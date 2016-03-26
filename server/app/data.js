@@ -46,6 +46,7 @@ export default app => {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
                 .then(data => dbPUT('sensor-entries', data))
+                .then(() => app.alarms.runChecks()) // No need to wait for results
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'mbg') {

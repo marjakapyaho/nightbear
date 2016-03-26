@@ -18,29 +18,26 @@ export const ALARM_LEVEL_UP_TIMES = {
     [analyser.STATUS_FALLING]: [ 6, 7, 10]
 };
 
+let nextCheck;
+
 export default app => {
 
     const log = app.logger(__filename);
 
     return {
-        initAlarms,
         runChecks
     };
 
-    function initAlarms() {
-        runChecks();
-        setInterval(runChecks, 1 * helpers.MIN_IN_MS);
-    }
-
     function runChecks() {
-        return app.data.getTimelineContent().then(
-            function(timelineContent) {
-                doChecks(timelineContent);
-            },
-            function(err) {
-                log.error('Checks failed with error', err);
-            }
-        );
+        log('Running checks');
+
+        // Clear previous timer (if exists) and set next one
+        if (nextCheck) { clearTimeout(nextCheck); }
+        nextCheck = setTimeout(runChecks, 6 * helpers.MIN_IN_MS);
+
+        return app.data.getTimelineContent()
+            .then(doChecks)
+            .catch(err => log.error('Checks failed with error:', err));
     }
 
     function doChecks(timelineContent) {
