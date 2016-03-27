@@ -89,8 +89,9 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
     state[STATUS_OUTDATED] = currentTimestamp - latestDataPoint.date > activeProfile.TIME_SINCE_SGV_LIMIT;
 
     state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
-    state[STATUS_PERSISTENT_HIGH] = _.filter(latestEntries, (entry) => entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL).length === 0 &&
-        (latestDirection === 'FortyFiveUp' || detectDirection(latestDirection) === 'Flat');
+    state[STATUS_PERSISTENT_HIGH] = latestEntries.length > 30 &&
+        _.filter(latestEntries, (entry) => entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL).length === 0 &&
+        (latestDirection === 'FortyFiveUp' || latestDirection === 'Flat');
 
     state[STATUS_LOW] = latestGlucoseValue < activeProfile.LOW_LEVEL_ABS + (_.findWhere(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
 
