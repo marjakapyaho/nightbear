@@ -80,10 +80,11 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
     let latestDataPoint = _.sortBy(latestEntries, 'date')[latestEntries.length - 1];
     let latestGlucoseValue = latestDataPoint.nb_glucose_value;
     let latestDirection = latestDataPoint.direction;
+    let latestNoise = latestDataPoint.noise;
 
     // If we have no direction, calculate one
     if (latestDirection === helpers.DIRECTION_NOT_COMPUTABLE) {
-        latestDirection = calculateDirection(latestEntries);
+        latestDirection = calculateDirection(latestEntries, latestNoise);
     }
 
     state[STATUS_OUTDATED] = currentTimestamp - latestDataPoint.date > activeProfile.TIME_SINCE_SGV_LIMIT;
@@ -117,23 +118,21 @@ function calculateSlope(older, newer) {
     return ((newer.nb_glucose_value - older.nb_glucose_value) / (newer.date - older.date)) * helpers.MIN_IN_MS * 5;
 }
 
-function calculateDirection(entries) {
-    let latest = _.slice(_.sortBy(entries, 'date'), -3);
-    let finalSlope, direction, slope1, slope2;
+function calculateDirection(entries, latestNoise) {
+    let neededDataPointCount = latestNoise >= helpers.NOISE_LEVEL_LIMIT ? 6 : 2;
+    let latest = _.slice(_.sortBy(entries, 'date'), -(neededDataPointCount + 1));
+    let finalSlope, direction;
 
-    // If we have over one entry
-    if (latest.length === 2) {
-        slope1 = calculateSlope(latest[0], latest[1]);
-    }
-    else if (latest.length === 3) {
-        slope1 = calculateSlope(latest[0], latest[1]);
-        slope2 = calculateSlope(latest[1], latest[2]);
-
-        finalSlope = (slope1 + slope2) / 2; // TODO: do weighted average
-    }
-    else {
+    if (latest.length < neededDataPointCount + 1) {
         return helpers.DIRECTION_NOT_COMPUTABLE;
     }
+
+    let sumOfSlopes = 0;
+    for (let i = 0; i < neededDataPointCount; i++) {
+        sumOfSlopes += calculateSlope(latest[i], latest[i + 1]);
+    }
+
+    finalSlope = sumOfSlopes / neededDataPointCount;
 
     let limit1 = 0.3;
     let limit2 = 0.7;
