@@ -33,15 +33,14 @@ export default app => {
     }
 
     function nightscoutUploaderPost(datum) {
-        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
-            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/entries';
-            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
-            log('Sending entry downstream to:', url);
-            axios.post(url, datum, headers).then(
+
+        if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
+            app.nightscoutProxy.sendEntry(datum).then(
                 success => log('Successfully sent entry downstream'),
-                failure => log('Failed to send entry downstream:', failure)
-            )
+                failure => log.error('Failed to send entry downstream:', failure)
+            );
         }
+
         if (datum.type === 'sgv') {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
@@ -204,14 +203,11 @@ export default app => {
 
     function createDeviceStatus(postData) {
 
-        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
-            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/devicestatus';
-            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
-            log('Sending devicestatus downstream to:', url);
-            axios.post(url, postData, headers).then(
+        if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
+            app.nightscoutProxy.sendDeviceStatus(postData).then(
                 success => log('Successfully sent devicestatus downstream'),
-                failure => log('Failed to send devicestatus downstream:', failure)
-            )
+                failure => log.error('Failed to send devicestatus downstream:', failure)
+            );
         }
 
         let deviceStatus = {
