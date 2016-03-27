@@ -17,107 +17,107 @@ describe('basic alarm checks', () => {
     });
 
 
-    //it('works with FALLING status + ACK + battery alarm', () => {
-    //
-    //    return post('/api/v1/entries', ENTRIES[0])
-    //        .then(() => post('/api/v1/entries', ENTRIES[1]))
-    //
-    //        // Should not alarm
-    //        .then(() => setCurrentTime(ENTRIES[2].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[2]))
-    //        .then(() => setCurrentTime(ENTRIES[3].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[3]))
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(status.alarms, []))
-    //
-    //        // Should alarm falling
-    //        .then(() => setCurrentTime(ENTRIES[4].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[4]))
-    //        .then(() => app.alarms.runChecks())
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(stripMetaFields(status.alarms), [{
-    //            "level": 1,
-    //            "status": "active",
-    //            "type": "falling",
-    //            "validAfter": ENTRIES[4].date
-    //        }]))
-    //
-    //        // Check that level rises ok
-    //        .then(() => setCurrentTime(ENTRIES[5].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[5]))
-    //        .then(() => setCurrentTime(ENTRIES[6].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[6]))
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(stripMetaFields(status.alarms), [{
-    //            "level": 2,
-    //            "status": "active",
-    //            "type": "falling",
-    //            "validAfter": ENTRIES[4].date,
-    //            "pushoverReceipts": [ "FAKE_PUSHOVER_RECEIPT" ]
-    //        }]))
-    //
-    //        // Acknowledge testing
-    //        .then(() => setCurrentTime(ENTRIES[7].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[7]))
-    //        .then(() => post('/api/v1/status')) // ack latest alarm
-    //        .then(() => app.alarms.runChecks())
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint won't return ack'ed alarms
-    //        .then(() => app.data.getActiveAlarms(true)) // but the internal API will
-    //        .then(alarms => assertEqual(stripMetaFields(alarms), [{
-    //            "level": 1, // level is reset by the ack operation
-    //            "status": "active",
-    //            "type": "falling",
-    //            "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
-    //            "pushoverReceipts": []
-    //        }]))
-    //
-    //        // Still snoozing
-    //        .then(() => setCurrentTime(ENTRIES[8].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[8]))
-    //        .then(() => app.data.getActiveAlarms(true))
-    //        .then(alarms => assertEqual(stripMetaFields(alarms), [{
-    //            "level": 1,
-    //            "status": "active",
-    //            "type": "falling",
-    //            "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // see above
-    //            "pushoverReceipts": []
-    //        }]))
-    //
-    //        // Alarm cleared
-    //        .then(() => setCurrentTime(ENTRIES[9].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[9]))
-    //        .then(() => setCurrentTime(ENTRIES[10].date))
-    //        .then(() => post('/api/v1/entries', ENTRIES[10]))
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
-    //        .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
-    //        .then(alarms => assertEqual(alarms, []))
-    //
-    //        // Uploader battery should alarm if too low
-    //        .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 90 }))
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(stripMetaFields(status.deviceStatus), { "uploaderBattery": 90 }))
-    //        .then(() => setCurrentTime(ENTRIES[10].date + 2000))
-    //        .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 20 }))
-    //        .then(() => app.alarms.runChecks())
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(stripMetaFields(status.alarms), [{
-    //            "level": 1,
-    //            "status": "active",
-    //            "type": "battery",
-    //            "validAfter": ENTRIES[10].date + 2000
-    //        }]))
-    //
-    //        // Clear battery alarm
-    //        .then(() => setCurrentTime(ENTRIES[10].date + 3000))
-    //        .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 30 }))
-    //        .then(() => app.alarms.runChecks())
-    //        .then(() => get('/api/v1/status'))
-    //        .then(status => assertEqual(stripMetaFields(status.alarms), []))
-    //});
+    xit('works with FALLING status + ACK + battery alarm', () => {
 
-    it('works with FALLING + LOW status', () => {
+        return post('/api/v1/entries', ENTRIES[0])
+            .then(() => post('/api/v1/entries', ENTRIES[1]))
+
+            // Should not alarm
+            .then(() => setCurrentTime(ENTRIES[2].date))
+            .then(() => post('/api/v1/entries', ENTRIES[2]))
+            .then(() => setCurrentTime(ENTRIES[3].date))
+            .then(() => post('/api/v1/entries', ENTRIES[3]))
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(status.alarms, []))
+
+            // Should alarm falling
+            .then(() => setCurrentTime(ENTRIES[4].date))
+            .then(() => post('/api/v1/entries', ENTRIES[4]))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
+                "level": 1,
+                "status": "active",
+                "type": "falling",
+                "validAfter": ENTRIES[4].date
+            }]))
+
+            // Check that level rises ok
+            .then(() => setCurrentTime(ENTRIES[5].date))
+            .then(() => post('/api/v1/entries', ENTRIES[5]))
+            .then(() => setCurrentTime(ENTRIES[6].date))
+            .then(() => post('/api/v1/entries', ENTRIES[6]))
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
+                "level": 2,
+                "status": "active",
+                "type": "falling",
+                "validAfter": ENTRIES[4].date,
+                "pushoverReceipts": [ "FAKE_PUSHOVER_RECEIPT" ]
+            }]))
+
+            // Acknowledge testing
+            .then(() => setCurrentTime(ENTRIES[7].date))
+            .then(() => post('/api/v1/entries', ENTRIES[7]))
+            .then(() => post('/api/v1/status')) // ack latest alarm
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint won't return ack'ed alarms
+            .then(() => app.data.getActiveAlarms(true)) // but the internal API will
+            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+                "level": 1, // level is reset by the ack operation
+                "status": "active",
+                "type": "falling",
+                "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // the "falling" alarm type will snooze for 10 min, according to current settings // TODO: Get this from variable
+                "pushoverReceipts": []
+            }]))
+
+            // Still snoozing
+            .then(() => setCurrentTime(ENTRIES[8].date))
+            .then(() => post('/api/v1/entries', ENTRIES[8]))
+            .then(() => app.data.getActiveAlarms(true))
+            .then(alarms => assertEqual(stripMetaFields(alarms), [{
+                "level": 1,
+                "status": "active",
+                "type": "falling",
+                "validAfter": ENTRIES[7].date + 1000 * 60 * 10, // see above
+                "pushoverReceipts": []
+            }]))
+
+            // Alarm cleared
+            .then(() => setCurrentTime(ENTRIES[9].date))
+            .then(() => post('/api/v1/entries', ENTRIES[9]))
+            .then(() => setCurrentTime(ENTRIES[10].date))
+            .then(() => post('/api/v1/entries', ENTRIES[10]))
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(status.alarms, [])) // the HTTP endpoint gives all clear
+            .then(() => app.data.getActiveAlarms(true)) // and the internal API likewise
+            .then(alarms => assertEqual(alarms, []))
+
+            // Uploader battery should alarm if too low
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 90 }))
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.deviceStatus), { "uploaderBattery": 90 }))
+            .then(() => setCurrentTime(ENTRIES[10].date + 2000))
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 20 }))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), [{
+                "level": 1,
+                "status": "active",
+                "type": "battery",
+                "validAfter": ENTRIES[10].date + 2000
+            }]))
+
+            // Clear battery alarm
+            .then(() => setCurrentTime(ENTRIES[10].date + 3000))
+            .then(() => post('/api/v1/devicestatus', { "uploaderBattery": 30 }))
+            .then(() => app.alarms.runChecks())
+            .then(() => get('/api/v1/status'))
+            .then(status => assertEqual(stripMetaFields(status.alarms), []))
+    });
+
+    xit('works with FALLING + LOW status', () => {
 
         return post('/api/v1/entries', ENTRIES2[0])
 
@@ -173,7 +173,7 @@ describe('basic alarm checks', () => {
             .then(alarms => assertEqual(alarms, []));
     });
 
-    it('works with RISING + HIGH status', () => {
+    xit('works with RISING + HIGH status', () => {
 
         return post('/api/v1/entries', ENTRIES3[0])
 
