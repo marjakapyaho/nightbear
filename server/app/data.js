@@ -1,7 +1,6 @@
 import * as helpers from './helpers';
 import * as alarms from './alarms';
 import _ from 'lodash';
-import axios from 'axios';
 
 const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 
@@ -165,23 +164,11 @@ export default app => {
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
 
-                return sendPushoverAcks(alarm.pushoverReceipts).then(function() {
+                return app.pushover.ackAlarms(alarm.pushoverReceipts).then(() => {
                     alarm.pushoverReceipts = [];
                     return app.data.updateAlarm(alarm);
                 });
             });
-    }
-
-    function sendPushoverAcks(receipts = []) {
-        return Promise.all(receipts.map(receipt => {
-            let url = 'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json';
-            return axios.post(url, 'token=' + encodeURIComponent(process.env.PUSHOVER_TOKEN), {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(
-                success => log('Pushover ack success:', receipt),
-                failure => log.error('Pushover ack failure:', failure)
-            );
-        }));
     }
 
     function getStatus() {

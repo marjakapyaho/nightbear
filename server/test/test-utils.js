@@ -27,10 +27,8 @@ export function createTestApp() {
         currentTime: () => fakeCurrentTime,
         pouchDB: new PouchDB(dbName, { db: MemDOWN }), // http://pouchdb.com/adapters.html#pouchdb_in_node_js
         pushover: {
-            send(data, callback) {
-                console.log('Sent PUSHOVER alert with data', data);
-                callback(null, '{ "receipt": "FAKE_PUSHOVER_RECEIPT" }');
-            }
+            sendAlarm: () => Promise.resolve('FAKE_PUSHOVER_RECEIPT'),
+            ackAlarms: () => Promise.resolve()
         }
     });
     let httpHostPrefix;
