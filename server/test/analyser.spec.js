@@ -120,9 +120,13 @@ describe('analyser', () => {
             [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
             [ { glucose: 5.2, direction: 'NOT COMPUTABLE', noise: 4 } ],
             [ { glucose: 8, direction: 'NOT COMPUTABLE', noise: 4 } ],
-            [ { glucose: 5, direction: 'NOT COMPUTABLE', noise: 4 } ],
-            [ { glucose: 6, direction: 'NOT COMPUTABLE', noise: 4 } ],
-            [ { glucose: 5, direction: 'NOT COMPUTABLE', noise: 4 } ]
+            [ { glucose: 10, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 7, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 11, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 13, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
+            [ { glucose: 12.5, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
+            [ { glucose: 15, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ]
         );
     });
 
