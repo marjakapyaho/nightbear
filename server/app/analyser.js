@@ -89,9 +89,20 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
     state[STATUS_OUTDATED] = currentTimestamp - latestDataPoint.date > activeProfile.TIME_SINCE_SGV_LIMIT;
 
     state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
-    state[STATUS_PERSISTENT_HIGH] = latestEntries.length > 30 &&
-        _.filter(latestEntries, (entry) => entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL).length === 0 &&
-        (latestDirection === 'FortyFiveUp' || latestDirection === 'Flat');
+
+    const pastTwoHours = _.filter(latestEntries, entry => entry.date >= currentTimestamp - helpers.HOUR_IN_MS * 2);
+    const knownTimeWindow = _.last(pastTwoHours).date - _.first(pastTwoHours).date;
+    const haveWideEnoughWindow = knownTimeWindow > helpers.HOUR_IN_MS * 2 - helpers.MIN_IN_MS * 10; // allow 10 min tolerance
+    const haveEnoughDataPoints = pastTwoHours.length > 18; // allow a few entries to be missing (2 hours would be 24 entries at 5 min intervals)
+    const allAreHighEnough = _.filter(pastTwoHours, entry => entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL).length === 0; // not a single entry is below the HIGH_LEVEL_REL limit
+
+    state[STATUS_PERSISTENT_HIGH] = (
+        !state[STATUS_HIGH] &&
+        haveWideEnoughWindow &&
+        haveEnoughDataPoints &&
+        allAreHighEnough &&
+        (latestDirection === 'FortyFiveUp' || latestDirection === 'Flat')
+    );
 
     state[STATUS_LOW] = latestGlucoseValue < activeProfile.LOW_LEVEL_ABS + (_.findWhere(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
 

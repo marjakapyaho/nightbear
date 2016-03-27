@@ -99,6 +99,7 @@ describe('analyser', () => {
 
     it('detects persistent high', () => {
         assertTimelineAnalysis(DAYTIME,
+            // 12:00
             [ { glucose: 10, direction: 'FortyFiveUp' } ],
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
@@ -111,6 +112,7 @@ describe('analyser', () => {
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
+            // 13:00
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
@@ -122,14 +124,13 @@ describe('analyser', () => {
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
             [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' } ],
-            [ { glucose: 11, direction: 'Flat' }, analyser.STATUS_PERSISTENT_HIGH ]
+            [ { glucose: 11, direction: 'Flat' }, analyser.STATUS_PERSISTENT_HIGH ],
+            // 14:00
+            [ { glucose: 12, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
+            [ { glucose: 13, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
+            [ { glucose: 14, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
+            [ { glucose: 15, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
+            [ { glucose: 16, direction: 'FortyFiveUp' }, analyser.STATUS_HIGH ], // "high" trumps "persistent high"
         );
     });
 
