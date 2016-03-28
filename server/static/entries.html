@@ -43,8 +43,8 @@
         <pre id="info">???</pre>
         <ul></ul>
 
-        <p id="ui-version">version???</p>
-        <p id="db-version">version???</p>
+        <p>UI_VERSION = <span id="ui-version">version???</span></p>
+        <p>DB_VERSION = <span id="db-version">version???</span></p>
 
         <button id="add-carbs">Add carbs</button>
         <button id="add-insulin">Add insulin</button>
@@ -53,7 +53,7 @@
         <script>
             $(function() {
 
-                var UI_VERSION = 'v6'; // match this with the manifest.appcache file
+                var UI_VERSION = 'v7'; // match this with the manifest.appcache file
                 var DB_VERSION = 'v5'; // increment this to force a re-sync
 
                 $('#ui-version').text(UI_VERSION);
