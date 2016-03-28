@@ -35,10 +35,17 @@
         <pre id="status-up" style="font-weight: bold;">status-up ???</pre>
         <pre id="info">???</pre>
         <ul></ul>
-        <p>v4</p>
+
+        <p id="version">version???</p>
+
+        <button onclick="delete localStorage.dbUrl">Clear remote URL</button>
 
         <script>
             $(function() {
+
+                var VERSION = 'v5';
+
+                $('#version').text(VERSION);
                 
                 if (!localStorage.dbUrl) {
                     localStorage.dbUrl = prompt('Enter full DB URL to connect to') || '';
@@ -50,7 +57,7 @@
 
                 console.log('App starting up');
 
-                var local = window.db = new PouchDB('user_marja');
+                var local = window.db = new PouchDB('user_marja_' + VERSION);
                 var remote = new PouchDB(localStorage.dbUrl);
 
                 /*
@@ -87,8 +94,8 @@
                     var replDOWN = remote.replicate.to(local, {
                         live: true,
                         retry: true,
-                        filter: 'nightbear_immutability/mutable_timeline',
-                        query_params: { atOrLaterThan: filterBackTo }
+                        filter: 'nightbear_immutability/mutable_timeline'
+//                        query_params: { atOrLaterThan: filterBackTo }
                     });
 
                     var replDOWNStarted = Date.now();
