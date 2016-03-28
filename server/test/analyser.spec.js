@@ -1,12 +1,22 @@
 import * as testUtils from './test-utils';
 import * as analyser from '../app/analyser';
+import * as helpers from '../app/helpers';
 import _ from 'lodash';
 
 const { assertEqual } = testUtils;
-const NIGHTTIME = 1458960000000; // Sat Mar 26 2016 04:40:00 GMT+0200 (EET), arbitrary but nicely aligned
-const DAYTIME = 1459000000000; // Sat Mar 26 2016 15:46:40 GMT+0200 (EET), ^ ditto
+const DAYTIME = 1459000000000; // Sat Mar 26 2016 15:46:40 GMT+0200 (EET)
 const TIMELINE_TICK = 1000 * 60 * 5; // 5 min == 300000 ms
 const situationObjectToArray = x => _.compact(_.map(x, (val, key) => val ? key : null)); // e.g. { high: true, low: false } => [ 'high' ]
+const PROFILE = {
+    HIGH_LEVEL_REL: 10,
+    HIGH_LEVEL_ABS: 15,
+    LOW_LEVEL_REL: 9,
+    LOW_LEVEL_ABS: 5,
+    TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
+    BATTERY_LIMIT: 30,
+    ALARM_RETRY: 120,
+    ALARM_EXPIRE: 60 * 20 // 20 min
+};
 
 describe('analyser', () => {
 
@@ -97,6 +107,29 @@ describe('analyser', () => {
         );
     });
 
+    it('does not alert too easily while noise level is high', () => {
+        assertTimelineAnalysis(DAYTIME,
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 8.5, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 7, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 5, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 5.2, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 8, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 10, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 7, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 9, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 11, direction: 'NOT COMPUTABLE', noise: 4 } ],
+            [ { glucose: 13, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
+            [ { glucose: 12.5, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
+            [ { glucose: 15, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ]
+        );
+    });
+
     it('detects persistent high', () => {
         assertTimelineAnalysis(DAYTIME,
             // 12:00
@@ -130,7 +163,7 @@ describe('analyser', () => {
             [ { glucose: 13, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
             [ { glucose: 14, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
             [ { glucose: 15, direction: 'FortyFiveUp' }, analyser.STATUS_PERSISTENT_HIGH ],
-            [ { glucose: 16, direction: 'FortyFiveUp' }, analyser.STATUS_HIGH ], // "high" trumps "persistent high"
+            [ { glucose: 16, direction: 'FortyFiveUp' }, analyser.STATUS_HIGH ] // "high" trumps "persistent high"
         );
     });
 
@@ -153,13 +186,14 @@ function assertTimelineAnalysis(startTimestamp, ...expectedTimeline) {
         const entriesThusFar = expectedTimeline.slice(0, i + 1);
         const snapshot = {
             currentTimestamp,
-            activeProfile: analyser.getActiveProfile(currentTimestamp),
+            activeProfile: PROFILE,
             latestEntries: (
                 entriesThusFar
-                    .map(([ { glucose, direction } ], j) => ({
+                    .map(([ { glucose, direction, noise } ], j) => ({
                         date: startTimestamp + j * TIMELINE_TICK,
                         direction,
-                        nb_glucose_value: glucose
+                        nb_glucose_value: glucose,
+                        noise: noise || 1
                     }))
             ),
             latestTreatments: (
