@@ -23,6 +23,13 @@
                 -ms-user-select: none;
                 user-select: none;
             }
+
+            button {
+                display: block;
+                font-size: 20px;
+                padding: 15px;
+                margin: 20px;
+            }
         </style>
     </head>
 
@@ -36,17 +43,59 @@
         <pre id="info">???</pre>
         <ul></ul>
 
-        <p id="version">version???</p>
+        <p id="ui-version">version???</p>
+        <p id="db-version">version???</p>
 
-        <button onclick="delete localStorage.dbUrl">Clear remote URL</button>
+        <button id="add-carbs">Add carbs</button>
+        <button id="add-insulin">Add insulin</button>
+        <button id="clear-url">Clear remote URL</button>
 
         <script>
             $(function() {
 
-                var VERSION = 'v5';
+                var UI_VERSION = 'v6'; // match this with the manifest.appcache file
+                var DB_VERSION = 'v5'; // increment this to force a re-sync
 
-                $('#version').text(VERSION);
-                
+                $('#ui-version').text(UI_VERSION);
+                $('#db-version').text(DB_VERSION);
+                $('#clear-url').on('click', function() {
+                    delete localStorage.dbUrl;
+                });
+                $('#add-carbs').on('click', function() {
+                    var carbs = parseInt(prompt('How many carbs?'), 10);
+                    var now = Date.now();
+                    if (carbs > 0) {
+                        local.put({
+                            "_id": "treatments/" + new Date(now).toISOString().replace(/\..*/, 'Z'),
+                            "eventType": "Meal Bolus",
+                            "created_at": new Date(now).toISOString(),
+                            "date": now,
+                            "enteredBy": "Nightbear Entries UI",
+                            "carbs": carbs
+                        }).then(
+                            function() { alert('Success'); },
+                            function() { alert('Failure'); }
+                        );
+                    }
+                });
+                $('#add-insulin').on('click', function() {
+                    var insulin = parseInt(prompt('How much insulin?'), 10);
+                    var now = Date.now();
+                    if (insulin > 0) {
+                        local.put({
+                            "_id": "treatments/" + new Date(now).toISOString().replace(/\..*/, 'Z'),
+                            "eventType": "Meal Bolus",
+                            "created_at": new Date(now).toISOString(),
+                            "date": now,
+                            "enteredBy": "Nightbear Entries UI",
+                            "insulin": insulin
+                        }).then(
+                            function() { alert('Success'); },
+                            function() { alert('Failure'); }
+                        );
+                    }
+                });
+
                 if (!localStorage.dbUrl) {
                     localStorage.dbUrl = prompt('Enter full DB URL to connect to') || '';
                 }
@@ -57,8 +106,8 @@
 
                 console.log('App starting up');
 
-                var local = window.db = new PouchDB('user_marja_' + VERSION);
-                var remote = new PouchDB(localStorage.dbUrl);
+                var local = window.localDB = new PouchDB('user_marja_' + DB_VERSION);
+                var remote = window.remoteDB = new PouchDB(localStorage.dbUrl);
 
                 /*
                 local.put({
@@ -118,7 +167,7 @@
 
                 }
 
-//                start_repl_UP();
+                start_repl_UP();
 
                 function start_repl_UP() {
 
@@ -170,7 +219,7 @@
                     console.log('rendering');
                     local.info()
                         .then(function(i) { $('#info').text(JSON.stringify(i, undefined, 4)) });
-                    db.allDocs({ include_docs: true, limit: 10, descending: true, start_key: 'treatments/_' })
+                    local.allDocs({ include_docs: true, limit: 10, descending: true, start_key: 'treatments/_' })
                         .then(function(res) {
                             $('ul').html('').append(
                                 res.rows.map(function(row) {
