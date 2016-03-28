@@ -86,8 +86,8 @@ export default app => {
                 log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
                 alarm.level = neededLevel;
                 operations.push(
-                    sendAlarm(alarm.level, alarm.type) // send out the alarm
-                        .then(receipt => { // and only persist the level upgrade IF the alarm got sent (so we get retries)
+                    app.pushover.sendAlarm(alarm.level, alarm.type, app.analyser.getProfile().ALARM_RETRY, app.analyser.getProfile().ALARM_EXPIRE)
+                        .then(receipt => { // only persist the level upgrade IF the alarm got sent (so we get retries)
                             alarm.pushoverReceipts = alarm.pushoverReceipts || [];
                             alarm.pushoverReceipts.push(receipt);
                             return app.data.updateAlarm(alarm);
@@ -106,40 +106,4 @@ export default app => {
         return Promise.all(operations);
     }
 
-    function sendAlarm(level, type) {
-        let msg = {
-            message: type,
-            title: "NightBear alert",
-            sound: 'persistent',
-            device: process.env['PUSHOVER_LEVEL_1'],
-            priority: 2,
-            retry: app.analyser.getProfile().ALARM_RETRY,
-            expire: app.analyser.getProfile().ALARM_EXPIRE,
-            callback: 'http://nightbear.jrw.fi/api/v1/status'
-        };
-
-        if (level === 2) {
-            msg.device = process.env['PUSHOVER_LEVEL_1'];
-        }
-        else if (level === 3) {
-            msg.device = process.env['PUSHOVER_LEVEL_2'];
-        }
-        else if (level === 4) {
-            msg.device = process.env['PUSHOVER_LEVEL_3'];
-        }
-
-        return new Promise(function (resolve, reject) {
-            app.pushover.send(msg, function(err, result) {
-                if (err) {
-                    return reject(err);
-                }
-
-                let resultJSON = JSON.parse(result);
-                let receipt = resultJSON.receipt;
-
-                log('Pushover sent with receipt nro:', receipt);
-                resolve(receipt);
-            });
-        });
-    }
 }

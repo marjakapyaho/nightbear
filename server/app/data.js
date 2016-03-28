@@ -1,7 +1,6 @@
 import * as helpers from './helpers';
 import * as alarms from './alarms';
 import _ from 'lodash';
-import axios from 'axios';
 
 const END = '\uffff'; // http://pouchdb.com/api.html#prefix-search
 
@@ -33,15 +32,14 @@ export default app => {
     }
 
     function nightscoutUploaderPost(datum) {
-        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
-            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/entries';
-            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
-            log('Sending entry downstream to:', url);
-            axios.post(url, datum, headers).then(
+
+        if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
+            app.nightscoutProxy.sendEntry(datum).then(
                 success => log('Successfully sent entry downstream'),
-                failure => log('Failed to send entry downstream:', failure)
-            )
+                failure => log.error('Failed to send entry downstream:', failure)
+            );
         }
+
         if (datum.type === 'sgv') {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
@@ -166,23 +164,11 @@ export default app => {
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
 
-                return sendPushoverAcks(alarm.pushoverReceipts).then(function() {
+                return app.pushover.ackAlarms(alarm.pushoverReceipts).then(() => {
                     alarm.pushoverReceipts = [];
                     return app.data.updateAlarm(alarm);
                 });
             });
-    }
-
-    function sendPushoverAcks(receipts = []) {
-        return Promise.all(receipts.map(receipt => {
-            let url = 'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json';
-            return axios.post(url, 'token=' + encodeURIComponent(process.env.PUSHOVER_TOKEN), {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(
-                success => log('Pushover ack success:', receipt),
-                failure => log.error('Pushover ack failure:', failure)
-            );
-        }));
     }
 
     function getStatus() {
@@ -204,14 +190,11 @@ export default app => {
 
     function createDeviceStatus(postData) {
 
-        if (process.env.DOWNSTREAM_NIGHTSCOUT_URL) { // e.g. "http://nightscout.somehost.com"
-            const url = process.env.DOWNSTREAM_NIGHTSCOUT_URL.replace(/\/*$/, '') + '/api/v1/devicestatus';
-            const headers = { headers: { 'api-secret': process.env.DOWNSTREAM_NIGHTSCOUT_SECRET } };
-            log('Sending devicestatus downstream to:', url);
-            axios.post(url, postData, headers).then(
+        if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
+            app.nightscoutProxy.sendDeviceStatus(postData).then(
                 success => log('Successfully sent devicestatus downstream'),
-                failure => log('Failed to send devicestatus downstream:', failure)
-            )
+                failure => log.error('Failed to send devicestatus downstream:', failure)
+            );
         }
 
         let deviceStatus = {
