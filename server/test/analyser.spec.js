@@ -45,12 +45,12 @@ describe('analyser', () => {
         );
     });
 
-    xit('needs to rise enough to clar low', () => {
+    it('needs to rise enough to clar low', () => {
         assertTimelineAnalysis(DAYTIME,
             [ { glucose: 6, direction: 'FortyFiveDown' } ],
             [ { glucose: 4.2, direction: 'FortyFiveDown' }, analyser.STATUS_LOW ],
-            [ { glucose: 3.8, direction: 'Flat' }, analyser.STATUS_LOW ]
-            [ { glucose: 5.5, direction: 'SingleUp' }, analyser.STATUS_LOW ]
+            [ { glucose: 3.8, direction: 'Flat' }, analyser.STATUS_LOW ],
+            [ { glucose: 5.5, direction: 'SingleUp', activeAlarm: analyser.STATUS_LOW }, analyser.STATUS_LOW ],
             [ { glucose: 7.1, direction: 'SingleUp' } ]
         );
     });
@@ -64,11 +64,11 @@ describe('analyser', () => {
         );
     });
 
-    xit('needs to fall enough to clear high', () => {
+    it('needs to fall enough to clear high', () => {
         assertTimelineAnalysis(DAYTIME,
             [ { glucose: 10, direction: 'SingleUp' } ],
             [ { glucose: 16, direction: 'SingleUp' }, analyser.STATUS_HIGH ],
-            [ { glucose: 14, direction: 'SingleDown' }, analyser.STATUS_HIGH ]
+            [ { glucose: 14, direction: 'SingleDown', activeAlarm: analyser.STATUS_HIGH  }, analyser.STATUS_HIGH ],
             [ { glucose: 12.5, direction: 'SingleDown' } ]
         );
     });
@@ -184,6 +184,7 @@ function assertTimelineAnalysis(startTimestamp, ...expectedTimeline) {
     const actualTimeline = expectedTimeline.map((timelineEntry, i) => {
         const currentTimestamp = startTimestamp + i * TIMELINE_TICK;
         const entriesThusFar = expectedTimeline.slice(0, i + 1);
+        const activeAlarmType = _.first(_.last(entriesThusFar)).activeAlarm;
         const snapshot = {
             currentTimestamp,
             activeProfile: PROFILE,
@@ -210,7 +211,7 @@ function assertTimelineAnalysis(startTimestamp, ...expectedTimeline) {
             latestDeviceStatus: {
                 uploaderBattery: _.get(_.findLast(entriesThusFar, '[0].battery'), '[0].battery') || 100 // repeat the last battery specified in test case, or default to 100 if it's never specified
             },
-            latestAlarms: []
+            latestAlarms: activeAlarmType ? [ { type: activeAlarmType } ] : []
         };
         const actualSituations = situationObjectToArray(analyser.analyseTimelineSnapshot(snapshot));
         return timelineEntry.slice(0, 1).concat(actualSituations)
