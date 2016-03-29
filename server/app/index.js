@@ -17,7 +17,7 @@ const modules = {
 
 export default function(overrides = {}) {
     const app = {};
-    const inject = m => app[m] = (overrides[m] || modules[m](app));
+    const inject = m => app[m] = (overrides[m] || modules[m] && modules[m](app));
     Object.keys(modules).forEach(inject);
     return app;
 }
