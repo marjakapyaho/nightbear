@@ -8,6 +8,7 @@ const modules = {
     currentTime: null,
     pouchDB: null,
     pushover: null,
+    nightscoutProxy: null,
     alarms,
     analyser,
     data,
