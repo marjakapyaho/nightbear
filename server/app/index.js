@@ -2,6 +2,7 @@ import alarms from './alarms';
 import analyser from './analyser';
 import data from './data';
 import server from './server';
+import profile from './profile';
 
 const modules = {
     logger: null,
@@ -12,7 +13,8 @@ const modules = {
     alarms,
     analyser,
     data,
-    server
+    server,
+    profile
 };
 
 export default function(overrides = {}) {
