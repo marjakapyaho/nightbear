@@ -19,10 +19,10 @@ export function stripMetaFields(doc) {
     return _.isArray(doc) ? doc.map(stripMetaFields) : _.omit(doc, '_id', '_rev');
 }
 
-export function createTestApp() {
+export function createTestApp(overrides = {}) {
     let fakeCurrentTime = Date.now(); // any time-sensitive tests will likely want to change this
     const dbName = Date.now() + ''; // even though the in-memory DB's get dumped when the test suite exits, DB's with the same name will SHARE data during runtime
-    const app = createAppInstance({
+    const app = createAppInstance(_.extend({
         logger: new Logger(false), // no transports enabled
         currentTime: () => fakeCurrentTime,
         pouchDB: new PouchDB(dbName, { db: MemDOWN }), // http://pouchdb.com/adapters.html#pouchdb_in_node_js
@@ -30,7 +30,7 @@ export function createTestApp() {
             sendAlarm: () => Promise.resolve('FAKE_PUSHOVER_RECEIPT'),
             ackAlarms: () => Promise.resolve()
         }
-    });
+    }, overrides));
     let httpHostPrefix;
     app.__test = { // attach some helpful utilities for interacting with the test app we created
         createTestServer() {

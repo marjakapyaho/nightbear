@@ -2,20 +2,63 @@ import ENTRIES from './alarms-falling.json';
 import ENTRIES2 from './alarms-low.json';
 import ENTRIES3 from './alarms-high.json';
 import * as testUtils from './test-utils';
+import * as analyser from '../app/analyser';
 
 describe('basic alarm checks', () => {
 
+    const TIME = 1459000000000; // Sat Mar 26 2016 15:46:40 GMT+0200 (EET)
+    const ALL_OK = {};
+
     const { assertEqual, stripMetaFields } = testUtils;
     let app, get, post, setCurrentTime;
+    let analysisResult;
 
     beforeEach(function() {
-        app = testUtils.createTestApp();
+        app = testUtils.createTestApp({
+            analyser: {
+                analyseData: () => analysisResult,
+                getProfile: () => {}
+            }
+        });
         setCurrentTime = app.__test.setCurrentTime;
         get = app.__test.get;
         post = app.__test.post;
+        setCurrentTime(TIME);
         return app.__test.createTestServer();
     });
 
+    it('does not create alarms when there are no situations', () => {
+        analysisResult = ALL_OK;
+        return Promise.resolve()
+            .then(app.alarms.runChecks)
+            .then(() => app.data.getActiveAlarms())
+            .then(alarms => assertEqual(alarms, []));
+    });
+
+    it('creates an alarm when there is a situation', () => {
+        analysisResult = { [analyser.STATUS_HIGH]: true };
+        return Promise.resolve()
+            .then(app.alarms.runChecks)
+            .then(() => app.data.getActiveAlarms())
+            .then(alarms => assertEqual(stripMetaFields(alarms), [
+                {
+                    level: 1,
+                    status: 'active',
+                    type: analyser.STATUS_HIGH,
+                    validAfter: TIME
+                }
+            ]));
+    });
+
+    it('removes the alarm when the situation has passed', () => {
+        analysisResult = { [analyser.STATUS_HIGH]: true };
+        return Promise.resolve()
+            .then(app.alarms.runChecks)
+            .then(() => analysisResult = ALL_OK)
+            .then(app.alarms.runChecks)
+            .then(() => app.data.getActiveAlarms())
+            .then(alarms => assertEqual(alarms, []));
+    });
 
     xit('works with FALLING status + ACK + battery alarm', () => {
 
