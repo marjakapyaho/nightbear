@@ -5,7 +5,7 @@ import _ from 'lodash';
 export const ALARM_SNOOZE_TIMES = {
     [analyser.STATUS_OUTDATED]: 120,
     [analyser.STATUS_HIGH]: 90,
-    [analyser.STATUS_PERSISTENT_HIGH]: 90,
+    [analyser.STATUS_PERSISTENT_HIGH]: 60 * 3,
     [analyser.STATUS_LOW]: 15,
     [analyser.STATUS_RISING]: 20,
     [analyser.STATUS_FALLING]: 10,
