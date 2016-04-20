@@ -91,11 +91,11 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
 
     state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
 
-    const pastTwoHours = _.filter(latestEntries, entry => entry.date >= currentTimestamp - helpers.HOUR_IN_MS * 2);
-    const knownTimeWindow = _.last(pastTwoHours).date - _.first(pastTwoHours).date;
-    const haveWideEnoughWindow = knownTimeWindow > helpers.HOUR_IN_MS * 2 - helpers.MIN_IN_MS * 10; // we need 2 hours of data (with 10 min tolerance)
-    const haveEnoughDataPoints = pastTwoHours.length > 18; // allow a few entries to be missing (2 hours would be 24 entries at 5 min intervals)
-    const hasCounterConditions = _.some(pastTwoHours, entry => ( // reject the entire time period if even a single entry...
+    const relevantTimeWindow = _.filter(latestEntries, entry => entry.date >= currentTimestamp - helpers.HOUR_IN_MS * 2.5);
+    const timeWindowLength = _.last(relevantTimeWindow).date - _.first(relevantTimeWindow).date;
+    const haveWideEnoughWindow = timeWindowLength > helpers.HOUR_IN_MS * 2.5 - helpers.MIN_IN_MS * 10; // we need 2.5 hours of data (with 10 min tolerance)
+    const haveEnoughDataPoints = relevantTimeWindow.length > 25; // allow a few entries to be missing (2.5 hours would be 30 entries at 5 min intervals)
+    const hasCounterConditions = _.some(relevantTimeWindow, entry => ( // reject the entire time period if even a single entry...
         entry.nb_glucose_value > activeProfile.HIGH_LEVEL_ABS || // ...is above the HIGH limit
         entry.nb_glucose_value < activeProfile.HIGH_LEVEL_REL || // ...is below the RELATIVE HIGH limit
         (entry.direction !== 'FortyFiveUp' && entry.direction !== 'Flat') // ...shows any signs of active change, or slow fall

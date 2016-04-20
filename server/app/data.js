@@ -70,7 +70,7 @@ export default app => {
     // (which can then be analysed, rendered etc)
     function getTimelineContent() {
         return Promise.all([
-            getLatestEntries(helpers.HOUR_IN_MS * 2),
+            getLatestEntries(helpers.HOUR_IN_MS * 2.5),
             getLatestTreatments(helpers.HOUR_IN_MS * 3.5),
             getLatestDeviceStatus(),
             getActiveAlarms(true), // include acknowledged alarms
