@@ -167,6 +167,70 @@ describe('analyser', () => {
         );
     });
 
+    it('cancels persistent high for a single high value', () => {
+        assertTimelineAnalysis(DAYTIME,
+            // 12:00
+            [ { glucose: 14, direction: 'FortyFiveUp' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            // 13:00
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 16, direction: 'Flat' }, analyser.STATUS_HIGH ], // here we briefly go HIGH
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ], // ...so PERSISTENT_HIGH won't trigger here (otherwise it would)
+            // 14:00
+        );
+    });
+
+    it('cancels persistent high for a single low value', () => {
+        assertTimelineAnalysis(DAYTIME,
+            // 12:00
+            [ { glucose: 11, direction: 'FortyFiveUp' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            // 13:00
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 8, direction: 'Flat' } ], // here we briefly go below HIGH_LEVEL_REL
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ],
+            [ { glucose: 11, direction: 'Flat' } ], // ...so PERSISTENT_HIGH won't trigger here (otherwise it would)
+            // 14:00
+        );
+    });
+
     it('detects low battery', () => {
         assertTimelineAnalysis(DAYTIME,
             [ { glucose:  8, direction: 'Flat' } ],
