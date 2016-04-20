@@ -23,11 +23,12 @@ export default app => {
     };
 
     // @example dbPUT('sensor-entries', { ... }) => Promise
-    function dbPUT(collection, data) {
-        const object = _.extend({}, data, { _id: collection + '/' + helpers.isoTimestamp(data.date) });
+    function dbPUT(collection, data, dateOverride = null) { // TODO: Switch args order to make collection optional!
+        const _id = data._id || collection + '/' + helpers.isoTimestamp(dateOverride || data.date); // use existing ID if provided
+        const object = _.extend({}, data, { _id });
         return app.pouchDB.put(object).then(
-            success => log('dbPUT()', object, '=>', success), // resolve with undefined
-            failure => log('dbPUT()', object, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+            success => log.debug('dbPUT()', object, '=>', success), // resolve with undefined
+            failure => log.debug('dbPUT()', object, '=> FAILURE', failure) || Promise.reject(failure) // keep the Promise rejected; we don't log this on the "error" level because sometimes a PUT is expected to fail (e.g. duplicate keys)
         );
     }
 
@@ -35,8 +36,8 @@ export default app => {
 
         if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
             app.nightscoutProxy.sendEntry(datum).then(
-                success => log('Successfully sent entry downstream'),
-                failure => log.error('Failed to send entry downstream:', failure)
+                success => log(`Successfully sent entry (${datum.type}) downstream`),
+                failure => log.error('Failed to send entry downstream', failure)
             );
         }
 
@@ -44,6 +45,7 @@ export default app => {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
                 .then(data => dbPUT('sensor-entries', data))
+                .then(() => log(`Received entry (${datum.type})`))
                 .then(() => app.alarms.runChecks()) // No need to wait for results
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
@@ -52,6 +54,7 @@ export default app => {
                 .catch(err => {
                     if (err.name !== 'conflict') throw err; // conflict is actually often expected, as the Nightscout Uploader will keep sending the same entries over and over
                 })
+                .then(() => log(`Received entry (${datum.type})`))
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'cal') {
@@ -59,9 +62,11 @@ export default app => {
                 .catch(err => {
                     if (err.name !== 'conflict') throw err; // same as with "meter-entries"
                 })
+                .then(() => log(`Received entry (${datum.type})`))
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else {
+            log.error(`Received unknown entry`, datum);
             return Promise.reject('Unknown data type');
         }
     }
@@ -132,35 +137,38 @@ export default app => {
 
     function createAlarm(type, level) {
         let newAlarm = {
-            _id: 'alarms/' + helpers.isoTimestamp(app.currentTime()),
             type: type, // analyser status constants
             status: 'active',
             level: level,
             validAfter: app.currentTime()
         };
-
-        return app.pouchDB.put(newAlarm).then(
-            success => log('createAlarm()', newAlarm, '=>', success), // resolve with undefined
-            failure => log('createAlarm()', newAlarm, '=> FAILURE:', failure) || Promise.reject(failure) // keep the Promise rejected
+        return dbPUT('alarms', newAlarm, app.currentTime()).then(
+            () => log(`Created alarm (${type} on level ${level})`),
+            err => log.error('Could not create alarm') || Promise.reject(err) // keep the Promise rejected
         );
     }
 
     function updateAlarm(alarmDoc) {
-        log('updateAlarm()', alarmDoc);
-        return app.pouchDB.put(alarmDoc);
+        return dbPUT(null, alarmDoc).then(
+            () => log(`Updated alarm (${alarmDoc.type} on level ${alarmDoc.level})`),
+            err => log.error('Could not update alarm') || Promise.reject(err) // keep the Promise rejected
+        );
     }
 
     function ackLatestAlarm() {
         return app.data.getActiveAlarms()
             .then(docs => docs[0])
             .then(function(alarm) {
-                log('ackLatestAlarm()', alarm);
-                if (!alarm) return;
+                if (!alarm) {
+                    log.debug('Acking latest alarm, but no active alarms');
+                    return;
+                }
 
                 const snoozeTime = alarms.ALARM_SNOOZE_TIMES[alarm.type];
-                if (!snoozeTime) {
-                    throw new Error('Invalid alarm type');
-                }
+                if (!snoozeTime) throw new Error('Invalid alarm type');
+
+                log(`Acking latest alarm (${alarm.type} on level ${alarm.level}) for ${snoozeTime} minutes`);
+
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
 
@@ -183,7 +191,7 @@ export default app => {
                 };
             },
             function(err) {
-                log('Failed with error:', err);
+                log.error('Could not get status', err);
             }
         );
     }
@@ -197,15 +205,11 @@ export default app => {
             );
         }
 
-        let deviceStatus = {
-            _id: 'device-status/' + helpers.isoTimestamp(app.currentTime()),
-            uploaderBattery: postData.uploaderBattery
-        };
-
-        return app.pouchDB.put(deviceStatus).then(
-            success => log('createDeviceStatus()', deviceStatus, '=>', success),
-            failure => log('createDeviceStatus()', deviceStatus, '=> FAILURE:', failure) || Promise.reject(failure)
+        return dbPUT('device-status', { uploaderBattery: postData.uploaderBattery }, app.currentTime()).then(
+            () => log(`Received device status (${postData.uploaderBattery})`),
+            err => log.error('Could not create alarm') || Promise.reject(err) // keep the Promise rejected
         );
+
     }
 
     // Promises the single latest calibration doc
@@ -224,22 +228,21 @@ export default app => {
         return app.data.getTimelineContent()
             .then(function(dataSnapshot) {
                 let testData = {
-                    _id: 'test-data/' + helpers.isoTimestamp(app.currentTime()),
                     snapshot: dataSnapshot,
                     name: name || helpers.isoTimestamp(app.currentTime())
                 };
-                return app.pouchDB.put(testData).then(
-                    success => log('saveTestData()', testData, '=>', success),
-                    failure => log('saveTestData()', testData, '=> FAILURE:', failure) || Promise.reject(failure)
+                return dbPUT('test-data', testData, app.currentTime()).then(
+                    () => log(`Received test data (${testData.name})`),
+                    err => log.error('Could not store test data') || Promise.reject(err) // keep the Promise rejected
                 );
             });
     }
 
     function legacyPost(data) {
-        log('legacyPost()', 'Incoming data:', data);
+        log.debug('legacyPost()', 'Incoming data:', data);
         return app.pouchDB.get('treatments/' + helpers.isoTimestamp(data.time))
             .catch(() => {
-                log('legacyPost()', 'Existing treatment not found with time:', data.time);
+                log.debug('legacyPost()', 'Existing treatment not found with time:', data.time);
                 return {
                     eventType: helpers.DEFAULT_TREATMENT_TYPE,
                     created_at: new Date(data.time).toISOString(),
@@ -251,7 +254,10 @@ export default app => {
                 if (data.insulin) doc.insulin = data.insulin; else delete doc.insulin;
                 if (data.carbs) doc.carbs = data.carbs; else delete doc.carbs;
                 // TODO: if (data.sugar)..?
-                return dbPUT('treatments', doc);
+                return dbPUT('treatments', doc).then(
+                    () => log(`Received legacy data`),
+                    err => log.error('Could not store legacy data') || Promise.reject(err) // keep the Promise rejected
+                );
             });
     }
 
@@ -274,11 +280,11 @@ export default app => {
                 .value()
         ).then(
             data => {
-                log('getLegacyEntries()', 'Returning:', data.length);
+                log(`Returning ${data.length} legacy entries`);
                 return data;
             },
             err => {
-                log('getLegacyEntries()', 'Failed:', err);
+                log.error('Could not return legacy entries', err);
                 return Promise.reject(err);
             }
         );

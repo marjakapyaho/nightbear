@@ -39,8 +39,11 @@ export default function(consoleOutput = true, papertrailUrl = null) {
         const flatten = ctx => ctx.length === 0 ? null : (ctx.length === 1 ? ctx[0] : ctx);
         const internal = (level, message, ...context) => { logger.log(level, `[${label}] ${message}`, flatten(context)); };
 
+        // Return a function that logs with the "info" level by default
         return _.extend(internal.bind(null, 'info'), {
-            error: internal.bind(null, 'error')
+            // But attach other levels as properties, e.g. log.debug(), @see https://github.com/winstonjs/winston#using-logging-levels
+            debug: internal.bind(null, 'debug'),
+            error: internal.bind(null, 'error'),
         });
 
     };
