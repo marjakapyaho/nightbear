@@ -36,7 +36,7 @@ export default app => {
 
         if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
             app.nightscoutProxy.sendEntry(datum).then(
-                success => log(`Successfully sent entry (${datum.type}) downstream`),
+                success => log.debug(`Successfully sent entry (${datum.type}) downstream`),
                 failure => log.error('Failed to send entry downstream', failure)
             );
         }
@@ -200,7 +200,7 @@ export default app => {
 
         if (app.nightscoutProxy) { // only proxy incoming data if a downstream Nightscout server has been configured
             app.nightscoutProxy.sendDeviceStatus(postData).then(
-                success => log('Successfully sent devicestatus downstream'),
+                success => log.debug('Successfully sent devicestatus downstream'),
                 failure => log.error('Failed to send devicestatus downstream:', failure)
             );
         }

@@ -6,7 +6,6 @@ import _ from 'lodash';
 const { assertEqual } = testUtils;
 const DAYTIME = 1459000000000; // Sat Mar 26 2016 15:46:40 GMT+0200 (EET)
 const TIMELINE_TICK = 1000 * 60 * 5; // 5 min == 300000 ms
-const situationObjectToArray = x => _.compact(_.map(x, (val, key) => val ? key : null)); // e.g. { high: true, low: false } => [ 'high' ]
 const PROFILE = {
     HIGH_LEVEL_REL: 10,
     HIGH_LEVEL_ABS: 15,
@@ -22,7 +21,7 @@ describe('analyser', () => {
 
     it('detects outdated data', () => {
         assertEqual(
-            situationObjectToArray(
+            analyser.situationObjectToArray(
                 analyser.analyseTimelineSnapshot({
                     currentTimestamp: DAYTIME,
                     activeProfile: analyser.getActiveProfile(DAYTIME),
@@ -311,7 +310,7 @@ function assertTimelineAnalysis(startTimestamp, ...expectedTimeline) {
             },
             latestAlarms: activeAlarmType ? [ { type: activeAlarmType } ] : []
         };
-        const actualSituations = situationObjectToArray(analyser.analyseTimelineSnapshot(snapshot));
+        const actualSituations = analyser.situationObjectToArray(analyser.analyseTimelineSnapshot(snapshot));
         return timelineEntry.slice(0, 1).concat(actualSituations)
     });
     assertEqual(actualTimeline, expectedTimeline);

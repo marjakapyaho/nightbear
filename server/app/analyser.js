@@ -9,6 +9,8 @@ export const STATUS_RISING = 'rising';
 export const STATUS_FALLING = 'falling';
 export const STATUS_BATTERY = 'battery';
 
+export const situationObjectToArray = x => _.compact(_.map(x, (val, key) => val ? key : null)); // e.g. { high: true, low: false } => [ 'high' ]
+
 export default app => {
 
     const log = app.logger(__filename);
@@ -27,7 +29,9 @@ export default app => {
                 activeProfile: getProfile()
             }
         ));
-        log('Analysis state:', state);
+        const stateArray = situationObjectToArray(state);
+        log('Detected situations: ' + (stateArray.length ? stateArray.join(', ') : 'n/a'));
+        log.debug('Full analysis state:', state);
         return state;
     }
 

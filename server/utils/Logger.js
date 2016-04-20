@@ -12,6 +12,7 @@ export default function(consoleOutput = true, papertrailUrl = null) {
     if (consoleOutput) {
 
         logger.add(winston.transports.Console, {
+            level: 'debug',
             timestamp: () => new Date().toISOString(),
             colorize: true,
             handleExceptions: true
@@ -22,6 +23,7 @@ export default function(consoleOutput = true, papertrailUrl = null) {
     if (papertrailUrl) {
 
         logger.add(winston.transports.Papertrail, {
+            level: 'debug',
             host: papertrailUrl.split(':')[0],
             port: papertrailUrl.split(':')[1],
             program: 'nightbear-server',

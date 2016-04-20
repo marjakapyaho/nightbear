@@ -33,7 +33,7 @@ export default app => {
     };
 
     function runChecks() {
-        log('Running checks');
+        log.debug('Running checks');
 
         // Clear previous timer (if exists) and set next one
         if (nextCheck) { clearTimeout(nextCheck); }
@@ -41,11 +41,11 @@ export default app => {
 
         return app.data.getTimelineContent()
             .then(doChecks)
-            .catch(err => log.error('Checks failed with error:', err));
+            .catch(err => log.error('Checks failed', err));
     }
 
     function doChecks(timelineContent) {
-        log('Active alarms:', timelineContent.activeAlarms);
+        log.debug('Active alarms:', timelineContent.activeAlarms);
 
         let operations = [];
 
@@ -99,7 +99,7 @@ export default app => {
         });
 
         _.each(alarmsToCreate, function(alarmType) {
-            log('Create new alarm with status:', alarmType);
+            log.debug('Create new alarm with status:', alarmType);
             operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
         });
 
