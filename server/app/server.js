@@ -1,14 +1,21 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import { attempt, isError } from 'lodash';
 
 export default app => {
 
     const log = app.logger(__filename);
+    const parseIfPossible = body => {
+        const parsed = attempt(JSON.parse, body);
+        return isError(parsed) ? body : parsed;
+    };
 
     return {
         createExpressServer(port = 0, staticAssetsPath = null) {
 
             const server = express().use(bodyParser.json());
+
+            server.use(logResponseBody);
 
             server.post('/api/v1/entries', function(req, res) {
                 app.data.nightscoutUploaderPost(req.body).then(
@@ -78,5 +85,27 @@ export default app => {
 
         }
     };
+
+    // @see http://stackoverflow.com/a/19215370
+    function logResponseBody(req, res, next) {
+        const then = Date.now();
+        const oldWrite = res.write, oldEnd = res.end;
+        const chunks = [];
+        res.write = function(chunk) {
+            chunks.push(chunk);
+            oldWrite.apply(res, arguments);
+        };
+        res.end = function(chunk) {
+            if (chunk) chunks.push(chunk);
+            var body = Buffer.concat(chunks).toString('utf8');
+            log.debug(req.method + ' ' + req.path, {
+                incoming: parseIfPossible(req.body),
+                outgoing: parseIfPossible(body),
+                duration: ((Date.now() - then) / 1000).toFixed(3) + ' sec'
+            });
+            oldEnd.apply(res, arguments);
+        };
+        next();
+    }
 
 }
