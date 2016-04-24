@@ -172,10 +172,12 @@ export default app => {
                 alarm.validAfter = app.currentTime() + snoozeTime * helpers.MIN_IN_MS;
                 alarm.level = 1; // reset level
 
-                return app.pushover.ackAlarms(alarm.pushoverReceipts).then(() => {
-                    alarm.pushoverReceipts = [];
-                    return app.data.updateAlarm(alarm);
-                });
+                return app.pushover.ackAlarms(alarm.pushoverReceipts)
+                    .then(() => {
+                        alarm.pushoverReceipts = [];
+                        return app.data.updateAlarm(alarm);
+                    })
+                    .then(() => {}); // reply with empty JSON object
             });
     }
 
