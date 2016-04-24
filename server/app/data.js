@@ -161,7 +161,7 @@ export default app => {
             .then(function(alarm) {
                 if (!alarm) {
                     log.debug('Acking latest alarm, but no active alarms');
-                    return;
+                    return {};
                 }
 
                 const snoozeTime = alarms.ALARM_SNOOZE_TIMES[alarm.type];
