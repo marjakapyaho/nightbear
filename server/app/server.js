@@ -96,7 +96,7 @@ export default app => {
             oldWrite.apply(res, arguments);
         };
         res.end = function(chunk) {
-            if (chunk) chunks.push(chunk);
+            if (chunk) chunks.push(new Buffer(chunk));
             var body = Buffer.concat(chunks).toString('utf8');
             log.debug(req.method + ' ' + req.path, {
                 incoming: parseIfPossible(req.body),
