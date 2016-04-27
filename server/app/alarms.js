@@ -69,6 +69,8 @@ export default app => {
 
         _.each(alarmsToRemove, function(alarm) {
             alarm.status = 'inactive';
+            // We're not waiting for the results of pushover acks
+            app.pushover.ackAlarms(alarm.pushoverReceipts);
             operations.push(app.data.updateAlarm(alarm));
         });
 
