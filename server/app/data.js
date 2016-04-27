@@ -247,91 +247,14 @@ export default app => {
     }
 
     function getProfileSettings() {
-        return Promise.resolve({
-            alarmsOn: true,
-            profiles: {
-                day: {
-                    HIGH_LEVEL_REL: 10,
-                    HIGH_LEVEL_ABS: 15,
-                    LOW_LEVEL_REL: 9,
-                    LOW_LEVEL_ABS: 5,
-                    TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
-                    BATTERY_LIMIT: 30,
-                    ALARM_RETRY: 120,
-                    ALARM_EXPIRE: 60 * 20,
-                    alarmSettings: {
-                        outdated: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 120
-                        },
-                        high: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 90
-                        },
-                        persistent_high: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 90
-                        },
-                        low: {
-                            levels: [ 6, 7, 10 ],
-                            snooze: 15
-                        },
-                        rising: {
-                            levels: [ 8, 15, 15],
-                            snooze: 20
-                        },
-                        falling: {
-                            levels: [ 6, 7, 10],
-                            snooze: 10
-                        },
-                        battery: {
-                            levels: [ 10, 20, 20],
-                            snooze: 60
-                        }
-                    }
-                },
-                night: {
-                    HIGH_LEVEL_REL: 10,
-                    HIGH_LEVEL_ABS: 15,
-                    LOW_LEVEL_REL: 6,
-                    LOW_LEVEL_ABS: 4,
-                    TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
-                    BATTERY_LIMIT: 10,
-                    ALARM_RETRY: 30,
-                    ALARM_EXPIRE: 60 * 120,
-                    alarmSettings: {
-                        outdated: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 120
-                        },
-                        high: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 90
-                        },
-                        persistent_high: {
-                            levels: [ 10, 20, 20 ],
-                            snooze: 90
-                        },
-                        low: {
-                            levels: [ 6, 7, 10 ],
-                            snooze: 15
-                        },
-                        rising: {
-                            levels: [ 8, 15, 15],
-                            snooze: 20
-                        },
-                        falling: {
-                            levels: [ 6, 7, 10],
-                            snooze: 10
-                        },
-                        battery: {
-                            levels: [ 10, 20, 20],
-                            snooze: 60
-                        }
-                    }
-                }
-            }
-        });
+        return app.pouchDB.allDocs({
+                include_docs: true,
+                descending: true,
+                startkey: 'settings/_',
+                endkey: 'settings/',
+                limit: 1
+            })
+            .then(res => res.rows[0] ? res.rows[0].doc : null);
     }
 
     function legacyPost(data) {
