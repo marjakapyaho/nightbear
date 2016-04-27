@@ -16,8 +16,7 @@ export default app => {
     const log = app.logger(__filename);
 
     return {
-        analyseData,
-        getProfile
+        analyseData
     };
 
     function analyseData(timelineContent) {
@@ -26,7 +25,7 @@ export default app => {
             timelineContent,
             {
                 currentTimestamp: app.currentTime(),
-                activeProfile: getProfile()
+                activeProfile: app.profile.getActiveProfile(timelineContent.profileSettings)
             }
         ));
         const stateArray = situationObjectToArray(state);
@@ -35,38 +34,7 @@ export default app => {
         return state;
     }
 
-    function getProfile() {
-        return getActiveProfile(app.currentTime());
-    }
-
 };
-
-export function getActiveProfile(currentTimestamp) {
-    if (new Date(currentTimestamp).getHours() > 9) { // DAY
-        return {
-            HIGH_LEVEL_REL: 10,
-            HIGH_LEVEL_ABS: 15,
-            LOW_LEVEL_REL: 9,
-            LOW_LEVEL_ABS: 5,
-            TIME_SINCE_SGV_LIMIT: 20 * helpers.MIN_IN_MS,
-            BATTERY_LIMIT: 30,
-            ALARM_RETRY: 120,
-            ALARM_EXPIRE: 60 * 20 // 20 min
-        };
-    }
-    else { // NIGHT
-        return {
-            HIGH_LEVEL_REL: 10,
-            HIGH_LEVEL_ABS: 15,
-            LOW_LEVEL_REL: 6,
-            LOW_LEVEL_ABS: 4,
-            TIME_SINCE_SGV_LIMIT: 60 * helpers.MIN_IN_MS,
-            BATTERY_LIMIT: 10,
-            ALARM_RETRY: 30,
-            ALARM_EXPIRE: 60 * 120 // 120 min
-        };
-    }
-}
 
 export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, latestEntries, latestTreatments, latestDeviceStatus, latestAlarms }) {
     let state = {};

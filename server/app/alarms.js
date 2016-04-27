@@ -48,6 +48,7 @@ export default app => {
         log.debug('Active alarms:', timelineContent.activeAlarms);
 
         let operations = [];
+        let activeProfile = app.profile.getActiveProfile(timelineContent.profileSettings);
 
         // Analyse current status
         const state = app.analyser.analyseData(timelineContent);
@@ -78,7 +79,7 @@ export default app => {
             }
 
             const hasBeenValidFor = (app.currentTime() - alarm.validAfter) / helpers.MIN_IN_MS;
-            const levelUpTimes = ALARM_LEVEL_UP_TIMES[alarm.type];
+            const levelUpTimes = activeProfile.alarmSettings[alarm.type].levels;
             const accumulatedTimes = _.map(levelUpTimes, (x, i) => _.sum(_.take(levelUpTimes, i + 1)));
             const neededLevel = _.findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
 
@@ -86,7 +87,7 @@ export default app => {
                 log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
                 alarm.level = neededLevel;
                 operations.push(
-                    app.pushover.sendAlarm(alarm.level, alarm.type, app.analyser.getProfile().ALARM_RETRY, app.analyser.getProfile().ALARM_EXPIRE)
+                    app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE)
                         .then(receipt => { // only persist the level upgrade IF the alarm got sent (so we get retries)
                             alarm.pushoverReceipts = alarm.pushoverReceipts || [];
                             alarm.pushoverReceipts.push(receipt);

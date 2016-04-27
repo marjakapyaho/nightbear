@@ -24,7 +24,7 @@ describe('analyser', () => {
             analyser.situationObjectToArray(
                 analyser.analyseTimelineSnapshot({
                     currentTimestamp: DAYTIME,
-                    activeProfile: analyser.getActiveProfile(DAYTIME),
+                    activeProfile: PROFILE,
                     latestEntries: [],
                     latestTreatments: [],
                     latestDeviceStatus: {},

@@ -19,7 +19,8 @@ export default app => {
         createDeviceStatus,
         saveTestData,
         legacyPost,
-        getLegacyEntries
+        getLegacyEntries,
+        getProfileSettings
     };
 
     // @example dbPUT('sensor-entries', { ... }) => Promise
@@ -79,13 +80,15 @@ export default app => {
             getLatestTreatments(helpers.HOUR_IN_MS * 3.5),
             getLatestDeviceStatus(),
             getActiveAlarms(true), // include acknowledged alarms
-            getLatestCalibration()
-        ]).then(([ latestEntries, latestTreatments, latestDeviceStatus, activeAlarms, latestCal ]) => ({
+            getLatestCalibration(),
+            getProfileSettings()
+        ]).then(([ latestEntries, latestTreatments, latestDeviceStatus, activeAlarms, latestCal, profileSettings ]) => ({
             latestEntries,
             latestTreatments,
             latestDeviceStatus,
             activeAlarms,
-            latestCal
+            latestCal,
+            profileSettings
         }));
     }
 
@@ -156,15 +159,18 @@ export default app => {
     }
 
     function ackLatestAlarm() {
-        return app.data.getActiveAlarms()
-            .then(docs => docs[0])
-            .then(function(alarm) {
+        return Promise.all([
+            app.data.getActiveAlarms(),
+            app.data.getProfileSettings()
+        ]).then(
+            function([ docs, profileSettings ]) {
+                const alarm = docs[0];
                 if (!alarm) {
                     log.debug('Acking latest alarm, but no active alarms');
                     return {};
                 }
 
-                const snoozeTime = alarms.ALARM_SNOOZE_TIMES[alarm.type];
+                const snoozeTime = app.profile.getActiveProfile(profileSettings).alarmSettings[alarm.type].snooze;
                 if (!snoozeTime) throw new Error('Invalid alarm type');
 
                 log(`Acking latest alarm (${alarm.type} on level ${alarm.level}) for ${snoozeTime} minutes`);
@@ -238,6 +244,17 @@ export default app => {
                     err => log.error('Could not store test data') || Promise.reject(err) // keep the Promise rejected
                 );
             });
+    }
+
+    function getProfileSettings() {
+        return app.pouchDB.allDocs({
+                include_docs: true,
+                descending: true,
+                startkey: 'settings/_',
+                endkey: 'settings/',
+                limit: 1
+            })
+            .then(res => res.rows[0] ? res.rows[0].doc : null);
     }
 
     function legacyPost(data) {

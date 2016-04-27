@@ -10,11 +10,13 @@ describe('data', () => {
     let app, get, post, setCurrentTime;
 
     beforeEach(function() {
-        app = testUtils.createTestApp();
-        setCurrentTime = app.__test.setCurrentTime;
-        get = app.__test.get;
-        post = app.__test.post;
-        return app.__test.createTestServer();
+        return testUtils.createTestApp().then(newApp => {
+            app = newApp;
+            setCurrentTime = app.__test.setCurrentTime;
+            get = app.__test.get;
+            post = app.__test.post;
+            return app.__test.createTestServer();
+        });
     });
 
     it('creates and returns an alarm object', () => {
