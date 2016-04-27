@@ -47,6 +47,11 @@ export default app => {
     function doChecks(timelineContent) {
         log.debug('Active alarms:', timelineContent.activeAlarms);
 
+        if (!timelineContent.profileSettings.alarmsOn) {
+            log.debug('Alarm module DISABLED');
+            return;
+        }
+
         let operations = [];
         let activeProfile = app.profile.getActiveProfile(timelineContent.profileSettings);
 
