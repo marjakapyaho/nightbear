@@ -23,7 +23,7 @@ export default function(consoleOutput = true, papertrailUrl = null) {
     if (papertrailUrl) {
 
         logger.add(winston.transports.Papertrail, {
-            level: 'debug',
+            level: 'info', // only send the important stuff to Papertrail
             host: papertrailUrl.split(':')[0],
             port: papertrailUrl.split(':')[1],
             program: 'nightbear-server',
