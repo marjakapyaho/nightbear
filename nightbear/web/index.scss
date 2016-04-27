@@ -1,0 +1,4 @@
+@import "bootswatch/paper/variables"; // first include the "paper" vars, so the subsequent Bootstrap include sees them
+@import "utils/bootstrap-includes";
+@import "utils/bootstrap-customizations";
+@import "bootswatch/paper/bootswatch"; // now include the rest of the "paper" theme, as it depends on Bootstrap @see https://bootswatch.com/paper/
