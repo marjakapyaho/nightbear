@@ -7,11 +7,13 @@ describe('entries input and output', () => {
     let app, get, post;
 
     beforeEach(function() {
-        app = testUtils.createTestApp();
-        app.__test.setCurrentTime(1451472024000 + 1000); // 1 sec after the last entry in ENTRIES
-        get = app.__test.get;
-        post = app.__test.post;
-        return app.__test.createTestServer();
+        return app = testUtils.createTestApp().then(newApp => {
+            app = newApp;
+            app.__test.setCurrentTime(1451472024000 + 1000); // 1 sec after the last entry in ENTRIES
+            get = app.__test.get;
+            post = app.__test.post;
+            return app.__test.createTestServer();
+        });
     });
 
     it('interprets sensor change correctly', () => {

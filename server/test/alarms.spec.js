@@ -14,17 +14,19 @@ describe('basic alarm checks', () => {
     let analysisResult;
 
     beforeEach(function() {
-        app = testUtils.createTestApp({
+        return testUtils.createTestApp({
             analyser: {
                 analyseData: () => analysisResult,
                 getProfile: () => {}
             }
+        }).then(newApp => {
+            app = newApp;
+            setCurrentTime = app.__test.setCurrentTime;
+            get = app.__test.get;
+            post = app.__test.post;
+            setCurrentTime(TIME);
+            return app.__test.createTestServer();
         });
-        setCurrentTime = app.__test.setCurrentTime;
-        get = app.__test.get;
-        post = app.__test.post;
-        setCurrentTime(TIME);
-        return app.__test.createTestServer();
     });
 
     it('does not create alarms when there are no situations', () => {
