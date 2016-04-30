@@ -13,7 +13,7 @@
     "js-build": "NODE_PATH=../.. NODE_ENV=production browserify -g envify -t babelify index.js | uglifyjs --compress --mangle > dist/index.js 2> /dev/null",
     "js-watch": "NODE_PATH=../..                     watchify   -g envify -t babelify index.js --debug -v                    -o dist/index.js",
     "css-build": "                                                        node-sass --include-path=node_modules --image-path=assets --output dist --output-style=compressed index.scss",
-    "css-watch": "chokidar 'nightbear-web/**/*.scss' --initial --command 'node-sass --include-path=node_modules --image-path=assets --output dist                           index.scss'",
+    "css-watch": "chokidar index.scss 'ui/**/*.scss' --initial --command 'node-sass --include-path=node_modules --image-path=assets --output dist                           index.scss'",
     "copy-assets": "rm -rf dist/* && cp -R assets index.html dist",
     "s3-upload": "REV=$(git rev-parse HEAD | cut -c -8) && aws s3 sync --exclude .gitkeep --acl public-read dist s3://nightbear.fi/${REV:-INVALID}/",
     "release-to-staging": "REV=$(git rev-parse HEAD | cut -c -8) && npm run build && npm run s3-upload && ./contrib/s3-release ${REV:-INVALID} staging",
