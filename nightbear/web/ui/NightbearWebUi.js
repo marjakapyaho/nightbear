@@ -1,5 +1,5 @@
-import { PropTypes } from 'react';
 import { renderFromStore } from 'nightbear/web/utils/react';
+import LoginScreen from 'nightbear/web/ui/screens/LoginScreen';
 
 export default renderFromStore(
 
@@ -9,7 +9,7 @@ export default renderFromStore(
 
   (React, state, actions) => (
 
-    <p>Hello, world!</p>
+    <LoginScreen />
 
   )
 
