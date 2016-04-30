@@ -15,7 +15,9 @@
     "css-build": "                                                        node-sass --include-path=node_modules --image-path=assets --output dist --output-style=compressed index.scss",
     "css-watch": "chokidar 'nightbear-web/**/*.scss' --initial --command 'node-sass --include-path=node_modules --image-path=assets --output dist                           index.scss'",
     "copy-assets": "rm -rf dist/* && cp -R assets index.html dist",
-    "s3-upload": "UI_REV=$(git rev-parse HEAD | cut -c -8) && aws s3 sync --exclude .gitkeep --acl public-read dist s3://nightbear.fi/${UI_REV:-INVALID}/"
+    "s3-upload": "REV=$(git rev-parse HEAD | cut -c -8) && aws s3 sync --exclude .gitkeep --acl public-read dist s3://nightbear.fi/${REV:-INVALID}/",
+    "release-to-staging": "REV=$(git rev-parse HEAD | cut -c -8) && npm run build && npm run s3-upload && ./contrib/s3-release ${REV:-INVALID} staging",
+    "promote-to-live": "./contrib/s3-release $(./contrib/s3-current staging) index"
   },
   "license": "AGPL",
   "dependencies": {
@@ -41,6 +43,7 @@
     "http-server": "^0.9.0",
     "immutable": "^3.7.6",
     "immutable-devtools": "0.0.6",
+    "knox": "^0.9.2",
     "lodash": "^4.6.1",
     "mocha": "^2.4.5",
     "node-sass": "^3.4.2",
