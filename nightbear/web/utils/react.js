@@ -13,6 +13,7 @@ const CSS_NS_EXCLUDE = /^$/; // not excluding anything right now
 //          );
 export function renderFromProps(fileName, propTypes, renderFunc) {
   const ns = createCssNs({
+    prefix: 'nb-',
     namespace: fileName,
     exclude: CSS_NS_EXCLUDE,
     React,
@@ -36,6 +37,7 @@ export function renderFromProps(fileName, propTypes, renderFunc) {
 //          );
 export function renderFromStore(fileName, storeSelector, renderFunc) {
   const ns = createCssNs({
+    prefix: 'nb-',
     namespace: fileName,
     exclude: CSS_NS_EXCLUDE,
     React,

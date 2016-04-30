@@ -34,7 +34,7 @@
     "chai": "^3.5.0",
     "check-node-version": "^1.1.1",
     "chokidar-cli": "^1.2.0",
-    "css-ns": "^1.0.0",
+    "css-ns": "^1.1.0",
     "envify": "^3.4.0",
     "eslint": "^2.4.0",
     "eslint-config-airbnb": "^6.2.0",
