@@ -27,7 +27,7 @@ export default app => {
                 currentTimestamp: app.currentTime(),
                 activeProfile: app.profile.getActiveProfile(timelineContent.profileSettings)
             }
-        ));
+        ), log);
         const stateArray = situationObjectToArray(state);
         log('Detected situations: ' + (stateArray.length ? stateArray.join(', ') : 'n/a'));
         log.debug('Full analysis state:', state);
@@ -36,7 +36,7 @@ export default app => {
 
 };
 
-export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, latestEntries, latestTreatments, latestDeviceStatus, latestAlarms }) {
+export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, latestEntries, latestTreatments, latestDeviceStatus, latestAlarms }, log) {
     let state = {};
 
     // Check battery status
@@ -85,7 +85,35 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
 
     state[STATUS_FALLING] = !state[STATUS_LOW] && latestGlucoseValue < activeProfile.LOW_LEVEL_REL && detectDirection(latestDirection) === 'down';
 
+    // Check if we have a probable compression low case
+    if (checkForCompressionLow(currentTimestamp, latestEntries, latestTreatments, latestNoise)) {
+        if (log) log('Compression low identified, suppressed following state', state);
+        return {};
+    }
+
     return state;
+}
+
+function checkForCompressionLow(currentTimestamp, latestEntries, latestTreatments, latestNoise) {
+    let latestBolus = _.findLast(_.sortBy(latestTreatments, 'date'), (treatment) => treatment.insulin > 0 );
+    let noRecentBoluses = latestBolus ? (currentTimestamp - latestBolus.date > helpers.HOUR_IN_MS * 2) : true;
+    let isNightTime = new Date(currentTimestamp).getHours() < 9;
+    let isEnoughNoise = latestNoise >= helpers.NOISE_LEVEL_LIMIT;
+
+    if (noRecentBoluses && isNightTime && isEnoughNoise) {
+        let latestFiveEntries = _.slice(_.sortBy(latestEntries, 'date'), -5);
+        if (latestFiveEntries.length < 5) {
+            return false;
+        }
+        let containsHugeSlopes = false;
+        for (let i = 0; i < 4; i++) {
+            let slope = Math.abs(calculateSlope(latestFiveEntries[i], latestFiveEntries[i + 1]));
+            if (slope > 2) {
+                containsHugeSlopes = true;
+            }
+        }
+        return containsHugeSlopes;
+    }
 }
 
 function calculateSlope(older, newer) {

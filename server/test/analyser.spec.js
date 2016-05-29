@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 const { assertEqual } = testUtils;
 const DAYTIME = 1459000000000; // Sat Mar 26 2016 15:46:40 GMT+0200 (EET)
+const NIGHTTIME = 1458964000000; // Sat Mar 26 2016 05:46:40 GMT+0200 (EET)
 const TIMELINE_TICK = 1000 * 60 * 5; // 5 min == 300000 ms
 const PROFILE = {
     HIGH_LEVEL_REL: 10,
@@ -126,6 +127,26 @@ describe('analyser', () => {
             [ { glucose: 13, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
             [ { glucose: 12.5, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ],
             [ { glucose: 15, direction: 'NOT COMPUTABLE', noise: 4 }, analyser.STATUS_RISING ]
+        );
+    });
+
+    it('does not alarm on compression low', () => {
+        assertTimelineAnalysis(NIGHTTIME,
+            [ { glucose: 14.2, direction: 'NOT COMPUTABLE', noise: 2 } ],
+            [ { glucose: 14.4, direction: 'NOT COMPUTABLE', noise: 3 } ],
+            [ { glucose: 14, direction: 'NOT COMPUTABLE', noise: 3 } ],
+            [ { glucose: 13, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 6.5, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 4.2, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 2.5, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 2.7, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 2.7, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 2.7, direction: 'NOT COMPUTABLE', noise: 5 }, analyser.STATUS_LOW ],
+            [ { glucose: 3.1, direction: 'NOT COMPUTABLE', noise: 5 }, analyser.STATUS_LOW ],
+            [ { glucose: 10, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 14, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 16, direction: 'NOT COMPUTABLE', noise: 5 } ],
+            [ { glucose: 18, direction: 'NOT COMPUTABLE', noise: 5 } ]
         );
     });
 
