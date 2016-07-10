@@ -7,6 +7,7 @@
 * Dexcom G4
 * Motorola Droid Mini
 * Custom 3D printed case ([part 1](nightscout_rig_v1.0_dex.stl), [part 2](nightscout_rig_v1.0_droid.stl))
+* [Nokia Wireless Charging Plate DT-601](https://www.microsoft.com/en/mobile/accessory/dt-601/)
 * [Custom USB OTG cable](https://www.mimic-cables.com/products/nightscout-project-usb-cable) ([image](1.0/cable.png))
 * [Metal hinges](https://www.k-rauta.fi/rautakauppa/ty%C3%B6kalut-ja-pienrauta/pienrauta/huonekalu--ja-v%C3%A4liovensaranat/kaapinsarana-prof-suora-25x19-fe-zn-2kpl) ([image](1.0/hinges.jpg))
 
