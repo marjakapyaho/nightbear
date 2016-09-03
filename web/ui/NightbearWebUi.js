@@ -1,5 +1,5 @@
-import { renderFromStore } from 'nightbear/web/utils/react';
-import LoginScreen from 'nightbear/web/ui/screens/LoginScreen';
+import { renderFromStore } from 'web/utils/react';
+import LoginScreen from 'web/ui/screens/LoginScreen';
 
 export default renderFromStore(
 

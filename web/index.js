@@ -16,8 +16,8 @@ fastclick(document.body);
 
 // Construct our app instance
 import PouchDB from 'pouchdb';
-import { createReduxApp } from 'nightbear/web/utils/redux';
-import modules from 'nightbear/web/app/';
+import { createReduxApp } from 'web/utils/redux';
+import modules from 'web/app/';
 const utils = {
   pouchDB: new PouchDB(process.env.DB_URL),
   getCurrentTime: Date.now,
@@ -26,8 +26,8 @@ const utils = {
 const app = window.app = createReduxApp(modules, utils);
 
 // Import and render the UI root
-import NightbearWebUi from 'nightbear/web/ui/NightbearWebUi';
-import { renderReduxApp } from 'nightbear/web/utils/react';
+import NightbearWebUi from 'web/ui/NightbearWebUi';
+import { renderReduxApp } from 'web/utils/react';
 renderReduxApp(app, NightbearWebUi, document.getElementById('nightbear-web-root'));
 
 // Kick off the app

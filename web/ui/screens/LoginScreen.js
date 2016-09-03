@@ -1,5 +1,5 @@
 import { Input } from 'react-bootstrap';
-import { renderFromStore } from 'nightbear/web/utils/react';
+import { renderFromStore } from 'web/utils/react';
 
 export default renderFromStore(
 
