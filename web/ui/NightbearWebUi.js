@@ -1,5 +1,5 @@
 import { renderFromStore } from 'web/utils/react';
-import LoginScreen from 'web/ui/screens/LoginScreen';
+import SettingsScreen from 'web/ui/screens/SettingsScreen';
 
 export default renderFromStore(
 
@@ -9,7 +9,7 @@ export default renderFromStore(
 
   (React, state, actions) => (
 
-    <LoginScreen />
+    <SettingsScreen />
 
   )
 

@@ -14,12 +14,14 @@ fastclick(document.body);
 // import immutableDevTools from 'immutable-devtools';
 // immutableDevTools(Immutable);
 
+if (!localStorage.dbUrl) localStorage.dbUrl = prompt('Please enter your DB URL') || '';
+
 // Construct our app instance
 import PouchDB from 'pouchdb';
 import { createReduxApp } from 'web/utils/redux';
 import modules from 'web/app/';
 const utils = {
-  pouchDB: new PouchDB(process.env.DB_URL),
+  pouchDB: new PouchDB(localStorage.dbUrl),
   getCurrentTime: Date.now,
   devToolsExtension: window.devToolsExtension,
 };

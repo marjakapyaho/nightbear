@@ -3,33 +3,37 @@ import { fromJS, Map } from 'immutable';
 export default {
 
   initialState: { // NOTE: will pass through Immutable.fromJS() before first use
-    doingInitialFetch: false,
-    databaseFailures: {},
-    docMap: {},
+    databaseWorking: false,
+    databaseFailures: [],
+    currentSettings: null,
   },
 
   actionCreators: {
 
     startDatabaseConnection(app) {
-      app.actions.database.initialFetchStarted();
+      app.actions.database.databaseWorkStarted();
       app.utils.pouchDB.allDocs({
-        include_docs: true,
-        conflicts: true,
-      }).then(res => new Map(res.rows.map(row => [ row.id, fromJS(row.doc) ])))
-        .then(docMap => fetchConflictingRevs(app, docMap))
-        .then(app.actions.database.documentsReceived)
+          include_docs: true,
+          descending: true,
+          startkey: 'settings/_',
+          endkey: 'settings/',
+          limit: 1,
+        })
+        .then(res => res.rows[0] ? res.rows[0].doc : null)
+        .then(fromJS)
+        .then(app.actions.database.settingsReceived)
         .catch(app.actions.database.databaseFailed);
-      app.utils.pouchDB.changes({
-        since: 'now',
-        live: true,
-        retry: true,
-        include_docs: true,
-        conflicts: true,
-      }).on('change', change => {
-        const docMap = fromJS({ [change.id]: change.doc });
-        fetchConflictingRevs(app, docMap);
-        app.actions.database.documentsReceived(docMap);
-      }).on('error', app.actions.database.databaseFailed);
+    },
+
+    updateSettings(app, newSettings) {
+      app.actions.database.databaseWorkStarted();
+      const newDoc = newSettings
+        .set('_id', 'settings/' + isoTimestamp(app.utils.getCurrentTime()))
+        .delete('_rev')
+      app.utils.pouchDB.put(newDoc.toJS())
+        .then(() => newDoc)
+        .then(app.actions.database.settingsReceived)
+        .catch(app.actions.database.databaseFailed);
     },
 
   },
@@ -38,26 +42,20 @@ export default {
 
     database: {
 
-      initialFetchStarted(state) {
-        return state.set('doingInitialFetch', true);
+      databaseWorkStarted(state) {
+        return state.set('databaseWorking', true);
       },
 
-      documentsReceived(state) {
-        return state.set('doingInitialFetch', false);
-      },
-
-      conflictReceived(state, conflictingDoc) {
-        return state.updateIn([ 'docMap', conflictingDoc.get('_id'), '_conflicts' ], conflictList => (
-          conflictList.map(conflictRev => (
-            conflictRev === conflictingDoc.get('_rev') ? conflictingDoc : conflictRev)
-          )
-        ));
+      settingsReceived(state, settingsDoc) {
+        return state
+          .set('currentSettings', settingsDoc)
+          .set('databaseWorking', false);
       },
 
       databaseFailed(state, err) {
         return state
           .update('databaseFailures', list => list.push(err.message))
-          .set('doingInitialFetch', false);
+          .set('databaseWorking', false);
       },
 
     },
@@ -66,16 +64,7 @@ export default {
 
 };
 
-function fetchConflictingRevs(app, docMap) {
-  docMap
-    .filter(doc => doc.get('_conflicts') && doc.get('_conflicts').size)
-    .forEach(doc => {
-      doc.get('_conflicts').forEach(conflictingRev => {
-        app.utils.pouchDB.get(doc.get('_id'), { rev: conflictingRev })
-          .then(fromJS)
-          .then(app.actions.database.conflictReceived)
-          .catch(app.actions.database.databaseFailed);
-      });
-    });
-  return docMap; // for convenience, return the original docMap
+// @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
+function isoTimestamp(timeInMs) {
+  return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
 }
