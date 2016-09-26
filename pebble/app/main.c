@@ -32,11 +32,11 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(text_layer, "Up");
+  acknowledge_alarm();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(text_layer, "Down");
+  acknowledge_alarm();
 }
 
 static void click_config_provider(void *context) {
@@ -49,9 +49,13 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  text_layer = text_layer_create(GRect(0, 72, bounds.size.w, 20));
+  window_set_background_color(window, GColorWhite);
+
+  text_layer = text_layer_create(GRect(0, 60, bounds.size.w, 34));
   text_layer_set_text(text_layer, "Loading..");
+  text_layer_set_background_color(text_layer, GColorWhite);
   text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+  text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
   layer_add_child(window_layer, text_layer_get_layer(text_layer));
 }
 
@@ -76,19 +80,25 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     char *alarm_level = alarm_level_tuple->value->cstring;
 
     static char s_buffer[256];
-    snprintf(s_buffer, sizeof(s_buffer), "Found alarm of type %s with level %s", alarm_type, alarm_level);
+    snprintf(s_buffer, sizeof(s_buffer), "%s, %s", alarm_type, alarm_level);
     text_layer_set_text(text_layer, s_buffer);
+    window_set_background_color(window, GColorRed);
+    text_layer_set_background_color(text_layer, GColorRed);
+    text_layer_set_text_color(text_layer, GColorWhite);
   }
   else if(ack_success_tuple) {
     exitApp();
   }
   else {
-    text_layer_set_text(text_layer, "No alarms found");
+    text_layer_set_text(text_layer, "No alarms");
+    window_set_background_color(window, GColorIslamicGreen);
+    text_layer_set_background_color(text_layer, GColorIslamicGreen);
+    text_layer_set_text_color(text_layer, GColorWhite);
   }
 }
 
 static void outbox_sent_callback(DictionaryIterator *iter, void *context) {
-    text_layer_set_text(text_layer, "Clearing alarm..");
+    text_layer_set_text(text_layer, "Clearing..");
 }
 
 static void init(void) {
@@ -110,7 +120,6 @@ static void deinit(void) {
 
 int main(void) {
   init();
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   app_event_loop();
   deinit();
 }

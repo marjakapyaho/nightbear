@@ -15,7 +15,7 @@ function fetchAlarms() {
 
     xhrWrapper(url, 'get', {}, function(req) {
         if(req.status == 200) {
-            sendResultToPebble(JSON.parse(req.response));
+            sendResultToPebble(req.response);
         }
     });
 }
@@ -42,7 +42,7 @@ function sendResultToPebble(json) {
         Pebble.sendAppMessage({
             'ALARM_FOUND': 'true',
             'ALARM_TYPE': currentAlarm.type,
-            'ALARM_LEVEL': currentAlarm.level
+            'ALARM_LEVEL': currentAlarm.level + ""
         });
     }
     else {
@@ -56,10 +56,8 @@ function xhrWrapper(url, type, data, callback) {
         callback(xhr);
     };
     xhr.open(type, url);
-    if(data) {
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-    } else {
-        xhr.send();
-    }
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('accept', 'application/json');
+    xhr.responseType='json';
+    xhr.send();
 }
