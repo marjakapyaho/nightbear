@@ -1,13 +1,16 @@
 {
-  "name": "nightbear-backend",
+  "name": "nightbear-api",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-dev": "source dev.env && serverless deploy --stage dev",
+    "deploy-prod": "source prod.env && serverless deploy --stage prod"
   },
   "license": "AGPL",
   "dependencies": {
-    "serverless": "^1.0.0-rc.2"
+    "dotenv": "^2.0.0",
+    "serverless": "^1.0.0-rc.2",
+    "serverless-plugin-write-env-vars": "^1.0.1"
   }
 }
