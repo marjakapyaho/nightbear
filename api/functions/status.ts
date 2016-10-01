@@ -1,26 +1,21 @@
-interface Request {
-  requestId: string;
-  requestMethod: string;
-  requestParams: Object;
-  requestBody: Object;
-  requestEnv: Object;
-}
+import { Request } from '../utils/lambda';
 
 export default function(request: Request) {
   if (request.requestParams['fail'])
     return Promise.reject({
       status: 500,
       message: 'Nightbear API simulated failure',
+      details: withoutSecretDetails(request),
     });
   else
     return Promise.resolve({
       status: 200,
       message: 'Nightbear API is OK',
-      details: redactSecrets(request),
+      details: withoutSecretDetails(request),
     });
 }
 
-function redactSecrets(request: Request) {
+function withoutSecretDetails(request: Request) {
   return Object.keys(request)
     .filter(key => key !== 'requestEnv')
     .reduce((memo, key) => {
