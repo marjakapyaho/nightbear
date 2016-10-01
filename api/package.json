@@ -4,13 +4,17 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --project .",
+    "watch": "tsc --project . --watch",
     "deploy-dev": "source dev.env && serverless deploy --stage dev",
     "deploy-prod": "source prod.env && serverless deploy --stage prod"
   },
   "license": "AGPL",
   "dependencies": {
+    "@types/node": "^6.0.41",
     "dotenv": "^2.0.0",
     "serverless": "^1.0.0-rc.2",
-    "serverless-plugin-write-env-vars": "^1.0.1"
+    "serverless-plugin-write-env-vars": "^1.0.1",
+    "typescript": "^2.0.3"
   }
 }
