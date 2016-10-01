@@ -8,7 +8,7 @@ provider:
 
 # see https://github.com/serverless/serverless/blob/master/docs/02-providers/aws/events/01-apigateway.md
 functions:
-  hello:
+  status:
     handler: handler.status
     events:
       - http: GET status
