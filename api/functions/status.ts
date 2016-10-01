@@ -18,9 +18,15 @@ export default function(request: Request, context: Context) {
 
 function withoutSecrets(request: Request) {
   return Object.keys(request)
-    .filter(key => key !== 'requestEnv')
     .reduce((memo, key) => {
-      memo[key] = request[key];
+      if (key === 'requestEnv')
+        memo[key] = Object.keys(request[key])
+          .reduce((memo, envVarName) => {
+            memo[envVarName] = '(redacted for security)';
+            return memo;
+          }, {});
+      else
+        memo[key] = request[key];
       return memo;
-    }, { requestEnv: '(redacted for security)' });
+    }, {});
 }
