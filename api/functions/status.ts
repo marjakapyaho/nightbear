@@ -1,21 +1,22 @@
 import { Request } from '../utils/lambda';
+import { Context } from '../utils/context';
 
-export default function(request: Request) {
+export default function(request: Request, context: Context) {
   if (request.requestParams['fail'])
     return Promise.reject({
       status: 500,
       message: 'Nightbear API simulated failure',
-      details: withoutSecretDetails(request),
     });
   else
     return Promise.resolve({
       status: 200,
       message: 'Nightbear API is OK',
-      details: withoutSecretDetails(request),
+      request: withoutSecrets(request),
+      timestamp: context.timestamp(),
     });
 }
 
-function withoutSecretDetails(request: Request) {
+function withoutSecrets(request: Request) {
   return Object.keys(request)
     .filter(key => key !== 'requestEnv')
     .reduce((memo, key) => {
