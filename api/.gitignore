@@ -1,3 +1,6 @@
 /.serverless
 /dev.env
 /prod.env
+
+# Ignore TS compiler output
+**/*.js
