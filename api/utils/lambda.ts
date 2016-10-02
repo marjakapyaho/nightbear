@@ -4,8 +4,8 @@ export interface Request {
   requestId: string;
   requestMethod: string;
   requestParams: Object;
+  requestHeaders: Object;
   requestBody: Object;
-  requestEnv: Object;
 }
 
 type RequestHandler = (request: Request, context: Context) => Promise<Object>;
@@ -18,8 +18,8 @@ export function setUpRequestHandlers(exports: Object, handlers: RequestHandlerMa
         requestId: context.awsRequestId,
         requestMethod: event.method,
         requestParams: event.query,
+        requestHeaders: event.headers,
         requestBody: event.body,
-        requestEnv: process.env,
       })
         .then(request => handlers[handlerName](request, createContext(process.env)))
         .then(res => cb(null, res))

@@ -11,23 +11,8 @@ export default function(request: Request, context: Context) {
     return Promise.resolve({
       status: 200,
       message: 'Nightbear API is OK',
-      request: withoutSecrets(request),
       timestamp: context.timestamp(),
       version: context.version,
+      request: request,
     });
-}
-
-function withoutSecrets(request: Request) {
-  return Object.keys(request)
-    .reduce((memo, key) => {
-      if (key === 'requestEnv')
-        memo[key] = Object.keys(request[key])
-          .reduce((memo, envVarName) => {
-            memo[envVarName] = '(redacted for security)';
-            return memo;
-          }, {});
-      else
-        memo[key] = request[key];
-      return memo;
-    }, {});
 }
