@@ -2,7 +2,6 @@ var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
 var Vibe = require('ui/vibe');
-var Accel = require('ui/accel');
 
 var BEAR_URL = 'http://nightbear.jrw.fi/api/entries?hours=3';
 var BEAR_BASE_URL = 'http://nightbear.jrw.fi/api/v1';
@@ -97,9 +96,6 @@ initApp();
 
 function initApp() {
 
-    // Prepare the accelerometer
-    Accel.init();
-
     // Display the text in the window
     bearWindow.add(rect);
     bearWindow.add(upperRect);
@@ -115,9 +111,6 @@ function initApp() {
 
     // Start the clock
     startClock();
-
-    // InitAlarms
-    initAlarms();
 
     // Init data fetch
     fetchNewData();
@@ -228,7 +221,7 @@ function fetchNewData() {
             console.log('Data fetch error: ' + error);
 
             // Update text to show server connection fail
-            text.text(':(');
+            text.text('-');
 
             checkIfDisconnected();
         }
@@ -316,8 +309,11 @@ function drawGraph(data) {
 function checkIfDisconnected() {
     disconnectedRounds++;
 
-    if (disconnectedRounds > DISCONNECT_ALARM_TRESHOLD) {
-        Pebble.showSimpleNotificationOnPebble('Disconnected from API', '');
+    if (disconnectedRounds == DISCONNECT_ALARM_TRESHOLD) {
+        Pebble.showSimpleNotificationOnPebble('Disconnected', '');
+    }
+    else if (disconnectedRounds > DISCONNECT_ALARM_TRESHOLD) {
+        text.text('-');
     }
 }
 
