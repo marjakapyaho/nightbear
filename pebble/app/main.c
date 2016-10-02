@@ -94,6 +94,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     window_set_background_color(window, GColorIslamicGreen);
     text_layer_set_background_color(text_layer, GColorIslamicGreen);
     text_layer_set_text_color(text_layer, GColorWhite);
+    exitApp();
   }
 }
 
