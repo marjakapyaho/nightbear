@@ -12,7 +12,11 @@ functions:
     handler: lambda.status
     events:
       - http: GET status
-      - http: POST status
+  test:
+    handler: lambda.test
+    events:
+      - http: GET test
+      - http: POST test
 
 # see https://www.npmjs.com/package/serverless-plugin-write-env-vars
 custom:
