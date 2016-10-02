@@ -1,12 +1,5 @@
-import { Context, createContext } from './context';
-
-export interface Request {
-  requestId: string;
-  requestMethod: string;
-  requestParams: Object;
-  requestHeaders: Object;
-  requestBody: Object;
-}
+import { Request, Context } from '../utils/types';
+import { createContext } from './context';
 
 type RequestHandler = (request: Request, context: Context) => Promise<Object>;
 type RequestHandlerMap = { [propName: string]: RequestHandler; };

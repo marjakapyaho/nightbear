@@ -1,7 +1,4 @@
-export interface Context {
-  version: string;
-  timestamp: () => number;
-}
+import { Context } from '../utils/types';
 
 export function createContext(env: Object): Context {
   return {

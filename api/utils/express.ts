@@ -2,10 +2,9 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import { getUuid } from './uuid';
-import { Context, createContext } from './context';
-import { Request } from './lambda';
+import { createContext } from './context';
+import { RequestHandler } from './types';
 
-type RequestHandler = (request: Request, context: Context) => Promise<Object>;
 type HttpMethod = 'get' | 'post';
 type RequestHandlerTuple = [ HttpMethod, string, RequestHandler ];
 

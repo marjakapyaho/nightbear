@@ -1,5 +1,4 @@
-import { Request } from '../utils/lambda';
-import { Context } from '../utils/context';
+import { Request, Context } from '../utils/types';
 
 // API function for checking the health & status of the API
 export default function(request: Request, context: Context) {

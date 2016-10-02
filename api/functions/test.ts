@@ -1,4 +1,4 @@
-import { Request } from '../utils/lambda';
+import { Request } from '../utils/types';
 
 // API function for testing connectivity & failure handling on clients
 export default function(request: Request) {
