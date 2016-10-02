@@ -18,6 +18,7 @@ functions:
 custom:
   writeEnvVars:
     NIGHTBEAR_API_DB_URL: ${env:NIGHTBEAR_API_DB_URL}
+    NIGHTBEAR_API_VERSION: ${env:NIGHTBEAR_API_VERSION}
 
 plugins:
    - serverless-plugin-write-env-vars

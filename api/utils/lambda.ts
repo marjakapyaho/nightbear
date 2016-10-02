@@ -1,4 +1,4 @@
-import { Context, createRequestContext } from './context';
+import { Context, createContext } from './context';
 
 export interface Request {
   requestId: string;
@@ -21,7 +21,7 @@ export function setUpRequestHandlers(exports: Object, handlers: RequestHandlerMa
         requestBody: event.body,
         requestEnv: process.env,
       })
-        .then(request => handlers[handlerName](request, createRequestContext(request)))
+        .then(request => handlers[handlerName](request, createContext(process.env)))
         .then(res => cb(null, res))
         .catch(err => cb(new Error(`[500] Nightbear API Error (see logs for requestId ${context.awsRequestId})`))); // see https://serverless.com/framework/docs/providers/aws/events/apigateway/#status-codes
     };

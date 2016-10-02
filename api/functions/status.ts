@@ -13,6 +13,7 @@ export default function(request: Request, context: Context) {
       message: 'Nightbear API is OK',
       request: withoutSecrets(request),
       timestamp: context.timestamp(),
+      version: context.version,
     });
 }
 
