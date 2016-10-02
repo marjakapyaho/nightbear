@@ -6,13 +6,21 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --project .",
     "watch": "tsc --project . --watch",
+    "run-dev": "source dev.env && node express",
+    "run-prod": "source prod.env && node express",
     "deploy-dev": "source dev.env && serverless deploy --stage dev",
     "deploy-prod": "source prod.env && serverless deploy --stage prod"
   },
   "license": "AGPL",
   "dependencies": {
+    "@types/body-parser": "0.0.33",
+    "@types/cors": "0.0.33",
+    "@types/express": "^4.0.33",
     "@types/node": "^6.0.41",
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
     "dotenv": "^2.0.0",
+    "express": "^4.14.0",
     "serverless": "^1.0.0-rc.2",
     "serverless-plugin-write-env-vars": "^1.0.1",
     "typescript": "^2.0.3"
