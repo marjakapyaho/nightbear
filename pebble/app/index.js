@@ -1,11 +1,12 @@
 var BEAR_BASE_URL = 'http://nightbear.jrw.fi/api/v1';
+var HTTP_TIMEOUT = 6000;
 
 Pebble.addEventListener('ready', function() {
     fetchAlarms();
 });
 
 Pebble.addEventListener('appmessage', function(dict) {
-    if(dict.payload['ACK_ALARM']) {
+    if (dict.payload.ACK_ALARM) {
         ackAlarm();
     }
 });
@@ -13,21 +14,27 @@ Pebble.addEventListener('appmessage', function(dict) {
 function fetchAlarms() {
     var url = BEAR_BASE_URL + '/status';
 
-    xhrWrapper(url, 'get', {}, function(req) {
-        if(req.status == 200) {
-            sendResultToPebble(req.response);
+    xhrWrapper(url, 'get',
+        function(response) {
+            sendResultToPebble(response);
+        },
+        function(errorStatus) {
+            Pebble.sendAppMessage({ 'API_ERROR': 'Fetch failed'});
         }
-    });
+    );
 }
 
 function ackAlarm() {
     var url = BEAR_BASE_URL + '/status';
 
-    xhrWrapper(url, 'post', {}, function(req) {
-        if(req.status == 200) {
+    xhrWrapper(url, 'post',
+        function() {
             Pebble.sendAppMessage({ 'ACK_SUCCESS': 'true'});
+        },
+        function() {
+            Pebble.sendAppMessage({ 'API_ERROR': 'Ack failed'});
         }
-    });
+    );
 }
 
 function sendResultToPebble(json) {
@@ -38,7 +45,7 @@ function sendResultToPebble(json) {
         currentAlarm = alarms[0];
     }
 
-    if(currentAlarm) {
+    if (currentAlarm) {
         Pebble.sendAppMessage({
             'ALARM_FOUND': 'true',
             'ALARM_TYPE': currentAlarm.type,
@@ -50,14 +57,21 @@ function sendResultToPebble(json) {
     }
 }
 
-function xhrWrapper(url, type, data, callback) {
+function xhrWrapper(url, type, successCb, errorCb) {
     var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        callback(xhr);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                successCb(xhr.response);
+            }
+            else {
+                errorCb();
+            }
+        }
     };
     xhr.open(type, url);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('accept', 'application/json');
-    xhr.responseType='json';
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.timeout = HTTP_TIMEOUT;
+    xhr.responseType = 'json';
     xhr.send();
 }
