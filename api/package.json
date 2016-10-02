@@ -4,10 +4,11 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --project .",
-    "watch": "tsc --project . --watch",
-    "watch-dev": "source dev.env && nodemon --watch . express.js",
-    "watch-prod": "source prod.env && nodemon --watch . express.js",
+    "start": "npm run js-watch & sleep 5 && npm run serve-dev",
+    "js-build": "tsc --project .",
+    "js-watch": "tsc --project . --watch --pretty",
+    "serve-dev": "source dev.env && nodemon --watch . express.js",
+    "serve-prod": "source prod.env && nodemon --watch . express.js",
     "deploy-dev": "source dev.env && serverless deploy --stage dev",
     "deploy-prod": "source prod.env && serverless deploy --stage prod"
   },
