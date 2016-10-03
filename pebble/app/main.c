@@ -3,7 +3,7 @@
 static Window *window;
 static TextLayer *text_layer;
 
-const int MESSAGE_TIMEOUT = 3000;
+const int MESSAGE_TIMEOUT = 1500;
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
