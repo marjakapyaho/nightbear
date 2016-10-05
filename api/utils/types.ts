@@ -1,6 +1,7 @@
 export interface Request {
   requestId: string;
   requestMethod: string;
+  requestPath: string;
   requestParams: Object;
   requestHeaders: Object;
   requestBody: Object;

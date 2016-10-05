@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 import { getUuid } from './uuid';
 import { createContext } from './context';
 import { RequestHandler } from './types';
+import { handlerWithLogging } from './logging';
 
 type HttpMethod = 'get' | 'post';
 type RequestHandlerTuple = [ HttpMethod, string, RequestHandler ];
@@ -19,11 +20,12 @@ export function setUpRequestHandlers(...handlers: RequestHandlerTuple[]): void {
       Promise.resolve({
         requestId,
         requestMethod: req.method,
+        requestPath: req.path,
         requestParams: req.query,
         requestHeaders: req.headers,
         requestBody: req.body,
       })
-        .then(request => handler(request, context))
+        .then(request => handlerWithLogging(handler)(request, context))
         .then(
           data => res.status(200).json(data),
           err => res.status(500).json({ errorMessage: `[500] Nightbear API Error (see logs for requestId ${requestId})` })
