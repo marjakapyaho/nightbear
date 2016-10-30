@@ -2,6 +2,8 @@
 
 ## Version 1.0
 
+Taken into use approx. 2016-05-23.
+
 ### Components
 
 * Dexcom G4
@@ -46,3 +48,38 @@
 * Similarly, it's impossible to do the swipe-from-top Android gesture because of the bridge
 * The screws on the inside of the Dexcom side are ugly :)
 * Rounding on the outside should be increased where possible
+
+## Version 1.1
+
+Taken into use approx. 2016-07-11.
+
+### Components
+
+Same as in v1.0.
+
+### Images
+
+![image-01](1.1/tinkercad-01.png)
+
+![image-02](1.1/tinkercad-02.png)
+
+![image-01](1.1/IMG_20161030_170019.jpg)
+
+![image-02](1.1/IMG_20161030_170104.jpg)
+
+![image-03](1.1/IMG_20161030_170414.jpg)
+
+![image-04](1.1/IMG_20161030_170428.jpg)
+
+![image-05](1.1/IMG_20161030_170616.jpg)
+
+### Notable changes
+
+* The epoxy covering the magnets can be treated with sand paper to make them not stick
+* Droid power button cover closes fully
+* Hinge installation holes are built into the model for easier installation
+* The space unused by the Dexcom is reclaimed on the outside of the rig with a slant
+* The thumb-slot for unplugging the cables is significantly wider
+* The Droid status led is no longer obscured by the bridge that holds in it place
+* There's a gap for doing the swipe-from-top Android gesture on the Droid
+* Other minor tweaks
