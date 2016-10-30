@@ -21,8 +21,11 @@ functions:
 # see https://www.npmjs.com/package/serverless-plugin-write-env-vars
 custom:
   writeEnvVars:
-    NIGHTBEAR_API_DB_URL: ${env:NIGHTBEAR_API_DB_URL}
+    NIGHTBEAR_API_ENV: ${env:NIGHTBEAR_API_ENV}
     NIGHTBEAR_API_VERSION: ${env:NIGHTBEAR_API_VERSION}
+    NIGHTBEAR_API_DB_URL: ${env:NIGHTBEAR_API_DB_URL}
+    NIGHTBEAR_API_LOG_LEVEL: ${env:NIGHTBEAR_API_LOG_LEVEL}
+    NIGHTBEAR_API_PAPERTRAIL_URL: ${env:NIGHTBEAR_API_PAPERTRAIL_URL}
 
 plugins:
    - serverless-plugin-write-env-vars
