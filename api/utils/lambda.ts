@@ -1,24 +1,39 @@
 import { Request, Context } from '../utils/types';
 import { createContext } from './context';
-import { handlerWithLogging } from './logging';
+import { Logger, handlerWithLogging, getContextName, bindLoggingContext } from './logging';
 
 type RequestHandler = (request: Request, context: Context) => Promise<Object>;
 type RequestHandlerMap = { [propName: string]: RequestHandler; };
 
 export function setUpRequestHandlers(exports: Object, handlers: RequestHandlerMap): void {
+  const context = createContext(process.env);
+  context.log.info(`Nightbear API server started`);
   Object.keys(handlers).forEach(handlerName => {
-    exports[handlerName] = (event, context, cb) => {
+    exports[handlerName] = (lambdaEvent, lambdaContext, cb) => {
+      const requestId = lambdaContext.awsRequestId;
+      const log = bindLoggingContext(context.log, getContextName('request', requestId));
       Promise.resolve({
-        requestId: context.awsRequestId,
-        requestMethod: event.method,
-        requestPath: handlerName, // note that this isn't a "path" in the HTTP sense, but in Lambda we don't have easy access to that (with API Gateway sitting in between)
-        requestParams: event.query,
-        requestHeaders: event.headers,
-        requestBody: event.body,
+        requestId,
+        requestMethod: lambdaEvent.httpMethod,
+        requestPath: lambdaEvent.path,
+        requestParams: lambdaEvent.queryStringParameters || {},
+        requestHeaders: lambdaEvent.headers || {},
+        requestBody: parseRequestBody(lambdaEvent.body || '{}', log),
       })
-        .then(request => handlerWithLogging(handlers[handlerName])(request, createContext(process.env)))
-        .then(res => cb(null, res))
-        .catch(err => cb(new Error(`[500] Nightbear API Error (see logs for requestId ${context.awsRequestId})`))); // see https://serverless.com/framework/docs/providers/aws/events/apigateway/#status-codes
+        .then(request => handlerWithLogging(handlers[handlerName], log)(request, context))
+        .then(
+          res => cb(null, { statusCode: 200, body: JSON.stringify(res) }),
+          err => cb(null, { statusCode: 500, body: JSON.stringify({ errorMessage: `Nightbear API Error (see logs for requestId ${lambdaContext.awsRequestId})` }) })
+        )
     };
   });
+}
+
+function parseRequestBody(body: string, log: Logger): Object {
+  try {
+    return JSON.parse(body);
+  } catch (e) {
+    log.warn('Could not parse request body as JSON: ' + body);
+    return {};
+  }
 }

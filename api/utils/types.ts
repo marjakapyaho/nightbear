@@ -1,3 +1,5 @@
+import { Logger } from './logging';
+
 export interface Request {
   requestId: string;
   requestMethod: string;
@@ -10,6 +12,7 @@ export interface Request {
 export interface Context {
   version: string;
   timestamp: () => number;
+  log: Logger;
 }
 
 export type RequestHandler = (request: Request, context: Context) => Promise<Object>;

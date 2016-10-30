@@ -21,11 +21,8 @@ export interface Logger {
   wrappedLoggerInstance: any;
 }
 
-// TODO DELME
-const log = createLogger();
-
 // Wraps the given handler with logging for input/output
-export function handlerWithLogging(handler: RequestHandler): RequestHandler {
+export function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
   return (request, context) => {
     const then = context.timestamp();
     const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
@@ -96,4 +93,24 @@ export function createLogger(opts?: LoggerOptions): Logger {
 export function getContextName(label = 'default', uuid?: string) {
   if (uuid) return `${label}-${last(uuid.split('-'))}`; // the last 12 digits are unique enough for our purposes, without cluttering the logs too much
   return `${label}-${random(1e8, 1e9 - 1)}`;
+}
+
+// Wraps the logger so that it logs into a specific Papertrail program
+export function bindLoggingContext(logger: Logger, contextName: string): Logger {
+  if (getIn(logger, 'wrappedLoggerInstance.transports.Papertrail')) { // Papertrail has a native mechanism for logging into a specific context (or "program" as they call it)
+    return mapValues(logger, (func, name) => {
+      if (!AVAILABLE_LOGGING_LEVELS[name as string]) return func; // not a logging function
+      return (...args) => {
+        // Yes, this is super ugly, but currently there's no way to pass a "program" value per log() invocation.
+        // Also, we know that this call will always be synchronous, and never recursive, so this SHOULD be totally safe. :sunglasses:
+        // @see https://github.com/kenperkins/winston-papertrail/blob/v1.0.2/lib/winston-papertrail.js#L258
+        const prev = logger.wrappedLoggerInstance.transports.Papertrail.program;
+        logger.wrappedLoggerInstance.transports.Papertrail.program = contextName;
+        func.apply(null, args);
+        logger.wrappedLoggerInstance.transports.Papertrail.program = prev;
+      };
+    });
+  } else { // the other transports don't have a concept of "program", so just work as a no-op
+    return logger;
+  }
 }

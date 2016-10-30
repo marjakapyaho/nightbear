@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 import { getUuid } from './uuid';
 import { createContext } from './context';
 import { RequestHandler } from './types';
-import { handlerWithLogging } from './logging';
+import { handlerWithLogging, getContextName, bindLoggingContext } from './logging';
 
 type HttpMethod = 'get' | 'post';
 type RequestHandlerTuple = [ HttpMethod, string, RequestHandler ];
@@ -25,14 +25,17 @@ export function setUpRequestHandlers(...handlers: RequestHandlerTuple[]): void {
         requestHeaders: req.headers,
         requestBody: req.body,
       })
-        .then(request => handlerWithLogging(handler)(request, context))
+        .then(request => {
+          const log = bindLoggingContext(context.log, getContextName('request', request.requestId));
+          return handlerWithLogging(handler, log)(request, context);
+        })
         .then(
           data => res.status(200).json(data),
-          err => res.status(500).json({ errorMessage: `[500] Nightbear API Error (see logs for requestId ${requestId})` })
+          err => res.status(500).json({ errorMessage: `Nightbear API Error (see logs for requestId ${requestId})` })
         );
     });
   });
   const server = app.listen(3000, () => {
-    console.log(`Nightbear API server listening on port ${server.address().port}`);
+    context.log.info(`Nightbear API server listening on port ${server.address().port}`);
   });
 }
