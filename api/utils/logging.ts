@@ -31,11 +31,13 @@ export function handlerWithLogging(handler: RequestHandler, log: Logger): Reques
     return handler(request, context)
       .then(
         res => {
-          log.info(`Outgoing response: ${request.requestMethod} ${request.requestPath} (${duration()})`, res);
+          log.debug(`Outgoing response`, res);
+          log.info(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
           return res;
         },
         err => {
-          log.warn(`Outgoing error: ${request.requestMethod} ${request.requestPath} (${duration()})`, err);
+          log.debug(`Outgoing error`, err);
+          log.info(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
           return Promise.reject(err);
         },
       );
