@@ -7,6 +7,7 @@ export function createContext(env: Object): Context {
     timestamp: Date.now,
     log: createLogger({
       papertrailUrl: env['NIGHTBEAR_API_PAPERTRAIL_URL'] || null,
+      cloudWatchFormat: env['NIGHTBEAR_API_CLOUDWATCH_LOGS'] || false,
       loggingLevel: env['NIGHTBEAR_API_LOG_LEVEL'] || 'debug',
       systemName: `nightbear-api-${env['NIGHTBEAR_API_ENV'] || 'unknown'}`,
     })

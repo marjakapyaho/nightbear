@@ -3,6 +3,7 @@ import * as winston from 'winston';
 import 'winston-papertrail'; // importing `winston-papertrail` will expose `winston.transports.Papertrail`
 import { extend, isString, mapValues, isPlainObject, isArray, isUndefined, isError, attempt, random, last, get as getIn } from 'lodash';
 import { hostname } from 'os';
+import { inspect } from 'util';
 
 // @see https://github.com/winstonjs/winston#using-logging-levels
 const AVAILABLE_LOGGING_LEVELS = Object.freeze({
@@ -42,7 +43,8 @@ export function handlerWithLogging(handler: RequestHandler, log: Logger): Reques
 }
 
 interface LoggerOptions {
-  papertrailUrl?: string;
+  papertrailUrl?: string; // NOTE: when https://github.com/kenperkins/winston-papertrail/issues/52 is resolved, PaperTrail may be usable on AWS Lambda
+  cloudWatchFormat?: boolean;
   loggingLevel?: string;
   systemName?: string;
   handleExceptions?: boolean;
@@ -67,6 +69,16 @@ export function createLogger(opts?: LoggerOptions): Logger {
       hostname: opts.systemName || hostname(), // note: this is a Papertrail-specific option
       program: getContextName(opts.defaultContextName), // ^ ditto
       colorize: true,
+      handleExceptions,
+    });
+  } else if (opts && opts.cloudWatchFormat) {
+    logger.add(winston.transports.Console, {
+      level: opts && opts.loggingLevel || 'debug',
+      colorize: false,
+      formatter: options =>
+        options.level.toUpperCase() + ' ' +
+        (options.message !== undefined ? options.message : '') +
+        (options.meta && Object.keys(options.meta).length ? ' '+ inspect(options.meta).replace(/ *\n */g, ' ') : ''),
       handleExceptions,
     });
   } else {
