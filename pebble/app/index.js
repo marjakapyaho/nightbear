@@ -1,4 +1,4 @@
-var BEAR_BASE_URL = 'http://nightbear.jrw.fi/api/v1';
+var BEAR_BASE_URL = 'http://legacy.nightbear.fi/api/v1';
 var HTTP_TIMEOUT = 6000;
 
 Pebble.addEventListener('ready', function() {
@@ -75,3 +75,4 @@ function xhrWrapper(url, type, successCb, errorCb) {
     xhr.responseType = 'json';
     xhr.send();
 }
+

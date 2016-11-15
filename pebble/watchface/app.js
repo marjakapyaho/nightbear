@@ -3,8 +3,8 @@ var Vector2 = require('vector2');
 var ajax = require('ajax');
 var Vibe = require('ui/vibe');
 
-var BEAR_URL = 'http://nightbear.jrw.fi/api/entries?hours=3';
-var BEAR_BASE_URL = 'http://nightbear.jrw.fi/api/v1';
+var BEAR_URL = 'http://legacy.nightbear.fi/api/entries?hours=3';
+var BEAR_BASE_URL = 'http://legacy.nightbear.fi/api/v1';
 var HALF_WINDOW_HEIGHT = 84;
 var TEXT_POSITION = 20;
 var X_START = 0;
@@ -19,7 +19,7 @@ var alarmOn = false;
 var disconnectedRounds = 0;
 
 var bearWindow = new UI.Window({
-    fullscreen: true
+    status : false
 });
 
 var rect = new UI.Rect({
