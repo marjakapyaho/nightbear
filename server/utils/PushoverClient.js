@@ -17,7 +17,7 @@ export default function(logger, user, token) {
                 priority: 2,
                 retry,
                 expire,
-                callback: 'http://nightbear.jrw.fi/api/v1/status' // TODO: Make this configurable
+                callback: 'http://legacy.nightbear.fi/api/v1/status' // TODO: Make this configurable
             };
 
             if (level === 2) {
