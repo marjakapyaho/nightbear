@@ -83,8 +83,8 @@ export default app => {
                 ])
                     .then(
                         function() {
-                            log(`Received entry (${convertedData.sensorEntriesRaw.type})`);
-                            log(`Received device status for parakeet with battery (${convertedData.deviceStatusParakeet.parakeetBattery})`);
+                            log(`Received entry from parakeet (${convertedData.sensorEntriesRaw.type})`);
+                            log(`Received device status from parakeet with battery (${convertedData.deviceStatusParakeet.parakeetBattery})`);
                             return "!ACK  0!";
                         },
                         function(err) {
