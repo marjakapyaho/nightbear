@@ -16,6 +16,10 @@ export function setActualGlucose(entry, latestCalibration) {
     return entry;
 }
 
+export function setActualGlucoseForParakeet(entry, latestCalibration) {
+    return changeSGVUnit(calculateRaw(entry, latestCalibration));
+}
+
 // @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
 export function isoTimestamp(timeInMs) {
     return new Date(timeInMs).toISOString().replace(/\..*/, 'Z');
@@ -29,4 +33,32 @@ export function calculateRaw(dataPoint, calData) {
 // @example changeSGVUnit(68) => 3.8
 export function changeSGVUnit(sgv) {
     return Math.round((sgv / 18) * 10) / 10;
+}
+
+// Unused parameters:
+// rr (cache buster?)
+// zi (transmitter id)
+// pc (passcode for parakeet)
+// bm (?)
+// ct (?)
+export function convertRawTransmitterData(app, entry, latestCalibration) {
+    return {
+        "sensorEntriesRaw": {
+            "unfiltered": parseInt(entry.lv, 10),
+            "filtered": parseInt(entry.lf, 10),
+            "device": "parakeet",
+            "type": "raw",
+            "nb_glucose_value": setActualGlucoseForParakeet({ unfiltered: parseInt(entry.lv, 10) }, latestCalibration),
+            "date": convertCurrentTimeForParakeet(app, entry.ts) // adapted from parakeet app engine
+        },
+        "deviceStatusParakeet": {
+            "geoLocation": entry.gl,
+            "parakeetBattery": entry.bp,
+            "transmitterBattery": entry.db
+        }
+    };
+}
+
+export function convertCurrentTimeForParakeet(app, timeEntry) {
+    return parseInt(parseInt(app.currentTime(), 10) - (parseInt(timeEntry, 10) / 1000) + "000", 10)
 }

@@ -235,7 +235,7 @@ describe('analyser', () => {
             [ { glucose: 14, direction: 'Flat' } ],
             [ { glucose: 14, direction: 'Flat' } ],
             [ { glucose: 14, direction: 'Flat' } ],
-            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ]
             // 15:00
         );
     });
@@ -280,7 +280,7 @@ describe('analyser', () => {
             [ { glucose: 14, direction: 'Flat' } ],
             [ { glucose: 14, direction: 'Flat' } ],
             [ { glucose: 14, direction: 'Flat' } ],
-            [ { glucose: 14, direction: 'Flat' } ],
+            [ { glucose: 14, direction: 'Flat' } ]
             // 15:00
         );
     });

@@ -24,6 +24,13 @@ export default app => {
                 );
             });
 
+            server.get('/api/v1/entries', function(req, res) {
+                app.data.parakeetDataEntry(req.query).then(
+                    data => res.status(200).send(data || null),
+                    err => res.status(500).send({ error: err && err.message || true })
+                );
+            });
+
             server.get('/api/v1/status', function(req, res) {
                 app.data.getStatus().then(
                     data => res.status(200).send(data || null),
