@@ -1,7 +1,6 @@
 import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
 import * as analyser from '../app/analyser';
-import * as helpers from '../app/helpers';
 
 const NOW = 1451846139373; // arbitrary but known
 
@@ -72,9 +71,9 @@ describe('data', () => {
                 "unfiltered": 173344,
                 "filtered": 199488,
                 "device": "parakeet",
-                "nb_glucose_value": helpers.setActualGlucoseForParakeet(entry, testCal),
+                "nb_glucose_value": 10.1,
                 "type": "raw",
-                "date": helpers.convertCurrentTimeForParakeet(app, "365336")
+                "date": 1451846139007
             }));
     });
 });
