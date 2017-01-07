@@ -11,6 +11,7 @@ export default app => {
     return {
         getTimelineContent,
         nightscoutUploaderPost,
+        parakeetDataEntry,
         getActiveAlarms,
         createAlarm,
         updateAlarm,
@@ -70,6 +71,25 @@ export default app => {
             log.error(`Received unknown entry`, datum);
             return Promise.reject('Unknown data type');
         }
+    }
+
+    function parakeetDataEntry(datum) {
+        return getLatestCalibration()
+            .then(cal => helpers.convertRawTransmitterData(app, datum, cal))
+            .then((convertedData) => Promise.all([
+                dbPUT('sensor-entries-raw', convertedData.sensorEntriesRaw),
+                dbPUT('device-status-parakeet', convertedData.deviceStatusParakeet)
+            ]))
+            .then(
+                function([ sensorEntriesRaw, deviceStatusParakeet ]) {
+                    log(`Received entry (${sensorEntriesRaw.type})`);
+                    log(`Received device status for parakeet with battery (${deviceStatusParakeet.parakeetBattery})`);
+                    return "!ACK  0!";
+                },
+                function(err) {
+                    log.error('Failed to save parakeet data entry', err);
+                }
+            );
     }
 
     // Promises an object with a snapshot of the current timeline content
@@ -215,7 +235,7 @@ export default app => {
 
         return dbPUT('device-status', { uploaderBattery: postData.uploaderBattery }, app.currentTime()).then(
             () => log(`Received device status (${postData.uploaderBattery})`),
-            err => log.error('Could not create alarm') || Promise.reject(err) // keep the Promise rejected
+            err => log.error('Could not create device status') || Promise.reject(err) // keep the Promise rejected
         );
 
     }
