@@ -42,6 +42,7 @@ export function changeSGVUnit(sgv) {
 // bm (?)
 // ct (?)
 export function convertRawTransmitterData(app, entry, latestCalibration) {
+    const date = convertCurrentTimeForParakeet(app, entry.ts); // adapted from parakeet app engine
     return {
         "sensorEntriesRaw": {
             "unfiltered": parseInt(entry.lv, 10),
@@ -49,12 +50,13 @@ export function convertRawTransmitterData(app, entry, latestCalibration) {
             "device": "parakeet",
             "type": "raw",
             "nb_glucose_value": setActualGlucoseForParakeet({ unfiltered: parseInt(entry.lv, 10) }, latestCalibration),
-            "date": convertCurrentTimeForParakeet(app, entry.ts) // adapted from parakeet app engine
+            "date": date
         },
         "deviceStatusParakeet": {
             "geoLocation": entry.gl,
             "parakeetBattery": entry.bp,
-            "transmitterBattery": entry.db
+            "transmitterBattery": entry.db,
+            "date": date
         }
     };
 }

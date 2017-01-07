@@ -76,20 +76,22 @@ export default app => {
     function parakeetDataEntry(datum) {
         return getLatestCalibration()
             .then(cal => helpers.convertRawTransmitterData(app, datum, cal))
-            .then((convertedData) => Promise.all([
-                dbPUT('sensor-entries-raw', convertedData.sensorEntriesRaw),
-                dbPUT('device-status-parakeet', convertedData.deviceStatusParakeet)
-            ]))
-            .then(
-                function([ sensorEntriesRaw, deviceStatusParakeet ]) {
-                    log(`Received entry (${sensorEntriesRaw.type})`);
-                    log(`Received device status for parakeet with battery (${deviceStatusParakeet.parakeetBattery})`);
-                    return "!ACK  0!";
-                },
-                function(err) {
-                    log.error('Failed to save parakeet data entry', err);
-                }
-            );
+            .then(convertedData =>
+                Promise.all([
+                    dbPUT('sensor-entries-raw', convertedData.sensorEntriesRaw),
+                    dbPUT('device-status-parakeet', convertedData.deviceStatusParakeet)
+                ])
+                    .then(
+                        function() {
+                            log(`Received entry (${convertedData.sensorEntriesRaw.type})`);
+                            log(`Received device status for parakeet with battery (${convertedData.deviceStatusParakeet.parakeetBattery})`);
+                            return "!ACK  0!";
+                        },
+                        function(err) {
+                            log.error('Failed to save parakeet data entry', err);
+                        }
+                    )
+            )
     }
 
     // Promises an object with a snapshot of the current timeline content
