@@ -10,12 +10,12 @@ describe('data', () => {
     let app, get, post, setCurrentTime;
     const testCal = {
         "device": "dexcom",
-        "scale": 1,
-        "dateString": "Sun Jan 03 12:10:08 EET 2016",
-        "date": NOW,
+        "scale": 0.9759277764179161,
+        "dateString": "Sun Jan 08 10:26:06 EET 2017",
+        "date": 1483863966000,
         "type": "cal",
         "intercept": 30000,
-        "slope": 788.8442542907525
+        "slope": 670.2983835165696
     };
 
     beforeEach(function() {
@@ -60,7 +60,7 @@ describe('data', () => {
     it('receives parakeet entry and creates correct data entries', () => {
         setCurrentTime(NOW);
         return post('/api/v1/entries', testCal)
-            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=13337&lv=173344&lf=199488&db=217&ts=365336&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=142720&lf=151872&db=217&ts=365336&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
             .then(() => app.pouchDB.allDocs({
                 include_docs: true,
                 limit: 1,
@@ -68,12 +68,12 @@ describe('data', () => {
             }))
             .then(res => res.rows[0].doc)
             .then(entry => assertEqual(stripMetaFields(entry), {
-                "unfiltered": 173344,
-                "filtered": 199488,
+                "unfiltered": 142720,
+                "filtered": 151872,
                 "device": "parakeet",
-                "nb_glucose_value": 10.1,
                 "type": "raw",
-                "date": 1451846139007
+                "date": 1451846139007,
+                "nb_glucose_value": 9.1
             }));
     });
 });

@@ -7,10 +7,13 @@ export const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrar
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {
     let valueToUse = entry.sgv;
+    const rawValue = calculateRaw(entry, latestCalibration);
+
     if (entry.noise >= NOISE_LEVEL_LIMIT || entry.sgv < 40) {
-        valueToUse = calculateRaw(entry, latestCalibration);
+        valueToUse = rawValue;
     }
 
+    entry.nb_raw_value = changeSGVUnit(rawValue);
     entry.nb_glucose_value = changeSGVUnit(valueToUse);
 
     return entry;
