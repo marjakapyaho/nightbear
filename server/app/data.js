@@ -47,7 +47,7 @@ export default app => {
             return getLatestCalibration()
                 .then(cal => helpers.setActualGlucose(datum, cal))
                 .then(data => dbPUT('sensor-entries', data))
-                .then(() => log(`Received entry (${datum.type})`))
+                .then(() => log(`Received entry from uploader: (${datum.nb_glucose_value})`))
                 .then(() => app.alarms.runChecks()) // No need to wait for results
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
@@ -83,7 +83,7 @@ export default app => {
                 ])
                     .then(
                         function() {
-                            log(`Received entry from parakeet (${convertedData.sensorEntriesRaw.type})`);
+                            log(`Received entry from parakeet: (${convertedData.sensorEntriesRaw.nb_glucose_value})`);
                             log(`Received device status from parakeet with battery (${convertedData.deviceStatusParakeet.parakeetBattery})`);
                             return "!ACK  0!";
                         },
