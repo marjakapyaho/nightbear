@@ -62,7 +62,13 @@
           .filter(doc => doc.type === 'mbg')
           .map(doc => ({ x: doc.date, y: changeSGVUnit(doc.mbg), fromDocId: doc._id }))
       };
-      return sensorSeries.concat([ calibrations ]);
+      var nightbearRaw = {
+        name: 'nightbear-raw',
+        data: docs
+          .filter(doc => doc.nb_raw_value)
+          .map(doc => ({ x: doc.date, y: doc.nb_raw_value, fromDocId: doc._id }))
+      };
+      return sensorSeries.concat([ calibrations, nightbearRaw ]);
     }
 
     function renderChart(series) {
