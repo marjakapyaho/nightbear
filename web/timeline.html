@@ -34,6 +34,10 @@
       return Math.round((sgv / 18) * 10) / 10;
     }
 
+    function readableTime(ts) {
+      return (new Date(ts) + '').replace(/.*?(\d+:\d+:\d+).*/, '$1');
+    }
+
     function getNightbearData() {
       var startKey = new Date().toISOString().split('T')[0];
       var endKey = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString().split('T')[0];
@@ -74,7 +78,12 @@
             'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
         },
         xAxis: {
-          type: 'datetime'
+          type: 'datetime',
+          labels: {
+            formatter: function () {
+              return readableTime(this.value);
+            }
+          }
         },
         yAxis: {
           title: {
@@ -95,7 +104,7 @@
           formatter: function() {
             return '' +
               'Device: ' + this.series.name + '<br>' +
-              'Time: ' + (new Date(this.x) + '').replace(/.*?(\d+:\d+:\d+).*/, '$1') + '<br>' +
+              'Time: ' + readableTime(this.x) + '<br>' +
               'Value: ' + this.y + '<br>' +
               'ID: ' + this.point.fromDocId + '<br>' +
               '';
