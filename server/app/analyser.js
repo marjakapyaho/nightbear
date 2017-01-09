@@ -61,7 +61,7 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
 
     state[STATUS_OUTDATED] = currentTimestamp - latestDataPoint.date > activeProfile.TIME_SINCE_SGV_LIMIT;
 
-    state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.findWhere(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
+    state[STATUS_HIGH] = latestGlucoseValue > activeProfile.HIGH_LEVEL_ABS - (_.find(latestAlarms, { type: STATUS_HIGH }) ? 2 : 0);
 
     const relevantTimeWindow = _.filter(latestEntries, entry => entry.date >= currentTimestamp - helpers.HOUR_IN_MS * 2.5);
     const timeWindowLength = _.last(relevantTimeWindow).date - _.first(relevantTimeWindow).date;
@@ -79,7 +79,7 @@ export function analyseTimelineSnapshot({ currentTimestamp, activeProfile, lates
         !hasCounterConditions
     );
 
-    state[STATUS_LOW] = latestGlucoseValue < activeProfile.LOW_LEVEL_ABS + (_.findWhere(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
+    state[STATUS_LOW] = latestGlucoseValue < activeProfile.LOW_LEVEL_ABS + (_.find(latestAlarms, { type: STATUS_LOW }) ? 2 : 0);
 
     state[STATUS_RISING] = !state[STATUS_HIGH] && latestGlucoseValue > activeProfile.HIGH_LEVEL_REL && detectDirection(latestDirection) === 'up';
 

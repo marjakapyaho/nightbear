@@ -1,6 +1,7 @@
 import ENTRIES from './sensor-change.json';
 import * as testUtils from './test-utils';
 import * as analyser from '../app/analyser';
+import * as helpers from '../app/helpers';
 
 const NOW = 1451846139373; // arbitrary but known
 
@@ -16,6 +17,42 @@ describe('data', () => {
         "type": "cal",
         "intercept": 30000,
         "slope": 670.2983835165696
+    };
+    const uploaderEntry = {
+        "unfiltered": 100000,
+        "filtered": 174752,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 200,
+        "sgv": 200,
+        "dateString": "Sun Jan 03 2016 19:55:39 GMT+0200",
+        "type": "sgv",
+        "date": NOW - (helpers.MIN_IN_MS * 40),
+        "noise": 2
+    };
+    const uploaderEntry2 = {
+        "unfiltered": 200000,
+        "filtered": 174752,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 300,
+        "sgv": 300,
+        "dateString": "Sun Jan 03 2016 20:05:39 GMT+0200 ",
+        "type": "sgv",
+        "date": NOW - (helpers.MIN_IN_MS * 30),
+        "noise": 2
+    };
+    const uploaderEntry3 = {
+        "unfiltered": 400000,
+        "filtered": 174752,
+        "direction": "FortyFiveDown",
+        "device": "dexcom",
+        "rssi": 300,
+        "sgv": 300,
+        "dateString": "Sun Jan 03 2016 20:33:39 GMT+0200",
+        "type": "sgv",
+        "date": NOW - (helpers.MIN_IN_MS * 2),
+        "noise": 2
     };
 
     beforeEach(function() {
@@ -72,8 +109,32 @@ describe('data', () => {
                 "filtered": 151872,
                 "device": "parakeet",
                 "type": "raw",
-                "date": 1451846139007,
+                "date": 1451845774037,
                 "nb_glucose_value": 9.1
             }));
+    });
+
+    it('returns uploader entries and parakeet entries in correct order', () => {
+        setCurrentTime(NOW);
+        return post('/api/v1/entries', testCal)
+            .then(() => post('/api/v1/entries', uploaderEntry3))
+            .then(() => post('/api/v1/entries', uploaderEntry))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=300000&lf=151872&db=217&ts=1200000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=500000&lf=151872&db=217&ts=60000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => post('/api/v1/entries', uploaderEntry2))
+            .then(() => app.data.getLatestEntries(2 * helpers.HOUR_IN_MS))
+            .then((entries) => {
+                assertEqual(entries.length, 4);
+
+                assertEqual(entries[0].device, 'dexcom');
+                assertEqual(entries[1].device, 'dexcom');
+                assertEqual(entries[2].device, 'parakeet');
+                assertEqual(entries[3].device, 'dexcom');
+
+                assertEqual(entries[0].unfiltered, 100000);
+                assertEqual(entries[1].unfiltered, 200000);
+                assertEqual(entries[2].unfiltered, 300000);
+                assertEqual(entries[3].unfiltered, 400000);
+            })
     });
 });

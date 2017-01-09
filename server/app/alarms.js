@@ -68,7 +68,7 @@ export default app => {
 
         const alarmsToCreate = _.compact(_.map(state, function(value, key) {
             if (!value) return;
-            if (_.findWhere(alarmsToKeep, { type: key })) return;
+            if (_.find(alarmsToKeep, { type: key })) return;
             return key;
         }));
 

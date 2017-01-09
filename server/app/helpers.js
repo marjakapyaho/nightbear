@@ -82,7 +82,7 @@ export function convertRawTransmitterData(app, entry, latestCalibration) {
 }
 
 export function convertCurrentTimeForParakeet(app, timeEntry) {
-    return parseInt(parseInt(app.currentTime(), 10) - (parseInt(timeEntry, 10) / 1000) + "000", 10)
+    return app.currentTime() - parseInt(timeEntry, 10)
 }
 
 function cleanValues (entry, cal) {

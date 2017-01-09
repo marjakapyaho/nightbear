@@ -10,6 +10,7 @@ export default app => {
 
     return {
         getTimelineContent,
+        getLatestEntries,
         nightscoutUploaderPost,
         parakeetDataEntry,
         getActiveAlarms,
@@ -116,7 +117,7 @@ export default app => {
 
     // Promises the single latest calibration doc
     function getLatestCalibration() {
-        return app.pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+        return app.pouchDB.allDocs({
             include_docs: true,
             descending: true,
             startkey: 'calibrations/_',
@@ -128,7 +129,20 @@ export default app => {
 
     // Promises entries from the last durationMs
     function getLatestEntries(durationMs) {
-        return app.pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+        return Promise.all([
+            getLatestUploaderEntries(durationMs),
+            getLatestParakeetEntries(durationMs)
+        ])
+        .then(([uploaderEntries, parakeetEntries]) => {
+            return _.sortBy(_.unionBy(uploaderEntries, parakeetEntries, (entry) => {
+                return Math.round(entry.date / (5 * helpers.MIN_IN_MS));
+            }), 'date');
+        })
+    }
+
+    // Promises uploader entries from the last durationMs
+    function getLatestUploaderEntries(durationMs) {
+        return app.pouchDB.allDocs({
             include_docs: true,
             startkey: 'sensor-entries/' + helpers.isoTimestamp(app.currentTime() - durationMs),
             endkey: 'sensor-entries/' + helpers.isoTimestamp(app.currentTime())
@@ -136,9 +150,19 @@ export default app => {
         .then(res => res.rows.map(row => row.doc));
     }
 
+    // Promises raw parakeet entries from the last durationMs
+    function getLatestParakeetEntries(durationMs) {
+        return app.pouchDB.allDocs({
+            include_docs: true,
+            startkey: 'sensor-entries-raw/' + helpers.isoTimestamp(app.currentTime() - durationMs),
+            endkey: 'sensor-entries-raw/' + helpers.isoTimestamp(app.currentTime())
+        })
+        .then(res => res.rows.map(row => row.doc));
+    }
+
     // Promises treatments from the last durationMs
     function getLatestTreatments(durationMs) {
-        return app.pouchDB.allDocs({ // @see http://pouchdb.com/api.html#batch_fetch
+        return app.pouchDB.allDocs({
             include_docs: true,
             startkey: 'treatments/' + helpers.isoTimestamp(app.currentTime() - durationMs),
             endkey: 'treatments/' + helpers.isoTimestamp(app.currentTime())
@@ -315,7 +339,7 @@ export default app => {
                     carbs: entry.carbs,
                     insulin: entry.insulin,
                     sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
-                    is_raw: entry.nb_glucose_value && entry.noise >= helpers.NOISE_LEVEL_LIMIT
+                    is_raw: entry.nb_glucose_value && (!entry.noise || entry.noise >= helpers.NOISE_LEVEL_LIMIT)
                 }))
                 .sortBy(entry => entry.time) // return in chronological order
                 .value()
