@@ -4,7 +4,7 @@ export const NOISE_LEVEL_LIMIT = 4;
 export const DIRECTION_NOT_COMPUTABLE = 'NOT COMPUTABLE'; // when direction not computable, use raw sensor data instead
 export const DEFAULT_TREATMENT_TYPE = 'Meal Bolus'; // this is somewhat arbitrary, but "Meal Bolus" is the most applicable of the types available in Nightscout
 
-export let rawCalculationRatio = 1; // default to 1 which doesn't do anything, TODO: make this resettable in tests
+let rawCalculationRatio = 1; // default to 1 which doesn't do anything, TODO: make this resettable in tests
 
 // Updates the given entry by interpreting RAW data where necessary, and converting units
 export function setActualGlucose(entry, latestCalibration) {
@@ -69,7 +69,10 @@ export function convertRawTransmitterData(app, entry, latestCalibration) {
             "filtered": parseInt(entry.lf, 10),
             "device": "parakeet",
             "type": "raw",
-            "nb_glucose_value": setActualGlucoseForParakeet({ unfiltered: parseInt(entry.lv, 10) }, latestCalibration),
+            "nb_glucose_value": setActualGlucoseForParakeet({
+                unfiltered: parseInt(entry.lv, 10),
+                filtered: parseInt(entry.lf, 10) },
+                latestCalibration),
             "date": date
         },
         "deviceStatusParakeet": {

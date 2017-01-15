@@ -9,7 +9,28 @@ describe('data', () => {
 
     const { assertEqual, stripMetaFields } = testUtils;
     let app, get, post, setCurrentTime;
-    const testCal = {
+    const testCal1 = {
+        "device": "dexcom",
+        "scale": 1,
+        "dateString": "Sat Jan 14 20:15:57 EET 2017",
+        "date": 1484417757000,
+        "type": "cal",
+        "intercept": 30000,
+        "slope": 890.5885872888931
+    };
+    const uploaderEntry = {
+        "unfiltered": 196800,
+        "filtered": 201728,
+        "direction": "Flat",
+        "device": "dexcom",
+        "rssi": 173,
+        "sgv": 135,
+        "dateString": "Sun Jan 15 13:05:56 EET 2017",
+        "type": "sgv",
+        "date": 1484478356000,
+        "noise": 1
+    };
+    const testCal2 = {
         "device": "dexcom",
         "scale": 0.9759277764179161,
         "dateString": "Sun Jan 08 10:26:06 EET 2017",
@@ -18,7 +39,7 @@ describe('data', () => {
         "intercept": 30000,
         "slope": 670.2983835165696
     };
-    const uploaderEntry = {
+    const uploaderEntry1 = {
         "unfiltered": 100000,
         "filtered": 174752,
         "direction": "FortyFiveDown",
@@ -94,10 +115,10 @@ describe('data', () => {
             .then(alarms => assertEqual(alarms, []));
     });
 
-    it('receives parakeet entry and creates correct data entries', () => {
+    it('receives uploader entry and creates correct data entry', () => {
         setCurrentTime(NOW);
-        return post('/api/v1/entries', testCal)
-            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=142720&lf=151872&db=217&ts=365336&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+        return post('/api/v1/entries', testCal1)
+            .then(() => post('/api/v1/entries', uploaderEntry))
             .then(() => app.pouchDB.allDocs({
                 include_docs: true,
                 limit: 1,
@@ -105,20 +126,46 @@ describe('data', () => {
             }))
             .then(res => res.rows[0].doc)
             .then(entry => assertEqual(stripMetaFields(entry), {
-                "unfiltered": 142720,
-                "filtered": 151872,
+                "unfiltered": 196800,
+                "filtered": 201728,
+                "direction": "Flat",
+                "device": "dexcom",
+                "rssi": 173,
+                "sgv": 135,
+                "dateString": "Sun Jan 15 13:05:56 EET 2017",
+                "type": "sgv",
+                "date": 1484478356000,
+                "noise": 1,
+                "nb_raw_value": 7.3,
+                "nb_glucose_value": 7.5
+            }));
+    });
+
+    it('receives parakeet entry and creates correct data entries', () => {
+        setCurrentTime(NOW);
+        return post('/api/v1/entries', testCal1)
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=196800&lf=201728&db=217&ts=365336&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => app.pouchDB.allDocs({
+                include_docs: true,
+                limit: 1,
+                startkey: 'sensor-entries-raw/'
+            }))
+            .then(res => res.rows[0].doc)
+            .then(entry => assertEqual(stripMetaFields(entry), {
+                "unfiltered": 196800,
+                "filtered": 201728,
                 "device": "parakeet",
                 "type": "raw",
                 "date": 1451845774037,
-                "nb_glucose_value": 9.1
+                "nb_glucose_value": 7.3
             }));
     });
 
     it('returns uploader entries and parakeet entries in correct order', () => {
         setCurrentTime(NOW);
-        return post('/api/v1/entries', testCal)
+        return post('/api/v1/entries', testCal2)
             .then(() => post('/api/v1/entries', uploaderEntry3))
-            .then(() => post('/api/v1/entries', uploaderEntry))
+            .then(() => post('/api/v1/entries', uploaderEntry1))
             .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=300000&lf=151872&db=217&ts=1200000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
             .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=500000&lf=151872&db=217&ts=60000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
             .then(() => post('/api/v1/entries', uploaderEntry2))
