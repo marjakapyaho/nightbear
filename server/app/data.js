@@ -134,9 +134,18 @@ export default app => {
             getLatestParakeetEntries(durationMs)
         ])
         .then(([uploaderEntries, parakeetEntries]) => {
-            return _.sortBy(_.unionBy(uploaderEntries, parakeetEntries, (entry) => {
+            let combinedEntries = _.sortBy(_.unionBy(uploaderEntries, parakeetEntries, (entry) => {
                 return Math.round(entry.date / (5 * helpers.MIN_IN_MS));
             }), 'date');
+
+            // Remove last entry if it's parakeet - it comes 1 min before uploader entry
+            // and otherwise messes up calculations for a minute
+            const lastEntries = _.takeRight(combinedEntries, 2);
+            if (lastEntries.length == 2 && lastEntries[0].device == "dexcom" && lastEntries[1].device == "parakeet") {
+                return _.slice(combinedEntries, 0, -1);
+            }
+
+            return combinedEntries;
         })
     }
 

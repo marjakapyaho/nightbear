@@ -72,7 +72,7 @@ describe('data', () => {
         "sgv": 300,
         "dateString": "Sun Jan 03 2016 20:33:39 GMT+0200",
         "type": "sgv",
-        "date": NOW - (helpers.MIN_IN_MS * 2),
+        "date": NOW - (helpers.MIN_IN_MS * 5),
         "noise": 2
     };
 
@@ -167,6 +167,7 @@ describe('data', () => {
             .then(() => post('/api/v1/entries', uploaderEntry3))
             .then(() => post('/api/v1/entries', uploaderEntry1))
             .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=300000&lf=151872&db=217&ts=1200000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=500000&lf=151872&db=217&ts=360000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
             .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=500000&lf=151872&db=217&ts=60000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
             .then(() => post('/api/v1/entries', uploaderEntry2))
             .then(() => app.data.getLatestEntries(2 * helpers.HOUR_IN_MS))
