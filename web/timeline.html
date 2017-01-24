@@ -22,6 +22,10 @@
 
     if (!localStorage.dbCredentials) localStorage.dbCredentials = prompt('Please enter your DB credentials') || '';
 
+    var daysOffset = parseInt((location.hash.match(/(-?\d+)d/) || [])[0]) || 0;
+
+    console.log('daysOffset =', daysOffset);
+
     getNightbearData()
       .then(
         res => console.info(res) || res,
@@ -39,8 +43,8 @@
     }
 
     function getNightbearData() {
-      var startKey = new Date().toISOString().split('T')[0];
-      var endKey = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString().split('T')[0];
+      var startKey = new Date(Date.now() + 1000 * 60 * 60 * 24 * daysOffset).toISOString().split('T')[0];
+      var endKey = new Date(Date.now() + 1000 * 60 * 60 * 24 * (daysOffset + 1)).toISOString().split('T')[0];
       var url = 'https://nightbear.cloudant.com/user_marja/_design/global_stats/_view/per_date_and_type?limit=1000&reduce=false&include_docs=true&inclusive_end=false&start_key=%5B%22' + startKey + '%22%5D&end_key=%5B%22' + endKey + '%22%5D';
       return fetch(url, { headers: { 'Authorization': 'Basic ' + btoa(localStorage.dbCredentials) } })
         .then(res => res.json())
