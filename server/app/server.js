@@ -45,6 +45,13 @@ export default app => {
                 );
             });
 
+            server.get('/api/v1/hba1c', function(req, res) {
+                app.data.getHba1c().then(
+                    data => res.status(200).send(data || null),
+                    err => res.status(500).send({ error: err && err.message || true })
+                );
+            });
+
             // Rig battery status
             server.post('/api/v1/devicestatus', function(req, res) {
                 app.data.createDeviceStatus(req.body).then(

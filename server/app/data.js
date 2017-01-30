@@ -18,11 +18,12 @@ export default app => {
         updateAlarm,
         ackLatestAlarm,
         getStatus,
+        getHba1c,
         createDeviceStatus,
         saveTestData,
         legacyPost,
         getLegacyEntries,
-        getProfileSettings
+        getProfileSettings,
     };
 
     // @example dbPUT('sensor-entries', { ... }) => Promise
@@ -310,6 +311,11 @@ export default app => {
                 limit: 1
             })
             .then(res => res.rows[0] ? res.rows[0].doc : null);
+    }
+
+    function getHba1c() {
+        return getLatestEntries(90 * 24 * helpers.HOUR_IN_MS) // 3 months of entries
+            .then(entries => helpers.calculateHba1c(entries))
     }
 
     function legacyPost(data) {

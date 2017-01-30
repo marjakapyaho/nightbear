@@ -185,4 +185,17 @@ describe('data', () => {
                 assertEqual(entries[3].unfiltered, 400000);
             })
     });
+
+    it('returns correct HBA1C for given values', () => {
+        setCurrentTime(NOW);
+        return post('/api/v1/entries', testCal2)
+            .then(() => post('/api/v1/entries', uploaderEntry3))
+            .then(() => post('/api/v1/entries', uploaderEntry1))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=196800&lf=151872&db=217&ts=1200000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=196800&lf=151872&db=217&ts=360000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => get('/api/v1/entries?rr=469575&zi=6783252&pc=23456&lv=196800&lf=151872&db=217&ts=60000&bp=82&bm=4058&ct=300&gl=60.183220,24.923210'))
+            .then(() => post('/api/v1/entries', uploaderEntry2))
+            .then(() => app.data.getHba1c())
+            .then(hba1c => assertEqual(hba1c, '10.6'));
+    });
 });

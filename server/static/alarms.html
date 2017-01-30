@@ -91,6 +91,10 @@
     </head>
 
     <body>
+        <div>
+            <h3>HBA1C: </h3>
+            <h1 class="hba1c-estimate"></h1>
+        </div>
         <ul class="alarms"></ul>
         <div class="ack-alarm">Acknowledge alarm</div>
 
@@ -122,7 +126,14 @@
                     });
                 }
 
+                function getHBA1C() {
+                    $.getJSON( "/api/v1/hba1c", function(data) {
+                        $('.hba1c-estimate').text(data.hba1c)
+                    });
+                }
+
                 getStatus();
+                getHBA1C();
 
                 $('.ack-alarm').on('click', function() {
                     $.post( "/api/v1/status", function() {

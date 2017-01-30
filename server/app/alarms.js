@@ -2,26 +2,6 @@ import * as helpers from './helpers';
 import * as analyser from './analyser';
 import _ from 'lodash';
 
-export const ALARM_SNOOZE_TIMES = {
-    [analyser.STATUS_OUTDATED]: 120,
-    [analyser.STATUS_HIGH]: 90,
-    [analyser.STATUS_PERSISTENT_HIGH]: 60 * 3,
-    [analyser.STATUS_LOW]: 15,
-    [analyser.STATUS_RISING]: 20,
-    [analyser.STATUS_FALLING]: 10,
-    [analyser.STATUS_BATTERY]: 60
-};
-
-export const ALARM_LEVEL_UP_TIMES = {
-    [analyser.STATUS_OUTDATED]: [ 10, 20, 20],
-    [analyser.STATUS_HIGH]: [ 10, 20, 20],
-    [analyser.STATUS_PERSISTENT_HIGH]: [ 10, 20, 20],
-    [analyser.STATUS_LOW]: [ 6, 7, 10],
-    [analyser.STATUS_RISING]: [ 8, 15, 15],
-    [analyser.STATUS_FALLING]: [ 6, 7, 10],
-    [analyser.STATUS_BATTERY]: [ 10, 20, 20]
-};
-
 let nextCheck;
 
 export default app => {

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
@@ -23,6 +25,15 @@ export function setActualGlucose(entry, latestCalibration) {
 
 export function setActualGlucoseForParakeet(entry, latestCalibration) {
     return changeSGVUnit(calculateRaw(entry, latestCalibration));
+}
+
+export function calculateHba1c(entries) {
+    let avgGlucose = _.reduce(entries, function(sum, entry) {
+        return sum + changeSGVUnitToMgdl(entry.nb_glucose_value);
+    }, 0) / entries.length;
+
+    // TODO: Math.round(((avgGlucose + 46.7) / 28.7 - 2.15) * 10.929)
+    return (Math.round(10 * (avgGlucose + 46.7) / 28.7) / 10).toFixed(1);
 }
 
 // @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
@@ -53,6 +64,12 @@ export function calculateRaw(dataPoint, calData) {
 // @example changeSGVUnit(68) => 3.8
 export function changeSGVUnit(sgv) {
     return Math.round((sgv / 18) * 10) / 10;
+}
+
+// Converts blood glucose values from mmol/L (used in Europe) to mg/dL (used by Dexcom)
+export function changeSGVUnitToMgdl(sgv) {
+    let numeric = parseInt(10 * sgv, 10) / 10;
+    return Math.round(18 * numeric, 10);
 }
 
 // Unused parameters:
