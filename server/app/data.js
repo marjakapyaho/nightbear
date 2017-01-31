@@ -20,10 +20,9 @@ export default app => {
         getStatus,
         getHba1c,
         createDeviceStatus,
-        saveTestData,
         legacyPost,
         getLegacyEntries,
-        getProfileSettings,
+        getProfileSettings
     };
 
     // @example dbPUT('sensor-entries', { ... }) => Promise
@@ -288,20 +287,6 @@ export default app => {
         .then(res => res.rows[0] ? res.rows[0].doc : { uploaderBattery: null });
     }
 
-    function saveTestData(name) {
-        return app.data.getTimelineContent()
-            .then(function(dataSnapshot) {
-                let testData = {
-                    snapshot: dataSnapshot,
-                    name: name || helpers.isoTimestamp(app.currentTime())
-                };
-                return dbPUT('test-data', testData, app.currentTime()).then(
-                    () => log(`Received test data (${testData.name})`),
-                    err => log.error('Could not store test data') || Promise.reject(err) // keep the Promise rejected
-                );
-            });
-    }
-
     function getProfileSettings() {
         return app.pouchDB.allDocs({
                 include_docs: true,
@@ -315,7 +300,10 @@ export default app => {
 
     function getHba1c() {
         return getLatestEntries(90 * 24 * helpers.HOUR_IN_MS) // 3 months of entries
-            .then(entries => helpers.calculateHba1c(entries))
+            .then(entries => {
+                log(`Calculated HBA1C with ${entries.length} entries`);
+                return helpers.calculateHba1c(entries);
+            });
     }
 
     function legacyPost(data) {

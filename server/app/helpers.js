@@ -32,7 +32,6 @@ export function calculateHba1c(entries) {
         return sum + changeSGVUnitToMgdl(entry.nb_glucose_value);
     }, 0) / entries.length;
 
-    // TODO: Math.round(((avgGlucose + 46.7) / 28.7 - 2.15) * 10.929)
     return (Math.round(10 * (avgGlucose + 46.7) / 28.7) / 10).toFixed(1);
 }
 
