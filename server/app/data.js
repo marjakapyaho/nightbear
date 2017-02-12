@@ -75,6 +75,14 @@ export default app => {
     }
 
     function parakeetDataEntry(datum) {
+
+        if (app.parakeetProxy) { // only proxy incoming data if a downstream Parakeet server has been configured
+            app.parakeetProxy.sendEntry(datum).then(
+                success => log.debug(`Successfully sent Parakeet entry downstream`),
+                failure => log.error('Failed to send Parakeet entry downstream', failure)
+            );
+        }
+
         return getLatestCalibration()
             .then(cal => helpers.convertRawTransmitterData(app, datum, cal))
             .then(convertedData =>
