@@ -10,6 +10,7 @@ const modules = {
     pouchDB: null,
     pushover: null,
     nightscoutProxy: null,
+    parakeetProxy: null,
     alarms,
     analyser,
     data,
