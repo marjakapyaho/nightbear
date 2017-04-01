@@ -19,6 +19,7 @@ export default app => {
         ackLatestAlarm,
         getStatus,
         getHba1c,
+        getHba1cHistory,
         createDeviceStatus,
         legacyPost,
         getLegacyEntries,
@@ -307,11 +308,63 @@ export default app => {
     }
 
     function getHba1c() {
+        const overwrite = false;
+        const collection = 'hba1c-history';
+        const currentTime = app.currentTime();
+        const [ date ] = helpers.isoTimestamp(currentTime).split('T');
+        const docId = `${collection}/${date}`;
+        return Promise.resolve()
+            .then(() => app.pouchDB.get(docId))
+            .then(
+                doc => {
+                    if (overwrite) {
+                        return upsertHba1c(docId, date, currentTime, doc);
+                    }
+                    log(`Using pre-calculated HBA1C for date ${date}: ${doc.hba1c}`);
+                    return doc;
+                },
+                err => {
+                    if (err.error !== 'not_found') return Promise.reject(err); // this was some other, unexpected error
+                    return upsertHba1c(docId, date, currentTime);
+                }
+            )
+            .then(doc => doc.hba1c.toFixed(1));
+    }
+
+    function upsertHba1c(docId, date, currentTime, overwriteDoc) {
+        const limit = 1000;
         return getLatestEntries(90 * 24 * helpers.HOUR_IN_MS) // 3 months of entries
             .then(entries => {
-                log(`Calculated HBA1C with ${entries.length} entries`);
+                if (entries.length < limit) return Promise.reject(`Could not calculate HBA1C for date ${date} without at least ${limit} entries`);
+                log(`Calculating new HBA1C for date ${date} (${entries.length} entries)`);
                 return helpers.calculateHba1c(entries);
-            });
+            })
+            .then(hba1c => {
+                if (!(hba1c > 1)) return Promise.reject(`Got suspicious-looking HBA1C for date ${date}: ${hba1c}`);
+                log(`Calculated new HBA1C for date ${date}: ${hba1c}`);
+                const doc = {
+                    _id: docId,
+                    _rev: overwriteDoc ? overwriteDoc._rev : undefined,
+                    calculationPeriod: date,
+                    calculationTimestamp: currentTime,
+                    hba1c,
+                };
+                // TODO: dbPUT() should be used here I guess, but it doesn't handle date-only timestamps
+                return app.pouchDB.put(doc).then(
+                    success => log.debug('dbPUT()', doc, '=>', success), // resolve with undefined
+                    failure => log.debug('dbPUT()', doc, '=> FAILURE', failure) || Promise.reject(failure) // keep the Promise rejected; we don't log this on the "error" level because sometimes a PUT is expected to fail (e.g. duplicate keys)
+                ).then(() => doc)
+            })
+    }
+
+    function getHba1cHistory() {
+        return app.pouchDB.allDocs({
+            include_docs: true,
+            descending: true,
+            startkey: 'hba1c-history/_',
+            endkey: 'hba1c-history/',
+        })
+            .then(res => res.rows.map(row => [ row.doc.calculationPeriod, row.doc.hba1c ] ));
     }
 
     function legacyPost(data) {

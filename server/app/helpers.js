@@ -28,11 +28,12 @@ export function setActualGlucoseForParakeet(entry, latestCalibration) {
 }
 
 export function calculateHba1c(entries) {
-    let avgGlucose = _.reduce(entries, function(sum, entry) {
+    const numericEntries = entries.filter(entry => _.isNumber(entry.nb_glucose_value));
+    let avgGlucose = _.reduce(numericEntries, function(sum, entry) {
         return sum + changeSGVUnitToMgdl(entry.nb_glucose_value);
-    }, 0) / entries.length;
+    }, 0) / numericEntries.length;
 
-    return (Math.round(10 * (avgGlucose + 46.7) / 28.7) / 10).toFixed(1);
+    return (avgGlucose + 46.7) / 28.7;
 }
 
 // @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
@@ -68,7 +69,7 @@ export function changeSGVUnit(sgv) {
 // Converts blood glucose values from mmol/L (used in Europe) to mg/dL (used by Dexcom)
 export function changeSGVUnitToMgdl(sgv) {
     let numeric = parseInt(10 * sgv, 10) / 10;
-    return Math.round(18 * numeric, 10);
+    return Math.round(18 * numeric);
 }
 
 // Unused parameters:

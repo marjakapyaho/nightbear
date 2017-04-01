@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nightbear HBA1C Timeline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.6/css/highcharts.css" />
+    <style>
+        html, body, #chart {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="chart"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.6/highcharts.js"></script>
+<script>
+
+    getHba1cData()
+        .then(
+            res => console.info(res) || res,
+            err => console.warn(err)
+        )
+        .then(toHighchartsData)
+        .then(renderChart);
+
+    function getHba1cData() {
+        return fetch('/api/v1/hba1c-history')
+            .then(res => res.json())
+    }
+
+    function toHighchartsData(history) {
+        return [
+            {
+                name: 'Calculated',
+                data: history.map(entry => [ Date.parse(entry[0]), entry[1] ]),
+            },
+            {
+                name: 'Measured',
+                data: [
+                    [ Date.parse('2017-02-13'), 6.8 ],
+                    [ Date.parse('2016-09-26'), 6.8 ],
+                    [ Date.parse('2016-02-04'), 7.4 ],
+                    [ Date.parse('2015-10-22'), 7.5 ],
+                    [ Date.parse('2015-03-27'), 7.6 ],
+                    [ Date.parse('2014-09-25'), 7.5 ],
+                ],
+            },
+        ];
+    }
+
+    function renderChart(series) {
+        Highcharts.chart('chart', {
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Nightbear HBA1C Timeline'
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+            },
+            xAxis: {
+                type: 'datetime',
+            },
+            yAxis: {
+                title: {
+                    enabled: false
+                },
+                plotBands: [
+                    { // low
+                        from: 0,
+                        to: 4,
+                    },
+                    { // high
+                        from: 12,
+                        to: Infinity,
+                    }
+                ]
+            },
+            series: series
+        });
+    }
+
+</script>
+</body>
+</html>
