@@ -33,7 +33,7 @@ export function calculateHba1c(entries) {
         return sum + changeSGVUnitToMgdl(entry.nb_glucose_value);
     }, 0) / numericEntries.length;
 
-    return (avgGlucose + 46.7) / 28.7;
+    return ((avgGlucose + 46.7) / 28.7) - 0.6;
 }
 
 // @example isoTimestamp(1448805744000) => "2015-11-29T14:02:24Z"
