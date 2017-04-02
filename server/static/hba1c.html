@@ -37,20 +37,29 @@
         return [
             {
                 name: 'Calculated',
-                data: history.map(entry => [ Date.parse(entry[0]), entry[1] ]),
+                type: 'spline',
+                data: filterRelevantData(history.map(entry => [ Date.parse(entry[0]), entry[1] ])),
             },
             {
                 name: 'Measured',
-                data: [
+                type: 'spline',
+                data: filterRelevantData([
                     [ Date.parse('2017-02-13'), 6.8 ],
                     [ Date.parse('2016-09-26'), 6.8 ],
                     [ Date.parse('2016-02-04'), 7.4 ],
                     [ Date.parse('2015-10-22'), 7.5 ],
                     [ Date.parse('2015-03-27'), 7.6 ],
                     [ Date.parse('2014-09-25'), 7.5 ],
-                ],
+                ]),
             },
         ];
+    }
+
+    function filterRelevantData(series) {
+        const cutoff = Date.now() - 1000 * 60 * 60 * 24 * 30 * 6; // last 6 months
+        return series
+            .filter(d => d[0] >= cutoff)
+            .map(d => [ d[0], parseFloat(d[1].toFixed(2)) ]) // "smooth" the series to 2 decimals
     }
 
     function renderChart(series) {
@@ -59,7 +68,7 @@
                 zoomType: 'x'
             },
             title: {
-                text: 'Nightbear HBA1C Timeline'
+                text: 'HBA1C = ' + _.last(series[0].data)[1].toFixed(2)
             },
             subtitle: {
                 text: document.ontouchstart === undefined ?
