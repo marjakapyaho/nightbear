@@ -20,3 +20,6 @@ const app = createAppInstance({
 
 app.server.createExpressServer(3001, 'static');
 app.alarms.runChecks();
+
+setInterval(app.data.getHba1c, 1000 * 60 * 60 * 6); // calculate & cache a new HBA1C every 6 hours (though a new one will be created only once per 24h)
+app.data.getHba1c(); // ...and immediately during startup
