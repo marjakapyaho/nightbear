@@ -18,6 +18,10 @@
 <div id="chart"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/5.0.6/highcharts.js"></script>
+<script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
 <script>
 
     getHba1cData()
@@ -29,8 +33,7 @@
         .then(renderChart);
 
     function getHba1cData() {
-        return fetch('/api/v1/hba1c-history')
-            .then(res => res.json())
+        return $.get('/api/v1/hba1c-history');
     }
 
     function toHighchartsData(history) {
