@@ -307,7 +307,7 @@ export default app => {
             .then(res => res.rows[0] ? res.rows[0].doc : null);
     }
 
-    function getHba1c() {
+    function getHba1c(limit = 1000) {
         const overwrite = false;
         const collection = 'hba1c-history';
         const currentTime = app.currentTime();
@@ -317,22 +317,19 @@ export default app => {
             .then(() => app.pouchDB.get(docId))
             .then(
                 doc => {
-                    if (overwrite) {
-                        return upsertHba1c(docId, date, currentTime, doc);
-                    }
+                    if (overwrite) return upsertHba1c(docId, date, currentTime, limit, doc);
                     log(`Using pre-calculated HBA1C for date ${date}: ${doc.hba1c}`);
                     return doc;
                 },
                 err => {
-                    if (err.error !== 'not_found') return Promise.reject(err); // this was some other, unexpected error
-                    return upsertHba1c(docId, date, currentTime);
+                    if (err.name !== 'not_found') return Promise.reject(err); // this was some other, unexpected error
+                    return upsertHba1c(docId, date, currentTime, limit); // if the value was not found, calculate one
                 }
             )
             .then(doc => doc.hba1c.toFixed(1));
     }
 
-    function upsertHba1c(docId, date, currentTime, overwriteDoc) {
-        const limit = 1000;
+    function upsertHba1c(docId, date, currentTime, limit, overwriteDoc) {
         return getLatestEntries(90 * 24 * helpers.HOUR_IN_MS) // 3 months of entries
             .then(entries => {
                 if (entries.length < limit) return Promise.reject(`Could not calculate HBA1C for date ${date} without at least ${limit} entries`);
