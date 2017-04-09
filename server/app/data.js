@@ -277,6 +277,11 @@ export default app => {
             );
         }
 
+        if (!parseInt(postData.uploaderBattery, 10)) {
+            log.error('Did not create device status with battery 0');
+            return Promise.resolve();
+        }
+
         return dbPUT('device-status', { uploaderBattery: postData.uploaderBattery }, app.currentTime()).then(
             () => log(`Received device status (${postData.uploaderBattery})`),
             err => log.error('Could not create device status') || Promise.reject(err) // keep the Promise rejected
