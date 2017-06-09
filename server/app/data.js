@@ -384,7 +384,7 @@ export default app => {
             .then(doc => {
                 if (data.insulin) doc.insulin = data.insulin; else delete doc.insulin;
                 if (data.carbs) doc.carbs = data.carbs; else delete doc.carbs;
-                // TODO: if (data.sugar)..?
+                if (data.sugar) doc.sugar = data.sugar; else delete doc.sugar;
                 return dbPUT('treatments', doc).then(
                     () => log(`Received legacy data`),
                     err => log.error('Could not store legacy data') || Promise.reject(err) // keep the Promise rejected
@@ -396,19 +396,20 @@ export default app => {
         return Promise.all([
             getLatestEntries(hours * helpers.HOUR_IN_MS),
             getLatestTreatments(hours * helpers.HOUR_IN_MS)
-        ]).then(([ entries, treatments ]) =>
-            _(entries.concat(treatments))
-                .groupBy(entry => entry.date)
-                .map(group => _.merge.apply(_, group)) // if there's multiple entries/treatments with the same timestamp, merge them into one
-                .map(entry => ({
-                    time: entry.date,
-                    carbs: entry.carbs,
-                    insulin: entry.insulin,
-                    sugar: entry.nb_glucose_value && entry.nb_glucose_value.toFixed(1) + '', // "sugar" as in "blood sugar"; send as string
-                    is_raw: entry.nb_glucose_value && (!entry.noise || entry.noise >= helpers.NOISE_LEVEL_LIMIT)
-                }))
-                .sortBy(entry => entry.time) // return in chronological order
-                .value()
+        ]).then(([ entries, treatments ]) => {
+           return _(entries.concat(treatments))
+               .groupBy(entry => entry.date)
+               .map(group => _.merge.apply(_, group)) // if there's multiple entries/treatments with the same timestamp, merge them into one
+               .map(entry => ({
+                   time: entry.date,
+                   carbs: entry.carbs,
+                   insulin: entry.insulin,
+                   sugar: entry.nb_glucose_value ? entry.nb_glucose_value.toFixed(1) + '' : (entry.sugar ? entry.sugar : null), // "sugar" as in "blood sugar"; send as string
+                   is_raw: entry.nb_glucose_value && (!entry.noise || entry.noise >= helpers.NOISE_LEVEL_LIMIT)
+               }))
+               .sortBy(entry => entry.time) // return in chronological order
+               .value();
+            }
         ).then(
             data => {
                 log(`Returning ${data.length} legacy entries`);
