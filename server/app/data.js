@@ -278,7 +278,7 @@ export default app => {
         }
 
         if (!parseInt(postData.uploaderBattery, 10)) {
-            log.error('Did not create device status with battery 0');
+            log('Did not create device status with battery 0');
             return Promise.resolve();
         }
 
