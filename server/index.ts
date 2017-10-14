@@ -1,8 +1,9 @@
 import { startExpressServer } from './utils/express';
+import { createConsoleLogger } from './utils/logging';
+
+const log = createConsoleLogger();
 
 startExpressServer().then(
-  // tslint:disable-next-line:no-console
-  port => console.log(`Nightbear Server listening on ${port}`),
-  // tslint:disable-next-line:no-console
-  err => console.log(`Nightbear Server Error: ${err}`),
+  port => log.info(`Nightbear Server listening on ${port}`),
+  err => log.error(`Nightbear Server Error: ${err.message}`, err),
 );
