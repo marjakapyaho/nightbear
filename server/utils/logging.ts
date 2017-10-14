@@ -1,5 +1,6 @@
 import { getUuid } from './uuid';
 import { mapObject } from './data';
+import { RequestHandler } from './api';
 
 export type LogLevel
   = 'debug'
@@ -43,4 +44,26 @@ export function bindLoggingContext(logger: Logger, contextName: string): Logger 
       (message: string, meta?: any) =>
         method(`{${contextName}} ${message}`, meta),
   );
+}
+
+// Wraps the given handler with logging for input/output
+export function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
+  return (request, context) => {
+    const then = context.timestamp();
+    const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
+    log.debug(`Incoming request: ${request.requestMethod} ${request.requestPath}`, request);
+    return handler(request, context)
+      .then(
+        res => {
+          log.debug(`Outgoing response`, res);
+          log.info(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
+          return res;
+        },
+        err => {
+          log.debug(`Outgoing error`, err);
+          log.info(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
+          return Promise.reject(err);
+        },
+      );
+  };
 }

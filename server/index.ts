@@ -1,9 +1,13 @@
 import { startExpressServer } from './utils/express';
-import { createConsoleLogger } from './utils/logging';
+import { createNodeContext } from './utils/api';
+import { getServerStatus } from './api/getServerStatus';
 
-const log = createConsoleLogger();
+const context = createNodeContext();
 
-startExpressServer().then(
-  port => log.info(`Nightbear Server listening on ${port}`),
-  err => log.error(`Nightbear Server Error: ${err.message}`, err),
+startExpressServer(
+  context,
+  [ 'get', '/status', getServerStatus ],
+).then(
+  port => context.log.info(`Nightbear Server listening on ${port}`),
+  err => context.log.error(`Nightbear Server Error: ${err.message}`, err),
 );
