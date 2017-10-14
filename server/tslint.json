@@ -4,6 +4,7 @@
   "rules": {
     "arrow-parens": false,
     "curly": false,
+    "interface-name": false,
     "max-line-length": [ false ],
     "object-literal-sort-keys": false,
     "ordered-imports": [ false ],
