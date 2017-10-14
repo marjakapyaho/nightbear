@@ -1,3 +1,6 @@
+import { getUuid } from './uuid';
+import { mapObject } from './data';
+
 export type LogLevel
   = 'debug'
   | 'info'
@@ -22,4 +25,22 @@ export function createConsoleLogger(): Logger {
     warn: bind('warn'),
     error: bind('error'),
   };
+}
+
+// Transform an UUID into a helpful context name for bindLoggingContext()
+// @example getContextName() => "default-32846a768f5f"
+// @example getContextName('request', req.get('X-Request-ID')) => "request-32846a768f5f"
+export function getContextName(label = 'default', uuid?: string) {
+  const [ id ] = (uuid || getUuid()).split('-');
+  return `${label}-${id}`;
+}
+
+// Wraps the logger so that it logs into a specific context
+export function bindLoggingContext(logger: Logger, contextName: string): Logger {
+  return mapObject(
+    logger,
+    method =>
+      (message: string, meta?: any) =>
+        method(`{${contextName}} ${message}`, meta),
+  );
 }
