@@ -1,0 +1,18 @@
+{
+  "name": "nightbear-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "npm": ">=5.4.2 <6",
+    "node": ">=8.7.0 <9"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
+  "contributors": [
+    "Jarno Rantanen <jarno@jrw.fi>"
+  ],
+  "license": "AGPL"
+}
