@@ -8,6 +8,7 @@
     "node": ">=8.7.0 <9"
   },
   "scripts": {
+    "lint": "tslint --project . --type-check",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
@@ -18,6 +19,7 @@
   "dependencies": {
     "@types/node": "^8.0.34",
     "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
     "typescript": "^2.5.3"
   }
 }
