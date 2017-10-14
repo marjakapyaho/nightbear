@@ -1,9 +1,0 @@
-CACHE MANIFEST
-# v8
-
-CACHE:
-https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.3.0/pouchdb.js
-https://code.jquery.com/jquery-2.1.4.min.js
-
-NETWORK:
-*
