@@ -3,3 +3,5 @@ node_modules/
 npm-debug.log
 /hours.txt
 .env
+.DS_Store
+/.history
