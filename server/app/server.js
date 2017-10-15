@@ -26,6 +26,8 @@ export default app => {
             });
 
             server.get('/api/v1/entries', function(req, res) {
+                log('Recieving call from parakeet with mode', parakeetSettingsMode);
+
                 if (parakeetSettingsMode) {
                     parakeetSettingsMode = false;
                     res.status(200).send('!ACK  2!');
