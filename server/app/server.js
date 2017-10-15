@@ -9,6 +9,7 @@ export default app => {
         const parsed = attempt(JSON.parse, body);
         return isError(parsed) ? body : parsed;
     };
+    let parakeetSettingsMode = false;
 
     return {
         createExpressServer(port = 0, staticAssetsPath = null) {
@@ -25,10 +26,20 @@ export default app => {
             });
 
             server.get('/api/v1/entries', function(req, res) {
+                if (parakeetSettingsMode) {
+                    parakeetSettingsMode = false;
+                    res.status(200).send('!ACK  2!');
+                }
+
                 app.data.parakeetDataEntry(req.query).then(
                     data => res.status(200).send(data || null),
                     err => res.status(500).send({ error: err && err.message || true })
                 );
+            });
+
+            server.get('/api/v1/parakeet-settings-mode', function(req, res) {
+                parakeetSettingsMode = true;
+                res.status(200).send('Initiate parakeet settings mode');
             });
 
             server.get('/api/v1/status', function(req, res) {
