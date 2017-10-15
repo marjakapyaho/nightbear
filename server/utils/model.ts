@@ -157,9 +157,9 @@ export interface Alarm {
   modelType: 'Alarm';
   modelVersion: 1;
   // Alarm:
-  timestamp: number;
-  alarmLevel: number;
+  creationTimestamp: number;
   validAfterTimestamp: number;
+  alarmLevel: number;
   situationType: Situation;
   isActive: boolean;
   pushoverReceipts: string[];
