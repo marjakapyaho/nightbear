@@ -1,3 +1,16 @@
+export type Model
+  = Sensor
+  | SensorValue
+  | Calibration
+  | DeviceStatus
+  | Hba1c
+  | Insulin
+  | Carbs
+  | Alarm
+  | Settings
+  | Profile
+  ;
+
 export interface Sensor {
   // Model:
   modelType: 'Sensor';
