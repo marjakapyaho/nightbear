@@ -1,5 +1,6 @@
 export interface Sensor {
   modelType: 'Sensor';
+  modelVersion: 1;
   sensorId: string; // UUID
   startTimestamp: number;
   endTimestamp: number;
@@ -8,6 +9,7 @@ export interface Sensor {
 
 export interface DexcomSensorEntry {
   modelType: 'DexcomSensorEntry';
+  modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   signalStrength: number; // i.e. "rssi"
@@ -16,6 +18,7 @@ export interface DexcomSensorEntry {
 
 export interface DexcomRawSensorEntry {
   modelType: 'DexcomRawSensorEntry';
+  modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   signalStrength: number; // i.e. "rssi"
@@ -26,6 +29,7 @@ export interface DexcomRawSensorEntry {
 
 export interface ParakeetSensorEntry {
   modelType: 'ParakeetSensorEntry';
+  modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   rawFiltered: number;
@@ -34,6 +38,7 @@ export interface ParakeetSensorEntry {
 
 export interface DexcomCalibration {
   modelType: 'DexcomCalibration';
+  modelVersion: 1;
   timestamp: number;
   bloodGlucose: number[];
   isInitialCalibration: boolean;
@@ -44,6 +49,7 @@ export interface DexcomCalibration {
 
 export interface NightbearCalibration {
   modelType: 'NightbearCalibration';
+  modelVersion: 1;
   timestamp: number;
   bloodGlucose: number[];
   isInitialCalibration: boolean;
@@ -56,6 +62,7 @@ export interface NightbearCalibration {
 
 export interface DeviceStatus {
   modelType: 'DeviceStatus';
+  modelVersion: 1;
   deviceName: string;
   timestamp: number;
   batteryLevel: number;
@@ -64,6 +71,7 @@ export interface DeviceStatus {
 
 export interface Hba1c {
   modelType: 'Hba1c';
+  modelVersion: 1;
   source: 'calculated' | 'measured';
   timestamp: number;
   hba1cValue: number;
@@ -71,6 +79,7 @@ export interface Hba1c {
 
 export interface Insulin {
   modelType: 'Insulin';
+  modelVersion: 1;
   timestamp: number;
   amount: number;
   insulinType: string;
@@ -78,6 +87,7 @@ export interface Insulin {
 
 export interface Carbs {
   modelType: 'Carbs';
+  modelVersion: 1;
   timestamp: number;
   amount: number;
   carbsType: 'fast' | 'normal' | 'slow';
@@ -95,6 +105,7 @@ export type Situation
 
 export interface Alarm {
   modelType: 'Alarm';
+  modelVersion: 1;
   timestamp: number;
   alarmLevel: number;
   validAfterTimestamp: number;
@@ -105,11 +116,13 @@ export interface Alarm {
 
 export interface Settings {
   modelType: 'Settings';
+  modelVersion: 1;
   alarmsEnabled: boolean;
 }
 
 export interface Profile {
   modelType: 'Profile';
+  modelVersion: 1;
   profileName: string;
   activatedAt: {
     hours: number;
