@@ -7,8 +7,8 @@ export interface Sensor {
   placementNote: string;
 }
 
-export interface DexcomSensorEntry {
-  modelType: 'DexcomSensorEntry';
+export interface DexcomSensorValue {
+  modelType: 'DexcomSensorValue';
   modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
@@ -16,8 +16,8 @@ export interface DexcomSensorEntry {
   noiseLevel: number;
 }
 
-export interface DexcomRawSensorEntry {
-  modelType: 'DexcomRawSensorEntry';
+export interface DexcomRawSensorValue {
+  modelType: 'DexcomRawSensorValue';
   modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
@@ -27,8 +27,8 @@ export interface DexcomRawSensorEntry {
   rawUnfiltered: number;
 }
 
-export interface ParakeetSensorEntry {
-  modelType: 'ParakeetSensorEntry';
+export interface ParakeetSensorValue {
+  modelType: 'ParakeetSensorValue';
   modelVersion: 1;
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
