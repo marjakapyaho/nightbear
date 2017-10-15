@@ -6,48 +6,49 @@ export interface Sensor {
   placementNote: string;
 }
 
-export interface SensorEntry {
-  modelType: 'SensorEntry';
+export interface DexcomSensorEntry {
+  modelType: 'DexcomSensorEntry';
   timestamp: number;
   bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
-}
-
-export interface DexcomSensorEntry extends SensorEntry {
-  sensorEntryType: 'DexcomSensorEntry';
   signalStrength: number; // i.e. "rssi"
   noiseLevel: number;
 }
 
-export interface DexcomRawSensorEntry extends SensorEntry {
-  sensorEntryType: 'DexcomRawSensorEntry';
+export interface DexcomRawSensorEntry {
+  modelType: 'DexcomRawSensorEntry';
+  timestamp: number;
+  bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   signalStrength: number; // i.e. "rssi"
   noiseLevel: number;
   rawFiltered: number;
   rawUnfiltered: number;
 }
 
-export interface ParakeetSensorEntry extends SensorEntry {
-  sensorEntryType: 'ParakeetSensorEntry';
+export interface ParakeetSensorEntry {
+  modelType: 'ParakeetSensorEntry';
+  timestamp: number;
+  bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   rawFiltered: number;
   rawUnfiltered: number;
 }
 
-export interface Calibration {
-  modelType: 'Calibration';
+export interface DexcomCalibration {
+  modelType: 'DexcomCalibration';
   timestamp: number;
   bloodGlucose: number[];
   isInitialCalibration: boolean;
   slope: number;
   intercept: number;
-}
-
-export interface DexcomCalibration extends Calibration {
-  calibrationType: 'DexcomCalibration';
   scale: number;
 }
 
-export interface NightbearCalibration extends Calibration {
-  calibrationType: 'NightbearCalibration';
+export interface NightbearCalibration {
+  modelType: 'NightbearCalibration';
+  timestamp: number;
+  bloodGlucose: number[];
+  isInitialCalibration: boolean;
+  slope: number;
+  intercept: number;
   sensorId: string; // UUID
   rawValueId: string; // UUID
   slopeConfidence: number;
