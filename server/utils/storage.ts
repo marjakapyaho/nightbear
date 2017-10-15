@@ -1,5 +1,21 @@
 import { Model } from './model';
 import { assertExhausted } from './types';
+import * as PouchDB from 'pouchdb';
+
+export interface Storage {
+  saveModel<T extends Model>(model: T): Promise<T>;
+}
+
+export function createCouchDbStorage(dbUrl: string): Storage {
+  const db = new PouchDB(dbUrl);
+  return {
+    saveModel<T extends Model>(model: T): Promise<T> {
+      const doc = { ...model as any, _id: getStorageKey(model) }; // see https://github.com/Microsoft/TypeScript/issues/14409 for the need for the "any"
+      return db.put(doc)
+        .then(() => model);
+    },
+  };
+}
 
 const PREFIX_TIMELINE = 'timeline';
 const PREFIX_OTHER = 'other';
