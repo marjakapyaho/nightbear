@@ -29,7 +29,16 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
             return handlerWithLogging(handler, log)(request, context);
           })
           .then(
-            response => res.status(response.responseStatus).json(response.responseBody),
+            response => {
+              const { responseBody, responseStatus } = response;
+              res.status(responseStatus);
+              if (typeof responseBody === 'string') {
+                res.send(responseBody);
+              }
+              else {
+                res.json(responseBody);
+              }
+            },
             () => res.status(500).json({ errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})` }),
           );
       });
