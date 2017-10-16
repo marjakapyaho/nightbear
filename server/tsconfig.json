@@ -12,7 +12,8 @@
       "node"
     ],
     "lib": [
-      "es2015"
+      "es2015",
+      "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
     ]
   },
   "include": [
