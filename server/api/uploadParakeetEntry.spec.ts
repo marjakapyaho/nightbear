@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { uploadParakeetEntry } from "./uploadParakeetEntry";
+import { uploadParakeetEntry } from './uploadParakeetEntry';
 import { Request } from '../utils/api';
 
 describe('api/uploadParakeetEntry', () => {
@@ -23,8 +23,8 @@ describe('api/uploadParakeetEntry', () => {
         bp: '72',
         bm: '3981',
         ct: '279',
-        gl: '60.193707,24.949396'
-      }
+        gl: '60.193707,24.949396',
+      },
     };
 
     return uploadParakeetEntry(mockRequest)

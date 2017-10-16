@@ -8,6 +8,7 @@
     "max-line-length": [ false ],
     "object-literal-sort-keys": false,
     "ordered-imports": [ false ],
-    "quotemark": [ true, "single", "avoid-escape", "jsx-double" ]
+    "quotemark": [ true, "single", "avoid-escape", "jsx-double" ],
+    "one-line": false
   }
 }
