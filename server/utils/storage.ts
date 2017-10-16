@@ -31,9 +31,9 @@ export function getStorageKey(model: Model): string {
       return `${PREFIX_TIMELINE}/${timestampToString(model.creationTimestamp)}/${model.modelType}`;
     case 'Sensor':
       return `${PREFIX_TIMELINE}/${timestampToString(model.startTimestamp)}/${model.modelType}`;
-    case 'DexcomSensorValue':
-    case 'DexcomRawSensorValue':
-    case 'ParakeetSensorValue':
+    case 'DexcomSensorEntry':
+    case 'DexcomRawSensorEntry':
+    case 'ParakeetSensorEntry':
     case 'DexcomCalibration':
     case 'NightbearCalibration':
     case 'DeviceStatus':
