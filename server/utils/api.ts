@@ -12,7 +12,7 @@ export interface Request {
   requestId: string;
   requestMethod: string;
   requestPath: string;
-  requestParams: object;
+  requestParams: { [param: string]: string };
   requestHeaders: object;
   requestBody: object;
 }
