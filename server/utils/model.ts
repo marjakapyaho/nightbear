@@ -1,6 +1,6 @@
 export type Model
   = Sensor
-  | SensorValue
+  | SensorEntry
   | Calibration
   | DeviceStatus
   | Hba1c
@@ -22,46 +22,47 @@ export interface Sensor {
   readonly placementNote: string;
 }
 
-export type SensorValue
-  = DexcomSensorValue
-  | DexcomRawSensorValue
-  | ParakeetSensorValue
+export type SensorEntry
+  = DexcomSensorEntry
+  | DexcomRawSensorEntry
+  | ParakeetSensorEntry
   ;
 
-export interface DexcomSensorValue {
+export interface DexcomSensorEntry {
   // Model:
-  readonly modelType: 'DexcomSensorValue';
+  readonly modelType: 'DexcomSensorEntry';
   readonly modelVersion: 1;
-  // SensorValue:
+  // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
-  // DexcomSensorValue:
+  // DexcomSensorEntry:
   readonly signalStrength: number; // i.e. "rssi"
   readonly noiseLevel: number;
 }
 
-export interface DexcomRawSensorValue {
+export interface DexcomRawSensorEntry {
   // Model:
-  readonly modelType: 'DexcomRawSensorValue';
+  readonly modelType: 'DexcomRawSensorEntry';
   readonly modelVersion: 1;
-  // SensorValue:
+  // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
-  // DexcomRawSensorValue:
+  // DexcomRawSensorEntry:
   readonly signalStrength: number; // i.e. "rssi"
   readonly noiseLevel: number;
   readonly rawFiltered: number;
   readonly rawUnfiltered: number;
 }
 
-export interface ParakeetSensorValue {
+export interface ParakeetSensorEntry {
   // Model:
-  readonly modelType: 'ParakeetSensorValue';
+  readonly modelType: 'ParakeetSensorEntry';
   readonly modelVersion: 1;
-  // SensorValue:
+  // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
-  // ParakeetSensorValue:
+  // ParakeetSensorEntry:
+  readonly measuredAtTimestamp: number;
   readonly rawFiltered: number;
   readonly rawUnfiltered: number;
 }
