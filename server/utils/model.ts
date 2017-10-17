@@ -11,10 +11,20 @@ export type Model
   | Profile
   ;
 
+export type ModelMeta
+  = CouchDbModelMeta
+  ;
+
+export interface CouchDbModelMeta {
+  _id: string;
+  _rev: string;
+}
+
 export interface Sensor {
   // Model:
   readonly modelType: 'Sensor';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Sensor:
   readonly sensorId: string; // UUID
   readonly startTimestamp: number;
@@ -32,6 +42,7 @@ export interface DexcomSensorEntry {
   // Model:
   readonly modelType: 'DexcomSensorEntry';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
@@ -44,6 +55,7 @@ export interface DexcomRawSensorEntry {
   // Model:
   readonly modelType: 'DexcomRawSensorEntry';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
@@ -58,6 +70,7 @@ export interface ParakeetSensorEntry {
   // Model:
   readonly modelType: 'ParakeetSensorEntry';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
   readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
@@ -76,6 +89,7 @@ export interface DexcomCalibration {
   // Model:
   readonly modelType: 'DexcomCalibration';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
   readonly bloodGlucose: number[];
@@ -90,6 +104,7 @@ export interface NightbearCalibration {
   // Model:
   readonly modelType: 'NightbearCalibration';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
   readonly bloodGlucose: number[];
@@ -106,6 +121,7 @@ export interface DeviceStatus {
   // Model:
   readonly modelType: 'DeviceStatus';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // DeviceStatus:
   readonly deviceName: string;
   readonly timestamp: number;
@@ -117,6 +133,7 @@ export interface Hba1c {
   // Model:
   readonly modelType: 'Hba1c';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Hba1c:
   readonly source: 'calculated' | 'measured';
   readonly timestamp: number;
@@ -127,6 +144,7 @@ export interface Insulin {
   // Model:
   readonly modelType: 'Insulin';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Insulin:
   readonly timestamp: number;
   readonly amount: number;
@@ -137,6 +155,7 @@ export interface Carbs {
   // Model:
   readonly modelType: 'Carbs';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Carbs:
   readonly timestamp: number;
   readonly amount: number;
@@ -157,6 +176,7 @@ export interface Alarm {
   // Model:
   readonly modelType: 'Alarm';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Alarm:
   readonly creationTimestamp: number;
   readonly validAfterTimestamp: number;
@@ -170,6 +190,7 @@ export interface Settings {
   // Model:
   readonly modelType: 'Settings';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Settings:
   readonly alarmsEnabled: boolean;
 }
@@ -178,6 +199,7 @@ export interface Profile {
   // Model:
   readonly modelType: 'Profile';
   readonly modelVersion: 1;
+  readonly modelMeta?: ModelMeta;
   // Profile:
   readonly profileName: string;
   readonly activatedAt: {
