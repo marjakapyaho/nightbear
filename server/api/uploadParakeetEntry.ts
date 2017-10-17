@@ -23,16 +23,7 @@ export function uploadParakeetEntry(request: Request): Response {
 
 function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEntry {
   const timestamp = Date.now();
-  const latestCalibration: DexcomCalibration = {
-    modelType: 'DexcomCalibration',
-    modelVersion: 1,
-    timestamp,
-    bloodGlucose: [ 4.5 ],
-    isInitialCalibration: false,
-    slope: 828.3002146147081,
-    intercept: 30000,
-    scale: 0.9980735302684531,
-  };
+  const { slope, intercept, scale } = getLatestCalibration();
 
   const filtered = parseInt(params.lf, 10);
   const unfiltered = parseInt(params.lv, 10);
@@ -42,7 +33,7 @@ function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEn
     modelType: 'ParakeetSensorEntry',
     modelVersion: 1,
     timestamp,
-    bloodGlucose: calculateRaw(filtered, unfiltered, latestCalibration),
+    bloodGlucose: calculateRaw(filtered, unfiltered, slope, intercept, scale),
     measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
     rawFiltered: filtered,
     rawUnfiltered: unfiltered,
@@ -61,5 +52,18 @@ function parseParakeetStatus(params: { [key: string]: string }): DeviceStatus {
     timestamp,
     batteryLevel,
     geolocation,
+  };
+}
+
+function getLatestCalibration(): DexcomCalibration {
+  return {
+    modelType: 'DexcomCalibration',
+    modelVersion: 1,
+    timestamp: Date.now(),
+    bloodGlucose: [ 4.5 ],
+    isInitialCalibration: false,
+    slope: 828.3002146147081,
+    intercept: 30000,
+    scale: 0.9980735302684531,
   };
 }
