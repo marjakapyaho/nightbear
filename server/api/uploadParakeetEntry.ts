@@ -1,5 +1,8 @@
 import { Response, Request, createResponse } from '../utils/api';
-import { DeviceStatus, ParakeetSensorEntry } from '../utils/model';
+import {DeviceStatus, DexcomCalibration, ParakeetSensorEntry} from '../utils/model';
+import { calculateRaw } from '../utils/calculations';
+
+const PARAKEET_RESPONSE = '!ACK  0!'; // parakeet needs this response to work
 
 export function uploadParakeetEntry(request: Request): Response {
 
@@ -11,32 +14,52 @@ export function uploadParakeetEntry(request: Request): Response {
   // Parse parakeet status
   const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams);
 
-  // Save entries to db: TODO
+  // Save entries to db
   console.log(parakeetEntry); // tslint:disable-line:no-console
   console.log(parakeetStatus); // tslint:disable-line:no-console
 
-  return createResponse('!ACK  0!');
+  return createResponse(PARAKEET_RESPONSE);
 }
 
 function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEntry {
+  const timestamp = Date.now();
+  const latestCalibration: DexcomCalibration = {
+    modelType: 'DexcomCalibration',
+    modelVersion: 1,
+    timestamp,
+    bloodGlucose: [ 4.5 ],
+    isInitialCalibration: false,
+    slope: 828.3002146147081,
+    intercept: 30000,
+    scale: 0.9980735302684531,
+  };
+
+  const filtered = parseInt(params.lf, 10);
+  const unfiltered = parseInt(params.lv, 10);
+  const millisecondsSinceMeasured = parseInt(params.ts, 10);
+
   return {
     modelType: 'ParakeetSensorEntry',
     modelVersion: 1,
-    timestamp: Date.now(),
-    bloodGlucose: 5.5, // TODO
-    measuredAtTimestamp: Date.now() - parseInt(params.ts, 10),
-    rawFiltered: parseInt(params.lf, 10),
-    rawUnfiltered: parseInt(params.lv, 10),
+    timestamp,
+    bloodGlucose: calculateRaw(filtered, unfiltered, latestCalibration),
+    measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
+    rawFiltered: filtered,
+    rawUnfiltered: unfiltered,
   };
 }
 
 function parseParakeetStatus(params: { [key: string]: string }): DeviceStatus {
+  const batteryLevel = parseInt(params.bp, 10);
+  const geolocation = params.gl;
+  const timestamp = Date.now();
+
   return {
     modelType: 'DeviceStatus',
     modelVersion: 1,
     deviceName: 'parakeet',
-    timestamp: Date.now(),
-    batteryLevel: parseInt(params.bp, 10),
-    geolocation: params.gl,
+    timestamp,
+    batteryLevel,
+    geolocation,
   };
 }
