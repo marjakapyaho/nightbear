@@ -1,5 +1,3 @@
-import { DexcomCalibration } from './model';
-
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export function changeBloodGlucoseUnitToMmoll(glucoseInMgdl: number) {
   return Math.round((glucoseInMgdl / 18) * 10) / 10;
@@ -12,17 +10,23 @@ export function changeBloodGlucoseUnitToMgdl(glucoseInMmoll: number) {
 }
 
 // Calculates actual blood glucose in mmol/L from raw values and calibration
-export function calculateRaw(filtered: number, unfiltered: number, calibration: DexcomCalibration) {
+export function calculateRaw(
+  filtered: number,
+  unfiltered: number,
+  slope: number,
+  intercept: number,
+  scale: number,
+) {
   let raw = 0;
 
-  if (calibration.slope === 0 || unfiltered === 0 || calibration.scale === 0) {
+  if (slope === 0 || unfiltered === 0 || scale === 0) {
     raw = 0;
   }
   else if (filtered === 0) {
-    raw = calibration.scale * (unfiltered - calibration.intercept) / calibration.slope;
+    raw = scale * (unfiltered - intercept) / slope;
   }
   else {
-    raw = calibration.scale * (unfiltered - calibration.intercept) / calibration.slope;
+    raw = scale * (unfiltered - intercept) / slope;
   }
   return changeBloodGlucoseUnitToMmoll(raw);
 }
