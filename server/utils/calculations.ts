@@ -11,7 +11,6 @@ export function changeBloodGlucoseUnitToMgdl(glucoseInMmoll: number) {
 
 // Calculates actual blood glucose in mmol/L from raw values and calibration
 export function calculateRaw(
-  filtered: number,
   unfiltered: number,
   slope: number,
   intercept: number,
@@ -19,14 +18,9 @@ export function calculateRaw(
 ) {
   let raw = 0;
 
-  if (slope === 0 || unfiltered === 0 || scale === 0) {
-    raw = 0;
-  }
-  else if (filtered === 0) {
+  if (slope !== 0 || unfiltered !== 0 || scale !== 0) {
     raw = scale * (unfiltered - intercept) / slope;
   }
-  else {
-    raw = scale * (unfiltered - intercept) / slope;
-  }
+
   return changeBloodGlucoseUnitToMmoll(raw);
 }

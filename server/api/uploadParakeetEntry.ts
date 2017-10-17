@@ -33,7 +33,7 @@ function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEn
     modelType: 'ParakeetSensorEntry',
     modelVersion: 1,
     timestamp,
-    bloodGlucose: calculateRaw(filtered, unfiltered, slope, intercept, scale),
+    bloodGlucose: calculateRaw(unfiltered, slope, intercept, scale),
     measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
     rawFiltered: filtered,
     rawUnfiltered: unfiltered,
