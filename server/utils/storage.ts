@@ -1,5 +1,5 @@
-import { Model } from './model';
-import { assertExhausted } from './types';
+import { Model, CouchDbModelMeta } from './model';
+import { assertExhausted, assert } from './types';
 import * as PouchDB from 'pouchdb';
 
 type StoredModel<T extends Model>
@@ -9,6 +9,7 @@ type StoredModel<T extends Model>
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
+  loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
 }
 
 export function createCouchDbStorage(dbUrl: string): Storage {
@@ -19,7 +20,39 @@ export function createCouchDbStorage(dbUrl: string): Storage {
       return db.put(doc)
         .then(() => model);
     },
+    loadTimelineModels(fromTimePeriod: number): Promise<Model[]> {
+      return db.allDocs({
+        include_docs: true,
+        startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
+        endkey: `${PREFIX_TIMELINE}/_`,
+      })
+        .then(res => res.rows.map(reviveCouchDbRowIntoModel));
+    },
   };
+}
+
+// Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
+function reviveCouchDbRowIntoModel({ doc }: any): Model {
+  // Perform some basic runtime sanity checks:
+  assert(typeof doc === 'object', 'Expected object when reviving model', doc);
+  assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
+  assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
+  assert(doc.modelVersion === 1, 'Expected current "modelVersion" property when reviving', doc);
+  // Strip away the CouchDB document metadata:
+  const { _id, _rev } = doc;
+  Object.keys(doc).forEach(key => {
+    if (key.startsWith('_')) delete doc[key];
+  });
+  // Turn into standard Model object:
+  const model: Model = doc;
+  const modelMeta: CouchDbModelMeta = { _id, _rev };
+  return { ...model, modelMeta };
+}
+
+export function stripModelMeta(model: Model): Model {
+  const temp: any = model;
+  delete temp.modelMeta;
+  return temp;
 }
 
 const PREFIX_TIMELINE = 'timeline';
