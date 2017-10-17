@@ -2,33 +2,43 @@
   "name": "nightbear-server",
   "version": "0.0.1",
   "description": "",
-  "engines": {
-    "node": ">=5.1"
-  },
   "main": "index.js",
-  "scripts": {
-    "start": "babel-node index",
-    "watch": "nodemon --watch . --exec babel-node -- index",
-    "test": "NODE_PATH=.. mocha --compilers js:babel/register --reporter spec test/",
-    "test-watch": "NODE_PATH=.. mocha --watch --compilers js:babel/register --reporter spec test/"
+  "engines": {
+    "npm": ">=5.4.2 <6",
+    "node": ">=8.7.0 <9"
   },
-  "author": "Jarno Rantanen <jarno@jrw.fi>",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "lint": "tslint --project . --type-check && echo lint OK",
+    "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
+    "test": "mocha --require ts-node/register $(npm run --silent test-list)",
+    "test-watch": "mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
+    "test-list": "find . -name '*.spec.ts' -not -path './node_modules/*'",
+    "precommit": "npm run lint && npm test"
+  },
+  "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
+  "contributors": [
+    "Jarno Rantanen <jarno@jrw.fi>"
+  ],
   "license": "AGPL",
   "dependencies": {
-    "axios": "^0.8.1",
-    "babel": "^5.8.29",
-    "body-parser": "^1.14.1",
-    "express": "^4.13.3",
-    "lodash": "4.0.0",
-    "nodemon": "^1.8.1",
-    "pouchdb": "^5.1.0",
-    "pushover-notifications": "^0.2.2",
-    "winston": "^2.2.0",
-    "winston-papertrail": "^1.0.2"
-  },
-  "devDependencies": {
-    "chai": "^3.4.1",
-    "memdown": "^1.1.0",
-    "mocha": "^2.3.4"
+    "@types/body-parser": "^1.16.5",
+    "@types/chai": "^4.0.4",
+    "@types/cors": "^2.8.1",
+    "@types/express": "^4.0.37",
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.34",
+    "@types/pouchdb": "^6.3.1",
+    "body-parser": "^1.18.2",
+    "chai": "^4.1.2",
+    "chokidar-cli": "^1.2.0",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "husky": "^0.14.3",
+    "mocha": "^4.0.1",
+    "pouchdb": "^6.3.4",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3"
   }
 }
