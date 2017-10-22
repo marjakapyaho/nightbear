@@ -8,8 +8,11 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
 
   const { requestParams } = request;
 
+  // Get latest calibration
+  const latestCalibration = getLatestCalibration(context.timestamp());
+
   // Parse parakeet entry
-  const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, context.timestamp());
+  const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, latestCalibration, context.timestamp());
 
   // Parse parakeet status
   const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
@@ -23,9 +26,10 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
 
 export function parseParakeetEntry(
   params: { [key: string]: string },
+  latestCalibration: DexcomCalibration,
   timestamp: number,
   ): ParakeetSensorEntry {
-  const { slope, intercept, scale } = getLatestCalibration();
+  const { slope, intercept, scale } = latestCalibration;
 
   const filtered = parseInt(params.lf, 10);
   const unfiltered = parseInt(params.lv, 10);
@@ -59,11 +63,12 @@ export function parseParakeetStatus(
   };
 }
 
-function getLatestCalibration(): DexcomCalibration {
+// TODO: this should come from db
+function getLatestCalibration(timestamp: number): DexcomCalibration {
   return {
     modelType: 'DexcomCalibration',
     modelVersion: 1,
-    timestamp: Date.now(),
+    timestamp,
     bloodGlucose: [ 4.5 ],
     isInitialCalibration: false,
     slope: 828.3002146147081,
