@@ -1,18 +1,18 @@
-import { Response, Request, createResponse } from '../utils/api';
-import {DeviceStatus, DexcomCalibration, ParakeetSensorEntry} from '../utils/model';
+import { Response, Request, createResponse, Context } from '../utils/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../utils/model';
 import { calculateRaw } from '../utils/calculations';
 
 const PARAKEET_RESPONSE = '!ACK  0!'; // parakeet needs this response to work
 
-export function uploadParakeetEntry(request: Request): Response {
+export function uploadParakeetEntry(request: Request, context: Context): Response {
 
   const { requestParams } = request;
 
   // Parse parakeet entry
-  const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams);
+  const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, context.timestamp());
 
   // Parse parakeet status
-  const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams);
+  const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
   // Save entries to db
   console.log(parakeetEntry); // tslint:disable-line:no-console
@@ -21,8 +21,10 @@ export function uploadParakeetEntry(request: Request): Response {
   return createResponse(PARAKEET_RESPONSE);
 }
 
-function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEntry {
-  const timestamp = Date.now();
+export function parseParakeetEntry(
+  params: { [key: string]: string },
+  timestamp: number,
+  ): ParakeetSensorEntry {
   const { slope, intercept, scale } = getLatestCalibration();
 
   const filtered = parseInt(params.lf, 10);
@@ -40,10 +42,12 @@ function parseParakeetEntry(params: { [key: string]: string }): ParakeetSensorEn
   };
 }
 
-function parseParakeetStatus(params: { [key: string]: string }): DeviceStatus {
+export function parseParakeetStatus(
+  params: { [key: string]: string },
+  timestamp: number,
+  ): DeviceStatus {
   const batteryLevel = parseInt(params.bp, 10);
   const geolocation = params.gl;
-  const timestamp = Date.now();
 
   return {
     modelType: 'DeviceStatus',
