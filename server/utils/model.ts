@@ -73,7 +73,7 @@ export interface ParakeetSensorEntry {
   readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
-  readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
+  readonly bloodGlucose: number | null; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   // ParakeetSensorEntry:
   readonly measuredAtTimestamp: number;
   readonly rawFiltered: number;
