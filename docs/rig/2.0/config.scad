@@ -11,3 +11,8 @@ SAMSUNG_DEPTH = 8.3;
 SAMSUNG_CAM_BUMP_HEIGHT = 3; // actually measured: 0.7
 SAMSUNG_BUTTONS_HEIGHT = 2; // actually measured: 0.5
 SAMSUNG_ROUNDING = 7; // approximation
+
+MOPHIE_WIDTH = 69.3;
+MOPHIE_HEIGHT = 119.3;
+MOPHIE_DEPTH = 12.8;
+MOPHIE_ROUNDING = 4.5; // approximation

@@ -1,0 +1,56 @@
+include <config.scad>;
+
+use <roundedCube.scad>;
+
+// Example:
+mophie(0.5);
+
+module mophie(
+  withTolerance = 0
+) {
+
+  // Main body:
+  translate([ 0, withTolerance, withTolerance ])
+  minkowski() {
+    translate([ MOPHIE_WIDTH / -2, 0, 0 ])
+    roundedCube(
+      MOPHIE_WIDTH,
+      MOPHIE_HEIGHT,
+      MOPHIE_DEPTH,
+      r = MOPHIE_ROUNDING,
+      flatTop = true,
+      flatBottom = true
+    );
+    translate([ -withTolerance, -withTolerance, -withTolerance ])
+    cube([ withTolerance * 2, withTolerance * 2, withTolerance * 2 ]);
+  }
+
+  // Button/lights access:
+  buttonsSpace = 30;
+  openingDiameter = 11;
+  openingSmallerDiameter = 5;
+  openingUpTo = 26;
+  openingUpFrom = 9;
+  translate([ MOPHIE_WIDTH / -2 - buttonsSpace, openingUpTo, MOPHIE_DEPTH / 2 ])
+  rotate([ 0, 90, 0 ])
+  #cylinder(r = openingDiameter / 2, h = buttonsSpace);
+  #hull() {
+    translate([ MOPHIE_WIDTH / -2 - buttonsSpace, openingUpTo, MOPHIE_DEPTH / 2 ])
+    rotate([ 0, 90, 0 ])
+    cylinder(r = openingSmallerDiameter / 2, h = buttonsSpace);
+    translate([ MOPHIE_WIDTH / -2 - buttonsSpace, openingUpFrom, MOPHIE_DEPTH / 2 ])
+    rotate([ 0, 90, 0 ])
+    cylinder(r = openingSmallerDiameter / 2, h = buttonsSpace);
+  }
+
+  // Bottom access:
+  bottomMargin = 7;
+  bottomSpace = 37;
+  translate([ MOPHIE_WIDTH / -2 + bottomMargin, -bottomSpace, 0 ])
+  #cube([
+    MOPHIE_WIDTH - bottomMargin * 2,
+    bottomSpace,
+    MOPHIE_DEPTH + withTolerance * 2
+  ]);
+
+}
