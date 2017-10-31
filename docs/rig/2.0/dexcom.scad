@@ -10,7 +10,6 @@ module dexcom(
 ) {
 
   // Main body:
-  translate([ 0, withTolerance, withTolerance ])
   minkowski() {
     translate([ DEXCOM_WIDTH / -2, 0, 0 ])
     roundedCube(
@@ -29,7 +28,6 @@ module dexcom(
   screenMargin = 4.7;
   screenHeight = 46.9;
   screenSpace = 15;
-  translate([ 0, withTolerance, 0 ])
   translate([ DEXCOM_WIDTH / -2 + screenMargin, DEXCOM_HEIGHT - screenHeight - screenMargin, DEXCOM_DEPTH ])
   #roundedCube(
     DEXCOM_WIDTH - screenMargin * 2,
@@ -43,7 +41,6 @@ module dexcom(
   // Keypad access:
   keypadDiameter = 30;
   keypadDistance = 25; // from the bottom edge
-  translate([ 0, withTolerance, 0 ])
   translate([ 0, keypadDistance, DEXCOM_DEPTH ])
   #cylinder(r = keypadDiameter / 2, h = screenSpace);
 
@@ -54,7 +51,7 @@ module dexcom(
   #cube([
     DEXCOM_WIDTH - bottomMargin * 2,
     bottomSpace,
-    DEXCOM_DEPTH + withTolerance * 2
+    DEXCOM_DEPTH
   ]);
 
 }

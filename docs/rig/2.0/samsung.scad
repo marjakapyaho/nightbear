@@ -10,7 +10,6 @@ module samsung(
 ) {
 
   // Main body:
-  translate([ 0, withTolerance, withTolerance ])
   minkowski() {
     translate([ SAMSUNG_WIDTH / -2, 0, 0 ])
     roundedCube(
@@ -29,7 +28,6 @@ module samsung(
   screenHorMargin = 2.7;
   screenVerMargin = 10;
   screenSpace = 15;
-  translate([ 0, withTolerance, 0 ])
   translate([ SAMSUNG_WIDTH / -2 + screenHorMargin, 0, SAMSUNG_DEPTH ])
   #roundedCube(
     SAMSUNG_WIDTH - screenHorMargin * 2,
@@ -47,7 +45,7 @@ module samsung(
   #cube([
     bottomWith,
     bottomSpace,
-    SAMSUNG_DEPTH + withTolerance * 2
+    SAMSUNG_DEPTH
   ]);
 
   // Camera bump:

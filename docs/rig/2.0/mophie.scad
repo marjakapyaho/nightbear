@@ -10,7 +10,6 @@ module mophie(
 ) {
 
   // Main body:
-  translate([ 0, withTolerance, withTolerance ])
   minkowski() {
     translate([ MOPHIE_WIDTH / -2, 0, 0 ])
     roundedCube(
@@ -50,7 +49,7 @@ module mophie(
   #cube([
     MOPHIE_WIDTH - bottomMargin * 2,
     bottomSpace,
-    MOPHIE_DEPTH + withTolerance * 2
+    MOPHIE_DEPTH
   ]);
 
 }
