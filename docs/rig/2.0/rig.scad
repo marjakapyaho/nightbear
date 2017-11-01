@@ -5,50 +5,47 @@ use <dexcom.scad>;
 use <samsung.scad>;
 use <mophie.scad>;
 
-// Example:
-rig(0.5);
+$fn = 50;
 
-magic = 0.001;
-withTolerance = 0.5;
-dexUpShift = 30;
-layer1Depth = (RIG_WALL_THICKNESS * 2 + DEXCOM_DEPTH) / 2;
-layer2Depth = MOPHIE_DEPTH / 2;
+rig();
+
+toleranceAroundDevices = 0.5;
+toleranceBetweenDevices = 2;
+longestDevice = SAMSUNG_HEIGHT;
+widestDevice = SAMSUNG_WIDTH;
 
 module rig() {
-  layer1();
-  layer2();
-}
-
-module layer1() {
-  color("green")
   difference() {
-    translate([ RIG_WIDTH / -2, 0, 0 ])
-    roundedCube(
-      RIG_WIDTH,
-      RIG_HEIGHT,
-      layer1Depth,
-      r = GLOBAL_ROUNDING,
-      flatTop = true
-    );
-    translate([ 0, dexUpShift, DEXCOM_DEPTH + RIG_WALL_THICKNESS ])
-    rotate([ 0, 180, 0 ])
-    dexcom(withTolerance);
+    bottomHalf();
+    translate([ 0, 0, RIG_WALL_THICKNESS ])
+    deviceStack();
   }
 }
 
-module layer2() {
-  color("blue")
-  difference() {
-    translate([ RIG_WIDTH / -2, 0, layer1Depth ])
-    roundedCube(
-      RIG_WIDTH,
-      RIG_HEIGHT,
-      layer2Depth,
-      r = GLOBAL_ROUNDING,
-      flatTop = true,
-      flatBottom = true
-    );
-    translate([ 0, dexUpShift, layer1Depth ])
-    mophie(withTolerance);
-  }
+module deviceStack() {
+  // Dexcom:
+  color("SandyBrown")
+  translate([ 0, longestDevice - DEXCOM_HEIGHT, DEXCOM_DEPTH ])
+  rotate([ 0, 180, 0 ])
+  dexcom(toleranceAroundDevices, extendDownBy = toleranceBetweenDevices);
+  // Mophie:
+  color("LightGreen")
+  translate([ 0, longestDevice - MOPHIE_HEIGHT, DEXCOM_DEPTH + toleranceBetweenDevices ])
+  mophie(toleranceAroundDevices, extendUpBy = toleranceBetweenDevices);
+  // Samsung:
+  color("LightSkyBlue")
+  translate([ 0, 0, DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices ])
+  samsung(toleranceAroundDevices);
+}
+
+module bottomHalf() {
+  color("Thistle")
+  translate([ RIG_WIDTH / -2, 0, 0 ])
+  roundedCube(
+    RIG_WIDTH,
+    longestDevice + RIG_WALL_THICKNESS,
+    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2,
+    r = GLOBAL_ROUNDING,
+    flatTop = true
+  );
 }

@@ -8,9 +8,9 @@ DEXCOM_ROUNDING = 3.5;
 SAMSUNG_WIDTH = 69.8;
 SAMSUNG_HEIGHT = 136.5;
 SAMSUNG_DEPTH = 8.3;
-SAMSUNG_CAM_BUMP_HEIGHT = 3; // actually measured: 0.7
-SAMSUNG_BUTTONS_HEIGHT = 2; // actually measured: 0.5
-SAMSUNG_ROUNDING = 7; // approximation
+SAMSUNG_CAM_BUMP_HEIGHT = 1.5; // actually measured: 0.7
+SAMSUNG_BUTTONS_HEIGHT = 1; // actually measured: 0.5
+SAMSUNG_ROUNDING = 4.5; // approximation was 7, but matching Mophie
 
 MOPHIE_WIDTH = 69.3;
 MOPHIE_HEIGHT = 119.3;
@@ -18,5 +18,4 @@ MOPHIE_DEPTH = 12.8;
 MOPHIE_ROUNDING = 4.5; // approximation
 
 RIG_WIDTH = 75;
-RIG_HEIGHT = 150;
 RIG_WALL_THICKNESS = 3.5;

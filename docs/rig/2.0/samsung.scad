@@ -29,7 +29,7 @@ module samsung(
   screenVerMargin = 10;
   screenSpace = 15;
   translate([ SAMSUNG_WIDTH / -2 + screenHorMargin, 0, SAMSUNG_DEPTH ])
-  #roundedCube(
+  roundedCube(
     SAMSUNG_WIDTH - screenHorMargin * 2,
     SAMSUNG_HEIGHT - screenVerMargin,
     screenSpace,
@@ -42,7 +42,7 @@ module samsung(
   bottomWith = 14;
   bottomSpace = 32;
   translate([ bottomWith / -2, -bottomSpace, 0 ])
-  #cube([
+  cube([
     bottomWith,
     bottomSpace,
     SAMSUNG_DEPTH
@@ -56,18 +56,18 @@ module samsung(
     SAMSUNG_HEIGHT - cameraDistance,
     -SAMSUNG_CAM_BUMP_HEIGHT
   ])
-  #cylinder(r = cameraDiameter / 2, h = SAMSUNG_CAM_BUMP_HEIGHT);
+  cylinder(r = cameraDiameter / 2, h = SAMSUNG_CAM_BUMP_HEIGHT);
 
   // Buttons access:
   buttonsSpace = 30;
   buttonsHeight = 46 - 17;
-  buttonsVertExtra = 0;
+  buttonsVertExtra = 0.7;
   translate([
     SAMSUNG_WIDTH / -2 - buttonsSpace,
     SAMSUNG_HEIGHT - buttonsHeight - 17,
     -buttonsVertExtra
   ])
-  #roundedCube(
+  roundedCube(
     SAMSUNG_WIDTH + buttonsSpace * 2,
     buttonsHeight,
     SAMSUNG_DEPTH + buttonsVertExtra * 2,
