@@ -47,11 +47,11 @@ module dexcom(
   // Bottom access:
   bottomMargin = 7;
   bottomSpace = 30;
-  translate([ DEXCOM_WIDTH / -2 + bottomMargin, -bottomSpace, 0 ])
+  translate([ DEXCOM_WIDTH / -2 + bottomMargin, -bottomSpace, -withTolerance ])
   #cube([
     DEXCOM_WIDTH - bottomMargin * 2,
     bottomSpace,
-    DEXCOM_DEPTH
+    DEXCOM_DEPTH + withTolerance * 2
   ]);
 
 }
