@@ -1,6 +1,8 @@
 include <config.scad>;
 
 use <roundedCube.scad>;
+use <distributeChildren.scad>;
+
 use <dexcom.scad>;
 use <samsung.scad>;
 use <mophie.scad>;
@@ -15,6 +17,9 @@ toleranceAroundDevices = 0.25;
 toleranceBetweenDevices = 2;
 longestDevice = SAMSUNG_HEIGHT;
 widestDevice = SAMSUNG_WIDTH;
+gillHeight = 27;
+gillSlit = 4;
+gillStrikeThrough = RIG_WALL_THICKNESS * 2;
 
 module rig() {
   difference() {
@@ -106,6 +111,46 @@ module bottomHalf() {
       RIG_WALL_THICKNESS + SAMSUNG_HEIGHT,
       DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
     ]);
+    // Gills for the right side:
+    translate([ RIG_WIDTH + RIG_SIDE_COMPT + gillStrikeThrough / 4, 0, RIG_WALL_THICKNESS + 5 ])
+    rotate([ 0, 0, 90 ])
+    distributeChildren(
+      alongX = longestDevice + RIG_TRUNK_LENGTH + RIG_WALL_THICKNESS * 3, // space available for distributing the children into
+      childX = gillSlit, // i.e. the width of a single child
+      paddingX = 10 // distance of 1st and last children "from the sides"
+    ) {
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+    }
+    // Gills for the left side:
+    translate([ gillStrikeThrough / 1.2, 0, RIG_WALL_THICKNESS + 5 ])
+    rotate([ 0, 0, 90 ])
+    distributeChildren(
+      alongX = longestDevice + RIG_TRUNK_LENGTH + RIG_WALL_THICKNESS * 3, // space available for distributing the children into
+      childX = gillSlit, // i.e. the width of a single child
+      paddingX = 10 // distance of 1st and last children "from the sides"
+    ) {
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit(20);
+      gillSlit(24);
+      gillSlit();
+      gillSlit();
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit();
+    }
   }
   // Support pillar:
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
@@ -119,4 +164,14 @@ module bottomHalf() {
     25, // this is kind of arbitrary, as long as it's enough to support the weight of the overhang
     DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
   ]);
+}
+
+module gillSlit(shortenBy = 0) {
+  rotate([ 90, 0, 0 ])
+  hull() {
+    translate([ 0, 0, -gillStrikeThrough ])
+    cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
+    translate([ 0, gillHeight - shortenBy, -gillStrikeThrough ])
+    cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
+  }
 }
