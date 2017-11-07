@@ -9,7 +9,8 @@ $fn = 50;
 
 rig();
 
-magic = 0.0001;
+stripTopDownBy = 0;
+magic = 0.001;
 toleranceAroundDevices = 0.5;
 toleranceBetweenDevices = 2;
 longestDevice = SAMSUNG_HEIGHT;
@@ -26,7 +27,7 @@ module rig() {
 module deviceStack() {
   // Dexcom:
   color("SandyBrown")
-  translate([ 0, longestDevice - DEXCOM_HEIGHT, DEXCOM_DEPTH ])
+  translate([ (RIG_WIDTH - DEXCOM_WIDTH) / -2 + RIG_WALL_THICKNESS, longestDevice - DEXCOM_HEIGHT, DEXCOM_DEPTH ])
   rotate([ 0, 180, 0 ])
   dexcom(toleranceAroundDevices, extendDownBy = toleranceBetweenDevices);
   // Mophie:
@@ -44,9 +45,9 @@ module bottomHalf() {
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
   difference() {
     roundedCube(
-      RIG_WIDTH,
+      RIG_WIDTH + RIG_SIDE_COMPT,
       RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
-      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 + toleranceAroundDevices - magic,
+      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 + toleranceAroundDevices - magic - stripTopDownBy,
       r = GLOBAL_ROUNDING,
       flatTop = true
     );
@@ -57,7 +58,7 @@ module bottomHalf() {
       RIG_WALL_THICKNESS - toleranceAroundDevices
     ])
     cube([
-      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - DEXCOM_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
       DEXCOM_DEPTH + toleranceBetweenDevices
     ]);
@@ -68,7 +69,7 @@ module bottomHalf() {
       RIG_WALL_THICKNESS + DEXCOM_DEPTH
     ])
     cube([
-      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - MOPHIE_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
       MOPHIE_DEPTH + toleranceBetweenDevices * 2
     ]);
@@ -79,10 +80,31 @@ module bottomHalf() {
       RIG_WALL_THICKNESS + DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices
     ])
     cube([
-      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - SAMSUNG_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
       SAMSUNG_DEPTH + toleranceAroundDevices * 2
     ]);
-
+    // Dexcom right side compartment:
+    translate([
+      RIG_WALL_THICKNESS + DEXCOM_WIDTH + RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS + RIG_TRUNK_LENGTH + (longestDevice - DEXCOM_HEIGHT) - RIG_WALL_THICKNESS * 2 - magic,
+      RIG_WALL_THICKNESS - toleranceAroundDevices
+    ])
+    cube([
+      (RIG_WIDTH + RIG_SIDE_COMPT - DEXCOM_WIDTH) - RIG_WALL_THICKNESS * 3,
+      RIG_WALL_THICKNESS + DEXCOM_HEIGHT,
+      DEXCOM_DEPTH + toleranceBetweenDevices
+    ]);
+    // Mophie & Samsung right side compartment:
+    translate([
+      RIG_WALL_THICKNESS + SAMSUNG_WIDTH + RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS + RIG_TRUNK_LENGTH - RIG_WALL_THICKNESS * 2 - magic,
+      RIG_WALL_THICKNESS
+    ])
+    cube([
+      (RIG_WIDTH + RIG_SIDE_COMPT - SAMSUNG_WIDTH) - RIG_WALL_THICKNESS * 3,
+      RIG_WALL_THICKNESS + SAMSUNG_HEIGHT,
+      DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
+    ]);
   }
 }
