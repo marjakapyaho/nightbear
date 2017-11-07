@@ -130,6 +130,10 @@ module bottomHalf() {
       gillSlit();
       gillSlit();
       gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
     }
     // Gills for the left side:
     translate([ gillStrikeThrough / 1.2, 0, RIG_WALL_THICKNESS + 5 ])
@@ -143,10 +147,14 @@ module bottomHalf() {
       gillSlit();
       gillSlit();
       gillSlit();
+      gillSlit();
       gillSlit(20);
+      gillSlit(22);
       gillSlit(24);
       gillSlit();
       gillSlit();
+      gillSlit();
+      gillSlit(10);
       gillSlit(10);
       gillSlit(10);
       gillSlit();
