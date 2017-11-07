@@ -11,7 +11,7 @@ rig();
 
 stripTopDownBy = 0;
 magic = 0.001;
-toleranceAroundDevices = 0.5;
+toleranceAroundDevices = 0.25;
 toleranceBetweenDevices = 2;
 longestDevice = SAMSUNG_HEIGHT;
 widestDevice = SAMSUNG_WIDTH;
