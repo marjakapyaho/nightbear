@@ -40,7 +40,7 @@ module samsung(
 
   // Bottom access:
   bottomMargin = 7;
-  bottomSpace = 32;
+  bottomSpace = 10;
   translate([ SAMSUNG_WIDTH / -2 + bottomMargin, -bottomSpace, -withTolerance ])
   cube([
     SAMSUNG_WIDTH - bottomMargin * 2,
@@ -71,7 +71,8 @@ module samsung(
     SAMSUNG_WIDTH + buttonsSpace * 2,
     buttonsHeight,
     SAMSUNG_DEPTH + buttonsVertExtra * 2,
-    r = 2.5
+    r = 2.5,
+    flatTop = true
   );
 
 }

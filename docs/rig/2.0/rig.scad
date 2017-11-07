@@ -9,6 +9,7 @@ $fn = 50;
 
 rig();
 
+magic = 0.0001;
 toleranceAroundDevices = 0.5;
 toleranceBetweenDevices = 2;
 longestDevice = SAMSUNG_HEIGHT;
@@ -40,12 +41,48 @@ module deviceStack() {
 
 module bottomHalf() {
   color("Thistle")
-  translate([ RIG_WIDTH / -2, 0, 0 ])
-  roundedCube(
-    RIG_WIDTH,
-    longestDevice + RIG_WALL_THICKNESS,
-    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2,
-    r = GLOBAL_ROUNDING,
-    flatTop = true
-  );
+  translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
+  difference() {
+    roundedCube(
+      RIG_WIDTH,
+      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 + toleranceAroundDevices - magic,
+      r = GLOBAL_ROUNDING,
+      flatTop = true
+    );
+    // Dexcom trunk space:
+    translate([
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS - toleranceAroundDevices
+    ])
+    cube([
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      longestDevice - DEXCOM_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
+      DEXCOM_DEPTH + toleranceBetweenDevices
+    ]);
+    // Mophie trunk space:
+    translate([
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS + DEXCOM_DEPTH
+    ])
+    cube([
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      longestDevice - MOPHIE_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
+      MOPHIE_DEPTH + toleranceBetweenDevices * 2
+    ]);
+    // Samsung trunk space:
+    translate([
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS + DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices
+    ])
+    cube([
+      RIG_WIDTH - RIG_WALL_THICKNESS * 2,
+      longestDevice - SAMSUNG_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
+      SAMSUNG_DEPTH + toleranceAroundDevices * 2
+    ]);
+
+  }
 }
