@@ -46,11 +46,11 @@ module mophie(
   // Bottom access:
   bottomMargin = 7;
   bottomSpace = 37;
-  translate([ MOPHIE_WIDTH / -2 + bottomMargin, -bottomSpace, 0 ])
+  translate([ MOPHIE_WIDTH / -2 + bottomMargin, -bottomSpace, -withTolerance ])
   cube([
     MOPHIE_WIDTH - bottomMargin * 2,
     bottomSpace,
-    MOPHIE_DEPTH + extendUpBy
+    MOPHIE_DEPTH + extendUpBy + withTolerance * 2
   ]);
 
 }

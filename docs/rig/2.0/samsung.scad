@@ -39,13 +39,13 @@ module samsung(
   );
 
   // Bottom access:
-  bottomWith = 14;
+  bottomMargin = 7;
   bottomSpace = 32;
-  translate([ bottomWith / -2, -bottomSpace, 0 ])
+  translate([ SAMSUNG_WIDTH / -2 + bottomMargin, -bottomSpace, -withTolerance ])
   cube([
-    bottomWith,
+    SAMSUNG_WIDTH - bottomMargin * 2,
     bottomSpace,
-    SAMSUNG_DEPTH
+    SAMSUNG_DEPTH + withTolerance * 2
   ]);
 
   // Camera bump:
