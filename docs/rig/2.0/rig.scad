@@ -5,82 +5,9 @@ use <dexcom.scad>;
 use <samsung.scad>;
 use <mophie.scad>;
 
-$fn = 25;
-// $fn = 50;
+$fn = 50;
 
-// rig();
-
-wall = 3;
-tol = 0.75;
-bump = 1;
-r = 5;
-
-// Body:
-difference() {
-  roundedCube(
-    40,
-    40,
-    30,
-    r = r,
-    flatTop = true
-  );
-  translate([ wall, wall, wall ])
-  roundedCube(
-    40 - wall * 2,
-    40 - wall * 2,
-    30,
-    r = r - wall,
-    flatTop = true
-  );
-  // Grooves:
-  translate([ 0, 0, 25 ])
-  rotate([ 0, 90, 0 ])
-  cylinder(r = bump, h = 40);
-  translate([ 0, 0 + 40, 25 ])
-  rotate([ 0, 90, 0 ])
-  cylinder(r = bump, h = 40);
-  translate([ 40, 0, 25 ])
-  rotate([ 0, 90, 90 ])
-  cylinder(r = bump, h = 40);
-  translate([ 0, 0, 25 ])
-  rotate([ 0, 90, 90 ])
-  cylinder(r = bump, h = 40);
-}
-// Lid:
-*union() {
-  translate([ -wall - tol, -wall - tol, 30 - 15 + r - 0 ])
-  difference() {
-    roundedCube(
-      40 + wall * 2 + tol * 2,
-      40 + wall * 2 + tol * 2,
-      15,
-      r = r + tol,
-      flatBottom = true
-    );
-    translate([ wall, wall, 0 ])
-    roundedCube(
-      40 + tol * 2,
-      40 + tol * 2,
-      15 - wall,
-      r = 1,
-      flatBottom = true
-    );
-  }
-
-  // Bumps:
-  translate([ r, 0 - tol, 25 ])
-  rotate([ 0, 90, 0 ])
-  cylinder(r = bump, h = 40 - r * 2);
-  translate([ r, 0 + 40 + tol, 25 ])
-  rotate([ 0, 90, 0 ])
-  cylinder(r = bump, h = 40 - r * 2);
-  translate([ 40 + tol, 0 + r, 25 ])
-  rotate([ 0, 90, 90 ])
-  cylinder(r = bump, h = 40 - r * 2);
-  translate([ 0 - tol, 0 + r, 25 ])
-  rotate([ 0, 90, 90 ])
-  cylinder(r = bump, h = 40 - r * 2);
-}
+rig();
 
 toleranceAroundDevices = 0.5;
 toleranceBetweenDevices = 2;
