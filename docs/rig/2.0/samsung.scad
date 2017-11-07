@@ -68,7 +68,7 @@ module samsung(
     -buttonsVertExtra
   ])
   roundedCube(
-    SAMSUNG_WIDTH + buttonsSpace * 2,
+    SAMSUNG_WIDTH + buttonsSpace * 1, // note: use "* 2" to have the power button also accessible
     buttonsHeight,
     SAMSUNG_DEPTH + buttonsVertExtra * 2,
     r = 2.5,
