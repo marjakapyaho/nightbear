@@ -107,4 +107,16 @@ module bottomHalf() {
       DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
     ]);
   }
+  // Support pillar:
+  translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
+  translate([
+    RIG_WALL_THICKNESS + SAMSUNG_WIDTH,
+    RIG_WALL_THICKNESS + RIG_TRUNK_LENGTH - RIG_WALL_THICKNESS * 2,
+    RIG_WALL_THICKNESS
+  ])
+  cube([
+    RIG_WALL_THICKNESS,
+    25, // this is kind of arbitrary, as long as it's enough to support the weight of the overhang
+    DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
+  ]);
 }
