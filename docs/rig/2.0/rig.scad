@@ -62,62 +62,78 @@ module bottomHalf() {
       RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS - toleranceAroundDevices
     ])
-    cube([
+    roundedCube(
       RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - DEXCOM_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
-      DEXCOM_DEPTH + toleranceBetweenDevices
-    ]);
+      DEXCOM_DEPTH + toleranceBetweenDevices,
+      r = GLOBAL_ROUNDING,
+      flatTop = true,
+      flatBack = true
+    );
     // Mophie trunk space:
     translate([
       RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS + DEXCOM_DEPTH
     ])
-    cube([
+    roundedCube(
       RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - MOPHIE_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
-      MOPHIE_DEPTH + toleranceBetweenDevices * 2
-    ]);
+      MOPHIE_DEPTH + toleranceBetweenDevices * 2,
+      r = GLOBAL_ROUNDING,
+      flatTop = true,
+      flatBottom = true
+    );
     // Samsung trunk space:
     translate([
       RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS + DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices
     ])
-    cube([
+    roundedCube(
       RIG_WIDTH - RIG_WALL_THICKNESS * 2 + RIG_SIDE_COMPT,
       longestDevice - SAMSUNG_HEIGHT - RIG_WALL_THICKNESS * 2 + RIG_TRUNK_LENGTH,
-      SAMSUNG_DEPTH + toleranceAroundDevices * 2
-    ]);
+      SAMSUNG_DEPTH + toleranceAroundDevices * 2,
+      r = GLOBAL_ROUNDING,
+      flatTop = true,
+      flatBottom = true,
+      flatBack = true
+    );
     // Dexcom right side compartment:
     translate([
       RIG_WALL_THICKNESS + DEXCOM_WIDTH + RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS + RIG_TRUNK_LENGTH + (longestDevice - DEXCOM_HEIGHT) - RIG_WALL_THICKNESS * 2 - magic,
       RIG_WALL_THICKNESS - toleranceAroundDevices
     ])
-    cube([
+    roundedCube(
       (RIG_WIDTH + RIG_SIDE_COMPT - DEXCOM_WIDTH) - RIG_WALL_THICKNESS * 3,
       RIG_WALL_THICKNESS + DEXCOM_HEIGHT,
-      DEXCOM_DEPTH + toleranceBetweenDevices
-    ]);
+      DEXCOM_DEPTH + toleranceBetweenDevices,
+      r = GLOBAL_ROUNDING,
+      flatTop = true,
+      flatFront = true
+    );
     // Mophie & Samsung right side compartment:
     translate([
       RIG_WALL_THICKNESS + SAMSUNG_WIDTH + RIG_WALL_THICKNESS,
       RIG_WALL_THICKNESS + RIG_TRUNK_LENGTH - RIG_WALL_THICKNESS * 2 - magic,
       RIG_WALL_THICKNESS
     ])
-    cube([
+    roundedCube(
       (RIG_WIDTH + RIG_SIDE_COMPT - SAMSUNG_WIDTH) - RIG_WALL_THICKNESS * 3,
       RIG_WALL_THICKNESS + SAMSUNG_HEIGHT,
-      DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
-    ]);
+      DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2,
+      r = GLOBAL_ROUNDING,
+      flatTop = true,
+      flatFront = true
+    );
     // Gills for the right side:
     translate([ RIG_WIDTH + RIG_SIDE_COMPT + gillStrikeThrough / 4, 0, RIG_WALL_THICKNESS + 5 ])
     rotate([ 0, 0, 90 ])
     distributeChildren(
       alongX = longestDevice + RIG_TRUNK_LENGTH + RIG_WALL_THICKNESS * 3, // space available for distributing the children into
       childX = gillSlit, // i.e. the width of a single child
-      paddingX = 10 // distance of 1st and last children "from the sides"
+      paddingX = 15 // distance of 1st and last children "from the sides"
     ) {
       gillSlit();
       gillSlit();
@@ -141,12 +157,12 @@ module bottomHalf() {
     distributeChildren(
       alongX = longestDevice + RIG_TRUNK_LENGTH + RIG_WALL_THICKNESS * 3, // space available for distributing the children into
       childX = gillSlit, // i.e. the width of a single child
-      paddingX = 10 // distance of 1st and last children "from the sides"
+      paddingX = 12 // distance of 1st and last children "from the sides"
     ) {
       gillSlit();
       gillSlit();
       gillSlit();
-      gillSlit();
+      gillSlit(5);
       gillSlit();
       gillSlit(20);
       gillSlit(22);
