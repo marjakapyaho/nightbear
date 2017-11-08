@@ -164,9 +164,9 @@ module bottomHalf() {
       gillSlit();
       gillSlit(5);
       gillSlit();
-      gillSlit(20);
-      gillSlit(22);
-      gillSlit(24);
+      group() {} // i.e. empty place
+      group() {} // i.e. empty place
+      group() {} // i.e. empty place
       gillSlit();
       gillSlit();
       gillSlit();
