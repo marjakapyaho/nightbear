@@ -175,6 +175,13 @@ module bottomHalf() {
       gillSlit(10);
       gillSlit();
     }
+    // Charger outlet:
+    outletSize = 12;
+    translate([ (RIG_WIDTH + RIG_SIDE_COMPT) / 2, 0, 0 ]) { // center
+      translate([ 0, RIG_WALL_THICKNESS + 1, outletSize ])
+      rotate([ 90, 0, 0 ])
+      cylinder(r = outletSize / 2, h = 10);
+    }
   }
   // Support pillar:
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
@@ -188,6 +195,11 @@ module bottomHalf() {
     25, // this is kind of arbitrary, as long as it's enough to support the weight of the overhang
     DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
   ]);
+  // Charger attachment:
+  translate([ RIG_WIDTH / -2 + (RIG_WIDTH + RIG_SIDE_COMPT) / 2, -RIG_TRUNK_LENGTH, 0 ]) {
+    translate([ 0, 10, 1 ])
+    hook();
+  }
 }
 
 module gillSlit(shortenBy = 0) {
@@ -197,5 +209,19 @@ module gillSlit(shortenBy = 0) {
     cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
     translate([ 0, gillHeight - shortenBy, -gillStrikeThrough ])
     cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
+  }
+}
+
+module hook() {
+  difference() {
+    translate([ -5/2, 0, 0 ])
+    rotate([ 0, 0, 90 ])
+    rotate([ 90, 0, 0 ])
+    difference() {
+      cylinder(r = 8, h = 5);
+      cylinder(r = 5, h = 5);
+    }
+    translate([ -10, -10, -8 ])
+    cube([ 20, 20, 10 ]);
   }
 }
