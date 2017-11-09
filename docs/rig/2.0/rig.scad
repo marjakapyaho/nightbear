@@ -195,10 +195,21 @@ module bottomHalf() {
     25, // this is kind of arbitrary, as long as it's enough to support the weight of the overhang
     DEXCOM_DEPTH + toleranceBetweenDevices + MOPHIE_DEPTH + toleranceBetweenDevices - toleranceAroundDevices + SAMSUNG_DEPTH + toleranceAroundDevices * 2
   ]);
-  // Charger attachment:
-  translate([ RIG_WIDTH / -2 + (RIG_WIDTH + RIG_SIDE_COMPT) / 2, -RIG_TRUNK_LENGTH, 0 ]) {
+  translate([ RIG_WIDTH / -2 + (RIG_WIDTH + RIG_SIDE_COMPT) / 2, -RIG_TRUNK_LENGTH, 0 ]) { // center at the end
+    // Charger cable floor attachment:
     translate([ 0, 10, 1 ])
     hook();
+    // Cable flaps:
+    cableFlap();
+    mirror([ 1, 0, 0 ])
+    cableFlap();
+    // Cable hook:
+    translate([ 0, 0, 32 ])
+    difference() {
+      hook();
+      translate([ -5, 0, 0 ])
+      cube([ 10, 10, 10 ]);
+    }
   }
 }
 
@@ -224,4 +235,28 @@ module hook() {
     translate([ -10, -10, -8 ])
     cube([ 20, 20, 10 ]);
   }
+}
+
+module cableFlap() {
+  cableFlapWidth = 15;
+  cableFlapExtension = 16;
+  cableFlapSpace = 4.5;
+  cableFlapTop = 12;
+  cableFlapLeft = 20;
+  cableFlapRounding = RIG_WALL_THICKNESS / 2 - magic;
+  translate([ -cableFlapLeft, -cableFlapSpace - RIG_WALL_THICKNESS, cableFlapTop ])
+  roundedCube(
+    RIG_WALL_THICKNESS,
+    cableFlapSpace + RIG_WALL_THICKNESS,
+    cableFlapWidth,
+    r = cableFlapRounding,
+    flatBack = true
+  );
+  translate([ -cableFlapLeft - cableFlapExtension + RIG_WALL_THICKNESS, -cableFlapSpace - RIG_WALL_THICKNESS, cableFlapTop ])
+  roundedCube(
+    cableFlapExtension,
+    RIG_WALL_THICKNESS,
+    cableFlapWidth,
+    r = cableFlapRounding
+  );
 }
