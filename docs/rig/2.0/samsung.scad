@@ -6,7 +6,8 @@ use <roundedCube.scad>;
 samsung(0.5);
 
 module samsung(
-  withTolerance = 0
+  withTolerance = 0,
+  bottomSpace = 10
 ) {
 
   // Main body:
@@ -33,14 +34,14 @@ module samsung(
     SAMSUNG_WIDTH - screenHorMargin * 2,
     SAMSUNG_HEIGHT - screenVerMargin,
     screenSpace,
-    r = GLOBAL_ROUNDING,
+    r = 2.5,
     flatTop = true,
     flatBottom = true
   );
 
   // Bottom access:
-  bottomMargin = 7;
-  bottomSpace = 10;
+  bottomWidth = 25;
+  bottomMargin = (SAMSUNG_WIDTH - bottomWidth) / 2;
   translate([ SAMSUNG_WIDTH / -2 + bottomMargin, -bottomSpace, -withTolerance ])
   cube([
     SAMSUNG_WIDTH - bottomMargin * 2,
@@ -68,11 +69,20 @@ module samsung(
     -buttonsVertExtra
   ])
   roundedCube(
-    SAMSUNG_WIDTH + buttonsSpace * 1, // note: use "* 2" to have the power button also accessible
+    SAMSUNG_WIDTH + buttonsSpace * 2, // note: use "* 2" to have the power button also accessible
     buttonsHeight,
     SAMSUNG_DEPTH + buttonsVertExtra * 2,
     r = 2.5,
     flatTop = true
   );
+
+  // Notification LED access:
+  ledDiameter = 7;
+  translate([ SAMSUNG_WIDTH / -2 + 12.7, SAMSUNG_HEIGHT - ledDiameter / 2, SAMSUNG_DEPTH ])
+  cylinder(r = ledDiameter / 2, h = screenSpace);
+
+  // Ambient light sensor access:
+  translate([ SAMSUNG_WIDTH / -2 + 23, SAMSUNG_HEIGHT - ledDiameter / 2, SAMSUNG_DEPTH ])
+  cylinder(r = ledDiameter / 2, h = screenSpace);
 
 }
