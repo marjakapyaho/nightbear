@@ -17,9 +17,9 @@ toleranceAroundDevices = 0.25;
 toleranceBetweenDevices = 0.5;
 longestDevice = SAMSUNG_HEIGHT;
 widestDevice = SAMSUNG_WIDTH;
-gillHeight = 27;
-gillSlit = 4;
-gillStrikeThrough = RIG_WALL_THICKNESS * 2;
+gillHeight = 24;
+gillSlit = 3;
+gillStrikeThrough = 30;
 deviceBottomSpace = 20;
 internalDividerThickness = RIG_WALL_THICKNESS * 1.5;
 
@@ -97,6 +97,66 @@ module bottomHalf() {
       r = INNER_ROUNDING,
       flatTop = true
     );
+    // Gills for the right side:
+    gillsPositionTweak = -5;
+    gillsLengthTweak = 15;
+    translate([ RIG_WIDTH + gillStrikeThrough / 4, 0 + gillsPositionTweak, RIG_WALL_THICKNESS + 5 ])
+    rotate([ 0, 0, 90 ])
+    distributeChildren(
+      alongX = RIG_TRUNK_LENGTH + longestDevice + gillsLengthTweak, // space available for distributing the children into
+      childX = gillSlit, // i.e. the width of a single child
+      paddingX = 15 // distance of 1st and last children "from the sides"
+    ) {
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit();
+    }
+    // Gills for the left side:
+    translate([ gillStrikeThrough / 1.2, 0 + gillsPositionTweak, RIG_WALL_THICKNESS + 5 ])
+    rotate([ 0, 0, 90 ])
+    distributeChildren(
+      alongX = RIG_TRUNK_LENGTH + longestDevice + gillsLengthTweak, // space available for distributing the children into
+      childX = gillSlit, // i.e. the width of a single child
+      paddingX = 15 // distance of 1st and last children "from the sides"
+    ) {
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      group() {} // i.e. empty place
+      group() {} // i.e. empty place
+      group() {} // i.e. empty place
+      group() {} // i.e. empty place
+      gillSlit();
+      gillSlit();
+      gillSlit();
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit(10);
+      gillSlit();
+    }
   }
 }
 
