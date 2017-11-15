@@ -84,4 +84,31 @@ difference() {
   linear_extrude(height = textEmbedBy)
   text("^ ^ ^", halign = "center", valign = "center");
 
+  // Top excess space:
+  translate([
+    wallThickness + topPlugWidth,
+    height / -2,
+    thinWallThickness + botPlugDepth + wallThickness
+  ])
+  cube([
+    width,
+    height * 2,
+    totalOuterHeight
+  ]);
+
 }
+
+// Top extra rounding:
+translate([
+  wallThickness + topPlugWidth,
+  0,
+  thinWallThickness + botPlugDepth + betweenPlugs - wallThickness
+])
+roundedCube(
+  wallThickness + backStrengthening,
+  height,
+  thinWallThickness + topPlugDepth + wallThickness,
+  r = outerRounding,
+  flatLeft = true,
+  flatBottom = true
+);
