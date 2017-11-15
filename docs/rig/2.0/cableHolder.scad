@@ -100,7 +100,7 @@ difference() {
 
 // Top extra rounding:
 translate([
-  wallThickness + topPlugWidth,
+  wallThickness + topPlugWidth - magic,
   0,
   thinWallThickness + botPlugDepth + betweenPlugs - wallThickness
 ])
