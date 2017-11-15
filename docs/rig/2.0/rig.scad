@@ -28,14 +28,6 @@ module rig() {
     bottomHalf();
     translate([ 0, 0, RIG_WALL_THICKNESS ])
     deviceStack();
-
-    // Height Test System :tm:
-    translate([ -50, 77, 0 ])
-    cube([ 100, 100, 100 ]);
-    translate([ -50, 77 - 100 - 5 - 100, 0 ])
-    cube([ 100, 100 + 100, 100 ]);
-    translate([ -100, 77 - 100 - 5, 0 ])
-    cube([ 100, 200, 100 ]);
   }
 }
 
