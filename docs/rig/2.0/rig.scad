@@ -167,6 +167,21 @@ module bottomHalf() {
       chargerHeight,
       r = 1.5
     );
+    // Thinning for cable holder:
+    thinByAmount = 1;
+    thinAlongLength = 40;
+    translate([
+      RIG_WIDTH / 2 - DEXCOM_WIDTH / 2,
+      RIG_TRUNK_LENGTH - thinAlongLength + 15,
+      RIG_WALL_THICKNESS - thinByAmount
+    ])
+    roundedCube(
+      DEXCOM_WIDTH,
+      thinAlongLength,
+      thinByAmount * 2,
+      flatTop = true,
+      r = thinByAmount * 2 - magic
+    );
   }
 }
 
