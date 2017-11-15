@@ -157,6 +157,16 @@ module bottomHalf() {
       gillSlit(10);
       gillSlit();
     }
+    // Carger outlet:
+    chargerWidth = 13;
+    chargerHeight = 8.5;
+    translate([ RIG_WIDTH / 2 - chargerWidth / 2, -RIG_WALL_THICKNESS, RIG_WALL_THICKNESS + 3 ])
+    roundedCube(
+      chargerWidth,
+      RIG_WALL_THICKNESS * 3,
+      chargerHeight,
+      r = 1.5
+    );
   }
 }
 
