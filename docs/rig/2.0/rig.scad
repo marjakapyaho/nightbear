@@ -22,10 +22,21 @@ gillSlit = 3;
 gillStrikeThrough = 30;
 deviceBottomSpace = 20;
 internalDividerThickness = RIG_WALL_THICKNESS * 1.5;
+clampWidth = RIG_WALL_THICKNESS;
+clampHeight = 20;
+clampDepth = 15;
+clampRounding = 3;
+clampFromTop = 9.2;
+clampButtonInset = 2.5;
 
 module rig() {
+  // difference() {
+  //   bottomHalf();
+  //   translate([ 0, 0, RIG_WALL_THICKNESS ])
+  //   deviceStack();
+  // }
   difference() {
-    bottomHalf();
+    topHalf();
     translate([ 0, 0, RIG_WALL_THICKNESS ])
     deviceStack();
   }
@@ -63,13 +74,7 @@ module bottomHalf() {
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ])
   difference() {
     // Rig main body:
-    roundedCube(
-      RIG_WIDTH,
-      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
-      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - magic - stripTopDownBy,
-      r = OUTER_ROUNDING,
-      flatTop = true
-    );
+    rigMainBody();
     // Dexcom trunk space:
     dexcomTrunkWidth = RIG_WIDTH - 20.5; // arbitrary, but matches Dex's upstairs neighbor nicely
     translate([
@@ -185,6 +190,16 @@ module bottomHalf() {
   }
 }
 
+module rigMainBody() {
+  roundedCube(
+    RIG_WIDTH,
+    RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
+    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - magic - stripTopDownBy,
+    r = OUTER_ROUNDING,
+    flatTop = true
+  );
+}
+
 module gillSlit(shortenBy = 0) {
   rotate([ 90, 0, 0 ])
   hull() {
@@ -192,5 +207,97 @@ module gillSlit(shortenBy = 0) {
     cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
     translate([ 0, gillHeight - shortenBy, -gillStrikeThrough ])
     cylinder(r = gillSlit / 2 - magic, h = gillStrikeThrough);
+  }
+}
+
+module topHalf() {
+  translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ]) {
+    // Lid:
+    color("cyan")
+    translate([
+      0,
+      0,
+      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2
+    ])
+    resize([
+      RIG_WIDTH,
+      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
+      RIG_WALL_THICKNESS
+    ])
+    roundedCube(
+      RIG_WIDTH,
+      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
+      OUTER_ROUNDING + magic,
+      r = OUTER_ROUNDING,
+      flatBottom = true
+    );
+    // Clamps:
+    clampYMagic1 = 9.6;
+    clampYMagic2 = 69;
+    // Clamp bodies:
+    difference() {
+      union() {
+        // Bottom left:
+        translate([ 0, clampYMagic1, 0 ])
+        lidClamp();
+        // Bottom right:
+        translate([ RIG_WIDTH, clampHeight + clampYMagic1, 0 ])
+        rotate([ 0, 0, 180 ])
+        lidClamp();
+        // Top left:
+        translate([ 0, RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
+        lidClamp();
+        // Top right:
+        translate([ RIG_WIDTH, clampHeight + RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
+        rotate([ 0, 0, 180 ])
+        lidClamp();
+      }
+      // Rig main body:
+      rigMainBody();
+    }
+    // Clamp buttons:
+    union() {
+      // Bottom left:
+      translate([ 0, clampYMagic1, 0 ])
+      lidButton();
+      // Bottom right:
+      translate([ RIG_WIDTH, clampHeight + clampYMagic1, 0 ])
+      rotate([ 0, 0, 180 ])
+      lidButton();
+      // Top left:
+      translate([ 0, RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
+      lidButton();
+      // Top right:
+      translate([ RIG_WIDTH, clampHeight + RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
+      rotate([ 0, 0, 180 ])
+      lidButton();
+    }
+  }
+}
+
+module lidClamp() {
+  translate([
+    -clampWidth,
+    0,
+    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - clampDepth + RIG_WALL_THICKNESS
+  ]) {
+    roundedCube(
+      clampWidth * 3,
+      clampHeight,
+      clampDepth,
+      r = clampRounding
+    );
+  }
+}
+
+module lidButton() {
+  translate([
+    -clampWidth,
+    0,
+    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - clampDepth + RIG_WALL_THICKNESS
+  ]) {
+    translate([ clampButtonInset, clampHeight / 2, clampDepth - clampFromTop ])
+    rotate([ 0, 90, 0 ])
+    cylinder(r = gillSlit / 2, h = clampButtonInset);
   }
 }
