@@ -26,18 +26,23 @@ module samsung(
   }
 
   // Screen access:
-  screenHorMargin = 2.7;
-  screenVerMargin = 10;
+  screenHorMargin = 3.3;
+  screenVerMargin = 12;
+  screenBottomMargin = 1;
   screenSpace = 15;
-  translate([ SAMSUNG_WIDTH / -2 + screenHorMargin, 0, SAMSUNG_DEPTH ])
+  translate([ SAMSUNG_WIDTH / -2 + screenHorMargin, screenBottomMargin, SAMSUNG_DEPTH ])
   roundedCube(
     SAMSUNG_WIDTH - screenHorMargin * 2,
-    SAMSUNG_HEIGHT - screenVerMargin,
+    SAMSUNG_HEIGHT - screenVerMargin - screenBottomMargin,
     screenSpace,
     r = 2.5,
     flatTop = true,
     flatBottom = true
   );
+
+  // Top pulldown access:
+  translate([ 0, SAMSUNG_HEIGHT - 14, SAMSUNG_DEPTH ])
+  cylinder(r = 9, h = screenSpace);
 
   // Bottom access:
   bottomWidth = 25;
@@ -79,10 +84,12 @@ module samsung(
   // Notification LED access:
   ledDiameter = 7;
   translate([ SAMSUNG_WIDTH / -2 + 12.7, SAMSUNG_HEIGHT - ledDiameter / 2, SAMSUNG_DEPTH ])
+  color("blue")
   cylinder(r = ledDiameter / 2, h = screenSpace);
 
   // Ambient light sensor access:
-  translate([ SAMSUNG_WIDTH / -2 + 23, SAMSUNG_HEIGHT - ledDiameter / 2, SAMSUNG_DEPTH ])
+  translate([ SAMSUNG_WIDTH / -2 + 23.5, SAMSUNG_HEIGHT - ledDiameter / 2, SAMSUNG_DEPTH ])
+  color("blue")
   cylinder(r = ledDiameter / 2, h = screenSpace);
 
 }
