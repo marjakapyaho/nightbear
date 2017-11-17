@@ -22,12 +22,8 @@ gillSlit = 3;
 gillStrikeThrough = 30;
 deviceBottomSpace = 20;
 internalDividerThickness = RIG_WALL_THICKNESS * 1.5;
-clampWidth = RIG_WALL_THICKNESS;
-clampHeight = 20;
-clampDepth = 15;
-clampRounding = 3;
-clampFromTop = 9.2;
-clampButtonInset = 2.5;
+lidCoverAmount = 11;
+lidCoverRounding = 5 - magic;
 
 module rig() {
   // difference() {
@@ -190,10 +186,11 @@ module bottomHalf() {
   }
 }
 
-module rigMainBody() {
+module rigMainBody(padding = 0) {
+  translate([ -padding, -padding, 0 ])
   roundedCube(
-    RIG_WIDTH,
-    RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
+    RIG_WIDTH + padding * 2,
+    RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + padding * 2,
     RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - magic - stripTopDownBy,
     r = OUTER_ROUNDING,
     flatTop = true
@@ -212,92 +209,22 @@ module gillSlit(shortenBy = 0) {
 
 module topHalf() {
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ]) {
-    // Lid:
-    color("cyan")
-    translate([
-      0,
-      0,
-      RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2
-    ])
-    resize([
-      RIG_WIDTH,
-      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
-      RIG_WALL_THICKNESS
-    ])
-    roundedCube(
-      RIG_WIDTH,
-      RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS,
-      OUTER_ROUNDING + magic,
-      r = OUTER_ROUNDING,
-      flatBottom = true
-    );
-    // Clamps:
-    clampYMagic1 = 9.6;
-    clampYMagic2 = 69;
-    // Clamp bodies:
     difference() {
-      union() {
-        // Bottom left:
-        translate([ 0, clampYMagic1, 0 ])
-        lidClamp();
-        // Bottom right:
-        translate([ RIG_WIDTH, clampHeight + clampYMagic1, 0 ])
-        rotate([ 0, 0, 180 ])
-        lidClamp();
-        // Top left:
-        translate([ 0, RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
-        lidClamp();
-        // Top right:
-        translate([ RIG_WIDTH, clampHeight + RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
-        rotate([ 0, 0, 180 ])
-        lidClamp();
-      }
+      // Lid:
+      color("cyan")
+      translate([
+        -RIG_WALL_THICKNESS,
+        -RIG_WALL_THICKNESS,
+        RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - (lidCoverAmount - RIG_WALL_THICKNESS)
+      ])
+      roundedCube(
+        RIG_WIDTH + RIG_WALL_THICKNESS * 2,
+        RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + RIG_WALL_THICKNESS * 2,
+        lidCoverAmount,
+        r = lidCoverRounding
+      );
       // Rig main body:
-      rigMainBody();
+      #rigMainBody(toleranceAroundDevices);
     }
-    // Clamp buttons:
-    union() {
-      // Bottom left:
-      translate([ 0, clampYMagic1, 0 ])
-      lidButton();
-      // Bottom right:
-      translate([ RIG_WIDTH, clampHeight + clampYMagic1, 0 ])
-      rotate([ 0, 0, 180 ])
-      lidButton();
-      // Top left:
-      translate([ 0, RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
-      lidButton();
-      // Top right:
-      translate([ RIG_WIDTH, clampHeight + RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS - clampYMagic2, 0 ])
-      rotate([ 0, 0, 180 ])
-      lidButton();
-    }
-  }
-}
-
-module lidClamp() {
-  translate([
-    -clampWidth,
-    0,
-    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - clampDepth + RIG_WALL_THICKNESS
-  ]) {
-    roundedCube(
-      clampWidth * 3,
-      clampHeight,
-      clampDepth,
-      r = clampRounding
-    );
-  }
-}
-
-module lidButton() {
-  translate([
-    -clampWidth,
-    0,
-    RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - clampDepth + RIG_WALL_THICKNESS
-  ]) {
-    translate([ clampButtonInset, clampHeight / 2, clampDepth - clampFromTop ])
-    rotate([ 0, 90, 0 ])
-    cylinder(r = gillSlit / 2, h = clampButtonInset);
   }
 }

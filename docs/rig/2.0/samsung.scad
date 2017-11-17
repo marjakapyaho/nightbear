@@ -77,8 +77,7 @@ module samsung(
     SAMSUNG_WIDTH + buttonsSpace * 2, // note: use "* 2" to have the power button also accessible
     buttonsHeight,
     SAMSUNG_DEPTH + buttonsVertExtra * 2,
-    r = 2.5,
-    flatTop = true
+    r = 2.5
   );
 
   // Notification LED access:
