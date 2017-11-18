@@ -24,13 +24,15 @@ deviceBottomSpace = 20;
 internalDividerThickness = RIG_WALL_THICKNESS * 1.5;
 lidCoverAmount = 11;
 lidCoverRounding = 5 - magic;
+clampWidth = 30;
+clampDepth = 2.5;
 
 module rig() {
-  // difference() {
-  //   bottomHalf();
-  //   translate([ 0, 0, RIG_WALL_THICKNESS ])
-  //   deviceStack();
-  // }
+  difference() {
+    bottomHalf();
+    translate([ 0, 0, RIG_WALL_THICKNESS ])
+    deviceStack();
+  }
   difference() {
     topHalf();
     translate([ 0, 0, RIG_WALL_THICKNESS ])
@@ -184,6 +186,27 @@ module bottomHalf() {
       r = thinByAmount * 2 - magic
     );
   }
+  // Lid clamp recepticles:
+  translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ]) {
+    difference() {
+      // Lid clamps:
+      translate([
+        RIG_WIDTH / 2 - clampWidth / 2,
+        -RIG_WALL_THICKNESS,
+        RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - (lidCoverAmount - RIG_WALL_THICKNESS) - clampDepth - lidCoverAmount - clampDepth - toleranceAroundDevices
+      ])
+      color("orange")
+      roundedCube(
+        clampWidth,
+        RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + RIG_WALL_THICKNESS * 2,
+        lidCoverAmount + clampDepth,
+        r = lidCoverRounding,
+        flatTop = true
+      );
+      // Rig main body:
+      rigMainBody(-magic);
+    }
+  }
 }
 
 module rigMainBody(padding = 0) {
@@ -210,21 +233,36 @@ module gillSlit(shortenBy = 0) {
 module topHalf() {
   translate([ RIG_WIDTH / -2, -RIG_TRUNK_LENGTH, 0 ]) {
     difference() {
-      // Lid:
-      color("cyan")
-      translate([
-        -RIG_WALL_THICKNESS,
-        -RIG_WALL_THICKNESS,
-        RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - (lidCoverAmount - RIG_WALL_THICKNESS)
-      ])
-      roundedCube(
-        RIG_WIDTH + RIG_WALL_THICKNESS * 2,
-        RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + RIG_WALL_THICKNESS * 2,
-        lidCoverAmount,
-        r = lidCoverRounding
-      );
+      union() {
+        // Lid:
+        color("cyan")
+        translate([
+          -RIG_WALL_THICKNESS,
+          -RIG_WALL_THICKNESS,
+          RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - (lidCoverAmount - RIG_WALL_THICKNESS)
+        ])
+        roundedCube(
+          RIG_WIDTH + RIG_WALL_THICKNESS * 2,
+          RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + RIG_WALL_THICKNESS * 2,
+          lidCoverAmount,
+          r = lidCoverRounding
+        );
+        // Lid clamps:
+        translate([
+          RIG_WIDTH / 2 - clampWidth / 2,
+          -RIG_WALL_THICKNESS,
+          RIG_WALL_THICKNESS + DEXCOM_DEPTH + MOPHIE_DEPTH + SAMSUNG_DEPTH + toleranceBetweenDevices * 2 - (lidCoverAmount - RIG_WALL_THICKNESS) - clampDepth
+        ])
+        roundedCube(
+          clampWidth,
+          RIG_TRUNK_LENGTH + longestDevice + RIG_WALL_THICKNESS + RIG_WALL_THICKNESS * 2,
+          lidCoverAmount + clampDepth,
+          r = lidCoverRounding,
+          flatBottom = true
+        );
+      }
       // Rig main body:
-      #rigMainBody(toleranceAroundDevices);
+      rigMainBody(toleranceAroundDevices);
     }
   }
 }
