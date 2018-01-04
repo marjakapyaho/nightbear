@@ -4,7 +4,7 @@ export function mapObject<K extends string, V1, V2>(
   object: ObjMap<K, V1>,
   mapper: (v: V1, k: K) => V2,
 ): ObjMap<K, V2> {
-  return Object.keys(object)
+  return (Object.keys(object) as K[])
     .map<[ K, V1 ]>((key: K) => [ key, object[key] ])
     .reduce((memo, next) => {
       const [ key, val ] = next;
