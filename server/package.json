@@ -8,10 +8,10 @@
     "node": ">=8.7.0 <9"
   },
   "scripts": {
-    "start": "ts-node index.ts",
-    "lint": "tslint --project . --type-check && echo lint OK",
+    "start": "check-node-version --package && ts-node index.ts",
+    "lint": "check-node-version --package && tslint --project . --type-check && echo lint OK",
     "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
-    "test": "mocha --require ts-node/register $(npm run --silent test-list)",
+    "test": "check-node-version --package && mocha --require ts-node/register $(npm run --silent test-list)",
     "test-watch": "mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
     "test-list": "find . -name '*.spec.ts' -not -path './node_modules/*'",
     "precommit": "npm run lint && npm test"
@@ -32,6 +32,7 @@
     "@types/pouchdb": "^6.3.1",
     "body-parser": "^1.18.2",
     "chai": "^4.1.2",
+    "check-node-version": "^3.1.1",
     "chokidar-cli": "^1.2.0",
     "cors": "^2.8.4",
     "express": "^4.16.2",
