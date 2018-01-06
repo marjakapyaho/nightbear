@@ -1,0 +1,19 @@
+{
+  "name": "nightbear-router",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "npm": "~3.10",
+    "node": "~6.10"
+  },
+  "scripts": {
+  },
+  "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
+  "contributors": [
+    "Jarno Rantanen <jarno@jrw.fi>"
+  ],
+  "license": "AGPL",
+  "dependencies": {
+  }
+}
