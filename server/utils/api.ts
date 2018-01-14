@@ -8,13 +8,17 @@ export function createNodeContext(): Context {
   };
 }
 
+export interface Headers {
+  [header: string]: string;
+}
+
 export interface Request {
   requestId: string;
   requestMethod: string;
   requestPath: string;
   requestParams: { [param: string]: string };
-  requestHeaders: object;
-  requestBody: object;
+  requestHeaders: Headers;
+  requestBody: object | string;
 }
 
 export interface ResponsePayload {
