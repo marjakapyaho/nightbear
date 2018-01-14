@@ -5,6 +5,7 @@ const PROXIED_HEADERS = [
   'authorization',
   'content-type',
   'user-agent',
+  'x-request-id',
 ];
 
 export function proxyRequest(
@@ -18,7 +19,7 @@ export function proxyRequest(
         url: outgoingUrl,
         method: incomingRequest.requestMethod,
         data: incomingRequest.requestBody,
-        headers: getProxiedHeaders(incomingRequest.requestHeaders),
+        headers: getProxiedHeaders(incomingRequest.requestHeaders, incomingRequest.requestId),
         params: incomingRequest.requestParams,
       })
         .then(
@@ -34,7 +35,7 @@ export function proxyRequest(
   ).then(results => results.reduce((memo, next) => Object.assign(memo, next), {}));
 }
 
-function getProxiedHeaders(headers: Headers): Headers {
+function getProxiedHeaders(headers: Headers, includeRequestId?: string): Headers {
   return Object.keys(headers)
     .map(key => [ key, headers[key] ])
     .reduce((memo, next) => {
@@ -43,5 +44,5 @@ function getProxiedHeaders(headers: Headers): Headers {
         memo[key] = val;
       }
       return memo;
-    }, {} as Headers);
+    }, includeRequestId ? { 'X-Request-ID': includeRequestId } : {} as Headers);
 }
