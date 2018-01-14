@@ -45,7 +45,7 @@ export interface DexcomSensorEntry {
   readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
-  readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
+  readonly bloodGlucose: number | null; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   // DexcomSensorEntry:
   readonly signalStrength: number; // i.e. "rssi"
   readonly noiseLevel: number;
@@ -58,7 +58,7 @@ export interface DexcomRawSensorEntry {
   readonly modelMeta?: ModelMeta;
   // SensorEntry:
   readonly timestamp: number;
-  readonly bloodGlucose: number; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
+  readonly bloodGlucose: number | null; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
   // DexcomRawSensorEntry:
   readonly signalStrength: number; // i.e. "rssi"
   readonly noiseLevel: number;
@@ -94,10 +94,10 @@ export interface DexcomCalibration {
   readonly timestamp: number;
   readonly bloodGlucose: number[];
   readonly isInitialCalibration: boolean;
-  readonly slope: number;
-  readonly intercept: number;
+  readonly slope: number | null;
+  readonly intercept: number | null;
   // DexcomCalibration:
-  readonly scale: number;
+  readonly scale: number | null;
 }
 
 export interface NightbearCalibration {
