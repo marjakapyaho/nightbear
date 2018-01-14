@@ -11,16 +11,27 @@ export function proxyRequest(
   incomingRequest: Request,
   outgoingUrls: string[],
   axiosOverride: AxiosInstance = axios,
-): Promise<any> {
+): Promise<{ [outgoingUrl: string]: number }> {
   return Promise.all(
-    outgoingUrls.map(outgoingUrl => axiosOverride.request({
-      url: outgoingUrl,
-      method: incomingRequest.requestMethod,
-      data: incomingRequest.requestBody,
-      headers: getProxiedHeaders(incomingRequest.requestHeaders),
-      params: incomingRequest.requestParams,
-    })),
-  );
+    outgoingUrls.map(outgoingUrl =>
+      axiosOverride.request({
+        url: outgoingUrl,
+        method: incomingRequest.requestMethod,
+        data: incomingRequest.requestBody,
+        headers: getProxiedHeaders(incomingRequest.requestHeaders),
+        params: incomingRequest.requestParams,
+      })
+        .then(
+          res => res.status,
+          err => { // @see https://github.com/axios/axios#handling-errors
+            if (err.response) return err.response.status as number; // The request was made and the server responded with a status code that falls out of the range of 2xx
+            if (err.request) return 0; // The request was made but no response was received
+            throw new Error(`Could not proxy request: ${err}`); // Something happened in setting up the request that triggered an Error
+          },
+        )
+        .then(result => ({ [outgoingUrl]: result })),
+    ),
+  ).then(results => results.reduce((memo, next) => Object.assign(memo, next), {}));
 }
 
 function getProxiedHeaders(headers: Headers): Headers {
