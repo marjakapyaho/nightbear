@@ -45,6 +45,7 @@ describe('utils/proxy', () => {
                 headers: {
                   'Content-Type': 'text/plain',
                   'User-Agent': 'Amazon CloudFront',
+                  'X-Request-ID': '62c362a2-f949-11e7-907f-bf2bff7069b0',
                 },
                 params: {
                   foo: 'bar',
@@ -57,6 +58,7 @@ describe('utils/proxy', () => {
                 headers: {
                   'Content-Type': 'text/plain',
                   'User-Agent': 'Amazon CloudFront',
+                  'X-Request-ID': '62c362a2-f949-11e7-907f-bf2bff7069b0',
                 },
                 params: {
                   foo: 'bar',
