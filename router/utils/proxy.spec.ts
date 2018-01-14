@@ -30,7 +30,7 @@ describe('utils/proxy', () => {
       const fakeAxios = {
         request(args: object) {
           axiosArgs.push(args);
-          return Promise.resolve();
+          return Promise.resolve({ status: 200 });
         },
       } as any;
       return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, fakeAxios)
@@ -63,6 +63,26 @@ describe('utils/proxy', () => {
                 },
               },
             ],
+          );
+        });
+    });
+
+    it('resolves with the status of all operations', () => {
+      const fakeAxios = {
+        request(args: any) {
+          return args.url === 'http://one.com/'
+            ? Promise.resolve({ status: 200 })
+            : Promise.reject({ response: { status: 404 } });
+        },
+      } as any;
+      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, fakeAxios)
+        .then(res => {
+          assert.deepEqual(
+            res,
+            {
+              'http://one.com/': 200,
+              'http://two.com/': 404,
+            },
           );
         });
     });
