@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { proxyRequest } from './proxy';
+import { proxyRequest, DEFAULT_TIMEOUT } from './proxy';
 
 describe('utils/proxy', () => {
 
@@ -40,7 +40,7 @@ describe('utils/proxy', () => {
           return Promise.resolve({ status: 200 });
         },
       } as any;
-      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, PROXIED_HEADERS, fakeAxios)
+      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, PROXIED_HEADERS, undefined, fakeAxios)
         .then(() => {
           assert.deepEqual(
             axiosArgs,
@@ -57,6 +57,7 @@ describe('utils/proxy', () => {
                 params: {
                   foo: 'bar',
                 },
+                timeout: DEFAULT_TIMEOUT,
               },
               {
                 url: 'http://two.com/',
@@ -70,6 +71,7 @@ describe('utils/proxy', () => {
                 params: {
                   foo: 'bar',
                 },
+                timeout: DEFAULT_TIMEOUT,
               },
             ],
           );
@@ -84,7 +86,7 @@ describe('utils/proxy', () => {
             : Promise.reject({ response: { status: 404, statusText: 'Not Found', data: null, headers: {} } });
         },
       } as any;
-      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, [], fakeAxios)
+      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, [], undefined, fakeAxios)
         .then(res => {
           assert.deepEqual(
             res,
