@@ -25,6 +25,13 @@ describe('utils/proxy', () => {
       'http://two.com/',
     ];
 
+    const PROXIED_HEADERS = [
+      'authorization',
+      'content-type',
+      'user-agent',
+      'x-request-id',
+    ];
+
     it('calls axios with correct params', () => {
       const axiosArgs: object[] = [];
       const fakeAxios = {
@@ -33,7 +40,7 @@ describe('utils/proxy', () => {
           return Promise.resolve({ status: 200 });
         },
       } as any;
-      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, fakeAxios)
+      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, PROXIED_HEADERS, fakeAxios)
         .then(() => {
           assert.deepEqual(
             axiosArgs,
@@ -77,7 +84,7 @@ describe('utils/proxy', () => {
             : Promise.reject({ response: { status: 404, statusText: 'Not Found', data: null, headers: {} } });
         },
       } as any;
-      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, fakeAxios)
+      return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, [], fakeAxios)
         .then(res => {
           assert.deepEqual(
             res,
