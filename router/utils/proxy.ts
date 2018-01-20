@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Request, Headers } from '../../server/utils/api';
 
+export const DEFAULT_TIMEOUT = 10000;
+
 export interface ProxyResponse {
   data: any;
   status: number;
@@ -12,6 +14,7 @@ export function proxyRequest(
   incomingRequest: Request,
   outgoingUrls: string[],
   proxiedHeaders: string[] = [],
+  timeoutAfter: number = DEFAULT_TIMEOUT,
   axiosOverride: AxiosInstance = axios,
 ): Promise<{ [outgoingUrl: string]: ProxyResponse }> {
   return Promise.all(
@@ -25,11 +28,12 @@ export function proxyRequest(
           { 'X-Request-ID': incomingRequest.requestId, ...incomingRequest.requestHeaders },
           proxiedHeaders,
         ),
+        timeout: timeoutAfter,
       })
         .then(simplifyResponse)
         .catch(err => { // @see https://github.com/axios/axios#handling-errors
           if (err.response) return simplifyResponse(err.response); // The request was made and the server responded with a status code that falls out of the range of 2xx
-          if (err.request) return errorResponse('No response to request'); // The request was made but no response was received
+          if (err.request) return errorResponse('Request Timed Out'); // The request was made but no response was received
           throw new Error(`Could not proxy request: ${err}`); // Something happened in setting up the request that triggered an Error
         })
         .then(result => ({ [outgoingUrl]: result })),
