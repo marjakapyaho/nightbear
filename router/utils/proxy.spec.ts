@@ -69,12 +69,12 @@ describe('utils/proxy', () => {
         });
     });
 
-    it('resolves with the status of all operations', () => {
+    it('resolves with the result of all operations', () => {
       const fakeAxios = {
         request(args: any) {
           return args.url === 'http://one.com/'
-            ? Promise.resolve({ status: 200 })
-            : Promise.reject({ response: { status: 404 } });
+            ? Promise.resolve({ status: 200, statusText: 'OK', data: null, headers: {} })
+            : Promise.reject({ response: { status: 404, statusText: 'Not Found', data: null, headers: {} } });
         },
       } as any;
       return proxyRequest(SAMPLE_REQUEST, OUTGOING_URLS, fakeAxios)
@@ -82,8 +82,8 @@ describe('utils/proxy', () => {
           assert.deepEqual(
             res,
             {
-              'http://one.com/': 200,
-              'http://two.com/': 404,
+              'http://one.com/': { status: 200, statusText: 'OK', data: null, headers: {} },
+              'http://two.com/': { status: 404, statusText: 'Not Found', data: null, headers: {} },
             },
           );
         });
