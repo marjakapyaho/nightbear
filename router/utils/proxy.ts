@@ -1,13 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Request, Headers } from '../../server/utils/api';
 
-const PROXIED_HEADERS = [
-  'authorization',
-  'content-type',
-  'user-agent',
-  'x-request-id',
-];
-
 export interface ProxyResponse {
   data: any;
   status: number;
@@ -18,6 +11,7 @@ export interface ProxyResponse {
 export function proxyRequest(
   incomingRequest: Request,
   outgoingUrls: string[],
+  proxiedHeaders: string[] = [],
   axiosOverride: AxiosInstance = axios,
 ): Promise<{ [outgoingUrl: string]: ProxyResponse }> {
   return Promise.all(
@@ -26,8 +20,11 @@ export function proxyRequest(
         url: outgoingUrl,
         method: incomingRequest.requestMethod,
         data: incomingRequest.requestBody,
-        headers: getProxiedHeaders(incomingRequest.requestHeaders, incomingRequest.requestId),
         params: incomingRequest.requestParams,
+        headers: filterHeaders(
+          { 'X-Request-ID': incomingRequest.requestId, ...incomingRequest.requestHeaders },
+          proxiedHeaders,
+        ),
       })
         .then(simplifyResponse)
         .catch(err => { // @see https://github.com/axios/axios#handling-errors
@@ -40,16 +37,16 @@ export function proxyRequest(
   ).then(results => results.reduce((memo, next) => Object.assign(memo, next), {}));
 }
 
-function getProxiedHeaders(headers: Headers, includeRequestId?: string): Headers {
+function filterHeaders(headers: Headers, proxiedHeaders: string[]): Headers {
   return Object.keys(headers)
     .map(key => [ key, headers[key] ])
     .reduce((memo, next) => {
       const [ key, val ] = next;
-      if (PROXIED_HEADERS.indexOf(key.toLowerCase()) !== -1) {
+      if (proxiedHeaders.indexOf(key.toLowerCase()) !== -1) {
         memo[key] = val;
       }
       return memo;
-    }, includeRequestId ? { 'X-Request-ID': includeRequestId } : {} as Headers);
+    }, {} as Headers);
 }
 
 function simplifyResponse(response: AxiosResponse): ProxyResponse {
