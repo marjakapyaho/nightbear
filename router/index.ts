@@ -20,9 +20,13 @@ lambda.handler = (event: any, context: any, callback: any) => {
 
   proxyRequest(request, urls, proxiedHeaders, timeoutAfter).then(
     res => {
-      Object.keys(res).forEach(outgoingUrl => {
-        logInfo(`${request.requestMethod} ${request.requestPath} => ${outgoingUrl} => ${res[outgoingUrl].status || ''} ${res[outgoingUrl].statusText}`);
-      });
+      if (urls.length) {
+        urls.forEach(url => {
+          logInfo(`${request.requestMethod} ${request.requestPath} => ${url} => ${res[url].status || ''} ${res[url].statusText}`);
+        });
+      } else {
+        logInfo(`${request.requestMethod} ${request.requestPath} => NO-OP`);
+      }
       logDebug({ incoming: request.requestPath, outgoing: res });
       callback(null, { statusCode: 200 });
     },
