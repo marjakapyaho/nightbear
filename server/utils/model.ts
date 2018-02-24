@@ -85,6 +85,11 @@ export type Calibration
   | NightbearCalibration
   ;
 
+export interface MeterEntry {
+  readonly bloodGlucose: number;
+  readonly measuredAt: number;
+}
+
 export interface DexcomCalibration {
   // Model:
   readonly modelType: 'DexcomCalibration';
@@ -92,7 +97,7 @@ export interface DexcomCalibration {
   readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
-  readonly bloodGlucose: number[];
+  readonly meterEntries: MeterEntry[];
   readonly isInitialCalibration: boolean;
   readonly slope: number | null;
   readonly intercept: number | null;
@@ -107,7 +112,7 @@ export interface NightbearCalibration {
   readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
-  readonly bloodGlucose: number[];
+  readonly meterEntries: MeterEntry[];
   readonly isInitialCalibration: boolean;
   readonly slope: number;
   readonly intercept: number;
