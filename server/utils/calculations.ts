@@ -1,3 +1,5 @@
+export const NOISE_LEVEL_LIMIT = 4;
+
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export function changeBloodGlucoseUnitToMmoll(glucoseInMgdl: number): number {
   return Math.round((glucoseInMgdl / 18) * 10) / 10;
@@ -22,4 +24,9 @@ export function calculateRaw(
   }
 
   return null;
+}
+
+// Is Dexcom entry valid
+export function isDexcomEntryValid(noise: number, sgv: number): boolean {
+  return noise < NOISE_LEVEL_LIMIT && sgv > 40;
 }

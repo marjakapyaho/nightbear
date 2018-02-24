@@ -1,6 +1,6 @@
 import { startExpressServer } from './utils/express';
 import { createNodeContext } from './utils/api';
-import { getServerStatus } from './api/getServerStatus';
+import { getServerStatus } from './api/getServerStatus/getServerStatus';
 
 const context = createNodeContext();
 

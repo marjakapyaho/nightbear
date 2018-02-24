@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
-import { Request } from '../utils/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../utils/model';
+import { Request } from '../../utils/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../utils/model';
 
 describe('api/uploadParakeetEntry', () => {
 
@@ -10,6 +10,7 @@ describe('api/uploadParakeetEntry', () => {
     timestamp: () => 1508672249758,
   };
 
+  // Mock requests
   const mockRequest: Request = {
     requestId: '',
     requestMethod: '',
@@ -31,11 +32,15 @@ describe('api/uploadParakeetEntry', () => {
     },
   };
 
+  // Mock objects
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     modelVersion: 1,
     timestamp: 1508672249758 - 2 * 14934,
-    bloodGlucose: [ 8.0 ],
+    meterEntries: [{
+      bloodGlucose: 8.0,
+      measuredAt: 1508672249758 - 3 * 14934,
+    }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -61,6 +66,7 @@ describe('api/uploadParakeetEntry', () => {
     geolocation: '60.193707,24.949396',
   };
 
+  // Assertations
   it('uploads parakeet entry with correct response', () => {
     return uploadParakeetEntry(mockRequest, context)
       .then(res => {
