@@ -1,4 +1,6 @@
 export const NOISE_LEVEL_LIMIT = 4;
+export const MIN_IN_MS = 60 * 1000;
+export const HOUR_IN_MS = 60 * MIN_IN_MS;
 
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export function changeBloodGlucoseUnitToMmoll(glucoseInMgdl: number): number {
