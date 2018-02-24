@@ -83,3 +83,41 @@ Same as in v1.0.
 * The Droid status led is no longer obscured by the bridge that holds in it place
 * There's a gap for doing the swipe-from-top Android gesture on the Droid
 * Other minor tweaks
+
+## Version 2.0
+
+Taken into use approx. 2017-11-19.
+
+### Components
+
+* Dexcom G4
+* Samsung I9505 Galaxy S4
+* Mophie Powerstation 6200 mAh
+* Custom 3D printed case & internal cable holder
+* USB OTG y-cable & other USB cabling
+
+### Notable changes
+
+* Fully redesigned the case using parametrized models in OpenSCAD
+* Case contains a power bank, which charges itself and the phone while plugged in, and the phone when not plugged in
+* Remaining power can be viewed from the side of the case (see last pic)
+
+### Images
+
+![gif-01](2.0/rig-body.gif)
+
+[Click here for an interactive 3D version](2.0/rig-body.stl)
+
+![gif-02](2.0/rig-lid.gif)
+
+[Click here for an interactive 3D version](2.0/rig-lid.stl)
+
+![image-01](2.0/2.0-01.jpg)
+
+![image-02](2.0/2.0-02.jpg)
+
+![image-03](2.0/2.0-03.jpg)
+
+![image-04](2.0/2.0-04.jpg)
+
+![image-05](2.0/2.0-05.jpg)
