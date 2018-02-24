@@ -39,7 +39,7 @@ export function parseParakeetEntry(
     modelType: 'ParakeetSensorEntry',
     modelVersion: 1,
     timestamp,
-    bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
+    bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number),
     measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
     rawFiltered: filtered,
     rawUnfiltered: unfiltered,
@@ -69,7 +69,10 @@ function getLatestCalibration(timestamp: number): DexcomCalibration {
     modelType: 'DexcomCalibration',
     modelVersion: 1,
     timestamp,
-    bloodGlucose: [ 4.5 ],
+    meterEntries: [{
+      bloodGlucose: 7.7,
+      measuredAt: 2343242424,
+    }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
