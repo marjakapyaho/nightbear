@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, parseCalibration } from './uploadDexcomEntry';
-import { Request } from '../utils/api';
-import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from '../utils/model';
+import { Request } from '../../utils/api';
+import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from '../../utils/model';
 
 describe('api/uploadDexcomEntry', () => {
 
