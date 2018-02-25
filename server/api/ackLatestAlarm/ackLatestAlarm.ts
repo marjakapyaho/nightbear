@@ -44,7 +44,7 @@ export function getProfileSettings(timestamp: number): Profile {
     },
     analyserSettings: {
       HIGH_LEVEL_REL: 6,
-      TIME_SINCE_SGV_LIMIT: 5,
+      TIME_SINCE_BG_LIMIT: 5,
       BATTERY_LIMIT: 2,
       LOW_LEVEL_ABS: 7,
       ALARM_EXPIRE: 6,

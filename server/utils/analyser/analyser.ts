@@ -1,6 +1,6 @@
 import { chain, find, filter, some } from 'lodash';
-import { Alarm, AnalyserEntry, Carbs, DeviceStatus, Insulin, Profile, SensorEntry } from './model';
-import { calculateSlopesForEntries, HOUR_IN_MS, MIN_IN_MS } from './calculations';
+import { Alarm, AnalyserEntry, Carbs, DeviceStatus, Insulin, Profile, SensorEntry } from '../model';
+import { parseAnalyserEntries, HOUR_IN_MS, MIN_IN_MS } from '../calculations';
 
 export const STATUS_OUTDATED = 'outdated';
 export const STATUS_HIGH = 'high';
@@ -23,8 +23,13 @@ export const state = {
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 2;
 const LOW_CLEARING_THRESHOLD = 2;
+const slopeLimits = {
+  SLOW: 0.3,
+  MEDIUM: 0.7,
+  FAST: 1.3,
+};
 
-export function runAnalysis(
+export function initAnalysis(
   currentTimestamp: number,
   activeProfile: Profile,
   sensorEntries: SensorEntry[],
@@ -33,8 +38,22 @@ export function runAnalysis(
   deviceStatus: DeviceStatus,
   latestAlarms: Alarm[]) {
 
+  // Change SensorEntries to AnalyserEntries
+  const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
+
+  runAnalysis(currentTimestamp, activeProfile, entries, insulin, carbs, deviceStatus, latestAlarms);
+}
+
+export function runAnalysis(
+  currentTimestamp: number,
+  activeProfile: Profile,
+  entries: AnalyserEntry[],
+  insulin: Insulin[],
+  carbs: Carbs[],
+  deviceStatus: DeviceStatus,
+  latestAlarms: Alarm[]) {
+
   const settings = activeProfile.analyserSettings;
-  const entries: AnalyserEntry[] = calculateSlopesForEntries(sensorEntries);
   const latestEntry = chain(entries).sortBy('timestamp').last().value();
 
   state[STATUS_BATTERY] = deviceStatus.batteryLevel < settings.BATTERY_LIMIT;
@@ -44,7 +63,7 @@ export function runAnalysis(
     return state;
   }
 
-  state[STATUS_OUTDATED] = currentTimestamp - latestEntry.timestamp > settings.TIME_SINCE_SGV_LIMIT;
+  state[STATUS_OUTDATED] = (currentTimestamp - latestEntry.timestamp) > settings.TIME_SINCE_BG_LIMIT * MIN_IN_MS;
 
   const latestBG = latestEntry.bloodGlucose;
 
@@ -52,19 +71,21 @@ export function runAnalysis(
     return state;
   }
 
-  if (checkForNoiseOrCompression(insulin, carbs)) {
+  if (checkForCompressionLow(entries, activeProfile, insulin, carbs)) {
     return state;
   }
 
   state[STATUS_LOW] = detectLow(latestBG, settings.LOW_LEVEL_ABS, latestAlarms);
 
-  state[STATUS_FALLING] = detectFalling(latestBG, settings.LOW_LEVEL_REL);
+  state[STATUS_FALLING] = detectFalling(latestEntry, settings.LOW_LEVEL_REL);
 
   state[STATUS_HIGH] = detectStatusHigh(latestBG, settings.HIGH_LEVEL_ABS, latestAlarms);
 
   state[STATUS_PERSISTENT_HIGH] = detectPersistentHigh(entries, currentTimestamp, latestEntry, settings.HIGH_LEVEL_ABS, settings.HIGH_LEVEL_REL);
 
-  state[STATUS_RISING] = detectRising(latestBG, settings.HIGH_LEVEL_REL);
+  state[STATUS_RISING] = detectRising(latestEntry, settings.HIGH_LEVEL_REL);
+
+  return state;
 }
 
 function detectStatusHigh(latestBG: number, highLevel: number, latestAlarms: Alarm[]) {
@@ -86,8 +107,15 @@ function detectPersistentHigh(entries: AnalyserEntry[], currentTimestamp: number
   const hasCounterConditions = some(relevantTimeWindow, entry => {
     const isAboveHigh = entry.bloodGlucose > highLevelAbs;
     const isBelowRelativeHigh = entry.bloodGlucose < highLevelRel;
-    const isChanging = false; // TODO: check that slopes are not going down or up too fast
-    return isAboveHigh || isBelowRelativeHigh || isChanging;
+    let isFalling = false;
+    let isRisingFast = false;
+
+    // If slope is going down at all or up fast, suppress persistent high
+    if (entry.slope) {
+      isFalling = entry.slope < 0;
+      isRisingFast = entry.slope > slopeLimits.FAST;
+    }
+    return isAboveHigh || isBelowRelativeHigh || isFalling || isRisingFast;
   });
 
   return haveWideEnoughWindow && haveEnoughDataPoints && !hasCounterConditions;
@@ -97,16 +125,16 @@ function detectLow(latestBG: number, lowLevel: number, latestAlarms: Alarm[]) {
   return latestBG < lowLevel + (find(latestAlarms, { type: STATUS_LOW }) ? LOW_CLEARING_THRESHOLD : 0);
 }
 
-function detectRising(latestBG: number, highLevelRel: number) {
-  return !state[STATUS_HIGH] && latestBG > highLevelRel; // TODO: slope is up
+function detectRising(entry: AnalyserEntry, highLevelRel: number) {
+  return !state[STATUS_HIGH] && entry.bloodGlucose > highLevelRel && !!entry.slope && entry.slope > slopeLimits.MEDIUM;
 }
 
-function detectFalling(latestBG: number, lowLevelRel: number) {
-  return !state[STATUS_LOW] && latestBG < lowLevelRel;  // TODO: slope is down
+function detectFalling(entry: AnalyserEntry, lowLevelRel: number) {
+  return !state[STATUS_LOW] && entry.bloodGlucose < lowLevelRel && !!entry.slope && entry.slope < -slopeLimits.MEDIUM;
 }
 
-function checkForNoiseOrCompression(insulin: Insulin[], carbs: Carbs[]) {
-  console.log(insulin, carbs); // tslint:disable-line:no-console
+function checkForCompressionLow(entries: AnalyserEntry[], activeProfile: Profile, insulin: Insulin[], carbs: Carbs[]) {
+  console.log(entries, insulin, carbs, activeProfile); // tslint:disable-line:no-console
   // TODO: compression detection
 
   /* let latestBolus = _.findLast(_.sortBy(latestTreatments, 'date'), (treatment) => treatment.insulin > 0 );
