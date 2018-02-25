@@ -18,7 +18,7 @@ function createModelMeta(model: Model): CouchDbModelMeta {
 export function createCouchDbStorage(dbUrl: string): Storage {
   const db = new PouchDB(dbUrl);
   return {
-    saveModel<T extends Model>(model: T): Promise<T> {
+    saveModel<T extends Model>(model: T) {
       const modelMeta = createModelMeta(model);
       const { _id, _rev, modelVersion } = modelMeta;
       const doc: PouchDB.Core.PutDocument<Model> = {
@@ -36,7 +36,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           throw new Error(`Couldn't save model "${modelMeta._id}": ${errObj.message}`); // refine the error before giving it out
         });
     },
-    loadTimelineModels(fromTimePeriod: number): Promise<Model[]> {
+    loadTimelineModels(fromTimePeriod) {
       return db.allDocs({
         include_docs: true,
         startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
