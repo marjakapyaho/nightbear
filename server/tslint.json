@@ -9,6 +9,7 @@
     "object-literal-sort-keys": false,
     "ordered-imports": [ false ],
     "quotemark": [ true, "single", "avoid-escape", "jsx-double" ],
-    "one-line": false
+    "one-line": false,
+    "no-shadowed-variable": false
   }
 }
