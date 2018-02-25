@@ -5,7 +5,7 @@ import * as PouchDB from 'pouchdb';
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
   loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
-  loadOtherModels(): Promise<Model[]>;
+  loadGlobalModels(): Promise<Model[]>;
 }
 
 function createModelMeta(model: Model): CouchDbModelMeta {
@@ -48,15 +48,15 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
     },
-    loadOtherModels() {
+    loadGlobalModels() {
       return db.allDocs({
         include_docs: true,
-        startkey: `${PREFIX_OTHER}/`,
-        endkey: `${PREFIX_OTHER}/_`,
+        startkey: `${PREFIX_GLOBAL}/`,
+        endkey: `${PREFIX_GLOBAL}/_`,
       })
         .then(res => res.rows.map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't load other models: ${errObj.message}`); // refine the error before giving it out
+          throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
         });
     },
   };
@@ -82,7 +82,7 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
 }
 
 const PREFIX_TIMELINE = 'timeline';
-const PREFIX_OTHER = 'other';
+const PREFIX_GLOBAL = 'global';
 
 export function getStorageKey(model: Model): string {
   switch (model.modelType) {
@@ -101,9 +101,9 @@ export function getStorageKey(model: Model): string {
     case 'Hba1c':
       return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}`;
     case 'Settings':
-      return `${PREFIX_OTHER}/${model.modelType}`;
+      return `${PREFIX_GLOBAL}/${model.modelType}`;
     case 'Profile':
-      return `${PREFIX_OTHER}/${model.modelType}/${model.profileName}`;
+      return `${PREFIX_GLOBAL}/${model.modelType}/${model.profileName}`;
     default:
       return assertExhausted(model);
   }

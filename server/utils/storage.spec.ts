@@ -33,10 +33,10 @@ describe('utils/storage', () => {
       );
     });
 
-    it('works for other models', () => {
+    it('works for global models', () => {
       assert.equal(
         getStorageKey(MODEL_2),
-        'other/Settings',
+        'global/Settings',
       );
     });
 
@@ -73,10 +73,10 @@ describe('utils/storage', () => {
         .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
     });
 
-    it('loads other models', () => {
+    it('loads global models', () => {
       return storage.saveModel(MODEL_2)
         .catch(() => null) // if the Model already existed, this will fail, but for the purposes of this test, it doesn't matter
-        .then(() => storage.loadOtherModels())
+        .then(() => storage.loadGlobalModels())
         .then(loadedModels => assertEqualWithoutMeta(
           loadedModels.find(model => model.modelType === MODEL_2.modelType) as any, // cheating is allowed in test code
           MODEL_2,
