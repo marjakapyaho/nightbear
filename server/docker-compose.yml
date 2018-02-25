@@ -25,6 +25,17 @@ services:
       - "nginx-data:/etc/nginx/vhost.d"
       - "nginx-data:/usr/share/nginx/html"
 
+  server-stage:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "server-stage.nightbear.fi"
+      VIRTUAL_HOST: "server-stage.nightbear.fi"
+
 volumes:
   nginx-data:
   nginx-certs:
