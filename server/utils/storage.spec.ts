@@ -7,14 +7,12 @@ describe('utils/storage', () => {
 
   const MODEL_1: Carbs = {
     modelType: 'Carbs',
-    modelVersion: 1,
     timestamp: 1508092667717, // i.e. Sun Oct 15 2017 21:37:47 GMT+0300 (EEST)
     amount: 10,
     carbsType: 'normal',
   };
   const MODEL_2: Settings = {
     modelType: 'Settings',
-    modelVersion: 1,
     alarmsEnabled: false,
   };
 

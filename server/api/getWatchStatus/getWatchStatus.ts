@@ -13,7 +13,6 @@ export function getDeviceStatus(timestamp: number): DeviceStatus {
   console.log(timestamp); // tslint:disable-line:no-console
   return {
     modelType: 'DeviceStatus',
-    modelVersion: 1,
     deviceName: 'dexcom',
     timestamp: 324234324,
     batteryLevel: 80,
@@ -26,7 +25,6 @@ export function getActiveAlarms(timestamp: number): Alarm[] {
   console.log(timestamp); // tslint:disable-line:no-console
   return [{
     modelType: 'Alarm',
-    modelVersion: 1,
     creationTimestamp: 324234324,
     validAfterTimestamp: 234432423,
     alarmLevel: 1,

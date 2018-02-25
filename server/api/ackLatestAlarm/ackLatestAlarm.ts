@@ -37,7 +37,6 @@ export function getProfileSettings(timestamp: number): Profile {
   console.log(timestamp); // tslint:disable-line:no-console
   return {
     modelType: 'Profile',
-    modelVersion: 1,
     profileName: 'night',
     activatedAt: {
       hours: 1,
@@ -91,7 +90,6 @@ export function getActiveAlarms(timestamp: number): Alarm[] {
   console.log(timestamp); // tslint:disable-line:no-console
   return [{
     modelType: 'Alarm',
-    modelVersion: 1,
     creationTimestamp: 324234324,
     validAfterTimestamp: 234432423,
     alarmLevel: 1,

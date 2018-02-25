@@ -40,7 +40,6 @@ export function parseInsulinEntry(
 ): Insulin {
   return {
     modelType: 'Insulin',
-    modelVersion: 1,
     timestamp,
     amount: insulin,
     insulinType: 'Humalog',
@@ -53,7 +52,6 @@ export function parseCarbsEntry(
 ): Carbs {
   return {
     modelType: 'Carbs',
-    modelVersion: 1,
     timestamp,
     amount: carbs,
     carbsType: 'normal',

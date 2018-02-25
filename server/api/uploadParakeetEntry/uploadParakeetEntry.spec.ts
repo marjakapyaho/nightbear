@@ -35,7 +35,6 @@ describe('api/uploadParakeetEntry', () => {
   // Mock objects
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp: 1508672249758 - 2 * 14934,
     meterEntries: [{
       bloodGlucose: 8.0,
@@ -49,7 +48,6 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockParakeetSensorEntry: ParakeetSensorEntry = {
     modelType: 'ParakeetSensorEntry',
-    modelVersion: 1,
     timestamp: 1508672249758,
     bloodGlucose: 9.3, // was 8.7 with the old server
     measuredAtTimestamp: 1508672249758 - 14934,
@@ -59,7 +57,6 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
-    modelVersion: 1,
     deviceName: 'parakeet',
     timestamp: 1508672249758,
     batteryLevel: 80,

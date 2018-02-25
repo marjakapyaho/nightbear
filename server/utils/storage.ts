@@ -38,15 +38,17 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
   assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
   assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
-  assert(doc.modelVersion === 1, 'Expected current "modelVersion" property when reviving', doc);
+  assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
+  assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
   // Strip away the CouchDB document metadata:
   const { _id, _rev } = doc;
+  const { modelVersion } = doc.modelMeta;
   Object.keys(doc).forEach(key => {
     if (key.startsWith('_')) delete doc[key];
   });
   // Turn into standard Model object:
   const model: Model = doc;
-  const modelMeta: CouchDbModelMeta = { _id, _rev };
+  const modelMeta: CouchDbModelMeta = { _id, _rev, modelVersion };
   return { ...model, modelMeta };
 }
 
