@@ -5,6 +5,7 @@ import * as PouchDB from 'pouchdb';
 type StoredModel<T extends Model>
   = T
   & { _id: string; _rev?: string; }
+  & PouchDB.Core.ChangesMeta // note: I'm not a 100% sure why the PouchDB types want this, as the fields are all optional, but oh well
   ;
 
 export interface Storage {
