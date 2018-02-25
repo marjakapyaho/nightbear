@@ -1,7 +1,15 @@
 import 'mocha';
 import { assert } from 'chai';
-import { getStorageKey, createCouchDbStorage, stripModelMeta } from './storage';
-import { Carbs, Settings } from './model';
+import { Storage, getStorageKey, createCouchDbStorage } from './storage';
+import { Carbs, Settings, Model } from './model';
+
+// Asserts deep equality of 2 Models, ignoring their metadata
+function assertEqualWithoutMeta(actual: Model, expected: Model): void {
+  assert.deepEqual(
+    Object.assign({}, actual, { modelMeta: undefined }),
+    Object.assign({}, expected, { modelMeta: undefined }),
+  );
+}
 
 describe('utils/storage', () => {
 
@@ -38,26 +46,55 @@ describe('utils/storage', () => {
   const TEST_DB_URL = process.env.TEST_DB_URL || null;
   (TEST_DB_URL ? describe : xdescribe)('createCouchDbStorage()', () => {
 
+    let storage: Storage;
+    let timestamp: number;
+    let model: Carbs;
+
+    function findModel(models: Model[]): Model {
+      const found = models.find(m => m.modelType === model.modelType && m.timestamp === model.timestamp);
+      if (found) return found;
+      throw new Error(`Couldn't find the Model this test case is operating on`);
+    }
+
+    beforeEach(() => {
+      storage = createCouchDbStorage(TEST_DB_URL + '');
+      timestamp = Date.now(); // we need to have unique timestamps, lest we get document conflicts from CouchDB
+      model = { ...MODEL_1, timestamp };
+    });
+
     it('saves models', () => {
-      const storage = createCouchDbStorage(TEST_DB_URL + '');
-      const expected = { ...MODEL_1, timestamp: Date.now() }; // we need to have unique timestamps, lest we get document conflicts from CouchDB
-      return storage.saveModel(expected)
-        .then(actual => assert.deepEqual(actual, expected));
+      return storage.saveModel(model)
+        .then(actual => assertEqualWithoutMeta(actual, model));
     });
 
     it('loads models', () => {
-      const storage = createCouchDbStorage(TEST_DB_URL + '');
-      const expected = { ...MODEL_1, timestamp: Date.now() }; // we need to have unique timestamps, lest we get document conflicts from CouchDB
-      return storage.saveModel(expected)
+      return storage.saveModel(model)
         .then(() => storage.loadTimelineModels(1000 * 60))
-        .then(loadedModels => {
-          const actual = loadedModels.find(model => model.modelType === 'Carbs' && model.timestamp === expected.timestamp);
-          if (actual) {
-            assert.deepEqual(stripModelMeta(actual), expected);
-          } else {
-            assert.fail('Model not found :(');
-          }
-        });
+        .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
+    });
+
+    it('saves models that have been saved before', () => {
+      assert.equal(model.amount, 10); // check baseline assumptions
+      return storage.saveModel(model)
+        .then(savedModel => ({ ...savedModel, amount: 123 }))
+        .then(storage.saveModel)
+        .then(savedModel => assertEqualWithoutMeta(
+          savedModel,
+          { ...model, amount: 123 },
+        ));
+    });
+
+    it('saves models that have been loaded before', () => {
+      assert.equal(model.amount, 10); // check baseline assumptions
+      return storage.saveModel(model)
+        .then(() => storage.loadTimelineModels(1000 * 60))
+        .then(loadedModels => findModel(loadedModels))
+        .then(loadedModel => ({ ...loadedModel, amount: 123 }))
+        .then(storage.saveModel)
+        .then(savedModel => assertEqualWithoutMeta(
+          savedModel,
+          { ...model, amount: 123 },
+        ));
     });
 
   });

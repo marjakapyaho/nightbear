@@ -1,25 +1,40 @@
-import { Model, CouchDbModelMeta } from './model';
+import { Model, CouchDbModelMeta, MODEL_VERSION } from './model';
 import { assertExhausted, assert } from './types';
 import * as PouchDB from 'pouchdb';
-
-type StoredModel<T extends Model>
-  = T
-  & { _id: string; _rev?: string; }
-  & PouchDB.Core.ChangesMeta // note: I'm not a 100% sure why the PouchDB types want this, as the fields are all optional, but oh well
-  ;
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
   loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
 }
 
+function createModelMeta(model: Model): CouchDbModelMeta {
+  return {
+    _id: getStorageKey(model),
+    _rev: model.modelMeta && model.modelMeta._rev || null, // use existing _rev for Models that have already been saved before
+    modelVersion: MODEL_VERSION, // note that the version is fixed because since we're saving, the Model will be of the latest version
+  };
+}
+
 export function createCouchDbStorage(dbUrl: string): Storage {
   const db = new PouchDB(dbUrl);
   return {
     saveModel<T extends Model>(model: T): Promise<T> {
-      const doc: StoredModel<T> = { ...model as any, _id: getStorageKey(model) }; // see https://github.com/Microsoft/TypeScript/issues/14409 for the need for the "any"
-      return db.put(doc)
-        .then(() => model);
+      const modelMeta = createModelMeta(model);
+      const { _id, _rev, modelVersion } = modelMeta;
+      const doc: PouchDB.Core.PutDocument<Model> = {
+        ...model as Model, // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+        _id,
+        _rev: _rev || undefined,
+        modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
+      };
+      return db.put(doc) // save the doc in the DB
+        .then(res => {
+          const updatedMeta = { ...modelMeta, _rev: res.rev }; // update the model with the _rev assigned by the DB
+          return { ...model as Model, modelMeta: updatedMeta } as T; // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+        })
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't save model "${modelMeta._id}": ${errObj.message}`); // refine the error before giving it out
+        });
     },
     loadTimelineModels(fromTimePeriod: number): Promise<Model[]> {
       return db.allDocs({
@@ -27,7 +42,10 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
         endkey: `${PREFIX_TIMELINE}/_`,
       })
-        .then(res => res.rows.map(reviveCouchDbRowIntoModel));
+        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
+        });
     },
   };
 }
@@ -41,8 +59,7 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
   assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
   assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
   // Strip away the CouchDB document metadata:
-  const { _id, _rev } = doc;
-  const { modelVersion } = doc.modelMeta;
+  const { _id, _rev, modelMeta: { modelVersion } } = doc;
   Object.keys(doc).forEach(key => {
     if (key.startsWith('_')) delete doc[key];
   });
@@ -50,12 +67,6 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
   const model: Model = doc;
   const modelMeta: CouchDbModelMeta = { _id, _rev, modelVersion };
   return { ...model, modelMeta };
-}
-
-export function stripModelMeta(model: Model): Model {
-  const temp: any = model;
-  delete temp.modelMeta;
-  return temp;
 }
 
 const PREFIX_TIMELINE = 'timeline';
