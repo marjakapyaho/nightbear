@@ -71,6 +71,12 @@ export interface ParakeetSensorEntry {
   readonly rawUnfiltered: number;
 }
 
+export interface AnalyserEntry {
+  readonly timestamp: number;
+  readonly bloodGlucose: number;
+  readonly slope: number | null;
+}
+
 export type Calibration
   = DexcomCalibration
   | NightbearCalibration

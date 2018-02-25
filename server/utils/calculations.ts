@@ -1,3 +1,5 @@
+import {AnalyserEntry, SensorEntry} from './model';
+
 export const NOISE_LEVEL_LIMIT = 4;
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
@@ -31,4 +33,23 @@ export function calculateRaw(
 // Is Dexcom entry valid
 export function isDexcomEntryValid(noise: number, sgv: number): boolean {
   return noise < NOISE_LEVEL_LIMIT && sgv > 40;
+}
+
+export function calculateSlopesForEntries(entries: SensorEntry[]): AnalyserEntry[] {
+  return entries.map((entry, i) => {
+    if (!entry.bloodGlucose) return;
+
+    const currentBg = entry.bloodGlucose;
+    const currentTimestamp = entry.timestamp;
+    const previousEntry = entries[i - 1];
+    const previousBg = previousEntry ? previousEntry.bloodGlucose : null;
+    const previousTimestamp = previousEntry ? previousEntry.timestamp : null;
+    const slope = previousBg && previousTimestamp ? (currentBg - previousBg) / (currentTimestamp - previousTimestamp) * MIN_IN_MS * 5 : null;
+
+    return {
+      bloodGlucose: currentBg,
+      timestamp: currentTimestamp,
+      slope,
+    };
+  }).filter((entry): entry is AnalyserEntry => !!entry);
 }
