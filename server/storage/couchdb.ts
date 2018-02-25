@@ -1,20 +1,10 @@
-import { Model, CouchDbModelMeta, MODEL_VERSION } from './model';
-import { assertExhausted, assert } from './types';
 import * as PouchDB from 'pouchdb';
+import { Storage } from './storage';
+import { CouchDbModelMeta, Model, MODEL_VERSION } from '../utils/model';
+import { assert, assertExhausted } from '../utils/types';
 
-export interface Storage {
-  saveModel<T extends Model>(model: T): Promise<T>;
-  loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
-  loadGlobalModels(): Promise<Model[]>;
-}
-
-function createModelMeta(model: Model): CouchDbModelMeta {
-  return {
-    _id: getStorageKey(model),
-    _rev: model.modelMeta && model.modelMeta._rev || null, // use existing _rev for Models that have already been saved before
-    modelVersion: MODEL_VERSION, // note that the version is fixed because since we're saving, the Model will be of the latest version
-  };
-}
+const PREFIX_TIMELINE = 'timeline';
+const PREFIX_GLOBAL = 'global';
 
 export function createCouchDbStorage(dbUrl: string): Storage {
   const db = new PouchDB(dbUrl);
@@ -81,8 +71,13 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
   return { ...model, modelMeta };
 }
 
-const PREFIX_TIMELINE = 'timeline';
-const PREFIX_GLOBAL = 'global';
+function createModelMeta(model: Model): CouchDbModelMeta {
+  return {
+    _id: getStorageKey(model),
+    _rev: model.modelMeta && model.modelMeta._rev || null, // use existing _rev for Models that have already been saved before
+    modelVersion: MODEL_VERSION, // note that the version is fixed because since we're saving, the Model will be of the latest version
+  };
+}
 
 export function getStorageKey(model: Model): string {
   switch (model.modelType) {
