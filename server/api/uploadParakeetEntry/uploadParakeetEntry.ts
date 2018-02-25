@@ -1,6 +1,6 @@
 import { Response, Request, createResponse, Context } from '../../utils/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../utils/model';
-import { calculateRaw } from '../../utils/calculations';
+import { calculateRaw } from '../../utils/calculations/calculations';
 
 const PARAKEET_RESPONSE = '!ACK  0!'; // parakeet needs this response to work
 

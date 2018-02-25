@@ -11,6 +11,7 @@
     "quotemark": [ true, "single", "avoid-escape", "jsx-double" ],
     "one-line": false,
     "no-shadowed-variable": false,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "variable-name": false
   }
 }

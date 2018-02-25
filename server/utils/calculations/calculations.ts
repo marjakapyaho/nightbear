@@ -1,4 +1,5 @@
-import {AnalyserEntry, SensorEntry} from './model';
+import { chain, reduce, slice } from 'lodash';
+import { AnalyserEntry, SensorEntry } from '../model';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
@@ -36,6 +37,10 @@ export function isDexcomEntryValid(noise: number, sgv: number): boolean {
   return noise < NOISE_LEVEL_LIMIT && sgv > 40;
 }
 
+export function roundTo2Decimals(num: number) {
+  return Math.round(num * 100) / 100;
+}
+
 export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
 
   const analyserEntries: AnalyserEntry[] = entries
@@ -64,7 +69,7 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
     return {
       bloodGlucose: currentBg,
       timestamp: currentTimestamp,
-      slope: currentSlope,
+      slope: currentSlope ? roundTo2Decimals(currentSlope) : null,
     };
   });
 
@@ -74,11 +79,37 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
 }
 
 function detectNoise(entries: AnalyserEntry[]) {
-  console.log(entries); // tslint:disable-line:no-console
-  return [];
+  return entries.map(() => 0);
 }
 
 function smoothSlopesWithNoise(entries: AnalyserEntry[], noiseArray: number[]) {
-  console.log(noiseArray); // tslint:disable-line:no-console
-  return entries;
+  return chain(entries)
+    .map(makeWindow(noiseArray))
+    .map(average)
+    .value() as any; // TODO
+}
+
+function sum(entries: AnalyserEntry[]) {
+  return reduce(entries, (sumOfSlopes, entry) => sumOfSlopes + (entry.slope || 0), 0);
+}
+
+function average(entries: AnalyserEntry[]) {
+  const newSlope = sum(entries) / (entries.length || 1);
+  const middleIndex = Math.floor(entries.length / 2);
+  const currentEntry = entries[middleIndex];
+
+  return {
+    bloodGlucose: currentEntry.bloodGlucose,
+    timestamp: currentEntry.timestamp,
+    slope: roundTo2Decimals(newSlope),
+  };
+}
+
+function makeWindow(noiseArray: number[]) {
+  return (_number: number, index: number, entries: AnalyserEntry[]) => {
+    const noise = noiseArray[index];
+    const start = Math.max(0, index - noise);
+    const end   = Math.min(entries.length, index + noise + 1);
+    return slice(entries, start, end);
+  };
 }

@@ -1,7 +1,7 @@
 import { extend, find } from 'lodash';
 import { Response, Request, createResponse, Context } from '../../utils/api';
 import {DeviceStatus, DexcomCalibration, DexcomRawSensorEntry, DexcomSensorEntry, MeterEntry} from '../../utils/model';
-import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from '../../utils/calculations';
+import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from '../../utils/calculations/calculations';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',

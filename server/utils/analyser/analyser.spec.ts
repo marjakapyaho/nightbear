@@ -11,10 +11,10 @@ import {
   STATUS_RISING,
 } from './analyser';
 import { activeProfile } from './activeProfile';
-import { MIN_IN_MS } from '../calculations';
+import { MIN_IN_MS } from '../calculations/calculations';
 import { Alarm, Carbs, DeviceStatus, Insulin } from '../model';
 
-describe('api/uploadDexcomEntry', () => {
+describe('utils/analyser', () => {
 
   // Mock objects
   const currentTimestamp = 1508672249758;

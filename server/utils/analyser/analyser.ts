@@ -1,6 +1,6 @@
 import { chain, find, filter, some } from 'lodash';
 import { Alarm, AnalyserEntry, Carbs, DeviceStatus, Insulin, Profile, SensorEntry } from '../model';
-import { parseAnalyserEntries, HOUR_IN_MS, MIN_IN_MS } from '../calculations';
+import { parseAnalyserEntries, HOUR_IN_MS, MIN_IN_MS } from '../calculations/calculations';
 
 export const STATUS_OUTDATED = 'outdated';
 export const STATUS_HIGH = 'high';
