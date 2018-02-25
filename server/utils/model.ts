@@ -13,15 +13,7 @@ export type Model
   | Profile
   ;
 
-export type ModelMeta
-  = CouchDbModelMeta
-  ;
-
-export interface CouchDbModelMeta {
-  readonly _id: string;
-  readonly _rev: string | null;
-  readonly modelVersion: number; // MODEL_VERSION at the time the Model was persisted
-}
+export type ModelMeta = object; // this is storage-type specific
 
 export interface Sensor {
   // Model:

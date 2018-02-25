@@ -1,7 +1,13 @@
 import * as PouchDB from 'pouchdb';
 import { Storage } from './storage';
-import { CouchDbModelMeta, Model, MODEL_VERSION } from '../utils/model';
+import { Model, MODEL_VERSION } from '../utils/model';
 import { assert, assertExhausted } from '../utils/types';
+
+export interface CouchDbModelMeta {
+  readonly _id: string;
+  readonly _rev: string | null;
+  readonly modelVersion: number; // MODEL_VERSION at the time the Model was persisted
+}
 
 const PREFIX_TIMELINE = 'timeline';
 const PREFIX_GLOBAL = 'global';
@@ -9,7 +15,7 @@ const PREFIX_GLOBAL = 'global';
 export function createCouchDbStorage(dbUrl: string): Storage {
   const db = new PouchDB(dbUrl);
   return {
-    saveModel<T extends Model>(model: T) {
+    saveModel(model) {
       const modelMeta = createModelMeta(model);
       const { _id, _rev, modelVersion } = modelMeta;
       const doc: PouchDB.Core.PutDocument<Model> = {
@@ -20,8 +26,8 @@ export function createCouchDbStorage(dbUrl: string): Storage {
       };
       return db.put(doc) // save the doc in the DB
         .then(res => {
-          const updatedMeta = { ...modelMeta, _rev: res.rev }; // update the model with the _rev assigned by the DB
-          return { ...model as Model, modelMeta: updatedMeta } as T; // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+          const updatedMeta: CouchDbModelMeta = { ...modelMeta, _rev: res.rev }; // update the model with the _rev assigned by the DB
+          return { ...model as Model, modelMeta: updatedMeta } as any; // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
         })
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't save model "${modelMeta._id}": ${errObj.message}`); // refine the error before giving it out
@@ -71,10 +77,15 @@ function reviveCouchDbRowIntoModel({ doc }: any): Model {
   return { ...model, modelMeta };
 }
 
+function isModelMeta(meta: any): meta is CouchDbModelMeta {
+  return typeof meta === 'object' && meta['_id'];
+}
+
 function createModelMeta(model: Model): CouchDbModelMeta {
+  const meta = isModelMeta(model.modelMeta) ? model.modelMeta : null;
   return {
     _id: getStorageKey(model),
-    _rev: model.modelMeta && model.modelMeta._rev || null, // use existing _rev for Models that have already been saved before
+    _rev: meta ? meta._rev : null, // use existing _rev for Models that have already been saved before
     modelVersion: MODEL_VERSION, // note that the version is fixed because since we're saving, the Model will be of the latest version
   };
 }
