@@ -12,7 +12,7 @@ import {
 } from './analyser';
 import { activeProfile } from './activeProfile';
 import { MIN_IN_MS } from '../calculations/calculations';
-import { Alarm, Carbs, DeviceStatus, Insulin } from '../model';
+import { Alarm, Carbs, DeviceStatus, Insulin, SensorEntry } from '../model';
 
 describe('utils/analyser', () => {
 
@@ -30,9 +30,35 @@ describe('utils/analyser', () => {
     geolocation: null,
   };
 
-  const entries = [
-    { timestamp: currentTimestamp - 10 * MIN_IN_MS, bloodGlucose: 7, slope: 1 },
-    { timestamp: currentTimestamp - 5 * MIN_IN_MS, bloodGlucose: 7, slope: 1 },
+  const entries: SensorEntry[] = [
+    {
+      modelType: 'DexcomSensorEntry',
+      timestamp: currentTimestamp - 20 * MIN_IN_MS,
+      bloodGlucose: 8.5,
+      signalStrength: 1,
+      noiseLevel: 1,
+    },
+    {
+      modelType: 'DexcomSensorEntry',
+      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      bloodGlucose: 7,
+      signalStrength: 1,
+      noiseLevel: 1,
+    },
+    {
+      modelType: 'DexcomSensorEntry',
+      timestamp: currentTimestamp - 10 * MIN_IN_MS,
+      bloodGlucose: 7,
+      signalStrength: 1,
+      noiseLevel: 1,
+    },
+    {
+      modelType: 'DexcomSensorEntry',
+      timestamp: currentTimestamp - 5 * MIN_IN_MS,
+      bloodGlucose: 8,
+      signalStrength: 1,
+      noiseLevel: 1,
+    },
   ];
 
   // Assertations

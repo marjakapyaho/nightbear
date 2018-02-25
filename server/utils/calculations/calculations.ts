@@ -79,7 +79,7 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
 }
 
 function detectNoise(entries: AnalyserEntry[]) {
-  return entries.map(() => 0);
+  return entries.map(() => 0); // TODO: detect noise
 }
 
 function smoothSlopesWithNoise(entries: AnalyserEntry[], noiseArray: number[]) {

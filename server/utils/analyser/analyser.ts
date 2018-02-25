@@ -29,7 +29,7 @@ const slopeLimits = {
   FAST: 1.3,
 };
 
-export function initAnalysis(
+export function runAnalysis(
   currentTimestamp: number,
   activeProfile: Profile,
   sensorEntries: SensorEntry[],
@@ -38,22 +38,8 @@ export function initAnalysis(
   deviceStatus: DeviceStatus,
   latestAlarms: Alarm[]) {
 
-  // Change SensorEntries to AnalyserEntries
-  const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
-
-  runAnalysis(currentTimestamp, activeProfile, entries, insulin, carbs, deviceStatus, latestAlarms);
-}
-
-export function runAnalysis(
-  currentTimestamp: number,
-  activeProfile: Profile,
-  entries: AnalyserEntry[],
-  insulin: Insulin[],
-  carbs: Carbs[],
-  deviceStatus: DeviceStatus,
-  latestAlarms: Alarm[]) {
-
   const settings = activeProfile.analyserSettings;
+  const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries).sortBy('timestamp').last().value();
 
   state[STATUS_BATTERY] = deviceStatus.batteryLevel < settings.BATTERY_LIMIT;
