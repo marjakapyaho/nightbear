@@ -72,7 +72,6 @@ export function parseDexcomEntry(
   if (isDexcomEntryValid(noiseLevel, dexBloodGlucose)) {
     return {
       modelType: 'DexcomSensorEntry',
-      modelVersion: 1,
       timestamp,
       bloodGlucose: changeBloodGlucoseUnitToMmoll(dexBloodGlucose),
       signalStrength,
@@ -82,7 +81,6 @@ export function parseDexcomEntry(
   else {
     return {
       modelType: 'DexcomRawSensorEntry',
-      modelVersion: 1,
       timestamp,
       bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
       signalStrength,
@@ -109,7 +107,6 @@ export function initCalibration(
   else {
     return {
       modelType: 'DexcomCalibration',
-      modelVersion: 1,
       timestamp,
       meterEntries: [{
         bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
@@ -148,7 +145,6 @@ export function parseDexcomStatus(
 
   return {
     modelType: 'DeviceStatus',
-    modelVersion: 1,
     deviceName: 'dexcom',
     timestamp,
     batteryLevel,
@@ -160,7 +156,6 @@ export function parseDexcomStatus(
 function getLatestCalibration(timestamp: number): DexcomCalibration {
   return {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp,
     meterEntries: [{
       bloodGlucose: 7.7,

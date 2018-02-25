@@ -37,7 +37,6 @@ export function parseParakeetEntry(
 
   return {
     modelType: 'ParakeetSensorEntry',
-    modelVersion: 1,
     timestamp,
     bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number),
     measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
@@ -55,7 +54,6 @@ export function parseParakeetStatus(
 
   return {
     modelType: 'DeviceStatus',
-    modelVersion: 1,
     deviceName: 'parakeet',
     timestamp,
     batteryLevel,
@@ -67,7 +65,6 @@ export function parseParakeetStatus(
 function getLatestCalibration(timestamp: number): DexcomCalibration {
   return {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp,
     meterEntries: [{
       bloodGlucose: 7.7,

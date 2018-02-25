@@ -77,7 +77,6 @@ describe('api/uploadDexcomEntry', () => {
   // Mock objects
   const mockDexcomSensorEntry: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
-    modelVersion: 1,
     timestamp: 1508672249758,
     bloodGlucose: 7.5,
     signalStrength: 168,
@@ -86,7 +85,6 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp: 1508672249758 - 2 * 14934,
     meterEntries: [{
       bloodGlucose: 8.0,
@@ -100,7 +98,6 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterEntry: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp: 1508672249758,
     meterEntries: [{
       bloodGlucose: 8.5,
@@ -114,7 +111,6 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterAndCalEntries: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    modelVersion: 1,
     timestamp: 1508672249758,
     meterEntries: [{
       bloodGlucose: 8.5,
@@ -128,7 +124,6 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
-    modelVersion: 1,
     deviceName: 'dexcom',
     timestamp: 1508672249758,
     batteryLevel: 80,
