@@ -67,10 +67,20 @@ describe('utils/storage', () => {
         .then(actual => assertEqualWithoutMeta(actual, model));
     });
 
-    it('loads models', () => {
+    it('loads timeline models', () => {
       return storage.saveModel(model)
         .then(() => storage.loadTimelineModels(1000 * 60))
         .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
+    });
+
+    it('loads other models', () => {
+      return storage.saveModel(MODEL_2)
+        .catch(() => null) // if the Model already existed, this will fail, but for the purposes of this test, it doesn't matter
+        .then(() => storage.loadOtherModels())
+        .then(loadedModels => assertEqualWithoutMeta(
+          loadedModels.find(model => model.modelType === MODEL_2.modelType) as any, // cheating is allowed in test code
+          MODEL_2,
+        ));
     });
 
     it('saves models that have been saved before', () => {

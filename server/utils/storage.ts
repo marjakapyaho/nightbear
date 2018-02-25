@@ -5,6 +5,7 @@ import * as PouchDB from 'pouchdb';
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
   loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
+  loadOtherModels(): Promise<Model[]>;
 }
 
 function createModelMeta(model: Model): CouchDbModelMeta {
@@ -45,6 +46,17 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         .then(res => res.rows.map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
+        });
+    },
+    loadOtherModels() {
+      return db.allDocs({
+        include_docs: true,
+        startkey: `${PREFIX_OTHER}/`,
+        endkey: `${PREFIX_OTHER}/_`,
+      })
+        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't load other models: ${errObj.message}`); // refine the error before giving it out
         });
     },
   };
