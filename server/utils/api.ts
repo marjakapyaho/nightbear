@@ -9,7 +9,7 @@ export function createNodeContext(): Context {
 }
 
 export interface Headers {
-  [header: string]: string;
+  [header: string]: string | string[]; // in case someone's wondering, string[] is how multiple instances of the SAME header are represented
 }
 
 export interface Request {
