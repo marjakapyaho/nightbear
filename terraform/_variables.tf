@@ -11,18 +11,12 @@ variable "region" {
   default     = "eu-central-1"
 }
 
-variable "public_key_path" {
-  description = <<DESCRIPTION
-Path to the SSH public key to be used for authentication.
-Ensure this keypair is added to your local SSH agent so provisioners can connect.
-Example: $ ssh-add -K ~/.ssh/id_rsa
-DESCRIPTION
-  default     = "~/.ssh/id_rsa"
+variable "ec2_provisioner_public_key" {
+  description = "Public SSH key for EC2 provisioning."
 }
 
-variable "key_name" {
-  description = "Name to associate with the SSH key"
-  default     = "terraform-deployer"
+variable "ec2_provisioner_private_key" {
+  description = "Private SSH key for EC2 provisioning."
 }
 
 variable "aws_ami" {
