@@ -1,3 +1,7 @@
+variable "aws_route53_default_ttl" {
+  default = "300"
+}
+
 resource "aws_route53_zone" "main" {
   name = "nightbear.fi"
 }
@@ -18,7 +22,7 @@ resource "aws_route53_record" "legacy-nightscout" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "nightscout.nightbear.fi"
   type    = "A"
-  ttl     = "300"
+  ttl     = "${var.aws_route53_default_ttl}"
   records = ["46.101.64.73"]
 }
 
@@ -38,7 +42,7 @@ resource "aws_route53_record" "router-domain-validation" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "_47c30228735fe5c8c5d1a09bbcf36fae.router.nightbear.fi"
   type    = "CNAME"
-  ttl     = "300"
+  ttl     = "${var.aws_route53_default_ttl}"
   records = ["_cbf2a92d99e8b74b157957147eb1963a.acm-validations.aws"]
 }
 
@@ -46,7 +50,7 @@ resource "aws_route53_record" "server-stage" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server-stage.nightbear.fi"
   type    = "CNAME"
-  ttl     = "300"
+  ttl     = "${var.aws_route53_default_ttl}"
   records = ["ec2-18-196-232-153.eu-central-1.compute.amazonaws.com"]
 }
 
@@ -54,6 +58,6 @@ resource "aws_route53_record" "server-main" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server.nightbear.fi"
   type    = "A"
-  ttl     = "300"
+  ttl     = "${var.aws_route53_default_ttl}"
   records = ["213.243.183.237"]
 }
