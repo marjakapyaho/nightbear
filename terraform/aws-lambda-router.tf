@@ -73,9 +73,13 @@ resource "aws_api_gateway_integration" "router_integration_root" {
 # IMPORTANT! Due to the way API Gateway works, if this config is ever is changed, you need to:
 # $ terraform taint aws_api_gateway_deployment.router_deployment
 
+variable "router_stage_name" {
+  default = "default"
+}
+
 resource "aws_api_gateway_deployment" "router_deployment" {
   rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
-  stage_name  = "default"
+  stage_name  = "${var.router_stage_name}"
   depends_on  = [
     "aws_api_gateway_integration.router_integration",
     "aws_api_gateway_integration.router_integration_root",
