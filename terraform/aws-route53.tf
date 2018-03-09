@@ -38,6 +38,18 @@ resource "aws_route53_record" "router-web" {
   }
 }
 
+resource "aws_route53_record" "router-web-new" {
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = "${var.router_domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_cloudfront_distribution.router_distribution.domain_name}"
+    zone_id                = "${aws_cloudfront_distribution.router_distribution.hosted_zone_id}"
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "router-domain-validation" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "_47c30228735fe5c8c5d1a09bbcf36fae.router.nightbear.fi"

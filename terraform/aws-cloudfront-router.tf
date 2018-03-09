@@ -50,8 +50,41 @@ resource "aws_cloudfront_distribution" "router_distribution" {
     }
   }
 
+  # https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#viewer-certificate-arguments
   viewer_certificate {
-    cloudfront_default_certificate = true
-    ssl_support_method             = "sni-only"
+    acm_certificate_arn      = "${aws_acm_certificate_validation.router_cert_validation.certificate_arn}"
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.1_2016"
   }
+}
+
+# https://docs.aws.amazon.com/acm/latest/userguide/acm-services.html
+# "To use an ACM Certificate with CloudFront, you must request or import the certificate in the US East (N. Virginia) region."
+# https://www.terraform.io/docs/configuration/providers.html#multiple-provider-instances
+provider "aws" {
+  alias      = "acm_provider"
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
+  region     = "us-east-1"
+}
+
+# https://www.terraform.io/docs/providers/aws/r/acm_certificate.html
+resource "aws_acm_certificate" "router_cert" {
+  provider          = "aws.acm_provider" # because ACM needs to be used in the "us-east-1" region
+  domain_name       = "${var.router_domain_name}"
+  validation_method = "DNS"
+}
+
+resource "aws_route53_record" "router_cert_validation" {
+  name    = "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_name}"
+  type    = "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_type}"
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  records = [ "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_value}" ]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "router_cert_validation" {
+  provider                = "aws.acm_provider" # because ACM needs to be used in the "us-east-1" region
+  certificate_arn         = "${aws_acm_certificate.router_cert.arn}"
+  validation_record_fqdns = [ "${aws_route53_record.router_cert_validation.fqdn}" ]
 }
