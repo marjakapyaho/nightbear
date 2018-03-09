@@ -6,6 +6,7 @@ variable "router_domain_name" {
 # https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html
 resource "aws_cloudfront_distribution" "router_distribution" {
   enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = ""
   aliases             = [ "${var.router_domain_name}" ]
   price_class         = "PriceClass_100"
@@ -20,7 +21,7 @@ resource "aws_cloudfront_distribution" "router_distribution" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "match-viewer"
+      origin_protocol_policy = "https-only"
       origin_ssl_protocols   = [ "TLSv1", "TLSv1.1", "TLSv1.2" ]
     }
   }
