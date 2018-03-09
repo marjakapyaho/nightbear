@@ -61,9 +61,9 @@ resource "aws_route53_record" "router-domain-validation" {
 resource "aws_route53_record" "server-stage" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server-stage.nightbear.fi"
-  type    = "CNAME"
+  type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = ["ec2-18-196-232-153.eu-central-1.compute.amazonaws.com"]
+  records = ["${aws_instance.web.public_ip}"]
 }
 
 resource "aws_route53_record" "server-main" {
