@@ -1,5 +1,13 @@
 # Based on https://github.com/terraform-providers/terraform-provider-aws/tree/master/examples/two-tier
 
+# Output connection info for update scripts etc
+output "ec2_server_stage_user" {
+  value = "ubuntu"
+}
+output "ec2_server_stage_ip" {
+  value = "${aws_instance.server_stage.public_ip}"
+}
+
 # Create a VPC to launch our instances into
 resource "aws_vpc" "default" {
   cidr_block = "10.0.0.0/16"
@@ -94,13 +102,8 @@ resource "aws_instance" "server_stage" {
   # We're going to launch into the subnet we created above
   subnet_id = "${aws_subnet.default.id}"
 
-  # Run a remote provisioner on the instance after creating it
+  # Run provisioners on the instance after creating it
   provisioner "remote-exec" {
     script = "aws-ec2-provision.sh"
   }
-}
-
-# Output connection info for manual tweaks (if necessary)
-output "ec2_ssh_command" {
-  value = "ssh ubuntu@${aws_instance.server_stage.public_ip}"
 }
