@@ -1,9 +1,13 @@
 variable "aws_access_key" {
-  description = "AWS Access Key ID (AWS_ACCESS_KEY_ID)"
+  description = "AWS Access Key ID (a.k.a. AWS_ACCESS_KEY_ID)"
 }
 
 variable "aws_secret_key" {
-  description = "AWS Secret Access Key (AWS_SECRET_ACCESS_KEY)"
+  description = "AWS Secret Access Key (a.k.a. AWS_SECRET_ACCESS_KEY)"
+}
+
+variable "papertrail_host" {
+  description = "syslog drain to use for sending logs to Papertrail (a.k.a. NIGHTBEAR_PAPERTRAIL_HOST)"
 }
 
 variable "aws_region" {

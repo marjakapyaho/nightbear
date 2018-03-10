@@ -1,3 +1,6 @@
+# To verify variable substitution from environment:
+# $ docker-compose config
+
 version: "3"
 
 services:
@@ -24,6 +27,13 @@ services:
       - "nginx-certs:/etc/nginx/certs:rw"
       - "nginx-data:/etc/nginx/vhost.d"
       - "nginx-data:/usr/share/nginx/html"
+
+  logspout:
+    image: gliderlabs/logspout
+    restart: always
+    command: "${NIGHTBEAR_PAPERTRAIL_HOST}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   server-stage:
     build: .

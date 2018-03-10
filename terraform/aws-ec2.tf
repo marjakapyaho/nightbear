@@ -106,4 +106,7 @@ resource "aws_instance" "server_stage" {
   provisioner "remote-exec" {
     script = "aws-ec2-provision.sh"
   }
+  provisioner "remote-exec" {
+    inline = [ "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > nightbear/server/.env" ]
+  }
 }
