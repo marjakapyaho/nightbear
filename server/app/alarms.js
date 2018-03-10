@@ -12,14 +12,14 @@ export default app => {
         runChecks
     };
 
-    function runChecks() {
-        log.debug('Running checks');
+    function runChecks(queryThrottleMs = 0) {
+        log.debug(`Running checks (queries throttled at ${queryThrottleMs} ms)`);
 
         // Clear previous timer (if exists) and set next one
         if (nextCheck) { clearTimeout(nextCheck); }
-        nextCheck = setTimeout(runChecks, 6 * helpers.MIN_IN_MS);
+        nextCheck = setTimeout(runChecks, 6 * helpers.MIN_IN_MS, queryThrottleMs);
 
-        return app.data.getTimelineContent()
+        return app.data.getTimelineContent(queryThrottleMs)
             .then(doChecks)
             .catch(err => log.error('Checks failed', err));
     }

@@ -50,7 +50,7 @@ export default app => {
                 .then(cal => helpers.setActualGlucose(datum, cal))
                 .then(data => dbPUT('sensor-entries', data))
                 .then(() => log(`Received entry from uploader: (${datum.nb_glucose_value})`))
-                .then(() => app.alarms.runChecks()) // No need to wait for results
+                .then(() => app.alarms.runChecks(app.queryThrottleMs || 0)) // No need to wait for results
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'mbg') {
@@ -104,16 +104,20 @@ export default app => {
             )
     }
 
+    function wait(waitMs = 0) {
+        return new Promise(resolve => setTimeout(resolve, waitMs));
+    }
+
     // Promises an object with a snapshot of the current timeline content
     // (which can then be analysed, rendered etc)
-    function getTimelineContent() {
+    function getTimelineContent(throttleMs = 0) {
         return Promise.all([
-            getLatestEntries(helpers.HOUR_IN_MS * 2.5),
-            getLatestTreatments(helpers.HOUR_IN_MS * 3.5),
-            getLatestDeviceStatus(),
-            getActiveAlarms(true), // include acknowledged alarms
-            getLatestCalibration(),
-            getProfileSettings()
+            wait(throttleMs * 0).then(() => getLatestEntries(helpers.HOUR_IN_MS * 2.5)),
+            wait(throttleMs * 1).then(() => getLatestTreatments(helpers.HOUR_IN_MS * 3.5)),
+            wait(throttleMs * 2).then(() => getLatestDeviceStatus()),
+            wait(throttleMs * 3).then(() => getActiveAlarms(true)), // include acknowledged alarms
+            wait(throttleMs * 4).then(() => getLatestCalibration()),
+            wait(throttleMs * 5).then(() => getProfileSettings())
         ]).then(([ latestEntries, latestTreatments, latestDeviceStatus, activeAlarms, latestCal, profileSettings ]) => ({
             latestEntries,
             latestTreatments,

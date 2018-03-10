@@ -18,8 +18,10 @@ const app = createAppInstance({
     parakeetProxy: process.env.PARAKEET_PROXY_URL && new ParakeetProxy(logger, process.env.PARAKEET_PROXY_URL),
 });
 
+app.queryThrottleMs = parseInt(process.env.QUERY_THROTTLE_MS) || 0;
+
 app.server.createExpressServer(3001, 'static');
-app.alarms.runChecks();
+app.alarms.runChecks(app.queryThrottleMs || 0);
 
 setInterval(app.data.getHba1c, 1000 * 60 * 60 * 6); // calculate & cache a new HBA1C every 6 hours (though a new one will be created only once per 24h)
 app.data.getHba1c(); // ...and immediately during startup
