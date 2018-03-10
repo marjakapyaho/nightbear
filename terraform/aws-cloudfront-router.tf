@@ -1,6 +1,6 @@
 variable "router_domain_name" {
   # https://aws.amazon.com/premiumsupport/knowledge-center/resolve-cnamealreadyexists-error/
-  default = "router-new.nightbear.fi"
+  default = "router.nightbear.fi"
 }
 
 # https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html
