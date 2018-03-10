@@ -64,8 +64,8 @@ resource "aws_cloudfront_distribution" "router_distribution" {
 # https://www.terraform.io/docs/configuration/providers.html#multiple-provider-instances
 provider "aws" {
   alias      = "acm_provider"
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
   region     = "us-east-1"
 }
 

@@ -65,7 +65,7 @@ resource "aws_security_group" "default" {
 # Create an SSH key pair for accessing the EC2 instance
 resource "aws_key_pair" "ec2_provisioner" {
   key_name   = "ec2_provisioner"
-  public_key = "${var.ec2_provisioner_public_key}"
+  public_key = "${file("terraform.id_rsa.pub")}"
 }
 
 # Create the main EC2 instance
@@ -78,7 +78,7 @@ resource "aws_instance" "web" {
     user = "ubuntu"
     # Configure SSH access via private key
     agent = false
-    private_key = "${var.ec2_provisioner_private_key}"
+    private_key = "${file("terraform.id_rsa")}"
   }
 
   # EC2 instance type & image
