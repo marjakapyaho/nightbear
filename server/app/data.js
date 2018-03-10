@@ -50,7 +50,7 @@ export default app => {
                 .then(cal => helpers.setActualGlucose(datum, cal))
                 .then(data => dbPUT('sensor-entries', data))
                 .then(() => log(`Received entry from uploader: (${datum.nb_glucose_value})`))
-                .then(() => app.alarms.runChecks(1000)) // No need to wait for results // TODO: Make this number configurable
+                .then(() => app.alarms.runChecks(app.queryThrottleMs || 0)) // No need to wait for results
                 .then(() => [ datum ]); // reply as the Nightscout API would
         }
         else if (datum.type === 'mbg') {
