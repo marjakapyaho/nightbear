@@ -23,7 +23,7 @@ resource "aws_route53_record" "legacy-nightscout" {
   name    = "nightscout.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = ["46.101.64.73"]
+  records = [ "46.101.64.73" ]
 }
 
 resource "aws_route53_record" "router-web" {
@@ -38,12 +38,12 @@ resource "aws_route53_record" "router-web" {
   }
 }
 
-resource "aws_route53_record" "server-stage" {
+resource "aws_route53_record" "server_stage" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server-stage.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = ["${aws_instance.server_stage.public_ip}"]
+  records = [ "${aws_instance.server_stage.public_ip}" ]
 }
 
 resource "aws_route53_record" "server-main" {
@@ -51,5 +51,5 @@ resource "aws_route53_record" "server-main" {
   name    = "server.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = ["213.243.183.237"]
+  records = [ "213.243.183.237" ]
 }
