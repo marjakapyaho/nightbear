@@ -80,7 +80,7 @@ describe('utils/calculations', () => {
   ];
 
   // Assertations
-  it.only('parses correct slopes for analyser entries', () => {
+  it('parses correct slopes for analyser entries', () => {
     assert.deepEqual(
       parseAnalyserEntries(entriesBefore),
       entriesAfter,
