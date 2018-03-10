@@ -1,7 +1,7 @@
 import { extend } from 'lodash';
-import { Response, Context, createResponse } from '../../utils/api';
-import { Alarm, Profile } from '../../utils/model';
-import { MIN_IN_MS } from '../../utils/calculations';
+import { Response, Context, createResponse } from '../../models/api';
+import { Alarm, Profile } from '../../models/model';
+import { MIN_IN_MS } from '../../core/calculations/calculations';
 
 export function ackLatestAlarm(context: Context): Response {
   const activeAlarms: Alarm[] = getActiveAlarms(context.timestamp());
@@ -44,7 +44,7 @@ export function getProfileSettings(timestamp: number): Profile {
     },
     analyserSettings: {
       HIGH_LEVEL_REL: 6,
-      TIME_SINCE_SGV_LIMIT: 5,
+      TIME_SINCE_BG_LIMIT: 5,
       BATTERY_LIMIT: 2,
       LOW_LEVEL_ABS: 7,
       ALARM_EXPIRE: 6,

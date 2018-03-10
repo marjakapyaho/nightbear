@@ -1,4 +1,4 @@
-import { Logger, createConsoleLogger } from './logging';
+import { Logger, createConsoleLogger } from '../utils/logging';
 
 export function createNodeContext(): Context {
   return {

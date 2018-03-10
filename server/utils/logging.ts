@@ -1,6 +1,6 @@
 import { getUuid } from './uuid';
 import { mapObject } from './data';
-import { RequestHandler } from './api';
+import { RequestHandler } from '../models/api';
 
 export type LogLevel
   = 'debug'

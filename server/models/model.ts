@@ -71,6 +71,13 @@ export interface ParakeetSensorEntry {
   readonly rawUnfiltered: number;
 }
 
+export interface AnalyserEntry {
+  readonly timestamp: number;
+  readonly bloodGlucose: number;
+  readonly slope: number | null;
+  readonly rawSlope: number | null;
+}
+
 export type Calibration
   = DexcomCalibration
   | NightbearCalibration
@@ -195,13 +202,13 @@ export interface Profile {
   };
   readonly analyserSettings: {
     readonly HIGH_LEVEL_REL: number;
-    readonly TIME_SINCE_SGV_LIMIT: number;
+    readonly TIME_SINCE_BG_LIMIT: number; // minutes
     readonly BATTERY_LIMIT: number;
     readonly LOW_LEVEL_ABS: number;
-    readonly ALARM_EXPIRE: number;
+    readonly ALARM_EXPIRE: number; // minutes
     readonly LOW_LEVEL_REL: number;
     readonly HIGH_LEVEL_ABS: number;
-    readonly ALARM_RETRY: number;
+    readonly ALARM_RETRY: number; // minutes
   };
   readonly alarmSettings: {
     readonly [S in Situation]: {

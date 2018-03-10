@@ -1,6 +1,6 @@
 import * as PouchDB from 'pouchdb';
 import { Storage } from './storage';
-import { Model, MODEL_VERSION } from '../utils/model';
+import { Model, MODEL_VERSION } from '../models/model';
 import { assert, assertExhausted } from '../utils/types';
 
 export interface CouchDbModelMeta {

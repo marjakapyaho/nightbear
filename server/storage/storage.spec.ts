@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { Model, Carbs, Settings } from '../utils/model';
+import { Model, Carbs, Settings } from '../models/model';
 import { Storage } from './storage';
 
 // Asserts deep equality of 2 Models, ignoring their metadata
