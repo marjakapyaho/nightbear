@@ -2,7 +2,7 @@
 
 SSH_TARGET="ubuntu@server-stage.nightbear.fi"
 REMOTE_SCRIPT="aws-ec2-update-remote.sh"
-TRACK_BRANCH="add-server-setup" # TODO: This will probably become "master" at some point
+TRACK_BRANCH="master"
 COMPOSE_SERVICE="server-stage"
 SSH_KEY_FILE="terraform.id_rsa"
 
