@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SSH_TARGET="$(terraform output ec2_server_stage_user)@$(terraform output ec2_server_stage_ip)"
+SSH_TARGET="ubuntu@server-stage.nightbear.fi"
 REMOTE_SCRIPT="aws-ec2-update-remote.sh"
 TRACK_BRANCH="add-server-setup" # TODO: This will probably become "master" at some point
 COMPOSE_SERVICE="server-stage"
