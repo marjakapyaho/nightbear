@@ -19,7 +19,7 @@ export default app => {
         if (nextCheck) { clearTimeout(nextCheck); }
         nextCheck = setTimeout(runChecks, 6 * helpers.MIN_IN_MS);
 
-        return app.data.getTimelineContent()
+        return app.data.getTimelineContent(1000) // TODO: Make the throttleMs configurable
             .then(doChecks)
             .catch(err => log.error('Checks failed', err));
     }
