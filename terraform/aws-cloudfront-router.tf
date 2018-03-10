@@ -31,13 +31,13 @@ resource "aws_cloudfront_distribution" "router_distribution" {
     cached_methods         = [ "GET", "HEAD" ]
     target_origin_id       = "NightbearRouter"
     viewer_protocol_policy = "allow-all"
+    # TODO: https://github.com/terraform-providers/terraform-provider-aws/issues/1994
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
 
     forwarded_values {
       query_string = true
-      headers      = [ "*" ]
 
       cookies {
         forward = "all"
