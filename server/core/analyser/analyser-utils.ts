@@ -1,4 +1,4 @@
-import { AnalyserEntry, SensorEntry } from '../model';
+import { AnalyserEntry, SensorEntry } from '../../models/model';
 import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from '../calculations/calculations';
 import { slice, sum, reduce } from 'lodash';
 

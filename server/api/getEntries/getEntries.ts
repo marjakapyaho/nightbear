@@ -1,6 +1,6 @@
-import { Response, Context, createResponse, Request } from '../../utils/api';
-import { Carbs, Insulin, SensorEntry } from '../../utils/model';
-import { HOUR_IN_MS } from '../../utils/calculations/calculations';
+import { Response, Context, createResponse, Request } from '../../models/api';
+import { Carbs, Insulin, SensorEntry } from '../../models/model';
+import { HOUR_IN_MS } from '../../core/calculations/calculations';
 
 export function getEntries(request: Request, context: Context): Response {
   const { from, to } = request.requestParams;

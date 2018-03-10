@@ -1,5 +1,5 @@
-import { Response, Context, createResponse } from '../../utils/api';
-import { Hba1c } from '../../utils/model';
+import { Response, Context, createResponse } from '../../models/api';
+import { Hba1c } from '../../models/model';
 
 export function getHba1cHistory(context: Context): Response {
   console.log('use timestamp to fetch hba1c', context.timestamp()); // tslint:disable-line:no-console

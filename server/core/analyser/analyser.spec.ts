@@ -12,7 +12,7 @@ import {
 } from './analyser';
 import { activeProfile } from './activeProfile';
 import { MIN_IN_MS } from '../calculations/calculations';
-import { Alarm, DeviceStatus, Insulin, SensorEntry } from '../model';
+import { Alarm, DeviceStatus, Insulin, SensorEntry } from '../../models/model';
 
 describe('utils/analyser', () => {
 

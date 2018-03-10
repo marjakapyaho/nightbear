@@ -1,5 +1,5 @@
 import { startExpressServer } from './utils/express';
-import { createNodeContext } from './utils/api';
+import { createNodeContext } from './models/api';
 import { getServerStatus } from './api/getServerStatus/getServerStatus';
 import { uploadParakeetEntry } from './api/uploadParakeetEntry/uploadParakeetEntry';
 

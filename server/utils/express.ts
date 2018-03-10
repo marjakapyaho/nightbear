@@ -2,7 +2,7 @@ import * as express from 'express';
 import { Request as ExpressRequest } from 'express';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
-import { RequestHandler, Request, Headers, Context } from './api';
+import { RequestHandler, Request, Headers, Context } from '../models/api';
 import { getUuid } from './uuid';
 import { bindLoggingContext, getContextName, handlerWithLogging } from './logging';
 

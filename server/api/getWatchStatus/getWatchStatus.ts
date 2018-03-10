@@ -1,5 +1,5 @@
-import { Response, Context, createResponse } from '../../utils/api';
-import { Alarm, DeviceStatus } from '../../utils/model';
+import { Response, Context, createResponse } from '../../models/api';
+import { Alarm, DeviceStatus } from '../../models/model';
 
 export function getWatchStatus(context: Context): Response {
   return createResponse({

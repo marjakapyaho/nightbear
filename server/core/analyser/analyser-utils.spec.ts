@@ -1,10 +1,10 @@
 import 'mocha';
 import { assert } from 'chai';
-import { MIN_IN_MS } from './calculations';
-import { AnalyserEntry, SensorEntry } from '../model';
-import { parseAnalyserEntries } from '../analyser/analyser-utils';
+import { parseAnalyserEntries } from './analyser-utils';
+import { MIN_IN_MS } from '../calculations/calculations';
+import { AnalyserEntry, SensorEntry } from '../../models/model';
 
-describe('utils/calculations', () => {
+describe('utils/analyser-utils', () => {
 
   // Mock objects
   const currentTimestamp = 1508672249758;

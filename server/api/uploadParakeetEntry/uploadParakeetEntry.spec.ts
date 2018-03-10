@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
-import { Request } from '../../utils/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../utils/model';
+import { Request } from '../../models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
 
 describe('api/uploadParakeetEntry', () => {
 

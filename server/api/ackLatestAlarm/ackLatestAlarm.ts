@@ -1,7 +1,7 @@
 import { extend } from 'lodash';
-import { Response, Context, createResponse } from '../../utils/api';
-import { Alarm, Profile } from '../../utils/model';
-import { MIN_IN_MS } from '../../utils/calculations/calculations';
+import { Response, Context, createResponse } from '../../models/api';
+import { Alarm, Profile } from '../../models/model';
+import { MIN_IN_MS } from '../../core/calculations/calculations';
 
 export function ackLatestAlarm(context: Context): Response {
   const activeAlarms: Alarm[] = getActiveAlarms(context.timestamp());

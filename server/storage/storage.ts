@@ -1,4 +1,4 @@
-import { Model } from '../utils/model';
+import { Model } from '../models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;

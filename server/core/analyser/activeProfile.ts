@@ -1,4 +1,4 @@
-import { Profile } from '../model';
+import { Profile } from '../../models/model';
 
 export const activeProfile: Profile = {
   modelType: 'Profile',
