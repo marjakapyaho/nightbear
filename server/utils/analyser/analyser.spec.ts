@@ -12,14 +12,13 @@ import {
 } from './analyser';
 import { activeProfile } from './activeProfile';
 import { MIN_IN_MS } from '../calculations/calculations';
-import { Alarm, Carbs, DeviceStatus, Insulin, SensorEntry } from '../model';
+import { Alarm, DeviceStatus, Insulin, SensorEntry } from '../model';
 
 describe('utils/analyser', () => {
 
   // Mock objects
   const currentTimestamp = 1508672249758;
   const insulin: Insulin[] = [];
-  const carbs: Carbs[] = [];
   const latestAlarms: Alarm[] = [];
 
   const deviceStatus: DeviceStatus = {
@@ -64,7 +63,7 @@ describe('utils/analyser', () => {
   // Assertations
   it('detects no situation', () => {
     assert.deepEqual(
-      runAnalysis(currentTimestamp, activeProfile, entries, insulin, carbs, deviceStatus, latestAlarms),
+      runAnalysis(currentTimestamp, activeProfile, entries, insulin, deviceStatus, latestAlarms),
       {
         [STATUS_OUTDATED]: false,
         [STATUS_HIGH]: false,

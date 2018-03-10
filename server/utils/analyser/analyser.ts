@@ -1,5 +1,5 @@
 import { chain, find, filter, some } from 'lodash';
-import { Alarm, AnalyserEntry, Carbs, DeviceStatus, Insulin, Profile, SensorEntry } from '../model';
+import { Alarm, AnalyserEntry, DeviceStatus, Insulin, Profile, SensorEntry } from '../model';
 import { parseAnalyserEntries, HOUR_IN_MS, MIN_IN_MS } from '../calculations/calculations';
 
 export const STATUS_OUTDATED = 'outdated';
@@ -34,7 +34,6 @@ export function runAnalysis(
   activeProfile: Profile,
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
-  carbs: Carbs[],
   deviceStatus: DeviceStatus,
   latestAlarms: Alarm[]) {
 
@@ -57,7 +56,8 @@ export function runAnalysis(
     return state;
   }
 
-  if (checkForCompressionLow(entries, activeProfile, insulin, carbs)) {
+  if (checkForCompressionLow(entries, activeProfile, insulin)) {
+    console.log('DETECTED COMPRESSION LOW');
     return state;
   }
 
@@ -119,29 +119,14 @@ function detectFalling(entry: AnalyserEntry, lowLevelRel: number) {
   return !state[STATUS_LOW] && entry.bloodGlucose < lowLevelRel && !!entry.slope && entry.slope < -slopeLimits.MEDIUM;
 }
 
-function checkForCompressionLow(entries: AnalyserEntry[], activeProfile: Profile, insulin: Insulin[], carbs: Carbs[]) {
-  console.log(entries, insulin, carbs, activeProfile); // tslint:disable-line:no-console
-  // TODO: compression detection
+function checkForCompressionLow(entries: AnalyserEntry[], activeProfile: Profile, insulin: Insulin[]) {
+  const recentInsulin = insulin.length;
+  const isDay = activeProfile.profileName === 'day';
+  const lastFiveEntries = chain(entries).sortBy('timestamp').slice(-5).value();
 
-  /* let latestBolus = _.findLast(_.sortBy(latestTreatments, 'date'), (treatment) => treatment.insulin > 0 );
-   let noRecentBoluses = latestBolus ? (currentTimestamp - latestBolus.date > helpers.HOUR_IN_MS * 2) : true;
-   let isNightTime = new Date(currentTimestamp).getHours() < 9;
-   let isEnoughNoise = latestNoise >= helpers.NOISE_LEVEL_LIMIT;
+  if (recentInsulin || isDay || lastFiveEntries.length < 5) {
+    return false;
+  }
 
-   if (noRecentBoluses && isNightTime && isEnoughNoise) {
-     let latestFiveEntries = _.slice(_.sortBy(latestEntries, 'date'), -5);
-     if (latestFiveEntries.length < 5) {
-       return false;
-     }
-     let containsHugeSlopes = false;
-     for (let i = 0; i < 4; i++) {
-       let slope = Math.abs(calculateSlope(latestFiveEntries[i], latestFiveEntries[i + 1]));
-       if (slope > 2) {
-         containsHugeSlopes = true;
-       }
-     }
-     return containsHugeSlopes;
-   }*/
-
-  return false;
+  return !!find(entries, (entry) => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
 }

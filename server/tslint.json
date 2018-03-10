@@ -12,6 +12,7 @@
     "one-line": false,
     "no-shadowed-variable": false,
     "no-string-literal": false,
-    "variable-name": false
+    "variable-name": false,
+    "no-console": false
   }
 }

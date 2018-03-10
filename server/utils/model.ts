@@ -75,6 +75,7 @@ export interface AnalyserEntry {
   readonly timestamp: number;
   readonly bloodGlucose: number;
   readonly slope: number | null;
+  readonly rawSlope: number | null;
 }
 
 export type Calibration
