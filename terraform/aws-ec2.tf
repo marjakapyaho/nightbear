@@ -109,4 +109,7 @@ resource "aws_instance" "server_stage" {
   provisioner "remote-exec" {
     inline = [ "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > nightbear/server/.env" ]
   }
+  provisioner "local-exec" {
+    command = "cat aws-ec2-provision.txt"
+  }
 }
