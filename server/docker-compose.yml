@@ -1,0 +1,51 @@
+# To verify variable substitution from environment:
+# $ docker-compose config
+
+version: "3"
+
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "nginx-certs:/etc/nginx/certs:ro"
+      - "nginx-data:/etc/nginx/vhost.d"
+      - "nginx-data:/usr/share/nginx/html"
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+
+  nginx-proxy-letsencrypt-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "nginx-certs:/etc/nginx/certs:rw"
+      - "nginx-data:/etc/nginx/vhost.d"
+      - "nginx-data:/usr/share/nginx/html"
+
+  logspout:
+    image: gliderlabs/logspout
+    restart: always
+    command: "${NIGHTBEAR_PAPERTRAIL_HOST}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  server-stage:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "server-stage.nightbear.fi"
+      VIRTUAL_HOST: "server-stage.nightbear.fi"
+
+volumes:
+  nginx-data:
+  nginx-certs:
