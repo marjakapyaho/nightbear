@@ -70,7 +70,7 @@ resource "aws_key_pair" "ec2_provisioner" {
 
 # Create the main EC2 instance
 # https://www.terraform.io/docs/providers/aws/r/instance.html
-resource "aws_instance" "web" {
+resource "aws_instance" "server_stage" {
   # The connection block tells our provisioner how to communicate with the resource (instance)
   # https://www.terraform.io/docs/provisioners/connection.html
   connection {
@@ -102,5 +102,5 @@ resource "aws_instance" "web" {
 
 # Output connection info for manual tweaks (if necessary)
 output "ec2_ssh_command" {
-  value = "ssh ubuntu@${aws_instance.web.public_ip}"
+  value = "ssh ubuntu@${aws_instance.server_stage.public_ip}"
 }

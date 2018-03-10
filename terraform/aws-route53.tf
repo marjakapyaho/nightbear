@@ -63,7 +63,7 @@ resource "aws_route53_record" "server-stage" {
   name    = "server-stage.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = ["${aws_instance.web.public_ip}"]
+  records = ["${aws_instance.server_stage.public_ip}"]
 }
 
 resource "aws_route53_record" "server-main" {
