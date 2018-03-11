@@ -24,11 +24,11 @@ describe('storage/couchDbStorage', () => {
   });
 
   // Only run the tests for the CouchDB storage if one is configured for the test runner:
-  const TEST_DB_URL = process.env.TEST_DB_URL || null;
-  (TEST_DB_URL ? describe : xdescribe)('createCouchDbStorage()', () => {
+  const NIGHTBEAR_TEST_DB_URL = process.env.NIGHTBEAR_TEST_DB_URL || null;
+  (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('createCouchDbStorage()', () => {
 
     storageTestSuite(
-      createCouchDbStorage(TEST_DB_URL + ''),
+      createCouchDbStorage(NIGHTBEAR_TEST_DB_URL + ''),
     );
 
   });

@@ -3,12 +3,11 @@ import { assert } from 'chai';
 import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, parseCalibration } from './uploadDexcomEntry';
 import { Request } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from '../../models/model';
+import { createTestContext } from '../../utils/test';
 
 describe('api/uploadDexcomEntry', () => {
 
-  const context: any = {
-    timestamp: () => 1508672249758,
-  };
+  const context = createTestContext();
 
   // Mock requests
   const mockRequestBgEntry: Request = {

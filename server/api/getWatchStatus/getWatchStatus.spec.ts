@@ -1,12 +1,11 @@
 import 'mocha';
 import { assert } from 'chai';
 import { getWatchStatus } from './getWatchStatus';
+import { createTestContext } from '../../utils/test';
 
 describe('api/getWatchStatus', () => {
 
-  const context: any = {
-    timestamp: () => 1508672249758,
-  };
+  const context = createTestContext();
 
   // Mock objects
   const mockResponseJson: object = {

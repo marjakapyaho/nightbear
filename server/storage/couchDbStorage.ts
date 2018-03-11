@@ -14,7 +14,9 @@ const PREFIX_GLOBAL = 'global';
 
 export function createCouchDbStorage(dbUrl: string): Storage {
   const db = new PouchDB(dbUrl);
+
   return {
+
     saveModel(model) {
       const modelMeta = createModelMeta(model);
       const { _id, _rev, modelVersion } = modelMeta;
@@ -33,6 +35,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           throw new Error(`Couldn't save model "${modelMeta._id}": ${errObj.message}`); // refine the error before giving it out
         });
     },
+
     loadTimelineModels(fromTimePeriod) {
       return db.allDocs({
         include_docs: true,
@@ -44,6 +47,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
     },
+
     loadGlobalModels() {
       return db.allDocs({
         include_docs: true,
@@ -55,22 +59,26 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
         });
     },
+
   };
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
 function reviveCouchDbRowIntoModel({ doc }: any): Model {
+
   // Perform some basic runtime sanity checks:
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
   assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
   assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
   assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
   assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
+
   // Strip away the CouchDB document metadata:
   const { _id, _rev, modelMeta: { modelVersion } } = doc;
   Object.keys(doc).forEach(key => {
     if (key.startsWith('_')) delete doc[key];
   });
+
   // Turn into standard Model object:
   const model: Model = doc;
   const modelMeta: CouchDbModelMeta = { _id, _rev, modelVersion };

@@ -1,6 +1,7 @@
 import { getUuid } from './uuid';
 import { mapObject } from './data';
 import { RequestHandler } from '../models/api';
+import { noop } from 'lodash';
 
 export type LogLevel
   = 'debug'
@@ -10,6 +11,13 @@ export type LogLevel
 export type LoggerMethod = (message: string, meta?: any) => void;
 export type Logger = {
   [level in LogLevel]: LoggerMethod;
+};
+
+export const NO_LOGGING: Logger = {
+  debug: noop,
+  info: noop,
+  warn: noop,
+  error: noop,
 };
 
 export function createConsoleLogger(): Logger {

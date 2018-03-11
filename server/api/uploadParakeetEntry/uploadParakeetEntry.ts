@@ -18,8 +18,8 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
   const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
   // Save entries to db
-  console.log(parakeetEntry); // tslint:disable-line:no-console
-  console.log(parakeetStatus); // tslint:disable-line:no-console
+  context.storage.saveModel(parakeetEntry);
+  context.storage.saveModel(parakeetStatus);
 
   return createResponse(PARAKEET_RESPONSE);
 }
