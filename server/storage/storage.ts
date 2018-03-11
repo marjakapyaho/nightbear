@@ -5,3 +5,9 @@ export interface Storage {
   loadTimelineModels(fromTimePeriod: number): Promise<Model[]>;
   loadGlobalModels(): Promise<Model[]>;
 }
+
+export const NO_STORAGE: Storage = {
+  saveModel: model => Promise.resolve(model),
+  loadTimelineModels: () => Promise.resolve([]),
+  loadGlobalModels: () => Promise.resolve([]),
+};
