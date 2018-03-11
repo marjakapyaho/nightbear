@@ -1,19 +1,13 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
-import { Request, Context } from '../../models/api';
+import { Request } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
-import { NO_LOGGING } from '../../utils/logging';
-import { NO_STORAGE } from '../../storage/storage';
+import { createTestContext } from '../../utils/test';
 
 describe('api/uploadParakeetEntry', () => {
 
-  const context: Context = {
-    timestamp: () => 1508672249758,
-    httpPort: 80,
-    log: NO_LOGGING,
-    storage: NO_STORAGE,
-  };
+  const context = createTestContext();
 
   // Mock requests
   const mockRequest: Request = {
