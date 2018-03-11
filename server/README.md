@@ -4,7 +4,7 @@
 
 Create a local dev DB:
 
-1. Run `docker run -d -p 5984:5984 --name nightbear-dev-couchdb apache/couchdb:2.1.1`
+1. Run `docker run -d -p 5984:5984 --name nightbear-dev-couchdb couchdb:2.1.1`
 1. Visit http://localhost:5984/_utils/#/setup
 1. Create a single node, with credentials `admin:admin`
 1. Config -> CORS -> Enable CORS for all domains

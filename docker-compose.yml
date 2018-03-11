@@ -1,8 +1,0 @@
-server:
-  build: server/
-  environment:
-    - NODE_ENV=production
-    - VIRTUAL_HOST=nightbear.jrw.fi
-    - DB_URL
-  expose:
-    - 3000

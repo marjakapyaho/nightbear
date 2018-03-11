@@ -35,16 +35,26 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
+  db-stage:
+    image: couchdb:2.1.1
+    restart: always
+    expose:
+      - "5984"
+    environment:
+      COUCHDB_USER: "admin"
+      COUCHDB_PASSWORD: "admin"
+
   server-stage:
     build: .
     restart: always
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       NODE_ENV: "production"
       LETSENCRYPT_EMAIL: "admin@nightbear.fi"
       LETSENCRYPT_HOST: "server-stage.nightbear.fi"
       VIRTUAL_HOST: "server-stage.nightbear.fi"
+      NIGHTBEAR_DB_URL: "http://admin:admin@db-stage:5984/nightbear_stage"
 
 volumes:
   nginx-data:

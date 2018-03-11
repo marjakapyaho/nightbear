@@ -104,10 +104,10 @@ resource "aws_instance" "server_stage" {
 
   # Run provisioners on the instance after creating it
   provisioner "remote-exec" {
-    script = "aws-ec2-provision.sh"
+    inline = [ "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > .env" ]
   }
   provisioner "remote-exec" {
-    inline = [ "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > nightbear/server/.env" ]
+    script = "aws-ec2-provision.sh"
   }
   provisioner "local-exec" {
     command = "cat aws-ec2-provision.txt"
