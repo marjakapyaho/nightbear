@@ -13,6 +13,8 @@ const PREFIX_TIMELINE = 'timeline';
 const PREFIX_GLOBAL = 'global';
 
 export function createCouchDbStorage(dbUrl: string): Storage {
+  assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
+
   const db = new PouchDB(dbUrl);
 
   return {
