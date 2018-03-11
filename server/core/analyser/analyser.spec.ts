@@ -22,7 +22,7 @@ import { entriesPersistentHigh } from './test-data/persistent-high';
 import { entriesCompressionLow } from './test-data/compression-low';
 import { entriesOutdated } from './test-data/outdated';
 
-describe.only('utils/analyser', () => {
+describe('utils/analyser', () => {
 
   // Mock objects
   const currentTimestamp = 1508672249758;
