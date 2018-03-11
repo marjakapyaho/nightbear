@@ -1,10 +1,15 @@
 import { Logger, createConsoleLogger } from '../utils/logging';
+import { createCouchDbStorage } from '../storage/couchDbStorage';
+import { Storage } from '../storage/storage';
 
 export function createNodeContext(): Context {
+  const { NIGHTBEAR_DB_URL } = process.env;
+  if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
   return {
     httpPort: 3000,
     timestamp: Date.now,
     log: createConsoleLogger(),
+    storage: createCouchDbStorage(NIGHTBEAR_DB_URL),
   };
 }
 
@@ -32,6 +37,7 @@ export interface Context {
   httpPort: number;
   timestamp: () => number;
   log: Logger;
+  storage: Storage;
 }
 
 export type RequestHandler = (request: Request, context: Context) => Response;
