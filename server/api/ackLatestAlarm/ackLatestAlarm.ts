@@ -81,6 +81,10 @@ export function getProfileSettings(timestamp: number): Profile {
         escalationAfterMinutes: [2, 5, 7, 4],
         snoozeMinutes: 10,
       },
+      COMPRESSION_LOW: {
+        escalationAfterMinutes: [2, 5, 7, 4],
+        snoozeMinutes: 10,
+      },
     },
   };
 }

@@ -47,6 +47,10 @@ export function activeProfile(name: string): Profile {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 60,
       },
+      COMPRESSION_LOW: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
     },
   };
 }

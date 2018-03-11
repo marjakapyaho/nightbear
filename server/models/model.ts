@@ -160,14 +160,14 @@ export interface Carbs {
 }
 
 export type Situation
-  = 'OUTDATED'
-  | 'HIGH'
-  | 'PERSISTENT_HIGH'
+  = 'BATTERY'
+  | 'OUTDATED'
   | 'LOW'
-  | 'RISING'
   | 'FALLING'
-  | 'BATTERY'
-  ;
+  | 'COMPRESSION_LOW'
+  | 'HIGH'
+  | 'RISING'
+  | 'PERSISTENT_HIGH';
 
 export interface Alarm {
   // Model:
@@ -181,6 +181,10 @@ export interface Alarm {
   readonly isActive: boolean;
   readonly pushoverReceipts: string[];
 }
+
+export type State = {
+  [S in Situation]: false
+};
 
 export interface Settings {
   // Model:
