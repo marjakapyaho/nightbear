@@ -39,9 +39,20 @@ export function storageTestSuite(storage: Storage) {
     model = { ...MODEL_1, timestamp };
   });
 
-  it('saves models', () => {
+  it('saves models individually', () => {
     return storage.saveModel(model)
       .then(actual => assertEqualWithoutMeta(actual, model));
+  });
+
+  it('saves models in bulk', () => {
+    const models = [
+      model,
+    ];
+    return storage.saveModels(models)
+      .then(actuals => {
+        assert.equal(actuals.length, 1);
+        actuals.forEach((actual, i) => assertEqualWithoutMeta(actual, models[i]));
+      });
   });
 
   it('loads timeline models', () => {

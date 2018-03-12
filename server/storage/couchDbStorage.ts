@@ -38,6 +38,37 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         });
     },
 
+    saveModels(models) {
+      const metas = models.map(createModelMeta);
+      const docs = models.map((model, i) => {
+        const { _id, _rev, modelVersion } = metas[i];
+        const doc: PouchDB.Core.PutDocument<Model> = {
+          ...model as Model, // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+          _id,
+          _rev: _rev || undefined,
+          modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
+        };
+        return doc;
+      });
+      return db.bulkDocs(docs)
+        .then(res => {
+          return models.map((model, i) => {
+            const updatedMeta: CouchDbModelMeta = {
+              ...metas[i],
+              _rev: res[i].rev, // update the model meta with the _rev assigned by the DB
+            };
+            return {
+              ...model as Model, // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+              modelMeta: updatedMeta,
+            } as any;
+          });
+        })
+        .catch((errObj: PouchDB.Core.Error) => {
+          const idList = models.map(model => `"${getStorageKey(model)}"`).join(', ');
+          throw new Error(`Couldn't save model${idList.length ? 's' : ''} ${idList}: ${errObj.message}`); // refine the error before giving it out
+        });
+    },
+
     loadTimelineModels(fromTimePeriod) {
       return db.allDocs({
         include_docs: true,
