@@ -1,3 +1,5 @@
+import { SensorEntry } from '../models/model';
+
 export type ObjMap<K extends string, V> = { [P in K]: V };
 
 export function mapObject<K extends string, V1, V2>(
@@ -12,3 +14,8 @@ export function mapObject<K extends string, V1, V2>(
       return memo;
     }, {} as ObjMap<K, V2>);
 }
+
+// TODO: try to generalize
+export type SensorEntryWithBg = SensorEntry & { bloodGlucose: number; };
+
+export const hasBloodGlucose = (e: SensorEntry): e is SensorEntryWithBg => !!e.bloodGlucose;

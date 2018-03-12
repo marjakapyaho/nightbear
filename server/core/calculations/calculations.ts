@@ -1,3 +1,7 @@
+import { SensorEntry } from '../../models/model';
+import { reduce } from 'lodash';
+import { hasBloodGlucose } from '../../utils/data';
+
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const TIME_LIMIT_FOR_SLOPE = 25 * MIN_IN_MS;
@@ -36,4 +40,16 @@ export function isDexcomEntryValid(noise: number, sgv: number): boolean {
 
 export function roundTo2Decimals(num: number) {
   return Math.round(num * 100) / 100;
+}
+
+export function calculateHba1c(entries: SensorEntry[]) {
+  const numericEntries = entries.filter(hasBloodGlucose);
+  const sumOfEntries = reduce(numericEntries, (sum, entry) => {
+    return sum + changeBloodGlucoseUnitToMgdl(entry.bloodGlucose);
+  }, 0);
+
+  const avgGlucose = sumOfEntries / numericEntries.length;
+
+  // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
+  return ((avgGlucose + 46.7) / 28.7) - 0.6;
 }

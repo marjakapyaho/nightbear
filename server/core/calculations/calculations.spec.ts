@@ -1,12 +1,14 @@
 import { assert } from 'chai';
 import 'mocha';
 import {
+  calculateHba1c,
   calculateRaw,
   changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
   isDexcomEntryValid,
   roundTo2Decimals,
 } from './calculations';
+import { sensorEntries1, sensorEntries2 } from './test-data/sensor-entries';
 
 describe('core/calculations', () => {
 
@@ -71,5 +73,10 @@ describe('core/calculations', () => {
     assert.deepEqual(roundTo2Decimals(34.0879), 34.09);
     assert.deepEqual(roundTo2Decimals(5.9999), 6.00);
     assert.deepEqual(roundTo2Decimals(2.457), 2.46);
+  });
+
+  it('calculateHba1c', () => {
+    assert.deepEqual(calculateHba1c(sensorEntries1), 5.3278247884519665);
+    assert.deepEqual(calculateHba1c(sensorEntries2), 8.56326530612245);
   });
 });
