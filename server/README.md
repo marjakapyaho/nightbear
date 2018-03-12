@@ -14,3 +14,10 @@ Create a local dev DB:
 1. Use `export NIGHTBEAR_DB_URL=http://admin:admin@localhost:5984/dev`
 1. Use `export NIGHTBEAR_TEST_DB_URL=http://admin:admin@localhost:5984/test`
 1. Run `npm test` to see that everything works
+
+## Backups
+
+Useful utils for backing up/moving the DB's around:
+
+1. https://www.npmjs.com/package/@cloudant/couchbackup
+1. https://www.npmjs.com/package/couchreplicate
