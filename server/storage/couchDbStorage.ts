@@ -21,25 +21,12 @@ export function createCouchDbStorage(dbUrl: string): Storage {
 
   const db = new PouchDB(dbUrl);
 
-  return {
+  let self: Storage;
+
+  return self = {
 
     saveModel(model) {
-      const modelMeta = createModelMeta(model);
-      const { _id, _rev, modelVersion } = modelMeta;
-      const doc: PouchDB.Core.PutDocument<Model> = {
-        ...model as Model, // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
-        _id,
-        _rev: _rev || undefined,
-        modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
-      };
-      return db.put(doc) // save the doc in the DB
-        .then(res => {
-          const updatedMeta: CouchDbModelMeta = { ...modelMeta, _rev: res.rev }; // update the model with the _rev assigned by the DB
-          return { ...model as Model, modelMeta: updatedMeta } as any; // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
-        })
-        .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't save model "${modelMeta._id}": ${errObj.message}`); // refine the error before giving it out
-        });
+      return self.saveModels([ model ]).then(models => models[0]);
     },
 
     saveModels(models) {
@@ -58,7 +45,11 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         .then((res: PouchDbResult[]) => {
           if (res.some(isErrorResult)) {
             const resMap = res.map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`).join('\n');
-            throw new Error(`Couldn't save some models:\n${resMap}`);
+            if (res.length === 1) {
+              throw new Error(`Couldn't save model: ${resMap.trim()}`);
+            } else {
+              throw new Error(`Couldn't save some models:\n${resMap}`);
+            }
           }
           return models.map((model, i) => {
             const updatedMeta: CouchDbModelMeta = {
