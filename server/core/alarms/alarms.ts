@@ -1,4 +1,4 @@
-import { Alarm, Profile, State } from '../../models/model';
+import { Alarm, Profile, Situation, State } from '../../models/model';
 import { filter, compact, map, find, sum, take, findIndex } from 'lodash';
 import { MIN_IN_MS } from '../calculations/calculations';
 
@@ -8,17 +8,30 @@ export function alarms(
   activeProfile: Profile,
   activeAlarms: Alarm[]) {
 
-  const alarmsToRemove = filter(activeAlarms, (alarm) => !state[alarm.situationType]);
-  const alarmsToKeep = filter(activeAlarms, (alarm) => state[alarm.situationType]);
-  const alarmsToCreate = compact(map(state, (value, key) => {
-    if (!value) return;
-    if (find(alarmsToKeep, { type: key })) return;
-    return key;
-  }));
+  const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
 
   handleAlarmsToRemove(alarmsToRemove);
   handleAlarmsToKeep(alarmsToKeep, currentTimestamp, activeProfile);
   handleAlarmsToCreate(alarmsToCreate);
+}
+
+export function detectAlarmActions(
+  state: State,
+  activeAlarms: Alarm[]) {
+
+  const alarmsToRemove = filter(activeAlarms, (alarm) => !state[alarm.situationType]);
+  const alarmsToKeep = filter(activeAlarms, (alarm) => state[alarm.situationType]);
+  const alarmsToCreate = compact(map(state, (value, key) => {
+    if (!value) return;
+    if (find(alarmsToKeep, { situationType: key })) return;
+    return key as Situation;
+  }));
+
+  return {
+    alarmsToRemove,
+    alarmsToKeep,
+    alarmsToCreate,
+  };
 }
 
 function handleAlarmsToRemove(alarms: Alarm[]) {
@@ -70,7 +83,7 @@ function handleAlarmsToKeep(
 
 }
 
-function handleAlarmsToCreate(alarmTypes: string[]) {
+function handleAlarmsToCreate(alarmTypes: Situation[]) {
   alarmTypes.forEach((alarmType) => {
     console.log('creating new alarm with type', alarmType);
     // TODO: operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
