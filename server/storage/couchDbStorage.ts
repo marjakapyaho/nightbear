@@ -12,6 +12,10 @@ export interface CouchDbModelMeta {
 const PREFIX_TIMELINE = 'timeline';
 const PREFIX_GLOBAL = 'global';
 
+type PouchDbResult = PouchDB.Core.Response | PouchDB.Core.Error;
+
+const isErrorResult = (res: PouchDbResult): res is PouchDB.Core.Error => 'error' in res;
+
 export function createCouchDbStorage(dbUrl: string): Storage {
   assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
 
@@ -51,21 +55,21 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         return doc;
       });
       return db.bulkDocs(docs)
-        .then(res => {
+        .then((res: PouchDbResult[]) => {
+          if (res.some(isErrorResult)) {
+            const resMap = res.map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`).join('\n');
+            throw new Error(`Couldn't save some models:\n${resMap}`);
+          }
           return models.map((model, i) => {
             const updatedMeta: CouchDbModelMeta = {
               ...metas[i],
-              _rev: res[i].rev, // update the model meta with the _rev assigned by the DB
+              _rev: (res[i] as PouchDB.Core.Response).rev, // update the model meta with the _rev assigned by the DB
             };
             return {
               ...model as Model, // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
               modelMeta: updatedMeta,
             } as any;
           });
-        })
-        .catch((errObj: PouchDB.Core.Error) => {
-          const idList = models.map(model => `"${getStorageKey(model)}"`).join(', ');
-          throw new Error(`Couldn't save model${idList.length ? 's' : ''} ${idList}: ${errObj.message}`); // refine the error before giving it out
         });
     },
 

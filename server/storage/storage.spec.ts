@@ -44,6 +44,15 @@ export function storageTestSuite(storage: Storage) {
       .then(actual => assertEqualWithoutMeta(actual, model));
   });
 
+  it('reports save errors individually', () => {
+    return storage.saveModel(MODEL_2)
+      .then(() => storage.saveModel(MODEL_2)) // make sure we conflict
+      .then(
+        () => { throw new Error('Expecting a failure'); },
+        err => assert.match(err.message, /Couldn't save model.*global.*Settings.*update conflict/),
+      );
+  });
+
   it('saves models in bulk', () => {
     const models = [
       model,
@@ -53,6 +62,18 @@ export function storageTestSuite(storage: Storage) {
         assert.equal(actuals.length, 1);
         actuals.forEach((actual, i) => assertEqualWithoutMeta(actual, models[i]));
       });
+  });
+
+  it('reports save errors in bulk', () => {
+    const models = [
+      model,
+      model, // make sure we conflict
+    ];
+    return storage.saveModels(models)
+      .then(
+        () => { throw new Error('Expecting a failure'); },
+        err => assert.match(err.message, /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/),
+      );
   });
 
   it('loads timeline models', () => {
