@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SSH_TARGET="ubuntu@server-stage.nightbear.fi"
+SSH_TARGET="ubuntu@server-stage-temp.nightbear.fi"
 REMOTE_SCRIPT="aws-ec2-update-remote.sh"
 TRACK_BRANCH="server-next"
 COMPOSE_SERVICE="server-stage"
