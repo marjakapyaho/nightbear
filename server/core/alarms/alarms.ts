@@ -2,7 +2,7 @@ import { Alarm, Profile, Situation, State } from '../../models/model';
 import { filter, compact, map, find, sum, take, findIndex } from 'lodash';
 import { MIN_IN_MS } from '../calculations/calculations';
 
-export function alarms(
+export function runAlarmChecks(
   state: State,
   currentTimestamp: number,
   activeProfile: Profile,

@@ -1,4 +1,4 @@
-import { startExpressServer } from './utils/express';
+import { startExpressServer } from './main/express';
 import { createNodeContext } from './models/api';
 import { getServerStatus } from './api/getServerStatus/getServerStatus';
 import { uploadParakeetEntry } from './api/uploadParakeetEntry/uploadParakeetEntry';
