@@ -108,7 +108,10 @@ resource "aws_instance" "server_stage" {
   # Run provisioners on the instance after creating it
 
   provisioner "remote-exec" {
-    inline = ["echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > .env"]
+    inline = [
+      "echo NIGHTBEAR_COUCHDB_PASSWORD=${var.couchdb_password_stage} >> .env",
+      "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} >> .env",
+    ]
   }
   provisioner "remote-exec" {
     script = "aws-ec2-provision.sh"
