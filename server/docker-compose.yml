@@ -43,6 +43,9 @@ services:
     environment:
       COUCHDB_USER: "admin"
       COUCHDB_PASSWORD: "${NIGHTBEAR_COUCHDB_PASSWORD}"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "db-stage.nightbear.fi"
+      VIRTUAL_HOST: "db-stage.nightbear.fi"
 
   server-stage:
     build: .
