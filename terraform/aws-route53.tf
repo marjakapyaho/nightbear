@@ -46,6 +46,14 @@ resource "aws_route53_record" "server_stage" {
   records = ["${aws_instance.server_stage.public_ip}"]
 }
 
+resource "aws_route53_record" "db_stage" {
+  zone_id = "${aws_route53_zone.main.zone_id}"
+  name    = "db-stage.nightbear.fi"
+  type    = "A"
+  ttl     = "${var.aws_route53_default_ttl}"
+  records = ["${aws_instance.server_stage.public_ip}"]
+}
+
 resource "aws_route53_record" "server-main" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server.nightbear.fi"
