@@ -38,7 +38,7 @@ export function getProfileSettings(timestamp: number): Profile {
   return {
     modelType: 'Profile',
     profileName: 'night',
-    activatedAt: {
+    activatedAtUtc: {
       hours: 1,
       minutes: 20,
     },
@@ -86,6 +86,7 @@ export function getProfileSettings(timestamp: number): Profile {
         snoozeMinutes: 10,
       },
     },
+    pushoverLevels: [],
   };
 }
 

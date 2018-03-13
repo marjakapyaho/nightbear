@@ -61,6 +61,12 @@ function handleAlarmsToKeep(
     const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
     const neededLevel = findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
 
+    // TODO: find out correct level from settings.profile
+    // this doesn't do anything yet
+    const pushoverLevels = activeProfile.pushoverLevels;
+    const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : null;
+    console.log(pushoverRecipient);
+
     if (neededLevel !== alarm.alarmLevel) {
       const changedAlarm = Object.assign(alarm, ({ alarmLevel: neededLevel }));
       console.log('Save changed alarm', changedAlarm); // Note: only if pushover is successful

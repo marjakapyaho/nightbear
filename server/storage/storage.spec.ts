@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from '../models/model';
 import { Storage } from './storage';
+import { activeProfile } from '../utils/test';
 
 // Asserts deep equality of 2 Models, ignoring their metadata
 function assertEqualWithoutMeta(actual: Model, expected: Model): void {
@@ -21,6 +22,7 @@ export const MODEL_1: Carbs = {
 export const MODEL_2: Settings = {
   modelType: 'Settings',
   alarmsEnabled: false,
+  activeProfile: activeProfile('day'),
 };
 
 export function storageTestSuite(storage: Storage) {
