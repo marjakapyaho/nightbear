@@ -18,8 +18,7 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
   const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
   // Save entries to db
-  context.storage.saveModel(parakeetEntry);
-  context.storage.saveModel(parakeetStatus);
+  context.storage.saveModels([ parakeetEntry, parakeetStatus ]);
 
   return createResponse(PARAKEET_RESPONSE);
 }
