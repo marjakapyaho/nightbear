@@ -46,6 +46,7 @@ services:
       LETSENCRYPT_EMAIL: "admin@nightbear.fi"
       LETSENCRYPT_HOST: "db-stage.nightbear.fi"
       VIRTUAL_HOST: "db-stage.nightbear.fi"
+      VIRTUAL_PORT: "5984"
 
   server-stage:
     build: .
@@ -57,6 +58,7 @@ services:
       LETSENCRYPT_EMAIL: "admin@nightbear.fi"
       LETSENCRYPT_HOST: "server-stage-temp.nightbear.fi"
       VIRTUAL_HOST: "server-stage-temp.nightbear.fi"
+      VIRTUAL_PORT: "3000"
       NIGHTBEAR_DB_URL: "http://admin:${NIGHTBEAR_COUCHDB_PASSWORD}@db-stage:5984/nightbear_stage"
 
 volumes:
