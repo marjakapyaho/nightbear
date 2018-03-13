@@ -42,7 +42,10 @@ services:
       - "5984"
     environment:
       COUCHDB_USER: "admin"
-      COUCHDB_PASSWORD: "admin"
+      COUCHDB_PASSWORD: "${NIGHTBEAR_COUCHDB_PASSWORD}"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "db-stage.nightbear.fi"
+      VIRTUAL_HOST: "db-stage.nightbear.fi"
 
   server-stage:
     build: .
@@ -54,7 +57,7 @@ services:
       LETSENCRYPT_EMAIL: "admin@nightbear.fi"
       LETSENCRYPT_HOST: "server-stage-temp.nightbear.fi"
       VIRTUAL_HOST: "server-stage-temp.nightbear.fi"
-      NIGHTBEAR_DB_URL: "http://admin:admin@db-stage:5984/nightbear_stage"
+      NIGHTBEAR_DB_URL: "http://admin:${NIGHTBEAR_COUCHDB_PASSWORD}@db-stage:5984/nightbear_stage"
 
 volumes:
   nginx-data:

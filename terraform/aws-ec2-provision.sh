@@ -1,6 +1,8 @@
 #!/bin/bash
 
-DB_URL="http://admin:admin@localhost:5984" # note: this URL only needs to work WITHIN the DB container itself
+source ~/.env # make any secrets deposited by the previous steps available
+
+DB_URL="http://admin:$NIGHTBEAR_COUCHDB_PASSWORD@localhost:5984" # note: this URL only needs to work WITHIN the DB container itself
 DEFAULT_DB="nightbear_stage"
 
 # https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-convenience-script

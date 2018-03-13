@@ -10,6 +10,10 @@ variable "papertrail_host" {
   description = "syslog drain to use for sending logs to Papertrail (a.k.a. NIGHTBEAR_PAPERTRAIL_HOST)"
 }
 
+variable "couchdb_password_stage" {
+  description = "Password to set on the staging env CouchDB (a.k.a. NIGHTBEAR_COUCHDB_PASSWORD)"
+}
+
 variable "aws_region" {
   description = "AWS Region (AWS_DEFAULT_REGION)"
   default     = "eu-central-1"
