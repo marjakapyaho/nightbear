@@ -5,7 +5,7 @@
 # https://www.terraform.io/docs/providers/aws/r/lambda_function.html
 resource "aws_lambda_function" "router_function" {
   function_name    = "NightbearRouter"
-  filename         = "aws-lambda-router.zip" # from: https://github.com/jareware/lambda-multicast-proxy
+  filename         = "aws-lambda-router.zip"                          # from: https://github.com/jareware/lambda-multicast-proxy
   source_code_hash = "${base64sha256(file("aws-lambda-router.zip"))}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
@@ -73,20 +73,26 @@ resource "aws_api_gateway_integration" "router_proxy_integration" {
 }
 
 resource "aws_api_gateway_method_response" "router_proxy_response" {
-  rest_api_id     = "${aws_api_gateway_rest_api.router_api.id}"
-  resource_id     = "${aws_api_gateway_resource.router_proxy_resource.id}"
-  http_method     = "${aws_api_gateway_method.router_proxy_method.http_method}"
-  status_code     = "200"
-  response_models = { "application/json" = "Empty" }
+  rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
+  resource_id = "${aws_api_gateway_resource.router_proxy_resource.id}"
+  http_method = "${aws_api_gateway_method.router_proxy_method.http_method}"
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
 }
 
 resource "aws_api_gateway_integration_response" "router_proxy_integration_response" {
-  depends_on         = [ "aws_api_gateway_integration.router_proxy_integration" ]
-  rest_api_id        = "${aws_api_gateway_rest_api.router_api.id}"
-  resource_id        = "${aws_api_gateway_resource.router_proxy_resource.id}"
-  http_method        = "${aws_api_gateway_method.router_proxy_method.http_method}"
-  status_code        = "${aws_api_gateway_method_response.router_proxy_response.status_code}"
-  response_templates = { "application/json" = "" }
+  depends_on  = ["aws_api_gateway_integration.router_proxy_integration"]
+  rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
+  resource_id = "${aws_api_gateway_resource.router_proxy_resource.id}"
+  http_method = "${aws_api_gateway_method.router_proxy_method.http_method}"
+  status_code = "${aws_api_gateway_method_response.router_proxy_response.status_code}"
+
+  response_templates = {
+    "application/json" = ""
+  }
 }
 
 # Allow responding to OPTIONS requests for CORS clients with a MOCK endpoint:
@@ -99,10 +105,11 @@ resource "aws_api_gateway_method" "router_options_method" {
 }
 
 resource "aws_api_gateway_integration" "router_options_integration" {
-  rest_api_id       = "${aws_api_gateway_rest_api.router_api.id}"
-  resource_id       = "${aws_api_gateway_resource.router_proxy_resource.id}"
-  http_method       = "${aws_api_gateway_method.router_options_method.http_method}"
-  type              = "MOCK"
+  rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
+  resource_id = "${aws_api_gateway_resource.router_proxy_resource.id}"
+  http_method = "${aws_api_gateway_method.router_options_method.http_method}"
+  type        = "MOCK"
+
   request_templates = {
     "application/json" = <<EOF
 { "statusCode": 200 }
@@ -111,29 +118,34 @@ EOF
 }
 
 resource "aws_api_gateway_integration_response" "router_options_integration_response" {
-  depends_on          = [ "aws_api_gateway_integration.router_options_integration" ]
-  rest_api_id         = "${aws_api_gateway_rest_api.router_api.id}"
-  resource_id         = "${aws_api_gateway_resource.router_proxy_resource.id}"
-  http_method         = "${aws_api_gateway_method.router_options_method.http_method}"
-  status_code         = "200"
+  depends_on  = ["aws_api_gateway_integration.router_options_integration"]
+  rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
+  resource_id = "${aws_api_gateway_resource.router_proxy_resource.id}"
+  http_method = "${aws_api_gateway_method.router_options_method.http_method}"
+  status_code = "200"
+
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS,GET,PUT,PATCH,DELETE'",
-    "method.response.header.Access-Control-Allow-Origin" = "'*'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS,GET,PUT,PATCH,DELETE'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
 resource "aws_api_gateway_method_response" "router_options_response" {
-  depends_on          = [ "aws_api_gateway_method.router_options_method" ]
-  rest_api_id         = "${aws_api_gateway_rest_api.router_api.id}"
-  resource_id         = "${aws_api_gateway_resource.router_proxy_resource.id}"
-  http_method         = "OPTIONS"
-  status_code         = "200"
-  response_models     = { "application/json" = "Empty" }
+  depends_on  = ["aws_api_gateway_method.router_options_method"]
+  rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
+  resource_id = "${aws_api_gateway_resource.router_proxy_resource.id}"
+  http_method = "OPTIONS"
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true,
-    "method.response.header.Access-Control-Allow-Methods" = true,
-    "method.response.header.Access-Control-Allow-Origin" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
   }
 }
 
@@ -149,7 +161,8 @@ variable "router_stage_name" {
 resource "aws_api_gateway_deployment" "router_deployment" {
   rest_api_id = "${aws_api_gateway_rest_api.router_api.id}"
   stage_name  = "${var.router_stage_name}"
-  depends_on  = [
+
+  depends_on = [
     "aws_api_gateway_integration.router_proxy_integration",
     "aws_api_gateway_integration.router_integration_root",
     "aws_api_gateway_integration.router_options_integration",
@@ -159,7 +172,8 @@ resource "aws_api_gateway_deployment" "router_deployment" {
 # Add necessary permissions for reading events from API Gateway, and writing logs to CloudWatch:
 
 resource "aws_iam_role" "router_role" {
-  name               = "AllowLambdaExec"
+  name = "AllowLambdaExec"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -187,8 +201,9 @@ resource "aws_lambda_permission" "router_api_gw_allow" {
 
 # https://github.com/terraform-providers/terraform-provider-aws/issues/2237
 resource "aws_iam_policy" "router_logging_allow" {
-  name   = "NightbearRouterAllowLogging"
-  path   = "/"
+  name = "NightbearRouterAllowLogging"
+  path = "/"
+
   policy = <<EOF
 {
   "Version": "2012-10-17",

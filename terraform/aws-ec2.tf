@@ -1,9 +1,11 @@
 # Based on https://github.com/terraform-providers/terraform-provider-aws/tree/master/examples/two-tier
 
 # Output connection info for update scripts etc
+
 output "ec2_server_stage_user" {
   value = "ubuntu"
 }
+
 output "ec2_server_stage_ip" {
   value = "${aws_instance.server_stage.public_ip}"
 }
@@ -84,14 +86,15 @@ resource "aws_instance" "server_stage" {
   connection {
     # The default login name for our AMI
     user = "ubuntu"
+
     # Configure SSH access via private key
-    agent = false
+    agent       = false
     private_key = "${file("terraform.id_rsa")}"
   }
 
   # EC2 instance type & image
   instance_type = "t2.micro"
-  ami = "${var.aws_ami}"
+  ami           = "${var.aws_ami}"
 
   # The name of our SSH keypair we created above
   key_name = "${aws_key_pair.ec2_provisioner.id}"
@@ -103,8 +106,9 @@ resource "aws_instance" "server_stage" {
   subnet_id = "${aws_subnet.default.id}"
 
   # Run provisioners on the instance after creating it
+
   provisioner "remote-exec" {
-    inline = [ "echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > .env" ]
+    inline = ["echo NIGHTBEAR_PAPERTRAIL_HOST=${var.papertrail_host} > .env"]
   }
   provisioner "remote-exec" {
     script = "aws-ec2-provision.sh"

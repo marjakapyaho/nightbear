@@ -8,13 +8,14 @@ resource "aws_cloudfront_distribution" "router_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = ""
-  aliases             = [ "${var.router_domain_name}" ]
+  aliases             = ["${var.router_domain_name}"]
   price_class         = "PriceClass_100"
 
   origin {
     # Sadly, the aws_api_gateway_deployment provider doesn't export this value on its own
     # e.g. "https://abcdefg.execute-api.eu-central-1.amazonaws.com/default" => "abcdefg.execute-api.eu-central-1.amazonaws.com"
     domain_name = "${replace(aws_api_gateway_deployment.router_deployment.invoke_url, "/^.*\\/\\/(.*)\\/.*$/", "$1")}"
+
     origin_id   = "NightbearRouter"
     origin_path = "/${var.router_stage_name}"
 
@@ -22,19 +23,20 @@ resource "aws_cloudfront_distribution" "router_distribution" {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = [ "TLSv1", "TLSv1.1", "TLSv1.2" ]
+      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
   }
 
   default_cache_behavior {
-    allowed_methods        = [ "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT" ]
-    cached_methods         = [ "GET", "HEAD" ]
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "NightbearRouter"
     viewer_protocol_policy = "allow-all"
+
     # TODO: https://github.com/terraform-providers/terraform-provider-aws/issues/1994
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl     = 0
+    default_ttl = 3600
+    max_ttl     = 86400
 
     forwarded_values {
       query_string = true
@@ -71,7 +73,7 @@ provider "aws" {
 
 # https://www.terraform.io/docs/providers/aws/r/acm_certificate.html
 resource "aws_acm_certificate" "router_cert" {
-  provider          = "aws.acm_provider" # because ACM needs to be used in the "us-east-1" region
+  provider          = "aws.acm_provider"          # because ACM needs to be used in the "us-east-1" region
   domain_name       = "${var.router_domain_name}"
   validation_method = "DNS"
 }
@@ -80,12 +82,12 @@ resource "aws_route53_record" "router_cert_validation" {
   name    = "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_name}"
   type    = "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_type}"
   zone_id = "${aws_route53_zone.main.zone_id}"
-  records = [ "${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_value}" ]
+  records = ["${aws_acm_certificate.router_cert.domain_validation_options.0.resource_record_value}"]
   ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "router_cert_validation" {
-  provider                = "aws.acm_provider" # because ACM needs to be used in the "us-east-1" region
+  provider                = "aws.acm_provider"                                    # because ACM needs to be used in the "us-east-1" region
   certificate_arn         = "${aws_acm_certificate.router_cert.arn}"
-  validation_record_fqdns = [ "${aws_route53_record.router_cert_validation.fqdn}" ]
+  validation_record_fqdns = ["${aws_route53_record.router_cert_validation.fqdn}"]
 }

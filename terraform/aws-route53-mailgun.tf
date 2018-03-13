@@ -3,6 +3,7 @@ resource "aws_route53_record" "mailgun-mx" {
   name    = "nightbear.fi"
   type    = "MX"
   ttl     = "${var.aws_route53_default_ttl}"
+
   records = [
     "10 mxa.mailgun.org",
     "10 mxb.mailgun.org",

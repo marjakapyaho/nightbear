@@ -13,7 +13,7 @@ resource "aws_route53_record" "default-web" {
 
   alias {
     name                   = "d1v0fks74vpmvu.cloudfront.net."
-    zone_id                = "Z2FDTNDATAQYW2" # note: keep this in upper case, otherwise Terraform will keep seeing it as a difference when applying
+    zone_id                = "Z2FDTNDATAQYW2"                 # note: keep this in upper case, otherwise Terraform will keep seeing it as a difference when applying
     evaluate_target_health = false
   }
 }
@@ -23,7 +23,7 @@ resource "aws_route53_record" "legacy-nightscout" {
   name    = "nightscout.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = [ "46.101.64.73" ]
+  records = ["46.101.64.73"]
 }
 
 resource "aws_route53_record" "router-web" {
@@ -43,7 +43,7 @@ resource "aws_route53_record" "server_stage" {
   name    = "server-stage-temp.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = [ "${aws_instance.server_stage.public_ip}" ]
+  records = ["${aws_instance.server_stage.public_ip}"]
 }
 
 resource "aws_route53_record" "server-main" {
@@ -51,5 +51,5 @@ resource "aws_route53_record" "server-main" {
   name    = "server.nightbear.fi"
   type    = "A"
   ttl     = "${var.aws_route53_default_ttl}"
-  records = [ "213.243.183.237" ]
+  records = ["213.243.183.237"]
 }
