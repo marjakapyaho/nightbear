@@ -22,20 +22,20 @@ export function getEntries(request: Request, context: Context): Response {
 export function getSensorEntries(
   from: number,
   to: number): SensorEntry[] {
-  console.log('Fetch sensor entries from time range', from, to); // tslint:disable-line:no-console
+  console.log('Fetch sensor entries from time range', from, to);
   return [];
 }
 
 export function getInsulin(
   from: number,
   to: number): Insulin[] {
-  console.log('Fetch insulin from time range', from, to); // tslint:disable-line:no-console
+  console.log('Fetch insulin from time range', from, to);
   return [];
 }
 
 export function getCarbs(
   from: number,
   to: number): Carbs[] {
-  console.log('Fetch carbs from time range', from, to); // tslint:disable-line:no-console
+  console.log('Fetch carbs from time range', from, to);
   return [];
 }

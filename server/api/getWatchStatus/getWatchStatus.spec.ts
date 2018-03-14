@@ -1,10 +1,11 @@
 import 'mocha';
 import { assert } from 'chai';
 import { getWatchStatus } from './getWatchStatus';
-import { createTestContext } from '../../utils/test';
+import { createTestContext, createTestRequest } from '../../utils/test';
 
 describe('api/getWatchStatus', () => {
 
+  const request = createTestRequest();
   const context = createTestContext();
 
   // Mock objects
@@ -30,7 +31,7 @@ describe('api/getWatchStatus', () => {
   // Assertations
   // TODO: this doesn't really test anything
   it('get watch status', () => {
-    return getWatchStatus(context)
+    return getWatchStatus(request, context)
       .then(res => {
         assert.deepEqual(
           res.responseBody,

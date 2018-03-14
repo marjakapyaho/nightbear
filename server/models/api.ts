@@ -42,7 +42,7 @@ export interface Context {
 
 export type RequestHandler = (request: Request, context: Context) => Response;
 
-export function createResponse(responseBody: object | string): Response {
+export function createResponse(responseBody: object | string = ''): Response {
   return Promise.resolve({
     responseStatus: 200,
     responseBody,

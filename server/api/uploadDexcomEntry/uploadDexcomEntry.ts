@@ -1,6 +1,6 @@
 import { extend, find } from 'lodash';
 import { Response, Request, createResponse, Context } from '../../models/api';
-import {DeviceStatus, DexcomCalibration, DexcomRawSensorEntry, DexcomSensorEntry, MeterEntry} from '../../models/model';
+import { DeviceStatus, DexcomCalibration, DexcomRawSensorEntry, DexcomSensorEntry, MeterEntry, Model } from '../../models/model';
 import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from '../../core/calculations/calculations';
 
 const ENTRY_TYPES = {
@@ -10,49 +10,36 @@ const ENTRY_TYPES = {
 };
 
 export function uploadDexcomEntry(request: Request, context: Context): Response {
-
   const { requestBody } = request;
   const requestObject = requestBody as any; // we don't know what this object is yet
   const timestamp = context.timestamp();
   const latestCalibration = getLatestCalibration(context.timestamp());
 
-  if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
-    const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestCalibration, timestamp);
-    if (dexcomEntry.modelType === 'DexcomSensorEntry') {
-      console.log('SAVING DexcomSensorEntry'); // tslint:disable-line:no-console
-      console.log(dexcomEntry); // tslint:disable-line:no-console
-      // TODO: save DexcomSensorEntry
-    }
-    else {
-      console.log('SAVING DexcomRawSensorEntry'); // tslint:disable-line:no-console
-      console.log(dexcomEntry); // tslint:disable-line:no-console
-      // TODO: save DexcomRawSensorEntry
-    }
-  }
-  else if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
-    const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration, timestamp);
-    if (newDexcomCalibration) {
-      console.log('SAVING DexcomCalibration with meter entry'); // tslint:disable-line:no-console
-      console.log(newDexcomCalibration); // tslint:disable-line:no-console
-      // TODO: save DexcomCalibration
-    }
-  }
-  else if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
-    const updatedDexcomCalibration: DexcomCalibration | null = parseCalibration(requestObject, latestCalibration);
-    if (updatedDexcomCalibration) {
-      console.log('SAVING DexcomCalibration with cal'); // tslint:disable-line:no-console
-      console.log(updatedDexcomCalibration); // tslint:disable-line:no-console
-      // TODO: save DexcomCalibration
-    }
-  }
-  else if (requestObject.hasOwnProperty('uploaderBattery')) {
-    const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
-    console.log('SAVING DeviceStatus'); // tslint:disable-line:no-console
-    console.log(dexcomStatus); // tslint:disable-line:no-console
-    // TODO: save DeviceStatus
-  }
-
-  return createResponse(requestObject); // Nightscout api responds with request data
+  return Promise.resolve()
+    .then((): Promise<Model> => {
+      if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
+        const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestCalibration, timestamp);
+        return context.storage.saveModel(dexcomEntry);
+      }
+      else if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
+        const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration, timestamp);
+        if (newDexcomCalibration) {
+          return context.storage.saveModel(newDexcomCalibration);
+        }
+      }
+      else if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
+        const updatedDexcomCalibration: DexcomCalibration | null = parseCalibration(requestObject, latestCalibration);
+        if (updatedDexcomCalibration) {
+          return context.storage.saveModel(updatedDexcomCalibration);
+        }
+      }
+      else if (requestObject.hasOwnProperty('uploaderBattery')) {
+        const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
+        return context.storage.saveModel(dexcomStatus);
+      }
+      return Promise.reject('Unknown Dexcom entry type');
+    })
+    .then(() => Promise.resolve(createResponse(requestObject)));
 }
 
 export function parseDexcomEntry(
@@ -109,6 +96,8 @@ export function initCalibration(
       modelType: 'DexcomCalibration',
       timestamp,
       meterEntries: [{
+        modelType: 'MeterEntry',
+        timestamp: 1508672249758,
         bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
         measuredAt: bgTimestamp,
       }],
@@ -158,6 +147,8 @@ function getLatestCalibration(timestamp: number): DexcomCalibration {
     modelType: 'DexcomCalibration',
     timestamp,
     meterEntries: [{
+      modelType: 'MeterEntry',
+      timestamp: 1508672249758,
       bloodGlucose: 7.7,
       measuredAt: 2343242424,
     }],

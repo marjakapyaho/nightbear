@@ -86,6 +86,8 @@ describe('api/uploadDexcomEntry', () => {
     modelType: 'DexcomCalibration',
     timestamp: 1508672249758 - 2 * 14934,
     meterEntries: [{
+      modelType: 'MeterEntry',
+      timestamp: 1508672249758,
       bloodGlucose: 8.0,
       measuredAt: 1508672249758 - 4 * 14934,
     }],
@@ -99,6 +101,8 @@ describe('api/uploadDexcomEntry', () => {
     modelType: 'DexcomCalibration',
     timestamp: 1508672249758,
     meterEntries: [{
+      modelType: 'MeterEntry',
+      timestamp: 1508672249758,
       bloodGlucose: 8.5,
       measuredAt: 1508672249758 - 3 * 14934,
     }],
@@ -112,6 +116,8 @@ describe('api/uploadDexcomEntry', () => {
     modelType: 'DexcomCalibration',
     timestamp: 1508672249758,
     meterEntries: [{
+      modelType: 'MeterEntry',
+      timestamp: 1508672249758,
       bloodGlucose: 8.5,
       measuredAt: 1508672249758 - 3 * 14934,
     }],

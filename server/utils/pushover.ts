@@ -35,9 +35,9 @@ export function sendPushoverAlarm(
   */
 }
 
-export function ackPushoverAlarms(receipts = []) {
+export function ackPushoverAlarms(receipts: string[] = []) {
   return Promise.all(receipts.map(receipt => {
-    console.log(receipt);
+    return receipt;
     /*
     return axios.post(
       'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json',
