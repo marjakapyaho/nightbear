@@ -138,6 +138,7 @@ export function getStorageKey(model: Model): string {
     case 'DexcomCalibration':
     case 'NightbearCalibration':
     case 'DeviceStatus':
+    case 'MeterEntry':
     case 'Insulin':
     case 'Carbs':
     case 'Hba1c':

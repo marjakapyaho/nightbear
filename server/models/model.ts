@@ -6,12 +6,12 @@ export type Model
   | Calibration
   | DeviceStatus
   | Hba1c
+  | MeterEntry
   | Insulin
   | Carbs
   | Alarm
   | Settings
-  | Profile
-  ;
+  | Profile;
 
 export type ModelMeta = object; // this is storage-type specific
 
@@ -29,8 +29,7 @@ export interface Sensor {
 export type SensorEntry
   = DexcomSensorEntry
   | DexcomRawSensorEntry
-  | ParakeetSensorEntry
-  ;
+  | ParakeetSensorEntry;
 
 export interface DexcomSensorEntry {
   // Model:
@@ -84,6 +83,9 @@ export type Calibration
   ;
 
 export interface MeterEntry {
+  readonly modelType: 'MeterEntry';
+  readonly modelMeta?: ModelMeta;
+  readonly timestamp: number;
   readonly bloodGlucose: number;
   readonly measuredAt: number;
 }

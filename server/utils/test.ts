@@ -1,7 +1,18 @@
-import { Context } from '../models/api';
+import { Context, Request } from '../models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from '../storage/storage';
 import { Profile } from '../models/model';
+
+export function createTestRequest(): Request {
+  return {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestParams: {},
+    requestHeaders: {},
+    requestBody: {},
+  };
+}
 
 export function createTestContext(): Context {
   return {

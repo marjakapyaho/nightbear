@@ -2,7 +2,8 @@ import { Response, Request, createResponse, Context } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
 import { calculateRaw } from '../../core/calculations/calculations';
 
-const PARAKEET_RESPONSE = '!ACK  0!'; // parakeet needs this response to work
+// parakeet needs this response to work
+const PARAKEET_RESPONSE = '!ACK  0!';
 
 export function uploadParakeetEntry(request: Request, context: Context): Response {
 
@@ -18,9 +19,8 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
   const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
   // Save entries to db
-  context.storage.saveModels([ parakeetEntry, parakeetStatus ]);
-
-  return createResponse(PARAKEET_RESPONSE);
+  return context.storage.saveModels([ parakeetEntry, parakeetStatus ])
+    .then(() => Promise.resolve(createResponse(PARAKEET_RESPONSE)));
 }
 
 export function parseParakeetEntry(
@@ -66,6 +66,8 @@ function getLatestCalibration(timestamp: number): DexcomCalibration {
     modelType: 'DexcomCalibration',
     timestamp,
     meterEntries: [{
+      modelType: 'MeterEntry',
+      timestamp: 1508672249758,
       bloodGlucose: 7.7,
       measuredAt: 2343242424,
     }],

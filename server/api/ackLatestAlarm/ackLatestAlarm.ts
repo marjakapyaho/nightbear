@@ -1,35 +1,27 @@
 import { extend } from 'lodash';
-import { Response, Context, createResponse } from '../../models/api';
+import { Response, Context, createResponse, Request } from '../../models/api';
 import { Alarm, Profile } from '../../models/model';
 import { MIN_IN_MS } from '../../core/calculations/calculations';
+import { ackPushoverAlarms } from '../../utils/pushover';
 
-export function ackLatestAlarm(context: Context): Response {
-  const activeAlarms: Alarm[] = getActiveAlarms(context.timestamp());
+export function ackLatestAlarm(_request: Request, context: Context): Response {
+  const latestActiveAlarm: Alarm = getLatestAlarms(context.timestamp());
   const profile: Profile = getProfileSettings(context.timestamp());
 
-  if (!activeAlarms.length) {
-    return createResponse({});
+  if (!latestActiveAlarm) {
+    return createResponse();
   }
 
-  // TODO: what if there are many?
-  const latestAlarm: Alarm = activeAlarms[0];
-  const snoozeTime = profile.alarmSettings[latestAlarm.situationType].snoozeMinutes;
-  if (!snoozeTime) throw new Error('Invalid alarm type');
+  const snoozeTime = profile.alarmSettings[latestActiveAlarm.situationType].snoozeMinutes;
 
-  const updatedAlarm = extend(latestAlarm, {
+  const updatedAlarm = extend(latestActiveAlarm, {
     validAfterTimestamp: context.timestamp() + snoozeTime * MIN_IN_MS,
     alarmLevel: 1,
   });
 
-  // TODO: ack pushover alarms and then save updated alarm
-  console.log(updatedAlarm); // tslint:disable-line:no-console
-  /*  return app.pushover.ackAlarms(alarm.pushoverReceipts)
-    .then(() => {
-      alarm.pushoverReceipts = [];
-      return app.data.updateAlarm(alarm);
-    })*/
-
-  return createResponse({});
+  return ackPushoverAlarms(updatedAlarm.pushoverReceipts)
+    .then(() => context.storage.saveModel(extend(updatedAlarm, { pushoverReceipts: [] })))
+    .then(() => createResponse());
 }
 
 export function getProfileSettings(timestamp: number): Profile {
@@ -90,10 +82,10 @@ export function getProfileSettings(timestamp: number): Profile {
   };
 }
 
-export function getActiveAlarms(timestamp: number): Alarm[] {
+export function getLatestAlarms(timestamp: number): Alarm {
   // TODO: use timestamp to get active alarms
-  console.log(timestamp); // tslint:disable-line:no-console
-  return [{
+  console.log(timestamp);
+  return {
     modelType: 'Alarm',
     creationTimestamp: 324234324,
     validAfterTimestamp: 234432423,
@@ -101,5 +93,5 @@ export function getActiveAlarms(timestamp: number): Alarm[] {
     situationType: 'PERSISTENT_HIGH',
     isActive: true,
     pushoverReceipts: [],
-  }];
+  };
 }

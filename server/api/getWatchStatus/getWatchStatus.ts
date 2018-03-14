@@ -1,7 +1,7 @@
-import { Response, Context, createResponse } from '../../models/api';
+import { Response, Context, createResponse, Request } from '../../models/api';
 import { Alarm, DeviceStatus } from '../../models/model';
 
-export function getWatchStatus(context: Context): Response {
+export function getWatchStatus(_request: Request, context: Context): Response {
   return createResponse({
     alarms: getActiveAlarms(context.timestamp()),
     deviceStatus: getDeviceStatus(context.timestamp()),
