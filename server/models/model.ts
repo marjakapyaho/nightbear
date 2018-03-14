@@ -192,6 +192,7 @@ export interface Settings {
   readonly modelMeta?: ModelMeta;
   // Settings:
   readonly alarmsEnabled: boolean;
+  readonly activeProfile: Profile;
 }
 
 export interface Profile {
@@ -200,7 +201,7 @@ export interface Profile {
   readonly modelMeta?: ModelMeta;
   // Profile:
   readonly profileName: string;
-  readonly activatedAt: {
+  readonly activatedAtUtc: {
     readonly hours: number;
     readonly minutes: number;
   };
@@ -220,4 +221,5 @@ export interface Profile {
       readonly snoozeMinutes: number;
     }
   };
+  readonly pushoverLevels: string[];
 }
