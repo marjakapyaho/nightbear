@@ -73,7 +73,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
         endkey: `${PREFIX_TIMELINE}/_`,
       })
-        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
@@ -85,7 +85,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         startkey: `${PREFIX_GLOBAL}/`,
         endkey: `${PREFIX_GLOBAL}/_`,
       })
-        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
         });
@@ -95,7 +95,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
-function reviveCouchDbRowIntoModel({ doc }: any): Model {
+function reviveCouchDbRowIntoModel(doc: any): Model {
 
   // Perform some basic runtime sanity checks:
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
