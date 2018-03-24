@@ -79,6 +79,35 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         });
     },
 
+    loadLatestTimelineModels(modelType, limit = 1) {
+      return Promise.resolve()
+        .then(() =>
+          db.createIndex({
+            index: { fields: [ 'modelType', '_id' ] }, // index first by "modelType", and then by "_id", since that gives us temporal ordering
+          }).catch((errObj: PouchDB.Core.Error) => {
+            throw new Error(`Couldn't create index: ${errObj.message}`); // refine the error before giving it out
+          }),
+        )
+        .then(res => {
+          if (res.result !== 'exists') {
+            // TODO: log res as info/warning
+          }
+        })
+        .then(() =>
+          db.find({
+            selector: { modelType },
+            limit,
+            sort: [{ modelType: 'desc' }, { _id: 'desc' }], // { _id: 'desc' } gives us the latest first
+          }).catch((errObj: PouchDB.Core.Error) => {
+            throw new Error(`Couldn't query index: ${errObj.message}`); // refine the error before giving it out
+          }),
+        )
+        .then(res => res.docs.map(reviveCouchDbRowIntoModel))
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't load latest timeline models: ${errObj.message}`); // refine the error before giving it out
+        });
+    },
+
     loadGlobalModels() {
       return db.allDocs({
         include_docs: true,
