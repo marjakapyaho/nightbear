@@ -1,7 +1,10 @@
 import * as PouchDB from 'pouchdb';
+import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
 import { Model, MODEL_VERSION } from '../models/model';
 import { assert, assertExhausted } from '../utils/types';
+
+PouchDB.plugin(PouchDBFind);
 
 export interface CouchDbModelMeta {
   readonly _id: string;
@@ -70,9 +73,38 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
         endkey: `${PREFIX_TIMELINE}/_`,
       })
-        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
+        });
+    },
+
+    loadLatestTimelineModels(modelType, limit = 1) {
+      return Promise.resolve()
+        .then(() =>
+          db.createIndex({
+            index: { fields: [ 'modelType', '_id' ] }, // index first by "modelType", and then by "_id", since that gives us temporal ordering
+          }).catch((errObj: PouchDB.Core.Error) => {
+            throw new Error(`Couldn't create index: ${errObj.message}`); // refine the error before giving it out
+          }),
+        )
+        .then(res => {
+          if (res.result !== 'exists') {
+            // TODO: log res as info/warning
+          }
+        })
+        .then(() =>
+          db.find({
+            selector: { modelType },
+            limit,
+            sort: [{ modelType: 'desc' }, { _id: 'desc' }], // { _id: 'desc' } gives us the latest first
+          }).catch((errObj: PouchDB.Core.Error) => {
+            throw new Error(`Couldn't query index: ${errObj.message}`); // refine the error before giving it out
+          }),
+        )
+        .then(res => res.docs.map(reviveCouchDbRowIntoModel))
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't load latest timeline models: ${errObj.message}`); // refine the error before giving it out
         });
     },
 
@@ -82,7 +114,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         startkey: `${PREFIX_GLOBAL}/`,
         endkey: `${PREFIX_GLOBAL}/_`,
       })
-        .then(res => res.rows.map(reviveCouchDbRowIntoModel))
+        .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
         });
@@ -92,7 +124,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
-function reviveCouchDbRowIntoModel({ doc }: any): Model {
+function reviveCouchDbRowIntoModel(doc: any): Model {
 
   // Perform some basic runtime sanity checks:
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);

@@ -118,4 +118,19 @@ export function storageTestSuite(storage: Storage) {
       ));
   });
 
+  it('loads latest timeline models by type', () => {
+    return Promise.resolve()
+      .then(() => [
+        { ...model, timestamp: timestamp - 2, amount: 1 },
+        { ...model, timestamp: timestamp - 1, amount: 2 },
+        { ...model, timestamp: timestamp - 0, amount: 3 },
+      ])
+      .then(storage.saveModels)
+      .then(() => storage.loadLatestTimelineModels('Carbs', 1))
+      .then(models => {
+        assert.equal(models.length, 1);
+        assertEqualWithoutMeta(models[0], { ...model, timestamp: timestamp - 0, amount: 3 });
+      });
+  });
+
 }
