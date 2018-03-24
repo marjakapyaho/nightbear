@@ -8,7 +8,7 @@
     "node": ">=8.7.0 <9"
   },
   "scripts": {
-    "preinstall": "check-node-version --package",
+    "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "start": "check-node-version --package && ts-node index.ts",
     "lint": "check-node-version --package && tslint --project . --type-check && echo lint OK",
     "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
