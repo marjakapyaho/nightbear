@@ -103,7 +103,6 @@ export interface DexcomCalibration {
   readonly isInitialCalibration: boolean;
   readonly slope: number | null;
   readonly intercept: number | null;
-  // DexcomCalibration:
   readonly scale: number | null;
 }
 
@@ -117,10 +116,12 @@ export interface NightbearCalibration {
   readonly isInitialCalibration: boolean;
   readonly slope: number;
   readonly intercept: number;
+  readonly scale: number | null;
   // NightbearCalibration:
   readonly sensorId: string; // UUID
   readonly rawValueId: string; // UUID
   readonly slopeConfidence: number;
+  readonly sensorConfidence: number;
 }
 
 export interface DeviceStatus {
