@@ -97,7 +97,7 @@ export function initCalibration(
       timestamp,
       meterEntries: [{
         modelType: 'MeterEntry',
-        timestamp: 1508672249758,
+        timestamp,
         bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
         measuredAt: bgTimestamp,
       }],
@@ -148,9 +148,9 @@ function getLatestCalibration(timestamp: number): DexcomCalibration {
     timestamp,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp,
       bloodGlucose: 7.7,
-      measuredAt: 2343242424,
+      measuredAt: timestamp,
     }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
