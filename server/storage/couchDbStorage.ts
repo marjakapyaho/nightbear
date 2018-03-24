@@ -1,7 +1,10 @@
 import * as PouchDB from 'pouchdb';
+import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
 import { Model, MODEL_VERSION } from '../models/model';
 import { assert, assertExhausted } from '../utils/types';
+
+PouchDB.plugin(PouchDBFind);
 
 export interface CouchDbModelMeta {
   readonly _id: string;
