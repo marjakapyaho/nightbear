@@ -42,6 +42,15 @@ export function roundTo2Decimals(num: number) {
   return Math.round(num * 100) / 100;
 }
 
+export function timestampIsUnderMaxAge(
+  currentTimestamp: number,
+  timestampToCheck: number,
+  maxAgeInMinutes: number): boolean
+{
+  const maxAgeInMs = maxAgeInMinutes * MIN_IN_MS;
+  return timestampToCheck > (currentTimestamp - maxAgeInMs);
+}
+
 export function calculateHba1c(entries: SensorEntry[]) {
   const numericEntries = entries.filter(hasBloodGlucose);
   const sumOfEntries = reduce(numericEntries, (sum, entry) => {
