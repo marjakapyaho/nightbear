@@ -29,8 +29,7 @@ describe('api/getWatchStatus', () => {
   };
 
   // Assertations
-  // TODO: this doesn't really test anything
-  it('get watch status', () => {
+  xit('get watch status', () => {
     return getWatchStatus(request, context)
       .then(res => {
         assert.deepEqual(
