@@ -25,3 +25,9 @@ app.alarms.runChecks(app.queryThrottleMs || 0);
 
 setInterval(app.data.getHba1c, 1000 * 60 * 60 * 6); // calculate & cache a new HBA1C every 6 hours (though a new one will be created only once per 24h)
 app.data.getHba1c(); // ...and immediately during startup
+
+// Get info about hba1c with different time spans
+setInterval(app.data.getNewHba1c, 1000 * 60 * 60 * 6, 4);
+app.data.getNewHba1c(8);
+app.data.getNewHba1c(4);
+app.data.getNewHba1c(2);

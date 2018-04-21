@@ -23,7 +23,8 @@ export default app => {
         createDeviceStatus,
         legacyPost,
         getLegacyEntries,
-        getProfileSettings
+        getProfileSettings,
+        getNewHba1c
     };
 
     // @example dbPUT('sensor-entries', { ... }) => Promise
@@ -360,6 +361,16 @@ export default app => {
                     success => log.debug('dbPUT()', doc, '=>', success), // resolve with undefined
                     failure => log.debug('dbPUT()', doc, '=> FAILURE', failure) || Promise.reject(failure) // keep the Promise rejected; we don't log this on the "error" level because sometimes a PUT is expected to fail (e.g. duplicate keys)
                 ).then(() => doc)
+            })
+    }
+
+    function getNewHba1c(weeks) {
+        return getLatestEntries(weeks * 7 * 24 * helpers.HOUR_IN_MS)
+            .then(entries => {
+                return helpers.calculateHba1c(entries);
+            })
+            .then(hba1c => {
+                log(`CALCULATED hba1c for ${weeks} weeks: ${hba1c}`);
             })
     }
 
