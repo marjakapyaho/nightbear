@@ -29,5 +29,11 @@ app.data.getHba1c(); // ...and immediately during startup
 // Get info about hba1c with different time spans
 setInterval(app.data.getNewHba1c, 1000 * 60 * 60 * 6, 4);
 app.data.getNewHba1c(8);
-app.data.getNewHba1c(4);
-app.data.getNewHba1c(2);
+
+setTimeout(function() {
+    app.data.getNewHba1c(4);
+}, 5000);
+
+setTimeout(function() {
+    app.data.getNewHba1c(2);
+}, 10000);
