@@ -65,7 +65,7 @@ describe('api/uploadParakeetEntry', () => {
   };
 
   // Assertations
-  it('uploads parakeet entry with correct response', () => {
+  xit('uploads parakeet entry with correct response', () => {
     return uploadParakeetEntry(mockRequest, context)
       .then(res => {
         assert.equal(

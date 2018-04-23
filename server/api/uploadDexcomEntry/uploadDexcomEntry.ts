@@ -1,6 +1,13 @@
 import { extend, find } from 'lodash';
 import { Response, Request, createResponse, Context } from '../../models/api';
-import { DeviceStatus, DexcomCalibration, DexcomRawSensorEntry, DexcomSensorEntry, MeterEntry, Model } from '../../models/model';
+import {
+  DeviceStatus,
+  DexcomCalibration,
+  DexcomRawSensorEntry,
+  DexcomSensorEntry,
+  MeterEntry,
+  Model,
+} from '../../models/model';
 import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from '../../core/calculations/calculations';
 
 const ENTRY_TYPES = {
@@ -13,10 +20,15 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const { requestBody } = request;
   const requestObject = requestBody as any; // we don't know what this object is yet
   const timestamp = context.timestamp();
-  const latestCalibration = getLatestCalibration(context.timestamp());
 
   return Promise.resolve()
-    .then((): Promise<Model> => {
+    .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 2))
+    .then((latestCalibrations): Promise<Model> => {
+      const latestCalibration = find(latestCalibrations as DexcomCalibration[], (cal) => cal.slope !== null); // TODO
+      if (!latestCalibration) {
+        return Promise.reject('Could not find DexcomCalibration for uploading Dexcom entry');
+      }
+
       if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
         const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestCalibration, timestamp);
         return context.storage.saveModel(dexcomEntry);
@@ -28,7 +40,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         }
       }
       else if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
-        const updatedDexcomCalibration: DexcomCalibration | null = parseCalibration(requestObject, latestCalibration);
+        const updatedDexcomCalibration: DexcomCalibration | null = amendCalibration(requestObject, latestCalibration);
         if (updatedDexcomCalibration) {
           return context.storage.saveModel(updatedDexcomCalibration);
         }
@@ -37,7 +49,11 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
         return context.storage.saveModel(dexcomStatus);
       }
-      return Promise.reject('Unknown Dexcom entry type');
+      else {
+        return Promise.reject('Unknown Dexcom entry type');
+      }
+
+      return Promise.reject('Failed to save Dexcom entry');
     })
     .then(() => Promise.resolve(createResponse(requestObject)));
 }
@@ -109,7 +125,7 @@ export function initCalibration(
   }
 }
 
-export function parseCalibration(
+export function amendCalibration(
   requestObject: { [key: string]: string },
   cal: DexcomCalibration,
 ): DexcomCalibration | null {
@@ -138,23 +154,5 @@ export function parseDexcomStatus(
     timestamp,
     batteryLevel,
     geolocation: null,
-  };
-}
-
-// TODO: this should come from db
-function getLatestCalibration(timestamp: number): DexcomCalibration {
-  return {
-    modelType: 'DexcomCalibration',
-    timestamp,
-    meterEntries: [{
-      modelType: 'MeterEntry',
-      timestamp,
-      bloodGlucose: 7.7,
-      measuredAt: timestamp,
-    }],
-    isInitialCalibration: false,
-    slope: 828.3002146147081,
-    intercept: 30000,
-    scale: 0.9980735302684531,
   };
 }

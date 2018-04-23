@@ -1,6 +1,7 @@
 import { Response, Request, createResponse, Context } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
 import { calculateRaw } from '../../core/calculations/calculations';
+import { find } from 'lodash';
 
 // parakeet needs this response to work
 const PARAKEET_RESPONSE = '!ACK  0!';
@@ -9,17 +10,23 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
 
   const { requestParams } = request;
 
-  // Get latest calibration
-  const latestCalibration = getLatestCalibration(context.timestamp());
+  return Promise.resolve()
+    .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 2))
+    .then((latestCalibrations) => {
+      const latestCalibration = find(latestCalibrations as DexcomCalibration[], (cal) => cal.slope !== null); // TODO
+      if (!latestCalibration) {
+        return Promise.reject('Could not find DexcomCalibration for uploading Parakeet entry');
+      }
 
-  // Parse parakeet entry
-  const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, latestCalibration, context.timestamp());
+      // Parse parakeet entry
+      const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, latestCalibration, context.timestamp());
 
-  // Parse parakeet status
-  const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
+      // Parse parakeet status
+      const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
-  // Save entries to db
-  return context.storage.saveModels([ parakeetEntry, parakeetStatus ])
+      // Save entries to db
+      return context.storage.saveModels([ parakeetEntry, parakeetStatus ]);
+    })
     .then(() => Promise.resolve(createResponse(PARAKEET_RESPONSE)));
 }
 
@@ -57,23 +64,5 @@ export function parseParakeetStatus(
     timestamp,
     batteryLevel,
     geolocation,
-  };
-}
-
-// TODO: this should come from db
-function getLatestCalibration(timestamp: number): DexcomCalibration {
-  return {
-    modelType: 'DexcomCalibration',
-    timestamp,
-    meterEntries: [{
-      modelType: 'MeterEntry',
-      timestamp: 1508672249758,
-      bloodGlucose: 7.7,
-      measuredAt: 2343242424,
-    }],
-    isInitialCalibration: false,
-    slope: 828.3002146147081,
-    intercept: 30000,
-    scale: 0.9980735302684531,
   };
 }
