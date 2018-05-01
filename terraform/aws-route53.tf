@@ -18,26 +18,6 @@ resource "aws_route53_record" "default-web" {
   }
 }
 
-resource "aws_route53_record" "legacy-nightscout" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "nightscout.nightbear.fi"
-  type    = "A"
-  ttl     = "${var.aws_route53_default_ttl}"
-  records = ["46.101.64.73"]
-}
-
-resource "aws_route53_record" "router-web" {
-  zone_id = "${aws_route53_zone.main.zone_id}"
-  name    = "${var.router_domain_name}"
-  type    = "A"
-
-  alias {
-    name                   = "${aws_cloudfront_distribution.router_distribution.domain_name}"
-    zone_id                = "${aws_cloudfront_distribution.router_distribution.hosted_zone_id}"
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_route53_record" "server_stage" {
   zone_id = "${aws_route53_zone.main.zone_id}"
   name    = "server-stage.nightbear.fi"
