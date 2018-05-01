@@ -67,13 +67,14 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         });
     },
 
-    loadTimelineModels(fromTimePeriod) {
+    loadTimelineModels(modelType, range: number, rangeEnd: number) {
       return db.allDocs({
         include_docs: true,
-        startkey: `${PREFIX_TIMELINE}/${timestampToString(Date.now() - fromTimePeriod)}`,
+        startkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd - range)}`,
         endkey: `${PREFIX_TIMELINE}/_`,
       })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
+        .then(models => models.filter(model => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
