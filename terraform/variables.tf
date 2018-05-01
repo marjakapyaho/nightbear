@@ -14,6 +14,10 @@ variable "couchdb_password_stage" {
   description = "Password to set on the staging env CouchDB (a.k.a. NIGHTBEAR_COUCHDB_PASSWORD)"
 }
 
+variable "db_admin_password" {
+  description = "Default admin password to set on CouchDB"
+}
+
 variable "aws_region" {
   description = "AWS Region (AWS_DEFAULT_REGION)"
   default     = "eu-central-1"
