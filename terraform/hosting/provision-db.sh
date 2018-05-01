@@ -10,6 +10,7 @@ CURL="docker-compose exec db curl"
 JSON="-H Content-Type:application/json"
 
 # Wait for the CouchDB API to come up
+docker-compose up -d db
 until $CURL $URL; do
   echo "Waiting for CouchDB to start..."
   sleep 1

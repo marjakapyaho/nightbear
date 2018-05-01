@@ -45,7 +45,7 @@ resource "aws_route53_record" "db" {
 
 # Provisioners for setting up the host, once it's up
 resource "null_resource" "provisioners" {
-  depends_on = ["aws_volume_attachment.this"] # because we depend on the EBS volume being available
+  depends_on = ["aws_volume_attachment.this", "aws_route53_record.server"] # because we depend on the EBS volume being available, and the domain being registered
 
   triggers {
     ec2_docker_host_instance_id = "${module.host.ec2_docker_host_instance_id}" # if the ec2_docker_host is re-provisioned, ensure these provisioners also re-run
@@ -78,23 +78,18 @@ resource "null_resource" "provisioners" {
     destination = "/home/${module.host.ec2_docker_host_username}/docker-compose.override.yml"
   }
 
-  # Pull images
-  provisioner "remote-exec" {
-    inline = ["echo Pulling docker images...; docker-compose pull --quiet"]
-  }
-
   # Install server depedencies
   provisioner "remote-exec" {
     script = "${path.module}/provision-server.sh"
   }
 
-  # Start services
-  provisioner "remote-exec" {
-    inline = ["docker-compose up -d"]
-  }
-
   # Prepare CouchDB for first use
   provisioner "remote-exec" {
     script = "${path.module}/provision-db.sh"
+  }
+
+  # Run first-time server deploy
+  provisioner "local-exec" {
+    command = "${path.module}/deploy-latest-server.sh"
   }
 }

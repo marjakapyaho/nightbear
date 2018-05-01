@@ -22,3 +22,7 @@ module "hosting_stage" {
   db_domain_zone    = "${aws_route53_zone.main.zone_id}"
   db_admin_password = "${var.db_admin_password}"
 }
+
+output "hosting_stage_ssh_command" {
+  value = "ssh -i terraform.id_rsa -o StrictHostKeyChecking=no ${module.hosting_stage.hosting_username}@${module.hosting_stage.hosting_public_ip}"
+}
