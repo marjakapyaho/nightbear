@@ -1,7 +1,17 @@
+import 'mocha';
 import { Context, Request } from '../models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from '../storage/storage';
 import { Profile } from '../models/model';
+import { Storage } from '../storage/storage';
+import { createCouchDbStorage } from '../storage/couchDbStorage';
+
+export function withStorage(suite: (storage: Storage) => void) {
+  const NIGHTBEAR_TEST_DB_URL = process.env.NIGHTBEAR_TEST_DB_URL || null;
+  (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('with CouchDB storage', () => {
+    suite(createCouchDbStorage(NIGHTBEAR_TEST_DB_URL + ''));
+  });
+}
 
 export function createTestRequest(): Request {
   return {

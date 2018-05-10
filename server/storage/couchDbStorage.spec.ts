@@ -1,7 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import { getStorageKey, createCouchDbStorage } from './couchDbStorage';
+import { getStorageKey } from './couchDbStorage';
 import { MODEL_1, MODEL_2, storageTestSuite } from './storage.spec';
+import { withStorage } from '../utils/test';
 
 describe('storage/couchDbStorage', () => {
 
@@ -23,14 +24,6 @@ describe('storage/couchDbStorage', () => {
 
   });
 
-  // Only run the tests for the CouchDB storage if one is configured for the test runner:
-  const NIGHTBEAR_TEST_DB_URL = process.env.NIGHTBEAR_TEST_DB_URL || null;
-  (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('createCouchDbStorage()', () => {
-
-    storageTestSuite(
-      createCouchDbStorage(NIGHTBEAR_TEST_DB_URL + ''),
-    );
-
-  });
+  withStorage(storageTestSuite);
 
 });
