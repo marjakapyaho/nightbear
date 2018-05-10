@@ -1,7 +1,7 @@
 import * as PouchDB from 'pouchdb';
 import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
-import { Model, MODEL_VERSION } from '../models/model';
+import { Model, MODEL_VERSION, ModelOfType, ModelType } from '../models/model';
 import { assert, assertExhausted } from '../utils/types';
 
 PouchDB.plugin(PouchDBFind);
@@ -67,20 +67,20 @@ export function createCouchDbStorage(dbUrl: string): Storage {
         });
     },
 
-    loadTimelineModels(modelType, range: number, rangeEnd: number) {
+    loadTimelineModels<T extends ModelType>(modelType: T, range: number, rangeEnd: number): Promise<Array<ModelOfType<T>>> {
       return db.allDocs({
         include_docs: true,
         startkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd - range)}`,
         endkey: `${PREFIX_TIMELINE}/_`,
       })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
-        .then(models => models.filter(model => model.modelType === modelType))
+        .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
     },
 
-    loadLatestTimelineModels(modelType, limit = 1) {
+    loadLatestTimelineModels<T extends ModelType>(modelType: T, limit?: number): Promise<Array<ModelOfType<T>>> {
       return Promise.resolve()
         .then(() =>
           db.createIndex({
@@ -104,6 +104,7 @@ export function createCouchDbStorage(dbUrl: string): Storage {
           }),
         )
         .then(res => res.docs.map(reviveCouchDbRowIntoModel))
+        .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load latest timeline models: ${errObj.message}`); // refine the error before giving it out
         });
