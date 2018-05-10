@@ -1,15 +1,35 @@
 import 'mocha';
+import * as PouchDB from 'pouchdb';
 import { Context, Request } from '../models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from '../storage/storage';
 import { Profile } from '../models/model';
 import { Storage } from '../storage/storage';
 import { createCouchDbStorage } from '../storage/couchDbStorage';
+import { getUuid } from './uuid';
 
-export function withStorage(suite: (storage: Storage) => void) {
-  const NIGHTBEAR_TEST_DB_URL = process.env.NIGHTBEAR_TEST_DB_URL || null;
+export type TestSuite = (storage: () => Storage) => void;
+
+export function withStorage(suite: TestSuite) {
+  withCouchDbStorage(suite);
+}
+
+function withCouchDbStorage(suite: TestSuite) {
+  const NIGHTBEAR_TEST_DB_URL = process.env.NIGHTBEAR_TEST_DB_URL || null; // e.g. "http://admin:admin@localhost:5984/"
   (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('with CouchDB storage', () => {
-    suite(createCouchDbStorage(NIGHTBEAR_TEST_DB_URL + ''));
+    let createdDbs: string[] = [];
+    suite(() => {
+      const dbUrl = `${NIGHTBEAR_TEST_DB_URL}temp_test_db_${getUuid()}`;
+      createdDbs.push(dbUrl);
+      return createCouchDbStorage(dbUrl);
+    });
+    after(() => {
+      return Promise.all(
+        createdDbs.map(dbUrl => new PouchDB(dbUrl).destroy()),
+      ).then(() => {
+        createdDbs = [];
+      });
+    });
   });
 }
 
