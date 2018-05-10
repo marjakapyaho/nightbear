@@ -25,8 +25,9 @@ export const MODEL_2: Settings = {
   activeProfile: activeProfile('day'),
 };
 
-export function storageTestSuite(storage: Storage) {
+export function storageTestSuite(storageFactory: () => Storage) {
 
+  let storage: Storage;
   let timestamp: number;
   let model: Carbs;
 
@@ -37,6 +38,7 @@ export function storageTestSuite(storage: Storage) {
   }
 
   beforeEach(() => {
+    storage = storageFactory();
     timestamp = Date.now(); // we need to have unique timestamps, so each Model is unique
     model = { ...MODEL_1, timestamp };
   });

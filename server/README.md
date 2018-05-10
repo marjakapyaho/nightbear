@@ -10,9 +10,8 @@ Create a local dev DB:
 1. Config -> CORS -> Enable CORS for all domains
 1. Config -> Main config -> `couch_httpd_auth` -> `timeout` -> set value to 31556926 (a year in seconds)
 1. Create a new DB called `dev`
-1. Create a new DB called `test`
 1. Use `export NIGHTBEAR_DB_URL=http://admin:admin@localhost:5984/dev`
-1. Use `export NIGHTBEAR_TEST_DB_URL=http://admin:admin@localhost:5984/test`
+1. Use `export NIGHTBEAR_TEST_DB_URL=http://admin:admin@localhost:5984/`
 1. Run `npm test` to see that everything works
 
 ## Backups

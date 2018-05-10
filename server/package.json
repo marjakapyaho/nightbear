@@ -42,6 +42,7 @@
     "lodash": "^4.17.5",
     "mocha": "^4.0.1",
     "pouchdb": "^6.4.3",
+    "pouchdb-adapter-memory": "^6.4.3",
     "pouchdb-find": "^6.4.3",
     "pushover-notifications": "^1.0.0",
     "ts-node": "^3.3.0",

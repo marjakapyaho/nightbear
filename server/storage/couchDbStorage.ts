@@ -19,10 +19,10 @@ type PouchDbResult = PouchDB.Core.Response | PouchDB.Core.Error;
 
 const isErrorResult = (res: PouchDbResult): res is PouchDB.Core.Error => 'error' in res;
 
-export function createCouchDbStorage(dbUrl: string): Storage {
+export function createCouchDbStorage(dbUrl: string, options: PouchDB.Configuration.DatabaseConfiguration = {}): Storage {
   assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
 
-  const db = new PouchDB(dbUrl);
+  const db = new PouchDB(dbUrl, options);
 
   let self: Storage;
 
