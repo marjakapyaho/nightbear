@@ -11,8 +11,8 @@ resource "aws_cloudfront_distribution" "this" {
     # e.g. "https://abcdefg.execute-api.eu-central-1.amazonaws.com/default" => "abcdefg.execute-api.eu-central-1.amazonaws.com"
     domain_name = "${replace(aws_api_gateway_deployment.this.invoke_url, "/^.*\\/\\/(.*)\\/.*$/", "$1")}"
 
-    origin_id   = "${var.cloudfront_apigw_cloudfront_function_name}"
-    origin_path = "/${var.cloudfront_apigw_cloudfront_stage_name}"
+    origin_id   = "${var.cloudfront_apigw_lambda_function_name}"
+    origin_path = "/${var.cloudfront_apigw_lambda_stage_name}"
 
     custom_origin_config {
       http_port              = 80
@@ -25,7 +25,7 @@ resource "aws_cloudfront_distribution" "this" {
   default_cache_behavior {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "${var.cloudfront_apigw_cloudfront_function_name}"
+    target_origin_id       = "${var.cloudfront_apigw_lambda_function_name}"
     viewer_protocol_policy = "allow-all"
 
     # TODO: https://github.com/terraform-providers/terraform-provider-aws/issues/1994

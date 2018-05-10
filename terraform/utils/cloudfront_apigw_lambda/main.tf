@@ -4,15 +4,15 @@
 
 # https://www.terraform.io/docs/providers/aws/r/lambda_function.html
 resource "aws_lambda_function" "this" {
-  function_name    = "${var.cloudfront_apigw_cloudfront_function_name}"
-  filename         = "${var.cloudfront_apigw_cloudfront_function_filename}"
-  source_code_hash = "${base64sha256(file("${var.cloudfront_apigw_cloudfront_function_filename}"))}"
-  handler          = "${var.cloudfront_apigw_cloudfront_function_handler}"
-  runtime          = "${var.cloudfront_apigw_cloudfront_function_runtime}"
+  function_name    = "${var.cloudfront_apigw_lambda_function_name}"
+  filename         = "${var.cloudfront_apigw_lambda_function_filename}"
+  source_code_hash = "${base64sha256(file("${var.cloudfront_apigw_lambda_function_filename}"))}"
+  handler          = "${var.cloudfront_apigw_lambda_function_handler}"
+  runtime          = "${var.cloudfront_apigw_lambda_function_runtime}"
   role             = "${aws_iam_role.this.arn}"
 
   environment {
-    variables = "${var.cloudfront_apigw_cloudfront_function_env_vars}"
+    variables = "${var.cloudfront_apigw_lambda_function_env_vars}"
   }
 }
 

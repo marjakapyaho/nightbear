@@ -30,7 +30,7 @@ resource "aws_lambda_permission" "this" {
 
 # https://github.com/terraform-providers/terraform-provider-aws/issues/2237
 resource "aws_iam_policy" "this" {
-  name = "${var.cloudfront_apigw_cloudfront_function_name}"
+  name = "${var.cloudfront_apigw_lambda_function_name}"
   path = "/"
 
   policy = <<EOF

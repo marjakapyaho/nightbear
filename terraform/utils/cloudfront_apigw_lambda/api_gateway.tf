@@ -1,7 +1,7 @@
 # Configure an API Gateway instance:
 
 resource "aws_api_gateway_rest_api" "this" {
-  name = "${var.cloudfront_apigw_cloudfront_function_name}"
+  name = "${var.cloudfront_apigw_lambda_function_name}"
 }
 
 # Add root resource to the API (it it needs to be included separately from the "proxy" resource defined below), which forwards to our Lambda:
@@ -125,7 +125,7 @@ resource "aws_api_gateway_method_response" "proxy_cors" {
 
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = "${aws_api_gateway_rest_api.this.id}"
-  stage_name  = "${var.cloudfront_apigw_cloudfront_stage_name}"
+  stage_name  = "${var.cloudfront_apigw_lambda_stage_name}"
 
   depends_on = [
     "aws_api_gateway_integration.proxy_root",
