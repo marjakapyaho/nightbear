@@ -80,7 +80,7 @@ export function storageTestSuite(storage: Storage) {
 
   it('loads timeline models', () => {
     return storage.saveModel(model)
-      .then(() => storage.loadTimelineModels(1000 * 60))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
   });
 
@@ -108,7 +108,7 @@ export function storageTestSuite(storage: Storage) {
   it('saves models that have been loaded before', () => {
     assert.equal(model.amount, 10); // check baseline assumptions
     return storage.saveModel(model)
-      .then(() => storage.loadTimelineModels(1000 * 60))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => findModel(loadedModels))
       .then(loadedModel => ({ ...loadedModel, amount: 123 }))
       .then(storage.saveModel)
