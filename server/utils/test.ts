@@ -59,12 +59,12 @@ export function createTestRequest(): Request {
   };
 }
 
-export function createTestContext(): Context {
+export function createTestContext(storage = NO_STORAGE): Context {
   return {
     httpPort: 80,
     timestamp: () => 1508672249758,
     log: NO_LOGGING,
-    storage: NO_STORAGE,
+    storage,
   };
 }
 
