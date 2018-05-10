@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
 import { Request } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
-import { createTestContext, withStorage } from '../../utils/test';
+import { createTestContext, withStorage, assertEqualWithoutMeta } from '../../utils/test';
 
 describe('api/uploadParakeetEntry', () => {
 
@@ -82,17 +82,8 @@ describe('api/uploadParakeetEntry', () => {
 
     it('uploads parakeet entry with correct response', () => {
       const context = createTestContext(createTestStorage());
-      const calibration: DexcomCalibration = {
-        modelType: 'DexcomCalibration',
-        timestamp: context.timestamp(),
-        meterEntries: [],
-        isInitialCalibration: false,
-        slope: 880.0351223627074,
-        intercept: 32412.807085821638,
-        scale: 1,
-      };
       return Promise.resolve()
-        .then(() => context.storage.saveModel(calibration))
+        .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => uploadParakeetEntry(mockRequest, context))
         .then(res => {
           assert.equal(
@@ -101,16 +92,9 @@ describe('api/uploadParakeetEntry', () => {
           );
         })
         .then(() => context.storage.loadLatestTimelineModels('ParakeetSensorEntry', 100))
-        .then(models => {
-          assert.equal(models.length, 1); // should find only one
-          assert.equal(models[0].bloodGlucose, 8.6); // the BG was correctly calculated with the previous calibration
-        })
+        .then(models => assertEqualWithoutMeta(models, [mockParakeetSensorEntry]))
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
-        .then(models => {
-          assert.equal(models.length, 1); // should find only one
-          assert.equal(models[0].batteryLevel, 80);
-        });
-
+        .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
     });
 
   });

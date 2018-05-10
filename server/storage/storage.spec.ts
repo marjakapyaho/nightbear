@@ -2,15 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from '../models/model';
 import { Storage } from './storage';
-import { activeProfile } from '../utils/test';
-
-// Asserts deep equality of 2 Models, ignoring their metadata
-function assertEqualWithoutMeta(actual: Model, expected: Model): void {
-  assert.deepEqual(
-    Object.assign({}, actual, { modelMeta: undefined }),
-    Object.assign({}, expected, { modelMeta: undefined }),
-  );
-}
+import { activeProfile, assertEqualWithoutMeta } from '../utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
