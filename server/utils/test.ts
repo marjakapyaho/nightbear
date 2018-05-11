@@ -1,10 +1,11 @@
 import 'mocha';
+import { assert } from 'chai';
 import * as PouchDB from 'pouchdb';
 import * as PouchDBMemory from 'pouchdb-adapter-memory';
 import { Context, Request } from '../models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from '../storage/storage';
-import { Profile } from '../models/model';
+import { Profile, Model } from '../models/model';
 import { Storage } from '../storage/storage';
 import { createCouchDbStorage } from '../storage/couchDbStorage';
 import { getUuid } from './uuid';
@@ -59,13 +60,31 @@ export function createTestRequest(): Request {
   };
 }
 
-export function createTestContext(): Context {
+export function createTestContext(storage = NO_STORAGE): Context {
   return {
     httpPort: 80,
     timestamp: () => 1508672249758,
     log: NO_LOGGING,
-    storage: NO_STORAGE,
+    storage,
   };
+}
+
+// Asserts deep equality of 2 Models, ignoring their metadata
+export function assertEqualWithoutMeta(actual: Model, expected: Model): void;
+export function assertEqualWithoutMeta(actual: Model[], expected: Model[]): void;
+export function assertEqualWithoutMeta(actual: any, expected: any): void {
+  const withoutMeta = (model: Model) => Object.assign({}, model, { modelMeta: undefined });
+  if (Array.isArray(actual)) {
+    assert.deepEqual(
+      actual.map(withoutMeta),
+      expected.map(withoutMeta),
+    );
+  } else {
+    assert.deepEqual(
+      withoutMeta(actual),
+      withoutMeta(expected),
+    );
+  }
 }
 
 export function activeProfile(name: string): Profile {

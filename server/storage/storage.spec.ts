@@ -2,15 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from '../models/model';
 import { Storage } from './storage';
-import { activeProfile } from '../utils/test';
-
-// Asserts deep equality of 2 Models, ignoring their metadata
-function assertEqualWithoutMeta(actual: Model, expected: Model): void {
-  assert.deepEqual(
-    Object.assign({}, actual, { modelMeta: undefined }),
-    Object.assign({}, expected, { modelMeta: undefined }),
-  );
-}
+import { activeProfile, assertEqualWithoutMeta } from '../utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -25,7 +17,7 @@ export const MODEL_2: Settings = {
   activeProfile: activeProfile('day'),
 };
 
-export function storageTestSuite(storageFactory: () => Storage) {
+export function storageTestSuite(createTestStorage: () => Storage) {
 
   let storage: Storage;
   let timestamp: number;
@@ -38,7 +30,7 @@ export function storageTestSuite(storageFactory: () => Storage) {
   }
 
   beforeEach(() => {
-    storage = storageFactory();
+    storage = createTestStorage();
     timestamp = Date.now(); // we need to have unique timestamps, so each Model is unique
     model = { ...MODEL_1, timestamp };
   });
