@@ -1,0 +1,36 @@
+# To verify variable substitution from environment:
+# $ docker-compose config
+
+version: "3"
+
+services:
+
+  server:
+    build: ./nightbear/server
+    restart: always
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: "production"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "${server_domain_name}"
+      VIRTUAL_HOST: "${server_domain_name}"
+      VIRTUAL_PORT: "3000"
+      NIGHTBEAR_DB_URL: "https://admin:${db_admin_password}@${db_domain_name}/nightbear_stage"
+
+  db:
+    image: couchdb:2.1.1
+    restart: always
+    expose:
+      - "5984"
+    environment:
+      COUCHDB_USER: "admin"
+      COUCHDB_PASSWORD: "${db_admin_password}"
+      LETSENCRYPT_EMAIL: "admin@nightbear.fi"
+      LETSENCRYPT_HOST: "${db_domain_name}"
+      VIRTUAL_HOST: "${db_domain_name}"
+      VIRTUAL_PORT: "5984"
+    volumes:
+      - "/data/couchdb:/opt/couchdb/data"
+
+  # Support services are inherited from the baseline defined by the "ec2_docker_host" module
