@@ -1,18 +1,9 @@
-variable "public_bucket_name" {
-  description = "Globally unique name to reserve for the bucket"
-}
-
-output "public_bucket_ssl_endpoint" {
-  description = "Full URL for the HTTPS endpoint for accessing the bucket"
-  value       = "https://s3.${data.aws_region.this.name}.amazonaws.com/${aws_s3_bucket.this.id}/"
-}
-
 # https://www.terraform.io/docs/providers/aws/d/region.html
 data "aws_region" "this" {}
 
 # https://www.terraform.io/docs/providers/aws/r/s3_bucket.html
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.public_bucket_name}"
+  bucket = "${var.public_s3_bucket_name}"
 
   # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
   acl = "public-read"
