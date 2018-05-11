@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "allowJs": false,
+    "declaration": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "es2015",
+      "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
+    ]
+  },
+  "include": [
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

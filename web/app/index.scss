@@ -2,3 +2,12 @@ body {
   background: lightgray;
   color: darkblue;
 }
+
+#root {
+  text-align: center;
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+  margin-top: -60px;
+  margin-left: -60px;
+}
