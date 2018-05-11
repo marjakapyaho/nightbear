@@ -7,11 +7,11 @@ variable "aws_secret_key" {
 }
 
 variable "papertrail_host" {
-  description = "syslog drain to use for sending logs to Papertrail (a.k.a. NIGHTBEAR_PAPERTRAIL_HOST)"
+  description = "syslog drain to use for sending logs to Papertrail"
 }
 
 variable "couchdb_password_stage" {
-  description = "Password to set on the staging env CouchDB (a.k.a. NIGHTBEAR_COUCHDB_PASSWORD)"
+  description = "Password to set on the staging env CouchDB"
 }
 
 variable "db_admin_password" {
