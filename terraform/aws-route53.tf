@@ -1,7 +1,3 @@
-variable "aws_route53_default_ttl" {
-  default = "300"
-}
-
 resource "aws_route53_zone" "main" {
   name = "nightbear.fi"
 }

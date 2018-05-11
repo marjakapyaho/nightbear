@@ -1,3 +1,9 @@
+module "email" {
+  source            = "./email"
+  email_domain_name = "nightbear.fi"
+  email_domain_zone = "${aws_route53_zone.main.zone_id}"
+}
+
 module "router" {
   source             = "./router"
   router_domain_name = "router.nightbear.fi"
