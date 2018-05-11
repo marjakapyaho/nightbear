@@ -1,25 +1,21 @@
 {
   "compilerOptions": {
+    "sourceMap": true,
     "target": "es5",
-    "module": "commonjs",
+    "jsx": "react",
+    "module": "es6",
+    "moduleResolution": "node",
     "allowJs": false,
-    "declaration": true,
+    "declaration": false,
     "downlevelIteration": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": [
-      "node"
-    ],
-    "lib": [
-      "es2015",
-      "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
-    ]
+    "lib": ["es6", "es7", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "app/*": ["./app/*"]
+    }
   },
-  "include": [
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["dist", "build", "node_modules"]
 }

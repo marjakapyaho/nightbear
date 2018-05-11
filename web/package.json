@@ -11,7 +11,7 @@
     "start": "webpack-dev-server --mode development --hot --progress --color --port 3000",
     "build": "webpack -p --progress --colors",
     "prettier": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "deploy": "npm run build && rm dist/*.ts && aws --profile nightbear s3 cp --acl public-read --recursive dist s3://stage-nightbear-fi/"
+    "deploy": "npm run build && aws --profile nightbear s3 cp --acl public-read --recursive dist s3://stage-nightbear-fi/"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [
