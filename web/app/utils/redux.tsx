@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, Store as ReduxStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Action } from 'app/actions';
 import { rootReducer, State } from 'app/reducers';
@@ -8,10 +8,7 @@ export type Dispatch = (action: Action) => Action;
 export type Reducer = (state: State | undefined, action: Action) => State;
 export type Middleware = (store: Store) => (next: Dispatch) => (action: Action) => Action;
 
-export function configureStore(
-  initialState?: State,
-  middleware: Middleware[] = [],
-): Store & ReduxStore<State> {
+export function configureStore(initialState?: State, middleware: Middleware[] = []): Store {
   let appliedMiddleware = applyMiddleware.apply(null, middleware);
 
   if (process.env.NODE_ENV !== 'production') {
