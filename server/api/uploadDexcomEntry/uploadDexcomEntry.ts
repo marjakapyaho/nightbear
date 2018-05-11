@@ -1,4 +1,4 @@
-import { extend, find } from 'lodash';
+import { find } from 'lodash';
 import { Response, Request, createResponse, Context } from '../../models/api';
 import {
   DeviceStatus,
@@ -22,38 +22,48 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const timestamp = context.timestamp();
 
   return Promise.resolve()
-    .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 2))
+    .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 1))
     .then((latestCalibrations): Promise<Model> => {
-      const latestCalibration = find(latestCalibrations as DexcomCalibration[], (cal) => cal.slope !== null); // TODO
-      if (!latestCalibration) {
-        return Promise.reject('Could not find DexcomCalibration for uploading Dexcom entry');
+
+      if (requestObject.hasOwnProperty('uploaderBattery')) {
+        const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
+        return context.storage.saveModel(dexcomStatus);
       }
 
-      if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
-        const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestCalibration, timestamp);
-        return context.storage.saveModel(dexcomEntry);
-      }
-      else if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
+      const latestCalibration = latestCalibrations[0] as DexcomCalibration;
+
+      if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
         const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration, timestamp);
         if (newDexcomCalibration) {
           return context.storage.saveModel(newDexcomCalibration);
         }
       }
-      else if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
+
+      // Calibration needs initialized calibration
+      if (!latestCalibration) {
+        return Promise.reject('Could not find incomplete DexcomCalibration for uploading actual Dexcom calibration');
+      }
+
+      if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
         const updatedDexcomCalibration: DexcomCalibration | null = amendCalibration(requestObject, latestCalibration);
         if (updatedDexcomCalibration) {
           return context.storage.saveModel(updatedDexcomCalibration);
         }
       }
-      else if (requestObject.hasOwnProperty('uploaderBattery')) {
-        const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
-        return context.storage.saveModel(dexcomStatus);
-      }
-      else {
-        return Promise.reject('Unknown Dexcom entry type');
+
+      const latestFullCalibration = find(latestCalibrations as DexcomCalibration[], (cal) => cal.slope !== null); // TODO
+
+      // Bg entry needs full calibration
+      if (!latestFullCalibration) {
+        return Promise.reject('Could not find complete DexcomCalibration for uploading Dexcom sensor entry');
       }
 
-      return Promise.reject('Failed to save Dexcom entry');
+      if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
+        const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestFullCalibration, timestamp);
+        return context.storage.saveModel(dexcomEntry);
+      }
+
+      return Promise.reject('Unknown Dexcom entry type');
     })
     .then(() => Promise.resolve(createResponse(requestObject)));
 }
@@ -96,7 +106,7 @@ export function parseDexcomEntry(
 
 export function initCalibration(
   requestObject: { [key: string]: string },
-  cal: DexcomCalibration,
+  cal: DexcomCalibration | undefined,
   timestamp: number,
   ): DexcomCalibration | null {
 
@@ -135,7 +145,7 @@ export function amendCalibration(
   const scale = parseFloat(requestObject.scale);
 
   if (cal && cal.meterEntries.length && !cal.slope && !cal.intercept && !cal.scale) {
-    return extend(cal, { slope, intercept, scale });
+    return { ...cal, slope, intercept, scale };
   }
   else {
     return null;
