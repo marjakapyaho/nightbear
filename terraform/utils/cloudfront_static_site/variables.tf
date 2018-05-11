@@ -10,3 +10,8 @@ variable "cloudfront_static_site_bucket_prefix" {
   description = "Prefix for the S3 bucket name that will be created (e.g. 'cloudfront_static_site_'); suffix is based on the domain name"
   default     = ""
 }
+
+variable "cloudfront_static_site_cache_ttl" {
+  description = "How long (in seconds) to keep files in CloudFront before requesting again from S3"
+  default     = 60
+}

@@ -13,10 +13,14 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   default_cache_behavior {
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "${var.cloudfront_static_site_domain_name}"
     viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0                                           # default is 0
+    default_ttl            = "${var.cloudfront_static_site_cache_ttl}"   # default is 86400 (i.e. one day)
+    max_ttl                = "${var.cloudfront_static_site_cache_ttl}"   # default is 31536000 (i.e. one year)
+    compress               = true
 
     forwarded_values {
       query_string = false
