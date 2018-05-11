@@ -53,3 +53,9 @@ module "hosting_stage" {
   db_domain_zone    = "${aws_route53_zone.main.zone_id}"
   db_admin_password = "${var.db_admin_password}"
 }
+
+module "web_stage" {
+  source                             = "./utils/cloudfront_static_site"
+  cloudfront_static_site_domain_name = "stage.nightbear.fi"
+  cloudfront_static_site_domain_zone = "${aws_route53_zone.main.zone_id}"
+}
