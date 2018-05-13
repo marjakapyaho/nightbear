@@ -1,13 +1,15 @@
 import { Middleware } from 'app/utils/redux';
-import { Action } from 'app/actions';
 
 const CONFIG_DB_URL = 'nightbear:config:dbUrl';
 
 export const persistence: Middleware = store => {
   setTimeout(read, 0);
   return next => action => {
-    write(action);
-    return next(action);
+    const preValue = store.getState().config.dbUrl;
+    const result = next(action);
+    const postValue = store.getState().config.dbUrl;
+    if (preValue !== postValue) write(postValue);
+    return result;
   };
 
   function read() {
@@ -17,9 +19,7 @@ export const persistence: Middleware = store => {
     });
   }
 
-  function write(action: Action) {
-    if (action.type === 'DB_URL_SET') {
-      localStorage.setItem(CONFIG_DB_URL, action.newDbUrl);
-    }
+  function write(newDbUrl: string) {
+    localStorage.setItem(CONFIG_DB_URL, newDbUrl);
   }
 };
