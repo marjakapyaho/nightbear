@@ -30,25 +30,54 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
   const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
-  const options = {
+  const changes = localDb.changes({
+    live: true,
+    since: 'now',
+    return_docs: false,
+  });
+  dispatchFromChanges(changes, dispatch);
+  const replOptions = {
     live: true,
     retry: true,
     batch_size: 1000,
   };
   const upReplication = PouchDB.replicate(localDb, remoteDb, {
-    ...options,
+    ...replOptions,
     checkpoint: 'source',
   });
   const downReplication = PouchDB.replicate(remoteDb, localDb, {
-    ...options,
+    ...replOptions,
     checkpoint: 'target',
   });
   dispatchFromReplication(upReplication, 'UP', dispatch);
   dispatchFromReplication(downReplication, 'DOWN', dispatch);
   return () => {
+    changes.cancel();
     upReplication.cancel();
     downReplication.cancel();
   };
+}
+
+function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
+  changeFeed
+    .on('change', change =>
+      dispatch({
+        type: 'DB_EMITTED_CHANGE',
+        change,
+      }),
+    )
+    .on('complete', info =>
+      dispatch({
+        type: 'DB_EMITTED_COMPLETE',
+        info,
+      }),
+    )
+    .on('error', err =>
+      dispatch({
+        type: 'DB_EMITTED_ERROR',
+        err,
+      }),
+    );
 }
 
 function dispatchFromReplication(

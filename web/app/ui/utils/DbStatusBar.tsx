@@ -1,32 +1,25 @@
 import { renderFromStore } from 'app/utils/react';
-import { State, ReplicationDirection, ReplicationState } from 'app/reducers';
+import { State, DbState, DbStatePart } from 'app/reducers';
 import { CSSProperties } from 'react';
-import { assertExhausted } from 'app/utils/types';
+import { assertExhausted, objectKeys } from 'app/utils/types';
 
 export default renderFromStore(
   __filename,
-  state => state.replication,
-  (React, { UP, DOWN }) => {
-    return (
-      <div className="this">
-        {renderState('UP', UP)}
-        {renderState('DOWN', DOWN)}
-      </div>
-    );
-    function renderState(
-      dir: ReplicationDirection,
-      state: State['replication'][ReplicationDirection],
-    ) {
+  state => state,
+  (React, { dbState }) => {
+    const parts = objectKeys(dbState);
+    return <div className="this">{parts.map(part => renderState(part, dbState[part]))};</div>;
+    function renderState(part: DbStatePart, state: State['dbState'][DbStatePart]) {
       return (
-        <div className="dir" style={getStyle(state.state)}>
-          {dir}: {state.state} {state.details}
+        <div key={part} className="dir" style={getStyle(state.state)}>
+          {part}: {state.state} {state.details}
         </div>
       );
     }
   },
 );
 
-function getStyle(state: ReplicationState): CSSProperties {
+function getStyle(state: DbState): CSSProperties {
   switch (state) {
     case 'DISABLED':
       return {

@@ -3,3 +3,7 @@ export function assertExhausted(x: never): any {
     `Assumed all cases handled during compile-time, but found an exception during run-time: ${x}`,
   );
 }
+
+export function objectKeys<T extends {}>(object: T): (keyof T)[] {
+  return Object.keys(object) as any;
+}

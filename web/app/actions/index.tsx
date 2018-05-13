@@ -3,6 +3,18 @@ import { ReplicationDirection } from 'app/reducers';
 export type Action = Readonly<
   | { type: 'DB_URL_SET'; newDbUrl: string }
   | {
+      type: 'DB_EMITTED_CHANGE';
+      change: PouchDB.Core.ChangesResponseChange<{}>;
+    }
+  | {
+      type: 'DB_EMITTED_COMPLETE';
+      info: PouchDB.Core.ChangesResponse<{}>;
+    }
+  | {
+      type: 'DB_EMITTED_ERROR';
+      err: PouchDB.Core.Error;
+    }
+  | {
       type: 'REPLICATION_EMITTED_CHANGE'; // something (anything) happened within the context of this replication
       direction: ReplicationDirection;
       info: PouchDB.Replication.ReplicationResult<{}>;
