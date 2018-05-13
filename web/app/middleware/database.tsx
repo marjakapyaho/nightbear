@@ -53,41 +53,41 @@ function dispatchFromReplication(
   replication
     .on('change', info =>
       dispatch({
-        type: 'DB_EMITTED_CHANGE',
+        type: 'REPLICATION_EMITTED_CHANGE',
         direction,
         info,
       }),
     )
     .on('paused', err =>
       dispatch({
-        type: 'DB_EMITTED_PAUSED',
+        type: 'REPLICATION_EMITTED_PAUSED',
         direction,
         err,
       }),
     )
     .on('active', () =>
       dispatch({
-        type: 'DB_EMITTED_ACTIVE',
+        type: 'REPLICATION_EMITTED_ACTIVE',
         direction,
       }),
     )
     .on('denied', err =>
       dispatch({
-        type: 'DB_EMITTED_DENIED',
+        type: 'REPLICATION_EMITTED_DENIED',
         direction,
         err,
       }),
     )
     .on('complete', info =>
       dispatch({
-        type: 'DB_EMITTED_COMPLETE',
+        type: 'REPLICATION_EMITTED_COMPLETE',
         direction,
         info,
       }),
     )
     .on('error', err =>
       dispatch({
-        type: 'DB_EMITTED_ERROR',
+        type: 'REPLICATION_EMITTED_ERROR',
         direction,
         err,
       }),
