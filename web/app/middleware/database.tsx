@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb';
 import { Middleware, Dispatch } from 'app/utils/redux';
-import { REPLICATION_DIRECTION } from 'app/actions';
+import { ReplicationDirection } from 'app/reducers';
 
 export const database: Middleware = store => {
   let existingReplication: (() => void) | null = null;
@@ -37,8 +37,8 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
     ...options,
     checkpoint: 'target',
   });
-  dispatchFromReplication(upReplication, 'up', dispatch);
-  dispatchFromReplication(downReplication, 'down', dispatch);
+  dispatchFromReplication(upReplication, 'UP', dispatch);
+  dispatchFromReplication(downReplication, 'DOWN', dispatch);
   return () => {
     upReplication.cancel();
     downReplication.cancel();
@@ -47,7 +47,7 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
 
 function dispatchFromReplication(
   replication: PouchDB.Replication.Replication<{}>,
-  direction: REPLICATION_DIRECTION,
+  direction: ReplicationDirection,
   dispatch: Dispatch,
 ) {
   replication
