@@ -5,19 +5,19 @@ export type TypeScriptWorkaround = AnyAction; // @see https://github.com/Microso
 
 export type State = Readonly<{
   config: {
-    dbUrl: string;
+    remoteDbUrl: string;
   };
 }>;
 
 export const defaultState: State = {
   config: {
-    dbUrl: '',
+    remoteDbUrl: '',
   },
 };
 
 export function rootReducer(state: State = defaultState, action: Action): State {
   if (action.type === 'DB_URL_SET') {
-    return { ...state, config: { ...state.config, dbUrl: action.newDbUrl } };
+    return { ...state, config: { ...state.config, remoteDbUrl: action.newDbUrl } };
   } else {
     return state;
   }

@@ -3,9 +3,9 @@ import { renderFromStore } from 'app/utils/react';
 export default renderFromStore(
   __filename,
   state => state.config,
-  (React, { dbUrl }, dispatch) => (
+  (React, { remoteDbUrl }, dispatch) => (
     <div>
-      {!!dbUrl && <pre>Logged in, with dbUrl = {dbUrl}</pre>}
+      {!!remoteDbUrl && <pre>Logged in, with dbUrl = {remoteDbUrl}</pre>}
       <button
         onClick={() =>
           dispatch({ type: 'DB_URL_SET', newDbUrl: prompt('Please enter new DB URL:') || '' })

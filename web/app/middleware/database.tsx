@@ -5,9 +5,9 @@ import { REPLICATION_DIRECTION } from 'app/actions';
 export const database: Middleware = store => {
   let existingReplication: (() => void) | null = null;
   return next => action => {
-    const oldValue = store.getState().config.dbUrl;
+    const oldValue = store.getState().config.remoteDbUrl;
     const result = next(action);
-    const newValue = store.getState().config.dbUrl;
+    const newValue = store.getState().config.remoteDbUrl;
     if (oldValue !== newValue) {
       if (existingReplication) {
         existingReplication();

@@ -5,9 +5,9 @@ const CONFIG_DB_URL = 'nightbear:config:dbUrl';
 export const persistence: Middleware = store => {
   setTimeout(read, 0);
   return next => action => {
-    const oldValue = store.getState().config.dbUrl;
+    const oldValue = store.getState().config.remoteDbUrl;
     const result = next(action);
-    const newValue = store.getState().config.dbUrl;
+    const newValue = store.getState().config.remoteDbUrl;
     if (oldValue !== newValue) write(newValue);
     return result;
   };
