@@ -87,9 +87,4 @@ resource "null_resource" "provisioners" {
   provisioner "remote-exec" {
     script = "${path.module}/provision-db.sh"
   }
-
-  # Run first-time server deploy
-  provisioner "local-exec" {
-    command = "${path.module}/deploy-latest-server.sh"
-  }
 }
