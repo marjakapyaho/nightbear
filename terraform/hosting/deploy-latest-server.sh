@@ -1,7 +1,8 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # https://stackoverflow.com/a/246128
-SSH_TARGET="ubuntu@server-stage.nightbear.fi"
+DEPLOY_ENV="$1"
+SSH_TARGET="ubuntu@server-$DEPLOY_ENV.nightbear.fi"
 SCRIPT_NAME="deploy-latest-server.sh"
 TRACK_BRANCH="server-next"
 COMPOSE_SERVICE="server"
@@ -9,7 +10,13 @@ SSH_KEY_FILE="$DIR/../terraform.id_rsa"
 REMOTE_DIR="nightbear/server"
 
 # This means we're running locally, on the dev's machine
-if [ "$1" != "--remote" ]; then
+if [ -z "$DEPLOYING_ON_REMOTE" ]; then
+
+  # Check that the user has specified an env
+  if [ -z "$1" ]; then
+    echo "Error: Please provide either 'prod' or 'stage' as first argument to script"
+    exit 1
+  fi
 
   # https://unix.stackexchange.com/a/269085
   BOLD="$(tput bold)"
@@ -18,9 +25,9 @@ if [ "$1" != "--remote" ]; then
   RESET="$(tput sgr 0)"
 
   echo
+  echo -e "Env:     ${BOLD}${DEPLOY_ENV}${RESET}"
   echo -e "Target:  ${BOLD}${SSH_TARGET}${RESET}"
   echo -e "Branch:  ${BOLD}${TRACK_BRANCH}${RESET}"
-  echo -e "Service: ${BOLD}${COMPOSE_SERVICE}${RESET}"
   echo
 
   scp \
@@ -40,7 +47,7 @@ if [ "$1" != "--remote" ]; then
     -i "$SSH_KEY_FILE" \
     -o StrictHostKeyChecking=no \
     "$SSH_TARGET" \
-    "TRACK_BRANCH=$TRACK_BRANCH COMPOSE_SERVICE=$COMPOSE_SERVICE ./$SCRIPT_NAME --remote"
+    "DEPLOYING_ON_REMOTE=1 TRACK_BRANCH=$TRACK_BRANCH COMPOSE_SERVICE=$COMPOSE_SERVICE ./$SCRIPT_NAME"
 
   if [ ! $? -eq 0 ]; then
     echo -e "\nUpdate: ${BOLD}${RED}ERROR${RESET}: ssh command failed\n"
