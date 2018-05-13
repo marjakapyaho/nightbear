@@ -19,7 +19,7 @@ export default renderFromStore(
     ) {
       return (
         <div className="dir" style={getStyle(state.state)}>
-          {dir}: {state.state}
+          {dir}: {state.state} {state.details}
         </div>
       );
     }

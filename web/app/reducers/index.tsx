@@ -33,9 +33,8 @@ export const defaultState: State = {
 };
 
 export function rootReducer(state: State = defaultState, action: Action): State {
+  if (action.type.substr(0, 2) === '@@') return defaultState; // @see https://github.com/reduxjs/redux/issues/186
   switch (action.type) {
-    case '@@INIT':
-      return state;
     case 'DB_URL_SET':
       return { ...state, config: { ...state.config, remoteDbUrl: action.newDbUrl } };
     case 'DB_EMITTED_CHANGE':

@@ -1,7 +1,6 @@
 import { ReplicationDirection } from 'app/reducers';
 
 export type Action = Readonly<
-  | { type: '@@INIT' } // note: the Redux API leaves this unspecified on purpose, but for exhaustiveness checks on type Action, let's include it
   | { type: 'DB_URL_SET'; newDbUrl: string }
   | {
       type: 'DB_EMITTED_CHANGE'; // something (anything) happened within the context of this replication
