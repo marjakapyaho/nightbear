@@ -22,7 +22,13 @@ export const database: Middleware = store => {
 };
 
 function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
-  const localDb = new PouchDB('nightbear_web_ui');
+  const isSafari = // https://stackoverflow.com/a/31732310 ;__;
+    navigator.vendor &&
+    navigator.vendor.indexOf('Apple') > -1 &&
+    navigator.userAgent &&
+    !navigator.userAgent.match('CriOS');
+  const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
+  const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
   const options = {
     live: true,
