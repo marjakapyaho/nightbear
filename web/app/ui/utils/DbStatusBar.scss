@@ -1,0 +1,9 @@
+.nb-DbStatusBar {
+  display: flex;
+  border: 1px solid black;
+
+  &-dir {
+    flex: 1;
+    padding: 5px 10px;
+  }
+}
