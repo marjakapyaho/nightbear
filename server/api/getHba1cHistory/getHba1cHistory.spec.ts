@@ -1,9 +1,30 @@
 import 'mocha';
+import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from '../../utils/test';
+import { Hba1c } from '../../models/model';
+import { getHba1cHistory } from './getHba1cHistory';
 
 describe('api/getHba1cHistory', () => {
 
-  // Assertations
-  it('get Hba1c history', () => {
-    console.log('TODO: test fetching hba1c history'); // tslint:disable-line:no-console
+  const request = createTestRequest();
+
+  const mockHba1c: Hba1c = {
+    modelType: 'Hba1c',
+    source: 'calculated',
+    timestamp: 1508672249758,
+    hba1cValue: 6.6,
+  };
+
+  const mockResponseJson = [mockHba1c];
+
+  withStorage(createTestStorage => {
+
+    it('get Hba1c history', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => context.storage.saveModel(mockHba1c))
+        .then(() => getHba1cHistory(request, context))
+        .then(res => assertEqualWithoutMeta(res.responseBody as any, mockResponseJson));
+    });
+
   });
 });
