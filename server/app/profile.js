@@ -7,7 +7,8 @@ export default app => {
         getActiveProfile(settingsObj) {
             log('Getting active profile');
             const currentTimestamp = app.currentTime();
-            if (new Date(currentTimestamp).getHours() > 9) { // DAY
+            // utc 6 = fi 9, utc 20 = fi 23
+            if (new Date(currentTimestamp).getHours() > 6 && new Date(currentTimestamp).getHours() < 20) { // DAY
                 log('Selected active profile: DAY', new Date(currentTimestamp).getHours());
                 return settingsObj.profiles.day;
             }
