@@ -8,6 +8,7 @@
     "node": ">=8.7.0 <9"
   },
   "scripts": {
+    "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "start": "check-node-version --package && ts-node index.ts",
     "lint": "check-node-version --package && tslint --project . --type-check && echo lint OK",
     "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
@@ -29,7 +30,8 @@
     "@types/lodash": "^4.14.104",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.34",
-    "@types/pouchdb": "^6.3.1",
+    "@types/pouchdb": "^6.3.2",
+    "@types/pouchdb-find": "^6.3.2",
     "body-parser": "^1.18.2",
     "chai": "^4.1.2",
     "check-node-version": "^3.1.1",
@@ -39,10 +41,12 @@
     "husky": "^0.14.3",
     "lodash": "^4.17.5",
     "mocha": "^4.0.1",
-    "pouchdb": "^6.3.4",
+    "pouchdb": "^6.4.3",
+    "pouchdb-adapter-memory": "^6.4.3",
+    "pouchdb-find": "^6.4.3",
     "pushover-notifications": "^1.0.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
-    "typescript": "^2.6.2"
+    "typescript": "^2.8.3"
   }
 }

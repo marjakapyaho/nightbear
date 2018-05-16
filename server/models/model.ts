@@ -13,6 +13,9 @@ export type Model
   | Settings
   | Profile;
 
+export type ModelType = Model['modelType'];
+export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
+
 export type ModelMeta = object; // this is storage-type specific
 
 export interface Sensor {

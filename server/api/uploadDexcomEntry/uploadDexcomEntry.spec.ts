@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
-import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, parseCalibration } from './uploadDexcomEntry';
+import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendCalibration } from './uploadDexcomEntry';
 import { Request } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from '../../models/model';
-import { createTestContext } from '../../utils/test';
+import { assertEqualWithoutMeta, createTestContext, withStorage } from '../../utils/test';
 
 describe('api/uploadDexcomEntry', () => {
 
@@ -136,14 +136,60 @@ describe('api/uploadDexcomEntry', () => {
   };
 
   // Assertations
-  it('uploads Dexcom entry with correct response', () => {
-    return uploadDexcomEntry(mockRequestBgEntry, context)
-      .then(res => {
-        assert.equal(
-          res.responseBody,
-          mockRequestBgEntry.requestBody,
-        );
-      });
+  withStorage(createTestStorage => {
+
+    it('uploads Dexcom sensor entry with correct response', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() => uploadDexcomEntry(mockRequestBgEntry, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestBgEntry.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DexcomSensorEntry', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockDexcomSensorEntry]));
+    });
+
+    it('uploads Dexcom meter entry and calibration with correct responses', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => uploadDexcomEntry(mockRequestMeterEntry, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestMeterEntry.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockDexcomCalWithMeterEntry]))
+        .then(() => uploadDexcomEntry(mockRequestCalibration, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestCalibration.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockDexcomCalWithMeterAndCalEntries]));
+    });
+
+    it('uploads Dexcom device status with correct response', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => uploadDexcomEntry(mockRequestDeviceStatus, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestDeviceStatus.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
+    });
+
   });
 
   it('produces correct DexcomSensorEntry', () => {
@@ -169,7 +215,7 @@ describe('api/uploadDexcomEntry', () => {
 
   it('adds calibration data to correct initalized calibration', () => {
     assert.deepEqual(
-      parseCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
+      amendCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
       mockDexcomCalWithMeterAndCalEntries,
     );
   });

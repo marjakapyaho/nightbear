@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
 import { Request } from '../../models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
-import { createTestContext } from '../../utils/test';
+import { createTestContext, withStorage, assertEqualWithoutMeta } from '../../utils/test';
 
 describe('api/uploadParakeetEntry', () => {
 
@@ -64,17 +64,6 @@ describe('api/uploadParakeetEntry', () => {
     geolocation: '60.193707,24.949396',
   };
 
-  // Assertations
-  it('uploads parakeet entry with correct response', () => {
-    return uploadParakeetEntry(mockRequest, context)
-      .then(res => {
-        assert.equal(
-          res.responseBody,
-          '!ACK  0!',
-        );
-      });
-  });
-
   it('produces correct ParakeetSensorEntry', () => {
     assert.deepEqual(
       parseParakeetEntry(mockRequest.requestParams, mockDexcomCalibration, context.timestamp()),
@@ -87,6 +76,27 @@ describe('api/uploadParakeetEntry', () => {
       parseParakeetStatus(mockRequest.requestParams, context.timestamp()),
       mockDeviceStatus,
     );
+  });
+
+  withStorage(createTestStorage => {
+
+    it('uploads parakeet entry with correct response', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() => uploadParakeetEntry(mockRequest, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            '!ACK  0!',
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('ParakeetSensorEntry', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockParakeetSensorEntry]))
+        .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
+    });
+
   });
 
 });

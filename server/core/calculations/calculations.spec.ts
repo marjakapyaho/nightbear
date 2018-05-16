@@ -1,12 +1,14 @@
 import { assert } from 'chai';
 import 'mocha';
 import {
+  MIN_IN_MS,
   calculateHba1c,
   calculateRaw,
   changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
   isDexcomEntryValid,
   roundTo2Decimals,
+  timestampIsUnderMaxAge,
 } from './calculations';
 import { sensorEntries1, sensorEntries2 } from './test-data/sensor-entries';
 
@@ -73,6 +75,12 @@ describe('core/calculations', () => {
     assert.deepEqual(roundTo2Decimals(34.0879), 34.09);
     assert.deepEqual(roundTo2Decimals(5.9999), 6.00);
     assert.deepEqual(roundTo2Decimals(2.457), 2.46);
+  });
+
+  it('timestampIsUnderMaxAge', () => {
+    const currentTimestamp = 1521972451237;
+    assert.deepEqual( timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 10 * MIN_IN_MS, 20 ), true );
+    assert.deepEqual( timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 30 * MIN_IN_MS, 20 ), false );
   });
 
   it('calculateHba1c', () => {

@@ -2,15 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from '../models/model';
 import { Storage } from './storage';
-import { activeProfile } from '../utils/test';
-
-// Asserts deep equality of 2 Models, ignoring their metadata
-function assertEqualWithoutMeta(actual: Model, expected: Model): void {
-  assert.deepEqual(
-    Object.assign({}, actual, { modelMeta: undefined }),
-    Object.assign({}, expected, { modelMeta: undefined }),
-  );
-}
+import { activeProfile, assertEqualWithoutMeta } from '../utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -25,8 +17,9 @@ export const MODEL_2: Settings = {
   activeProfile: activeProfile('day'),
 };
 
-export function storageTestSuite(storage: Storage) {
+export function storageTestSuite(createTestStorage: () => Storage) {
 
+  let storage: Storage;
   let timestamp: number;
   let model: Carbs;
 
@@ -37,6 +30,7 @@ export function storageTestSuite(storage: Storage) {
   }
 
   beforeEach(() => {
+    storage = createTestStorage();
     timestamp = Date.now(); // we need to have unique timestamps, so each Model is unique
     model = { ...MODEL_1, timestamp };
   });
@@ -80,7 +74,7 @@ export function storageTestSuite(storage: Storage) {
 
   it('loads timeline models', () => {
     return storage.saveModel(model)
-      .then(() => storage.loadTimelineModels(1000 * 60))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
   });
 
@@ -108,7 +102,7 @@ export function storageTestSuite(storage: Storage) {
   it('saves models that have been loaded before', () => {
     assert.equal(model.amount, 10); // check baseline assumptions
     return storage.saveModel(model)
-      .then(() => storage.loadTimelineModels(1000 * 60))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => findModel(loadedModels))
       .then(loadedModel => ({ ...loadedModel, amount: 123 }))
       .then(storage.saveModel)
@@ -116,6 +110,21 @@ export function storageTestSuite(storage: Storage) {
         savedModel,
         { ...model, amount: 123 },
       ));
+  });
+
+  it('loads latest timeline models by type', () => {
+    return Promise.resolve()
+      .then(() => [
+        { ...model, timestamp: timestamp - 2, amount: 1 },
+        { ...model, timestamp: timestamp - 1, amount: 2 },
+        { ...model, timestamp: timestamp - 0, amount: 3 },
+      ])
+      .then(storage.saveModels)
+      .then(() => storage.loadLatestTimelineModels('Carbs', 1))
+      .then(models => {
+        assert.equal(models.length, 1);
+        assertEqualWithoutMeta(models[0], { ...model, timestamp: timestamp - 0, amount: 3 });
+      });
   });
 
 }

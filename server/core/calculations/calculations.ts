@@ -4,6 +4,8 @@ import { hasBloodGlucose } from '../../utils/data';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
+export const DAY_IN_MS = 24 * HOUR_IN_MS;
+export const MONTH_IN_MS = 31 * DAY_IN_MS;
 export const TIME_LIMIT_FOR_SLOPE = 25 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
 
@@ -40,6 +42,15 @@ export function isDexcomEntryValid(noise: number, sgv: number): boolean {
 
 export function roundTo2Decimals(num: number) {
   return Math.round(num * 100) / 100;
+}
+
+export function timestampIsUnderMaxAge(
+  currentTimestamp: number,
+  timestampToCheck: number,
+  maxAgeInMinutes: number): boolean
+{
+  const maxAgeInMs = maxAgeInMinutes * MIN_IN_MS;
+  return timestampToCheck > (currentTimestamp - maxAgeInMs);
 }
 
 export function calculateHba1c(entries: SensorEntry[]) {
