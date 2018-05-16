@@ -54,6 +54,13 @@ module "hosting_stage" {
   db_admin_password = "${var.db_admin_password}"
 }
 
+module "web_stage" {
+  source                             = "./utils/cloudfront_static_site"
+  cloudfront_static_site_domain_name = "stage.nightbear.fi"
+  cloudfront_static_site_domain_zone = "${aws_route53_zone.main.zone_id}"
+  cloudfront_static_site_cache_ttl   = 10
+}
+
 module "hosting_prod" {
   source = "./hosting"
 
