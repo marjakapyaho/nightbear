@@ -1,6 +1,9 @@
 import PouchDB from 'pouchdb';
 import { Middleware, Dispatch } from 'app/utils/redux';
 import { ReplicationDirection } from 'app/reducers';
+import { debounce } from 'lodash';
+
+const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 
 export const database: Middleware = store => {
   let existingReplication: (() => void) | null = null;
@@ -59,25 +62,38 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
 }
 
 function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
+  const postChangeReady = debounce(
+    () =>
+      dispatch({
+        type: 'DB_EMITTED_READY',
+      }),
+    LOCAL_DB_ACTIVE_DEBOUNCE,
+  );
+  dispatch({
+    type: 'DB_EMITTED_READY',
+  });
   changeFeed
-    .on('change', change =>
+    .on('change', change => {
       dispatch({
         type: 'DB_EMITTED_CHANGE',
         change,
-      }),
-    )
-    .on('complete', info =>
+      });
+      postChangeReady();
+    })
+    .on('complete', info => {
       dispatch({
         type: 'DB_EMITTED_COMPLETE',
         info,
-      }),
-    )
-    .on('error', err =>
+      });
+      postChangeReady.cancel();
+    })
+    .on('error', err => {
       dispatch({
         type: 'DB_EMITTED_ERROR',
         err,
-      }),
-    );
+      });
+      postChangeReady.cancel();
+    });
 }
 
 function dispatchFromReplication(

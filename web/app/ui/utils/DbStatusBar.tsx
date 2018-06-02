@@ -23,7 +23,7 @@ function getStyle(state: DbState): CSSProperties {
   switch (state) {
     case 'DISABLED':
       return {
-        background: 'white',
+        background: 'darkgray',
         color: 'gray',
       };
     case 'ACTIVE':
@@ -33,12 +33,12 @@ function getStyle(state: DbState): CSSProperties {
       };
     case 'ONLINE':
       return {
-        background: 'gray',
+        background: 'darkgreen',
         color: 'white',
       };
     case 'OFFLINE':
       return {
-        background: 'orange',
+        background: 'lightgray',
         color: 'black',
       };
     case 'ERROR':

@@ -3,6 +3,9 @@ import { ReplicationDirection } from 'app/reducers';
 export type Action = Readonly<
   | { type: 'DB_URL_SET'; newDbUrl: string }
   | {
+      type: 'DB_EMITTED_READY';
+    }
+  | {
       type: 'DB_EMITTED_CHANGE';
       change: PouchDB.Core.ChangesResponseChange<{}>;
     }

@@ -42,6 +42,8 @@ export function rootReducer(state: State = defaultState, action: Action): State 
   switch (action.type) {
     case 'DB_URL_SET':
       return { ...state, config: { ...state.config, remoteDbUrl: action.newDbUrl } };
+    case 'DB_EMITTED_READY':
+      return updateDbState(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_CHANGE':
       return updateDbState(state, 'LOCAL', 'ACTIVE');
     case 'DB_EMITTED_COMPLETE':
