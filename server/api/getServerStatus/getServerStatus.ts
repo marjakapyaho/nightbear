@@ -1,4 +1,4 @@
-import { Response, Context, Request, createResponse } from 'server/models/api';
+import { Response, Context, Request, createResponse } from 'nightbear/server/models/api';
 
 export function getServerStatus(request: Request, context: Context): Response {
   return createResponse({

@@ -1,4 +1,4 @@
-import { Response, Context, createResponse, Request } from 'server/models/api';
+import { Response, Context, createResponse, Request } from 'nightbear/server/models/api';
 
 export function getWatchStatus(_request: Request, context: Context): Response {
   return Promise.all([

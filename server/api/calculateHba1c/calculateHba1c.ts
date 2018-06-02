@@ -1,6 +1,6 @@
-import { Response, Context, createResponse, Request } from 'server/models/api';
-import { calculateHba1c, DAY_IN_MS } from 'server/core/calculations/calculations';
-import { getMergedEntriesFeed } from 'server/core/entries/entries';
+import { Response, Context, createResponse, Request } from 'nightbear/server/models/api';
+import { calculateHba1c, DAY_IN_MS } from 'nightbear/server/core/calculations/calculations';
+import { getMergedEntriesFeed } from 'nightbear/server/core/entries/entries';
 
 const HBA1C_WEEKS = 4;
 

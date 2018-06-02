@@ -1,6 +1,6 @@
 import { getUuid } from './uuid';
 import { mapObject } from './data';
-import { RequestHandler } from 'server/models/api';
+import { RequestHandler } from 'nightbear/server/models/api';
 import { noop } from 'lodash';
 
 export type LogLevel

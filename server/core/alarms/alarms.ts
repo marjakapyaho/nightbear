@@ -1,4 +1,4 @@
-import { Alarm, Profile, Situation, State } from 'server/models/model';
+import { Alarm, Profile, Situation, State } from 'nightbear/server/models/model';
 import { filter, compact, map, find, sum, take, findIndex } from 'lodash';
 import { MIN_IN_MS } from '../calculations/calculations';
 

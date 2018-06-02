@@ -1,6 +1,6 @@
 import 'mocha';
-import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'server/utils/test';
-import { Hba1c } from 'server/models/model';
+import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'nightbear/server/utils/test';
+import { Hba1c } from 'nightbear/server/models/model';
 import { getHba1cHistory } from './getHba1cHistory';
 
 describe('api/getHba1cHistory', () => {

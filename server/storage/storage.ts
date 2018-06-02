@@ -1,4 +1,4 @@
-import { Model, ModelOfType, ModelType } from 'server/models/model';
+import { Model, ModelOfType, ModelType } from 'nightbear/server/models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;

@@ -1,5 +1,5 @@
 import { find } from 'lodash';
-import { Response, Request, createResponse, Context } from 'server/models/api';
+import { Response, Request, createResponse, Context } from 'nightbear/server/models/api';
 import {
   DeviceStatus,
   DexcomCalibration,
@@ -7,8 +7,8 @@ import {
   DexcomSensorEntry,
   MeterEntry,
   Model,
-} from 'server/models/model';
-import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'server/core/calculations/calculations';
+} from 'nightbear/server/models/model';
+import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'nightbear/server/core/calculations/calculations';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',

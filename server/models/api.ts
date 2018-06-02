@@ -1,6 +1,6 @@
-import { Logger, createConsoleLogger } from 'server/utils/logging';
-import { createCouchDbStorage } from 'server/storage/couchDbStorage';
-import { Storage } from 'server/storage/storage';
+import { Logger, createConsoleLogger } from 'nightbear/server/utils/logging';
+import { createCouchDbStorage } from 'nightbear/server/storage/couchDbStorage';
+import { Storage } from 'nightbear/server/storage/storage';
 
 export function createNodeContext(): Context {
   const { NIGHTBEAR_DB_URL } = process.env;

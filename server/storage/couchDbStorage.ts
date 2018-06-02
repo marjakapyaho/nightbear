@@ -1,8 +1,8 @@
 import * as PouchDB from 'pouchdb';
 import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
-import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'server/models/model';
-import { assert, assertExhausted } from 'server/utils/types';
+import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'nightbear/server/models/model';
+import { assert, assertExhausted } from 'nightbear/server/utils/types';
 
 PouchDB.plugin(PouchDBFind);
 

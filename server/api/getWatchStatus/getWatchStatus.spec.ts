@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { getWatchStatus } from './getWatchStatus';
-import { createTestContext, createTestRequest } from 'server/utils/test';
+import { createTestContext, createTestRequest } from 'nightbear/server/utils/test';
 
 describe('api/getWatchStatus', () => {
 

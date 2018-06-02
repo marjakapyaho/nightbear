@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'server/models/api';
-import { MONTH_IN_MS } from 'server/core/calculations/calculations';
+import { Response, Context, createResponse, Request } from 'nightbear/server/models/api';
+import { MONTH_IN_MS } from 'nightbear/server/core/calculations/calculations';
 import { isNaN } from 'lodash';
 
 export function getHba1cHistory(request: Request, context: Context): Response {

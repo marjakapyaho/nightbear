@@ -2,9 +2,9 @@ import * as express from 'express';
 import { Request as ExpressRequest } from 'express';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
-import { RequestHandler, Request, Headers, Context } from 'server/models/api';
-import { getUuid } from 'server/utils/uuid';
-import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
+import { RequestHandler, Request, Headers, Context } from 'nightbear/server/models/api';
+import { getUuid } from 'nightbear/server/utils/uuid';
+import { bindLoggingContext, getContextName, handlerWithLogging } from 'nightbear/server/utils/logging';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [ HttpMethod, string, RequestHandler ];
