@@ -23,7 +23,7 @@ variable "cloudfront_apigw_lambda_function_handler" {
 
 variable "cloudfront_apigw_lambda_function_runtime" {
   description = "Which node.js version should Lambda use for this function"
-  default     = "nodejs6.10"
+  default     = "nodejs8.10"
 }
 
 variable "cloudfront_apigw_lambda_function_env_vars" {
