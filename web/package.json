@@ -47,8 +47,10 @@
     "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.104",
     "@types/pouchdb": "^6.3.2",
     "css-ns": "^1.2.1",
+    "lodash": "^4.17.5",
     "pouchdb": "^6.4.3",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
