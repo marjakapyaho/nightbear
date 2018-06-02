@@ -14,6 +14,9 @@ Create a local dev DB:
 1. Use `export NIGHTBEAR_TEST_DB_URL=http://admin:admin@localhost:5984/`
 1. Run `npm test` to see that everything works
 
+## Starting docker process if it has stopped
+`docker start nightbear-dev-couchdb`
+
 ## Backups
 
 Useful utils for backing up/moving the DB's around:
