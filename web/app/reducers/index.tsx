@@ -76,6 +76,8 @@ export function rootReducer(state: State = defaultState, action: Action): State 
       return updateDbState(state, action.direction, 'DISABLED');
     case 'REPLICATION_EMITTED_ERROR':
       return updateDbState(state, action.direction, 'ERROR', action.err.message);
+    case 'TIMELINE_DATA_REQUESTED':
+      return state;
     default:
       return assertExhausted(action);
   }

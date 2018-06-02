@@ -7,23 +7,40 @@ const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
 
 export const database: Middleware = store => {
-  let existingReplication: (() => void) | null = null;
+  let existingReplication: ReturnType<typeof startReplication> | null;
   return next => action => {
     const oldValue = store.getState().config.remoteDbUrl;
     const result = next(action);
     const newValue = store.getState().config.remoteDbUrl;
     if (oldValue !== newValue) {
       if (existingReplication) {
-        existingReplication();
+        existingReplication.dispose();
         existingReplication = null;
       }
       if (newValue) {
         existingReplication = startReplication(newValue, store.dispatch);
       }
     }
+    if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
+      queryTimelineData(existingReplication.localDb).then(res =>
+        console.log('Results from DB:', res),
+      );
+    }
     return result;
   };
 };
+
+function queryTimelineData(db: PouchDB.Database<{}>) {
+  return db
+    .allDocs({
+      include_docs: true,
+      limit: 100,
+      descending: true,
+      start_key: 'timeline/_',
+      end_key: 'timeline/',
+    } as any)
+    .then(res => res.rows.map(row => row.doc));
+}
 
 function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   const isSafari = // https://stackoverflow.com/a/31732310 ;__;
@@ -63,11 +80,15 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
     });
     dispatchFromChanges(changes, dispatch);
   });
-  // Return a dispose function:
-  return () => {
-    if (changes) changes.cancel();
-    upReplication.cancel();
-    downReplication.cancel();
+  // Return our DB's & a dispose function:
+  return {
+    localDb,
+    remoteDb,
+    dispose() {
+      if (changes) changes.cancel();
+      upReplication.cancel();
+      downReplication.cancel();
+    },
   };
 }
 

@@ -46,4 +46,8 @@ export type Action = Readonly<
       direction: ReplicationDirection;
       err: PouchDB.Core.Error;
     }
+  | {
+      type: 'TIMELINE_DATA_REQUESTED';
+      timeRange: number;
+    }
 >;
