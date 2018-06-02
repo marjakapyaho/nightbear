@@ -84,5 +84,6 @@ module.exports = {
     contentBase: `${__dirname}/app`,
     hot: true,
     stats: 'minimal',
+    overlay: true,
   },
 };
