@@ -33,12 +33,7 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
   const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
-  const changes = localDb.changes({
-    live: true,
-    since: 'now',
-    return_docs: false,
-  });
-  dispatchFromChanges(changes, dispatch);
+  // Start replication in both directions:
   const replOptions = {
     live: true,
     retry: true,
@@ -54,11 +49,29 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   });
   dispatchFromReplication(upReplication, 'UP', dispatch);
   dispatchFromReplication(downReplication, 'DOWN', dispatch);
+  // Start changes feed, but ONLY after replications have finished (otherwise it'll be crazy noisy):
+  let changes: PouchDB.Core.Changes<{}> | null = null;
+  Promise.all([
+    eventToPromise(upReplication, 'paused'),
+    eventToPromise(downReplication, 'paused'),
+  ]).then(() => {
+    changes = localDb.changes({
+      live: true,
+      since: 'now',
+      return_docs: false,
+    });
+    dispatchFromChanges(changes, dispatch);
+  });
+  // Return a dispose function:
   return () => {
-    changes.cancel();
+    if (changes) changes.cancel();
     upReplication.cancel();
     downReplication.cancel();
   };
+}
+
+function eventToPromise(emitter: EventEmitter, event: string): Promise<null> {
+  return new Promise(resolve => emitter.once(event, resolve)).then(() => null);
 }
 
 function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
