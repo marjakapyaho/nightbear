@@ -23,7 +23,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 
   return Promise.resolve()
     .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 1))
-    .then((latestCalibrations): Promise<Model> => {
+    .then((latestCalibrations): Promise<Model | null> => {
 
       if (requestObject.hasOwnProperty('uploaderBattery')) {
         const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
@@ -37,6 +37,9 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         if (newDexcomCalibration) {
           return context.storage.saveModel(newDexcomCalibration);
         }
+        else {
+          return Promise.resolve(null);
+        }
       }
 
       // Calibration needs initialized calibration
@@ -48,6 +51,9 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         const updatedDexcomCalibration: DexcomCalibration | null = amendCalibration(requestObject, latestCalibration);
         if (updatedDexcomCalibration) {
           return context.storage.saveModel(updatedDexcomCalibration);
+        }
+        else {
+          return Promise.resolve(null);
         }
       }
 
@@ -144,6 +150,7 @@ export function amendCalibration(
   const intercept = parseFloat(requestObject.intercept);
   const scale = parseFloat(requestObject.scale);
 
+  // Only proceed if we don't already have this calibration data
   if (cal && cal.meterEntries.length && !cal.slope && !cal.intercept && !cal.scale) {
     return { ...cal, slope, intercept, scale };
   }
