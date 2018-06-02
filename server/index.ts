@@ -1,13 +1,13 @@
-import { startExpressServer } from './main/express';
-import { createNodeContext } from './models/api';
-import { getServerStatus } from './api/getServerStatus/getServerStatus';
-import { uploadParakeetEntry } from './api/uploadParakeetEntry/uploadParakeetEntry';
-import { uploadDexcomEntry } from './api/uploadDexcomEntry/uploadDexcomEntry';
-import { getEntries } from './api/getEntries/getEntries';
-import { getWatchStatus } from './api/getWatchStatus/getWatchStatus';
-import { getHba1cHistory } from './api/getHba1cHistory/getHba1cHistory';
-import { ackLatestAlarm } from './api/ackLatestAlarm/ackLatestAlarm';
-import { uploadEntries } from './api/uploadEntries/uploadEntries';
+import { startExpressServer } from 'server/main/express';
+import { createNodeContext } from 'server/models/api';
+import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
+import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
+import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
+import { getEntries } from 'server/api/getEntries/getEntries';
+import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
+import { getHba1cHistory } from 'server/api/getHba1cHistory/getHba1cHistory';
+import { ackLatestAlarm } from 'server/api/ackLatestAlarm/ackLatestAlarm';
+import { uploadEntries } from 'server/api/uploadEntries/uploadEntries';
 
 const context = createNodeContext();
 

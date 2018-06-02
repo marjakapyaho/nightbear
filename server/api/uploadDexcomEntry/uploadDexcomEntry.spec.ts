@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendCalibration } from './uploadDexcomEntry';
-import { Request } from '../../models/api';
-import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from '../../models/model';
-import { assertEqualWithoutMeta, createTestContext, withStorage } from '../../utils/test';
+import { Request } from 'server/models/api';
+import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'server/models/model';
+import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
 
 describe('api/uploadDexcomEntry', () => {
 

@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from '../../calculations/calculations';
-import { DexcomSensorEntry } from '../../../models/model';
+import { DexcomSensorEntry } from 'server/models/model';
 
 export function entriesRising(currentTimestamp: number): DexcomSensorEntry[] {
   return [

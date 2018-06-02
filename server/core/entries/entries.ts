@@ -1,5 +1,5 @@
-import { Context } from '../../models/api';
-import { SensorEntry } from '../../models/model';
+import { Context } from 'server/models/api';
+import { SensorEntry } from 'server/models/model';
 
 export function getMergedEntriesFeed(
   context: Context,

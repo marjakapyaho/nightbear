@@ -1,4 +1,4 @@
-import { Situation, State } from '../../../models/model';
+import { Situation, State } from 'server/models/model';
 
 export function getMockState(situation?: Situation): State {
   const state = {

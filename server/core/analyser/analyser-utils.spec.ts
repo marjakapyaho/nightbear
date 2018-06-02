@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { parseAnalyserEntries } from './analyser-utils';
 import { MIN_IN_MS } from '../calculations/calculations';
-import { AnalyserEntry, SensorEntry } from '../../models/model';
+import { AnalyserEntry, SensorEntry } from 'server/models/model';
 
 describe('utils/analyser-utils', () => {
 

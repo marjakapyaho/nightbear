@@ -2,12 +2,12 @@ import 'mocha';
 import { assert } from 'chai';
 import * as PouchDB from 'pouchdb';
 import * as PouchDBMemory from 'pouchdb-adapter-memory';
-import { Context, Request } from '../models/api';
+import { Context, Request } from 'server/models/api';
 import { NO_LOGGING } from './logging';
-import { NO_STORAGE } from '../storage/storage';
-import { Profile, Model } from '../models/model';
-import { Storage } from '../storage/storage';
-import { createCouchDbStorage } from '../storage/couchDbStorage';
+import { NO_STORAGE } from 'server/storage/storage';
+import { Profile, Model } from 'server/models/model';
+import { Storage } from 'server/storage/storage';
+import { createCouchDbStorage } from 'server/storage/couchDbStorage';
 import { getUuid } from './uuid';
 
 PouchDB.plugin(PouchDBMemory); // @see https://www.npmjs.com/package/pouchdb-adapter-memory

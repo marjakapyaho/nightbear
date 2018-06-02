@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
-import { Request } from '../../models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
-import { createTestContext, withStorage, assertEqualWithoutMeta } from '../../utils/test';
+import { Request } from 'server/models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'server/models/model';
+import { createTestContext, withStorage, assertEqualWithoutMeta } from 'server/utils/test';
 
 describe('api/uploadParakeetEntry', () => {
 

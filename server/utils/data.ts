@@ -1,4 +1,4 @@
-import { SensorEntry } from '../models/model';
+import { SensorEntry } from 'server/models/model';
 
 export type ObjMap<K extends string, V> = { [P in K]: V };
 

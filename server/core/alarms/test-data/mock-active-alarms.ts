@@ -1,4 +1,4 @@
-import { Alarm, Situation } from '../../../models/model';
+import { Alarm, Situation } from 'server/models/model';
 
 export function getMockActiveAlarms(currentTimestamp: number, situation?: Situation): Alarm[] {
   if (!situation) {

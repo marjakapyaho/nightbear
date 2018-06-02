@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { getMergedEntriesFeed } from './entries';
 import { HOUR_IN_MS } from '../calculations/calculations';
-import { createTestContext } from '../../utils/test';
+import { createTestContext } from 'server/utils/test';
 
 describe('core/entries', () => {
   const timestamp = Date.now();

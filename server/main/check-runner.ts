@@ -1,4 +1,4 @@
-import { MIN_IN_MS } from '../core/calculations/calculations';
+import { MIN_IN_MS } from 'server/core/calculations/calculations';
 import Timer = NodeJS.Timer;
 
 let nextCheck: Timer;
