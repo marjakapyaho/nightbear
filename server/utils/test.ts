@@ -4,10 +4,10 @@ import * as PouchDB from 'pouchdb';
 import * as PouchDBMemory from 'pouchdb-adapter-memory';
 import { Context, Request } from 'nightbear/core/models/api';
 import { NO_LOGGING } from './logging';
-import { NO_STORAGE } from 'nightbear/server/storage/storage';
+import { NO_STORAGE } from 'nightbear/core/storage/storage';
 import { Profile, Model } from 'nightbear/core/models/model';
-import { Storage } from 'nightbear/server/storage/storage';
-import { createCouchDbStorage } from 'nightbear/server/storage/couchDbStorage';
+import { Storage } from 'nightbear/core/storage/storage';
+import { createCouchDbStorage } from 'nightbear/core/storage/couchDbStorage';
 import { getUuid } from './uuid';
 
 PouchDB.plugin(PouchDBMemory); // @see https://www.npmjs.com/package/pouchdb-adapter-memory
