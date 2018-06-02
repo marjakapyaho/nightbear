@@ -8,7 +8,7 @@ export default renderFromStore(
   state => state,
   (React, { dbState }) => {
     const parts = objectKeys(dbState);
-    return <div className="this">{parts.map(part => renderState(part, dbState[part]))};</div>;
+    return <div className="this">{parts.map(part => renderState(part, dbState[part]))}</div>;
     function renderState(part: DbStatePart, state: State['dbState'][DbStatePart]) {
       return (
         <div key={part} className="dir" style={getStyle(state.state)}>
