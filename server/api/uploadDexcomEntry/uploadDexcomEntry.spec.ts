@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendCalibration } from './uploadDexcomEntry';
-import { Request } from 'nightbear/server/models/api';
-import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'nightbear/server/models/model';
+import { Request } from 'nightbear/core/models/api';
+import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'nightbear/core/models/model';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'nightbear/server/utils/test';
 
 describe('api/uploadDexcomEntry', () => {

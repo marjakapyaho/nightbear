@@ -1,5 +1,5 @@
 import { chain, find, filter, some } from 'lodash';
-import { Alarm, AnalyserEntry, DeviceStatus, Insulin, Profile, SensorEntry } from 'nightbear/server/models/model';
+import { Alarm, AnalyserEntry, DeviceStatus, Insulin, Profile, SensorEntry } from 'nightbear/core/models/model';
 import { HOUR_IN_MS, MIN_IN_MS } from '../calculations/calculations';
 import { parseAnalyserEntries } from './analyser-utils';
 

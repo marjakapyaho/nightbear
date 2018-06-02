@@ -1,4 +1,4 @@
-import { Response, Context, createResponse, Request } from 'nightbear/server/models/api';
+import { Response, Context, createResponse, Request } from 'nightbear/core/models/api';
 import { calculateHba1c, DAY_IN_MS } from 'nightbear/core/calculations/calculations';
 import { getMergedEntriesFeed } from 'nightbear/core/entries/entries';
 

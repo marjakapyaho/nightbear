@@ -1,5 +1,5 @@
 import { startExpressServer } from 'nightbear/server/main/express';
-import { createNodeContext } from 'nightbear/server/models/api';
+import { createNodeContext } from 'nightbear/core/models/api';
 import { getServerStatus } from 'nightbear/server/api/getServerStatus/getServerStatus';
 import { uploadParakeetEntry } from 'nightbear/server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { uploadDexcomEntry } from 'nightbear/server/api/uploadDexcomEntry/uploadDexcomEntry';

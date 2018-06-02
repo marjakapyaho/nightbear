@@ -1,4 +1,4 @@
-import { SensorEntry } from 'nightbear/server/models/model';
+import { SensorEntry } from 'nightbear/core/models/model';
 import { reduce } from 'lodash';
 import { hasBloodGlucose } from 'nightbear/server/utils/data';
 

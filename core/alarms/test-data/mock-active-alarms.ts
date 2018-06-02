@@ -1,4 +1,4 @@
-import { Alarm, Situation } from 'nightbear/server/models/model';
+import { Alarm, Situation } from 'nightbear/core/models/model';
 
 export function getMockActiveAlarms(currentTimestamp: number, situation?: Situation): Alarm[] {
   if (!situation) {

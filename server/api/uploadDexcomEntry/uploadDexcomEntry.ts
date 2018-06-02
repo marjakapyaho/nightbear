@@ -1,5 +1,5 @@
 import { find } from 'lodash';
-import { Response, Request, createResponse, Context } from 'nightbear/server/models/api';
+import { Response, Request, createResponse, Context } from 'nightbear/core/models/api';
 import {
   DeviceStatus,
   DexcomCalibration,
@@ -7,7 +7,7 @@ import {
   DexcomSensorEntry,
   MeterEntry,
   Model,
-} from 'nightbear/server/models/model';
+} from 'nightbear/core/models/model';
 import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'nightbear/core/calculations/calculations';
 
 const ENTRY_TYPES = {

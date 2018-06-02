@@ -1,5 +1,5 @@
-import { Response, Request, createResponse, Context } from 'nightbear/server/models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/server/models/model';
+import { Response, Request, createResponse, Context } from 'nightbear/core/models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/core/models/model';
 import { calculateRaw } from 'nightbear/core/calculations/calculations';
 import { find } from 'lodash';
 

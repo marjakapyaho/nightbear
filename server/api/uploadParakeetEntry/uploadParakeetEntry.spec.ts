@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
-import { Request } from 'nightbear/server/models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/server/models/model';
+import { Request } from 'nightbear/core/models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/core/models/model';
 import { createTestContext, withStorage, assertEqualWithoutMeta } from 'nightbear/server/utils/test';
 
 describe('api/uploadParakeetEntry', () => {

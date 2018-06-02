@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from '../../calculations/calculations';
-import { DexcomSensorEntry } from 'nightbear/server/models/model';
+import { DexcomSensorEntry } from 'nightbear/core/models/model';
 
 export function entriesOutdated(currentTimestamp: number): DexcomSensorEntry[] {
   return [
