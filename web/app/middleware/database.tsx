@@ -1,4 +1,8 @@
-import PouchDB from 'pouchdb';
+// @see https://github.com/pouchdb/pouchdb/issues/6692
+import PouchDBDefault from 'pouchdb';
+// tslint:disable-next-line:no-var-requires
+const PouchDB = PouchDBDefault || require('pouchdb');
+
 import { Middleware, Dispatch } from 'nightbear/web/app/utils/redux';
 import { ReplicationDirection } from 'nightbear/web/app/reducers';
 import { debounce } from 'lodash';

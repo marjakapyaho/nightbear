@@ -1,4 +1,8 @@
-import * as PouchDB from 'pouchdb';
+// @see https://github.com/pouchdb/pouchdb/issues/6692
+import PouchDBDefault from 'pouchdb';
+// tslint:disable-next-line:no-var-requires
+const PouchDB = PouchDBDefault || require('pouchdb');
+
 import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
 import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'nightbear/core/models/model';
