@@ -18,12 +18,12 @@
     "test-watch": "NODE_PATH=. mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
     "test-list": "find . -name '*.spec.ts' -not -path '*/node_modules/*'",
     "==================== SERVER ====================": "",
-    "server-start": "check-node-version --package && NODE_PATH=.. ts-node index.ts",
+    "server-start": "check-node-version --package && NODE_PATH=.. ts-node server/index.ts",
     "==================== WEB ====================": "",
-    "web-start": "webpack-dev-server --mode development --hot --progress --color --port 3000",
-    "web-build": "webpack -p --progress --colors",
-    "web-prettier": "prettier --write \"app/**/*.{ts,tsx,css}\"",
-    "web-deploy": "npm run build && aws --profile nightbear s3 cp --acl public-read --recursive dist s3://stage-nightbear-fi/"
+    "web-start": "webpack-dev-server --config web/webpack.config.js --mode development --hot --progress --color --port 3000",
+    "web-build": "webpack --config web/webpack.config.js -p --progress --colors",
+    "web-prettier": "prettier --write \"web/app/**/*.{ts,tsx,css}\"",
+    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --recursive web/dist s3://stage-nightbear-fi/"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [

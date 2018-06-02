@@ -21,9 +21,9 @@ export function configureStore(initialState?: State, middleware: Middleware[] = 
     appliedMiddleware,
   ) as Store;
 
-  if (module.hot) {
-    module.hot.accept('app/reducers', () => {
-      const nextReducer = require('app/reducers');
+  if ((module as any).hot) {
+    (module as any).hot.accept('nightbear/web/app/reducers', () => {
+      const nextReducer = require('nightbear/web/app/reducers');
       (store as any).replaceReducer(nextReducer);
     });
   }

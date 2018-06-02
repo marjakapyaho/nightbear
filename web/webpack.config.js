@@ -19,7 +19,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.tsx'],
     alias: {
-      app: `${__dirname}/app`, // allow non-relative imports from "app/..."
+      nightbear: `${__dirname}/../../nightbear`, // allow non-relative imports from "nightbear/..."
     },
   },
   node: {
