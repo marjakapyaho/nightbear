@@ -8,7 +8,7 @@ import {
   MeterEntry,
   Model,
 } from 'nightbear/server/models/model';
-import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'nightbear/server/core/calculations/calculations';
+import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'nightbear/core/calculations/calculations';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',
