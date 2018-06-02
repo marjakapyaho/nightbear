@@ -4,6 +4,7 @@ import { ReplicationDirection } from 'app/reducers';
 import { debounce } from 'lodash';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
+export const DB_REPLICATION_BATCH_SIZE = 500;
 
 export const database: Middleware = store => {
   let existingReplication: (() => void) | null = null;
@@ -37,7 +38,7 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   const replOptions = {
     live: true,
     retry: true,
-    batch_size: 1000,
+    batch_size: DB_REPLICATION_BATCH_SIZE,
   };
   const upReplication = PouchDB.replicate(localDb, remoteDb, {
     ...replOptions,

@@ -1,5 +1,11 @@
 import { renderFromStore } from 'app/utils/react';
-import { State, DbState, DbStatePart } from 'app/reducers';
+import {
+  State,
+  DbState,
+  DbStatePart,
+  getSummaryDbState,
+  getSummaryReplicationProgress,
+} from 'app/reducers';
 import { CSSProperties } from 'react';
 import { assertExhausted, objectKeys } from 'app/utils/types';
 
@@ -8,11 +14,20 @@ export default renderFromStore(
   state => state,
   (React, { dbState }) => {
     const parts = objectKeys(dbState);
-    return <div className="this">{parts.map(part => renderState(part, dbState[part]))}</div>;
+    const summaryState = getSummaryDbState(parts.map(key => dbState[key].state));
+    const summaryProgress = getSummaryReplicationProgress(parts.map(key => dbState[key]));
+    return (
+      <div className="this">
+        <div className="parts">{parts.map(part => renderState(part, dbState[part]))}</div>
+        <div className="summary" style={getStyle(summaryState)}>
+          {summaryState} {summaryProgress === null ? null : `(${summaryProgress} %)`}
+        </div>
+      </div>
+    );
     function renderState(part: DbStatePart, state: State['dbState'][DbStatePart]) {
       return (
         <div key={part} className="dir" style={getStyle(state.state)}>
-          {part}: {state.state} {state.details}
+          {part}: {state.state}
         </div>
       );
     }

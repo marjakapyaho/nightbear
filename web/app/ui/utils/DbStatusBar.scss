@@ -1,9 +1,16 @@
 .nb-DbStatusBar {
-  display: flex;
-  border: 1px solid black;
+  &-parts {
+    display: flex;
+    border: 1px solid black;
+  }
+
+  &-dir,
+  &-summary {
+    padding: 5px 10px;
+    text-align: center;
+  }
 
   &-dir {
     flex: 1;
-    padding: 5px 10px;
   }
 }
