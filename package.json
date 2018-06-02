@@ -8,13 +8,22 @@
     "node": ">=8.7.0 <9"
   },
   "scripts": {
+    "==================== GLOBAL HOOKS ====================": "",
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
-    "lint": "check-node-version --package && tslint --project . --type-check && echo lint OK",
+    "precommit": "npm run lint && npm test",
+    "==================== GLOBAL QA ====================": "",
+    "lint": "check-node-version --package && tslint --project . && echo lint OK",
     "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
     "test": "check-node-version --package && NODE_PATH=. mocha --require ts-node/register $(npm run --silent test-list)",
     "test-watch": "NODE_PATH=. mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
     "test-list": "find . -name '*.spec.ts' -not -path '*/node_modules/*'",
-    "precommit": "npm run lint && npm test"
+    "==================== SERVER ====================": "",
+    "server-start": "check-node-version --package && NODE_PATH=.. ts-node index.ts",
+    "==================== WEB ====================": "",
+    "web-start": "webpack-dev-server --mode development --hot --progress --color --port 3000",
+    "web-build": "webpack -p --progress --colors",
+    "web-prettier": "prettier --write \"app/**/*.{ts,tsx,css}\"",
+    "web-deploy": "npm run build && aws --profile nightbear s3 cp --acl public-read --recursive dist s3://stage-nightbear-fi/"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [
