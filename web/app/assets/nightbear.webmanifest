@@ -1,0 +1,15 @@
+{
+  "name": "Nightbear",
+  "short_name": "Nightbear",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }
+  ]
+}
