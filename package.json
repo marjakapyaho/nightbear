@@ -1,0 +1,51 @@
+{
+  "name": "nightbear",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "npm": ">=5.4.2 <6",
+    "node": ">=8.7.0 <9"
+  },
+  "scripts": {
+    "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
+    "lint": "check-node-version --package && tslint --project . --type-check && echo lint OK",
+    "lint-watch": "chokidar '**/*.ts' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
+    "test": "check-node-version --package && NODE_PATH=. mocha --require ts-node/register $(npm run --silent test-list)",
+    "test-watch": "NODE_PATH=. mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
+    "test-list": "find . -name '*.spec.ts' -not -path '*/node_modules/*'",
+    "precommit": "npm run lint && npm test"
+  },
+  "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
+  "contributors": [
+    "Jarno Rantanen <jarno@jrw.fi>"
+  ],
+  "license": "AGPL",
+  "dependencies": {
+    "@types/body-parser": "^1.16.5",
+    "@types/chai": "^4.0.4",
+    "@types/cors": "^2.8.1",
+    "@types/express": "^4.0.37",
+    "@types/lodash": "^4.14.104",
+    "@types/mocha": "^2.2.43",
+    "@types/node": "^8.0.34",
+    "@types/pouchdb": "^6.3.2",
+    "@types/pouchdb-find": "^6.3.2",
+    "body-parser": "^1.18.2",
+    "chai": "^4.1.2",
+    "check-node-version": "^3.1.1",
+    "chokidar-cli": "^1.2.0",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "husky": "^0.14.3",
+    "lodash": "^4.17.5",
+    "mocha": "^4.0.1",
+    "pouchdb": "^6.4.3",
+    "pouchdb-adapter-memory": "^6.4.3",
+    "pouchdb-find": "^6.4.3",
+    "pushover-notifications": "^1.0.0",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.8.3"
+  }
+}
