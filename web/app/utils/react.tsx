@@ -23,8 +23,8 @@ export function renderFromProps<Props>(
 ): ReactComponent<Props> {
   const { displayName, NsReact } = namespaceReact(filename);
   return class extends React.Component<Props> {
-    static displayName = displayName;
-    render() {
+    public static displayName = displayName;
+    public render() {
       return renderFunc(NsReact, this.props);
     }
   };
@@ -43,8 +43,8 @@ export function renderFromStore<OwnProps, IntProps>(
 ): ReactComponent<OwnProps> {
   const { displayName, NsReact } = namespaceReact(filename);
   const Component = class extends React.Component<IntProps & DispatchProp> {
-    static displayName = displayName;
-    render() {
+    public static displayName = displayName;
+    public render() {
       return renderFunc(NsReact, this.props, this.props._dispatch);
     }
   };

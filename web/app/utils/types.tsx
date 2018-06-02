@@ -9,6 +9,6 @@ export function assertNumber(x: any): number {
   return x;
 }
 
-export function objectKeys<T extends {}>(object: T): (keyof T)[] {
+export function objectKeys<T extends {}>(object: T): Array<keyof T> {
   return Object.keys(object) as any;
 }

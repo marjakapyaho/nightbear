@@ -107,7 +107,7 @@ export function getSummaryDbState(states: DbState[]): DbState {
 }
 
 export function getSummaryReplicationProgress(
-  parts: State['dbState'][DbStatePart][],
+  parts: Array<State['dbState'][DbStatePart]>,
 ): number | null {
   const tally = (index: 0 | 1) =>
     parts.reduce(
