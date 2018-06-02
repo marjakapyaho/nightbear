@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb';
-import { Middleware, Dispatch } from 'app/utils/redux';
-import { ReplicationDirection } from 'app/reducers';
+import { Middleware, Dispatch } from 'nightbear/web/app/utils/redux';
+import { ReplicationDirection } from 'nightbear/web/app/reducers';
 import { debounce } from 'lodash';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;

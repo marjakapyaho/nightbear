@@ -1,5 +1,5 @@
-import { renderFromStore } from 'app/utils/react';
-import DbStatusBar from 'app/ui/utils/DbStatusBar';
+import { renderFromStore } from 'nightbear/web/app/utils/react';
+import DbStatusBar from 'nightbear/web/app/ui/utils/DbStatusBar';
 
 export default renderFromStore(
   __filename,

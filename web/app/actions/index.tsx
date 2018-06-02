@@ -1,4 +1,4 @@
-import { ReplicationDirection } from 'app/reducers';
+import { ReplicationDirection } from 'nightbear/web/app/reducers';
 
 export type Action = Readonly<
   | { type: 'DB_URL_SET'; newDbUrl: string }
