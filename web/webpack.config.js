@@ -1,5 +1,4 @@
-const
-  webpack = require('webpack'),
+const webpack = require('webpack'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   ExtractTextPlugin = require('extract-text-webpack-plugin'),
   WebpackCleanupPlugin = require('webpack-cleanup-plugin'),
@@ -62,9 +61,7 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: IS_PROD ? 'production' : 'development',
     }),
-    new CopyWebpackPlugin([
-      'assets/**',
-    ]),
+    new CopyWebpackPlugin(['assets/**']),
     new WebpackCleanupPlugin(),
     new ExtractTextPlugin({
       filename: 'index.css',
