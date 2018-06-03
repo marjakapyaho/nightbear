@@ -28,8 +28,11 @@ export const database: Middleware = store => {
     }
     if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
       existingReplication.storage
-        .loadTimelineModels('ParakeetSensorEntry', 1000 * 60 * 60, Date.now())
-        .then(res => console.log('Results from DB:', res));
+        .loadTimelineModels('ParakeetSensorEntry', action.range, action.rangeEnd)
+        .then(
+          models => store.dispatch({ type: 'TIMELINE_DATA_RECEIVED', models }),
+          err => store.dispatch({ type: 'TIMELINE_DATA_FAILED', err }),
+        );
     }
     return result;
   };
