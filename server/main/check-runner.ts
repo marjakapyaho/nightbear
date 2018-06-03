@@ -1,7 +1,6 @@
 import { MIN_IN_MS } from 'nightbear/core/calculations/calculations';
-import Timer = NodeJS.Timer;
 
-let nextCheck: Timer;
+let nextCheck: NodeJS.Timer;
 
 export function runChecks() {
 
