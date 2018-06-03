@@ -4,10 +4,11 @@ import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration
 import { Request } from 'nightbear/core/models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'nightbear/core/models/model';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'nightbear/server/utils/test';
+import { MIN_IN_MS } from '../../../core/calculations/calculations';
 
 describe('api/uploadDexcomEntry', () => {
 
-  const context = createTestContext();
+  const timestampNow = 1508672249758;
 
   // Mock requests
   const mockRequestBgEntry: Request = {
@@ -25,7 +26,7 @@ describe('api/uploadDexcomEntry', () => {
       sgv: 135,
       dateString: 'Sun Nov 22 23:27:50 EET 2015',
       type: 'sgv',
-      date: 1448227670000,
+      date: timestampNow,
       noise: 1,
     },
   };
@@ -39,7 +40,7 @@ describe('api/uploadDexcomEntry', () => {
     requestBody: {
       device: 'dexcom',
       type: 'mbg',
-      date: 1508672249758 - 3 * 14934,
+      date: timestampNow - 2 * MIN_IN_MS,
       dateString: 'Sat Feb 24 14:13:42 EET 2018',
       mbg: 153,
     },
@@ -54,7 +55,7 @@ describe('api/uploadDexcomEntry', () => {
     requestBody: {
       device: 'dexcom',
       type: 'cal',
-      date: 1508672249758 - 2 * 14934,
+      date: timestampNow - MIN_IN_MS,
       dateString: 'Sat Feb 24 11:55:48 EET 2018',
       slope: 828.3002146147081,
       intercept: 30000,
@@ -76,7 +77,7 @@ describe('api/uploadDexcomEntry', () => {
   // Mock objects
   const mockDexcomSensorEntry: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
-    timestamp: 1508672249758,
+    timestamp: timestampNow,
     bloodGlucose: 7.5,
     signalStrength: 168,
     noiseLevel: 1,
@@ -84,12 +85,12 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: 1508672249758 - 2 * 14934,
+    timestamp: timestampNow - 3 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp: timestampNow - 3 * MIN_IN_MS,
       bloodGlucose: 8.0,
-      measuredAt: 1508672249758 - 4 * 14934,
+      measuredAt: timestampNow - 3 * MIN_IN_MS,
     }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
@@ -99,12 +100,12 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterEntry: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: 1508672249758,
+    timestamp: timestampNow - 2 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp: timestampNow - 2 * MIN_IN_MS,
       bloodGlucose: 8.5,
-      measuredAt: 1508672249758 - 3 * 14934,
+      measuredAt: timestampNow - 2 * MIN_IN_MS,
     }],
     isInitialCalibration: false,
     slope: null,
@@ -114,12 +115,12 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterAndCalEntries: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: 1508672249758,
+    timestamp: timestampNow - 2 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp: timestampNow - 2 * MIN_IN_MS,
       bloodGlucose: 8.5,
-      measuredAt: 1508672249758 - 3 * 14934,
+      measuredAt: timestampNow - 2 * MIN_IN_MS,
     }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
@@ -130,7 +131,7 @@ describe('api/uploadDexcomEntry', () => {
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
     deviceName: 'dexcom',
-    timestamp: 1508672249758,
+    timestamp: timestampNow,
     batteryLevel: 80,
     geolocation: null,
   };
@@ -194,21 +195,21 @@ describe('api/uploadDexcomEntry', () => {
 
   it('produces correct DexcomSensorEntry', () => {
     assert.deepEqual(
-      parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration, context.timestamp()),
+      parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration),
       mockDexcomSensorEntry,
     );
   });
 
   it('produces correct DexcomCalibration with new meter entry', () => {
     assert.deepEqual(
-      initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalibration, context.timestamp()),
+      initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalibration),
       mockDexcomCalWithMeterEntry,
     );
   });
 
   it('does not regenerate new calibration with same meter entry', () => {
     assert.deepEqual(
-      initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalWithMeterEntry, context.timestamp()),
+      initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalWithMeterEntry),
       null,
     );
   });
@@ -221,6 +222,7 @@ describe('api/uploadDexcomEntry', () => {
   });
 
   it('produces correct DeviceStatus', () => {
+    const context = createTestContext();
     assert.deepEqual(
       parseDexcomStatus(mockRequestDeviceStatus.requestBody as any, context.timestamp()),
       mockDeviceStatus,

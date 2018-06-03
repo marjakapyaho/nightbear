@@ -8,12 +8,14 @@ import { getWatchStatus } from 'nightbear/server/api/getWatchStatus/getWatchStat
 import { getHba1cHistory } from 'nightbear/server/api/getHba1cHistory/getHba1cHistory';
 import { ackLatestAlarm } from 'nightbear/server/api/ackLatestAlarm/ackLatestAlarm';
 import { uploadEntries } from 'nightbear/server/api/uploadEntries/uploadEntries';
+import { calculateHba1cForDate } from 'nightbear/server/api/calculateHba1c/calculateHba1c';
 
 const context = createNodeContext();
 
 startExpressServer(
   context,
   [ 'post', '/ack-latest-alarm', ackLatestAlarm ],
+  [ 'get', '/calculate-hba1c', calculateHba1cForDate ],
   [ 'get', '/get-entries', getEntries ],
   [ 'get', '/get-hba1c-history', getHba1cHistory ],
   [ 'get', '/get-server-status', getServerStatus ],

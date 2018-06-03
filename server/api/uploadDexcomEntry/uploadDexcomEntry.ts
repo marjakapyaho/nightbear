@@ -33,7 +33,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
       const latestCalibration = latestCalibrations[0] as DexcomCalibration;
 
       if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
-        const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration, timestamp);
+        const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration);
         if (newDexcomCalibration) {
           return context.storage.saveModel(newDexcomCalibration);
         }
@@ -65,7 +65,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
       }
 
       if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
-        const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestFullCalibration, timestamp);
+        const dexcomEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, latestFullCalibration);
         return context.storage.saveModel(dexcomEntry);
       }
 
@@ -77,7 +77,6 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 export function parseDexcomEntry(
   requestObject: { [key: string]: string },
   latestCalibration: DexcomCalibration,
-  timestamp: number,
   ): DexcomSensorEntry | DexcomRawSensorEntry {
 
   const { slope, intercept, scale } = latestCalibration;
@@ -87,11 +86,12 @@ export function parseDexcomEntry(
   const noiseLevel = parseInt(requestObject.noise, 10);
   const filtered = parseInt(requestObject.filtered, 10);
   const unfiltered = parseInt(requestObject.unfiltered, 10);
+  const uploadTimestamp = parseInt(requestObject.date, 10);
 
   if (isDexcomEntryValid(noiseLevel, dexBloodGlucose)) {
     return {
       modelType: 'DexcomSensorEntry',
-      timestamp,
+      timestamp: uploadTimestamp,
       bloodGlucose: changeBloodGlucoseUnitToMmoll(dexBloodGlucose),
       signalStrength,
       noiseLevel,
@@ -100,7 +100,7 @@ export function parseDexcomEntry(
   else {
     return {
       modelType: 'DexcomRawSensorEntry',
-      timestamp,
+      timestamp: uploadTimestamp,
       bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
       signalStrength,
       noiseLevel,
@@ -113,23 +113,22 @@ export function parseDexcomEntry(
 export function initCalibration(
   requestObject: { [key: string]: string },
   cal: DexcomCalibration | undefined,
-  timestamp: number,
   ): DexcomCalibration | null {
 
   const bgTimestamp = parseInt(requestObject.date, 10);
   const bloodGlucose = parseInt(requestObject.mbg, 10);
 
   // Only proceed if we don't already have this meter entry
-  if (cal && find(cal.meterEntries, (entry: MeterEntry) => entry.measuredAt === bgTimestamp)) {
+  if (cal && find(cal.meterEntries, (entry: MeterEntry) => entry.timestamp === bgTimestamp)) {
     return null;
   }
   else {
     return {
       modelType: 'DexcomCalibration',
-      timestamp,
+      timestamp: bgTimestamp,
       meterEntries: [{
         modelType: 'MeterEntry',
-        timestamp,
+        timestamp: bgTimestamp,
         bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
         measuredAt: bgTimestamp,
       }],
@@ -163,6 +162,7 @@ export function parseDexcomStatus(
   requestObject: { [key: string]: string },
   timestamp: number,
   ): DeviceStatus {
+
   const batteryLevel = parseInt(requestObject.uploaderBattery, 10);
 
   return {

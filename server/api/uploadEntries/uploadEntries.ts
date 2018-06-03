@@ -31,7 +31,7 @@ export function parseMeterEntry(
 ): MeterEntry {
   return {
     modelType: 'MeterEntry',
-    timestamp: 1508672249758,
+    timestamp,
     bloodGlucose,
     measuredAt: timestamp,
   };
