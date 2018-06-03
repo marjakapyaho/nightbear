@@ -130,7 +130,7 @@ export function createCouchDbStorage(dbUrl: string, options: PouchDB.Configurati
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
-function reviveCouchDbRowIntoModel(doc: any): Model {
+export function reviveCouchDbRowIntoModel(doc: any): Model {
 
   // Perform some basic runtime sanity checks:
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);

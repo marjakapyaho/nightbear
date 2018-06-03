@@ -74,6 +74,7 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
       live: true,
       since: 'now',
       return_docs: false,
+      include_docs: true,
     });
     dispatchFromChanges(changes, dispatch);
   });

@@ -3,6 +3,7 @@ import { assertExhausted, assertNumber } from 'nightbear/web/app/utils/types';
 import { isArray } from 'lodash';
 import { DB_REPLICATION_BATCH_SIZE } from 'nightbear/web/app/middleware/database';
 import { Model } from 'nightbear/core/models/model';
+import { reviveCouchDbRowIntoModel } from 'nightbear/core/storage/couchDbStorage';
 
 export type ReplicationDirection = 'UP' | 'DOWN';
 export type DbStatePart = ReplicationDirection | 'LOCAL';
@@ -58,7 +59,16 @@ export function rootReducer(state: State = defaultState, action: Action): State 
     case 'DB_EMITTED_READY':
       return updateDbState(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_CHANGE':
-      return updateDbState(state, 'LOCAL', 'ACTIVE');
+      const newModel = reviveCouchDbRowIntoModel(action.change.doc);
+      const update = updateDbState(state, 'LOCAL', 'ACTIVE');
+      if (isArray(state.timelineData.models)) {
+        return {
+          ...update,
+          timelineData: { ...state.timelineData, models: [newModel, ...state.timelineData.models] },
+        };
+      } else {
+        return update;
+      }
     case 'DB_EMITTED_COMPLETE':
       return updateDbState(state, 'LOCAL', 'DISABLED');
     case 'DB_EMITTED_ERROR':
