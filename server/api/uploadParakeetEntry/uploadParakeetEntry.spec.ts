@@ -4,10 +4,12 @@ import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './
 import { Request } from 'nightbear/core/models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/core/models/model';
 import { createTestContext, withStorage, assertEqualWithoutMeta } from 'nightbear/server/utils/test';
+import { MIN_IN_MS } from '../../../core/calculations/calculations';
 
 describe('api/uploadParakeetEntry', () => {
 
   const context = createTestContext();
+  const timestampNow = context.timestamp();
 
   // Mock requests
   const mockRequest: Request = {
@@ -34,10 +36,10 @@ describe('api/uploadParakeetEntry', () => {
   // Mock objects
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: 1508672249758 - 2 * 14934,
+    timestamp: timestampNow - 2 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp: timestampNow - 2 * MIN_IN_MS,
       bloodGlucose: 8.0,
     }],
     isInitialCalibration: false,
@@ -48,9 +50,8 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockParakeetSensorEntry: ParakeetSensorEntry = {
     modelType: 'ParakeetSensorEntry',
-    timestamp: 1508672249758,
+    timestamp: timestampNow - 14934, // requestParam ts (time since)
     bloodGlucose: 9.3, // was 8.7 with the old server
-    measuredAtTimestamp: 1508672249758 - 14934,
     rawFiltered: 165824,
     rawUnfiltered: 168416,
   };
@@ -58,7 +59,7 @@ describe('api/uploadParakeetEntry', () => {
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
     deviceName: 'parakeet',
-    timestamp: 1508672249758,
+    timestamp: timestampNow,
     batteryLevel: 80,
     geolocation: '60.193707,24.949396',
   };

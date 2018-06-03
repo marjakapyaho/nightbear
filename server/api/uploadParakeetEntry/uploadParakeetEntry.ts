@@ -43,9 +43,8 @@ export function parseParakeetEntry(
 
   return {
     modelType: 'ParakeetSensorEntry',
-    timestamp,
+    timestamp: timestamp - millisecondsSinceMeasured,
     bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number),
-    measuredAtTimestamp: timestamp - millisecondsSinceMeasured,
     rawFiltered: filtered,
     rawUnfiltered: unfiltered,
   };
