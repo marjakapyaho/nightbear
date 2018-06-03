@@ -90,7 +90,6 @@ export interface MeterEntry {
   readonly modelMeta?: ModelMeta;
   readonly timestamp: number;
   readonly bloodGlucose: number;
-  readonly measuredAt: number;
 }
 
 export interface DexcomCalibration {

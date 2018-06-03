@@ -130,7 +130,6 @@ export function initCalibration(
         modelType: 'MeterEntry',
         timestamp: bgTimestamp,
         bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
-        measuredAt: bgTimestamp,
       }],
       isInitialCalibration: false,
       slope: null,

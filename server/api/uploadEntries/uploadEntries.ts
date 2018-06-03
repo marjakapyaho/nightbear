@@ -33,7 +33,6 @@ export function parseMeterEntry(
     modelType: 'MeterEntry',
     timestamp,
     bloodGlucose,
-    measuredAt: timestamp,
   };
 }
 

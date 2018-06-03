@@ -17,7 +17,6 @@ describe('api/calculateHba1c', () => {
       modelType: 'MeterEntry',
       timestamp: 1508672249758 - 3 * 14934,
       bloodGlucose: 8.0,
-      measuredAt: 1508672249758 - 3 * 14934,
     }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
