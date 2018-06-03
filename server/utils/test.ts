@@ -1,13 +1,17 @@
+// @see https://github.com/pouchdb/pouchdb/issues/6692
+import PouchDBDefault from 'pouchdb';
+// tslint:disable-next-line:no-var-requires
+const PouchDB = PouchDBDefault || require('pouchdb');
+
 import 'mocha';
 import { assert } from 'chai';
-import * as PouchDB from 'pouchdb';
 import * as PouchDBMemory from 'pouchdb-adapter-memory';
-import { Context, Request } from '../models/api';
+import { Context, Request } from 'nightbear/core/models/api';
 import { NO_LOGGING } from './logging';
-import { NO_STORAGE } from '../storage/storage';
-import { Profile, Model } from '../models/model';
-import { Storage } from '../storage/storage';
-import { createCouchDbStorage } from '../storage/couchDbStorage';
+import { NO_STORAGE } from 'nightbear/core/storage/storage';
+import { Profile, Model } from 'nightbear/core/models/model';
+import { Storage } from 'nightbear/core/storage/storage';
+import { createCouchDbStorage } from 'nightbear/core/storage/couchDbStorage';
 import { getUuid } from './uuid';
 
 PouchDB.plugin(PouchDBMemory); // @see https://www.npmjs.com/package/pouchdb-adapter-memory

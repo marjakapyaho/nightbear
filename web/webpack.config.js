@@ -17,9 +17,9 @@ module.exports = {
   devtool: IS_PROD ? false : 'eval-source-map',
   target: 'web',
   resolve: {
-    extensions: ['.js', '.tsx'],
+    extensions: ['.js', '.ts', '.tsx'],
     alias: {
-      app: `${__dirname}/app`, // allow non-relative imports from "app/..."
+      nightbear: `${__dirname}/../../nightbear`, // allow non-relative imports from "nightbear/..."
     },
   },
   node: {
@@ -28,7 +28,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx$/,
+        test: /\.tsx?$/,
         use: 'ts-loader',
       },
       {

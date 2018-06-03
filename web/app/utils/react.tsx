@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { State } from 'app/reducers';
+import { State } from 'nightbear/web/app/reducers';
 import { connect } from 'react-redux';
 import { ReactNode } from 'react';
 import { createCssNs } from 'css-ns';
-import { Dispatch } from 'app/utils/redux';
+import { Dispatch } from 'nightbear/web/app/utils/redux';
 
 export type ReactApi = typeof React;
 export type ReactComponent<P> = React.ComponentClass<P>;
@@ -23,8 +23,8 @@ export function renderFromProps<Props>(
 ): ReactComponent<Props> {
   const { displayName, NsReact } = namespaceReact(filename);
   return class extends React.Component<Props> {
-    static displayName = displayName;
-    render() {
+    public static displayName = displayName;
+    public render() {
       return renderFunc(NsReact, this.props);
     }
   };
@@ -43,8 +43,8 @@ export function renderFromStore<OwnProps, IntProps>(
 ): ReactComponent<OwnProps> {
   const { displayName, NsReact } = namespaceReact(filename);
   const Component = class extends React.Component<IntProps & DispatchProp> {
-    static displayName = displayName;
-    render() {
+    public static displayName = displayName;
+    public render() {
       return renderFunc(NsReact, this.props, this.props._dispatch);
     }
   };

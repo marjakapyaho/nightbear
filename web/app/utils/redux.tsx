@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { Action } from 'app/actions';
-import { rootReducer, State } from 'app/reducers';
+import { Action } from 'nightbear/web/app/actions';
+import { rootReducer, State } from 'nightbear/web/app/reducers';
 
 export type Store = Readonly<{ getState: () => State; dispatch: Dispatch }>;
 export type Dispatch = (action: Action) => Action;
@@ -21,9 +21,9 @@ export function configureStore(initialState?: State, middleware: Middleware[] = 
     appliedMiddleware,
   ) as Store;
 
-  if (module.hot) {
-    module.hot.accept('app/reducers', () => {
-      const nextReducer = require('app/reducers');
+  if ((module as any).hot) {
+    (module as any).hot.accept('nightbear/web/app/reducers', () => {
+      const nextReducer = require('nightbear/web/app/reducers');
       (store as any).replaceReducer(nextReducer);
     });
   }

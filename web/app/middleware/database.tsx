@@ -1,7 +1,12 @@
-import PouchDB from 'pouchdb';
-import { Middleware, Dispatch } from 'app/utils/redux';
-import { ReplicationDirection } from 'app/reducers';
+// @see https://github.com/pouchdb/pouchdb/issues/6692
+import PouchDBDefault from 'pouchdb';
+// tslint:disable-next-line:no-var-requires
+const PouchDB = PouchDBDefault || require('pouchdb');
+
+import { Middleware, Dispatch } from 'nightbear/web/app/utils/redux';
+import { ReplicationDirection } from 'nightbear/web/app/reducers';
 import { debounce } from 'lodash';
+import { createCouchDbStorage } from 'nightbear/core/storage/couchDbStorage';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
@@ -22,25 +27,16 @@ export const database: Middleware = store => {
       }
     }
     if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
-      queryTimelineData(existingReplication.localDb).then(res =>
-        console.log('Results from DB:', res),
-      );
+      existingReplication.storage
+        .loadTimelineModels('ParakeetSensorEntry', action.range, action.rangeEnd)
+        .then(
+          models => store.dispatch({ type: 'TIMELINE_DATA_RECEIVED', models }),
+          err => store.dispatch({ type: 'TIMELINE_DATA_FAILED', err }),
+        );
     }
     return result;
   };
 };
-
-function queryTimelineData(db: PouchDB.Database<{}>) {
-  return db
-    .allDocs({
-      include_docs: true,
-      limit: 100,
-      descending: true,
-      start_key: 'timeline/_',
-      end_key: 'timeline/',
-    } as any)
-    .then(res => res.rows.map(row => row.doc));
-}
 
 function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
   const isSafari = // https://stackoverflow.com/a/31732310 ;__;
@@ -49,6 +45,7 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
     navigator.userAgent &&
     !navigator.userAgent.match('CriOS');
   const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
+  const storage = createCouchDbStorage('nightbear_web_ui', pouchDb7057Workaround);
   const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
   // Start replication in both directions:
@@ -77,13 +74,13 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
       live: true,
       since: 'now',
       return_docs: false,
+      include_docs: true,
     });
     dispatchFromChanges(changes, dispatch);
   });
   // Return our DB's & a dispose function:
   return {
-    localDb,
-    remoteDb,
+    storage,
     dispose() {
       if (changes) changes.cancel();
       upReplication.cancel();

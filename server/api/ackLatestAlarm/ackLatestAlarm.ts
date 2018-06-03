@@ -1,8 +1,8 @@
 import { extend } from 'lodash';
-import { Response, Context, createResponse, Request } from '../../models/api';
-import { Alarm, Profile } from '../../models/model';
-import { MIN_IN_MS } from '../../core/calculations/calculations';
-import { ackPushoverAlarms } from '../../utils/pushover';
+import { Response, Context, createResponse, Request } from 'nightbear/core/models/api';
+import { Alarm, Profile } from 'nightbear/core/models/model';
+import { MIN_IN_MS } from 'nightbear/core/calculations/calculations';
+import { ackPushoverAlarms } from 'nightbear/server/utils/pushover';
 
 export function ackLatestAlarm(_request: Request, context: Context): Response {
 

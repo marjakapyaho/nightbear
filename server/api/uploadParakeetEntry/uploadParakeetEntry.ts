@@ -1,6 +1,6 @@
-import { Response, Request, createResponse, Context } from '../../models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from '../../models/model';
-import { calculateRaw } from '../../core/calculations/calculations';
+import { Response, Request, createResponse, Context } from 'nightbear/core/models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/core/models/model';
+import { calculateRaw } from 'nightbear/core/calculations/calculations';
 import { find } from 'lodash';
 
 // parakeet needs this response to work

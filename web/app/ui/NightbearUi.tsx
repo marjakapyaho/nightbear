@@ -1,10 +1,13 @@
-import { renderFromStore } from 'app/utils/react';
-import DbStatusBar from 'app/ui/utils/DbStatusBar';
+import { renderFromStore } from 'nightbear/web/app/utils/react';
+import DbStatusBar from 'nightbear/web/app/ui/utils/DbStatusBar';
 
 export default renderFromStore(
   __filename,
-  state => state.config,
-  (React, { remoteDbUrl }, dispatch) => (
+  state => ({
+    remoteDbUrl: state.config.remoteDbUrl,
+    models: state.timelineData.models,
+  }),
+  (React, { remoteDbUrl, models }, dispatch) => (
     <div>
       <DbStatusBar />
       {!!remoteDbUrl && <pre>Logged in, with dbUrl = {remoteDbUrl}</pre>}
@@ -17,10 +20,13 @@ export default renderFromStore(
       </button>
       <button onClick={() => dispatch({ type: 'DB_URL_SET', newDbUrl: '' })}>Log out</button>
       <button
-        onClick={() => dispatch({ type: 'TIMELINE_DATA_REQUESTED', timeRange: 1000 * 60 * 60 })}
+        onClick={() =>
+          dispatch({ type: 'TIMELINE_DATA_REQUESTED', range: 1000 * 60 * 60, rangeEnd: Date.now() })
+        }
       >
         Request timeline data
       </button>
+      <pre>{JSON.stringify(models, null, 4)}</pre>
     </div>
   ),
 );

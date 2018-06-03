@@ -1,7 +1,9 @@
-import { Action } from 'app/actions';
-import { assertExhausted, assertNumber } from 'app/utils/types';
+import { Action } from 'nightbear/web/app/actions';
+import { assertExhausted, assertNumber } from 'nightbear/web/app/utils/types';
 import { isArray } from 'lodash';
-import { DB_REPLICATION_BATCH_SIZE } from 'app/middleware/database';
+import { DB_REPLICATION_BATCH_SIZE } from 'nightbear/web/app/middleware/database';
+import { Model } from 'nightbear/core/models/model';
+import { reviveCouchDbRowIntoModel } from 'nightbear/core/storage/couchDbStorage';
 
 export type ReplicationDirection = 'UP' | 'DOWN';
 export type DbStatePart = ReplicationDirection | 'LOCAL';
@@ -16,6 +18,11 @@ export type State = Readonly<{
       state: DbState;
       details: string | [number, number];
     }
+  };
+  timelineData: {
+    range: number;
+    rangeEnd: number;
+    models: Model[] | 'FETCHING' | 'ERROR';
   };
 }>;
 
@@ -37,6 +44,11 @@ export const defaultState: State = {
       details: '',
     },
   },
+  timelineData: {
+    range: 0,
+    rangeEnd: 0,
+    models: 'FETCHING',
+  },
 };
 
 export function rootReducer(state: State = defaultState, action: Action): State {
@@ -47,7 +59,16 @@ export function rootReducer(state: State = defaultState, action: Action): State 
     case 'DB_EMITTED_READY':
       return updateDbState(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_CHANGE':
-      return updateDbState(state, 'LOCAL', 'ACTIVE');
+      const newModel = reviveCouchDbRowIntoModel(action.change.doc);
+      const update = updateDbState(state, 'LOCAL', 'ACTIVE');
+      if (isArray(state.timelineData.models)) {
+        return {
+          ...update,
+          timelineData: { ...state.timelineData, models: [newModel, ...state.timelineData.models] },
+        };
+      } else {
+        return update;
+      }
     case 'DB_EMITTED_COMPLETE':
       return updateDbState(state, 'LOCAL', 'DISABLED');
     case 'DB_EMITTED_ERROR':
@@ -77,7 +98,22 @@ export function rootReducer(state: State = defaultState, action: Action): State 
     case 'REPLICATION_EMITTED_ERROR':
       return updateDbState(state, action.direction, 'ERROR', action.err.message);
     case 'TIMELINE_DATA_REQUESTED':
-      return state;
+      const { range, rangeEnd } = action;
+      return {
+        ...state,
+        timelineData: { ...state.timelineData, range, rangeEnd, models: 'FETCHING' },
+      };
+    case 'TIMELINE_DATA_RECEIVED':
+      const { models } = action;
+      return {
+        ...state,
+        timelineData: { ...state.timelineData, models },
+      };
+    case 'TIMELINE_DATA_FAILED':
+      return {
+        ...state,
+        timelineData: { ...state.timelineData, models: 'ERROR' },
+      };
     default:
       return assertExhausted(action);
   }
@@ -107,7 +143,7 @@ export function getSummaryDbState(states: DbState[]): DbState {
 }
 
 export function getSummaryReplicationProgress(
-  parts: State['dbState'][DbStatePart][],
+  parts: Array<State['dbState'][DbStatePart]>,
 ): number | null {
   const tally = (index: 0 | 1) =>
     parts.reduce(
@@ -116,6 +152,6 @@ export function getSummaryReplicationProgress(
     );
   const done = tally(0);
   const todo = tally(1);
-  if (todo > 0) return Math.round(100 * done / todo);
+  if (todo > 0) return Math.round((100 * done) / todo);
   return null;
 }
