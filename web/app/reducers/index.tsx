@@ -2,7 +2,7 @@ import { Action } from 'nightbear/web/app/actions';
 import { assertExhausted, assertNumber } from 'nightbear/web/app/utils/types';
 import { isArray } from 'lodash';
 import { DB_REPLICATION_BATCH_SIZE } from 'nightbear/web/app/middleware/database';
-import { Model } from 'nightbear/core/models/model';
+import { TimelineModelType, TimelineModel, isTimelineModel } from 'nightbear/core/models/model';
 import { reviveCouchDbRowIntoModel } from 'nightbear/core/storage/couchDbStorage';
 
 export type ReplicationDirection = 'UP' | 'DOWN';
@@ -22,7 +22,8 @@ export type State = Readonly<{
   timelineData: {
     range: number;
     rangeEnd: number;
-    models: Model[] | 'FETCHING' | 'ERROR';
+    modelTypes: TimelineModelType[];
+    models: TimelineModel[] | 'FETCHING' | 'ERROR';
   };
 }>;
 
@@ -47,6 +48,7 @@ export const defaultState: State = {
   timelineData: {
     range: 0,
     rangeEnd: 0,
+    modelTypes: ['ParakeetSensorEntry'],
     models: 'FETCHING',
   },
 };
@@ -60,11 +62,16 @@ export function rootReducer(state: State = defaultState, action: Action): State 
       return updateDbState(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_CHANGE':
       const newModel = reviveCouchDbRowIntoModel(action.change.doc);
+      if (!isTimelineModel(newModel)) return state;
       const update = updateDbState(state, 'LOCAL', 'ACTIVE');
       if (isArray(state.timelineData.models)) {
         return {
           ...update,
-          timelineData: { ...state.timelineData, models: [newModel, ...state.timelineData.models] },
+          timelineData: {
+            ...state.timelineData,
+            rangeEnd: Date.now(),
+            models: [newModel, ...state.timelineData.models],
+          },
         };
       } else {
         return update;
@@ -98,10 +105,10 @@ export function rootReducer(state: State = defaultState, action: Action): State 
     case 'REPLICATION_EMITTED_ERROR':
       return updateDbState(state, action.direction, 'ERROR', action.err.message);
     case 'TIMELINE_DATA_REQUESTED':
-      const { range, rangeEnd } = action;
+      const { range, rangeEnd, modelTypes } = action;
       return {
         ...state,
-        timelineData: { ...state.timelineData, range, rangeEnd, models: 'FETCHING' },
+        timelineData: { ...state.timelineData, range, rangeEnd, modelTypes, models: 'FETCHING' },
       };
     case 'TIMELINE_DATA_RECEIVED':
       const { models } = action;

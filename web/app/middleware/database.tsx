@@ -28,7 +28,7 @@ export const database: Middleware = store => {
     }
     if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
       existingReplication.storage
-        .loadTimelineModels('ParakeetSensorEntry', action.range, action.rangeEnd)
+        .loadTimelineModels(action.modelTypes[0], action.range, action.rangeEnd)
         .then(
           models => store.dispatch({ type: 'TIMELINE_DATA_RECEIVED', models }),
           err => store.dispatch({ type: 'TIMELINE_DATA_FAILED', err }),
