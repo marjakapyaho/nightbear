@@ -2,6 +2,7 @@ import { TimelineModel } from 'nightbear/core/models/model';
 import { renderFromProps } from 'nightbear/web/app/utils/react';
 import { objectKeys } from 'nightbear/web/app/utils/types';
 import Timestamp from 'nightbear/web/app/ui/utils/Timestamp';
+import { sortBy, reverse } from 'lodash';
 
 export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, props) => {
   if (props.models.length === 0) {
@@ -13,7 +14,11 @@ export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, 
           <thead>
             <tr>{renderThs(props.models[0])}</tr>
           </thead>
-          <tbody>{props.models.map((model, i) => <tr key={i}>{renderTds(model)}</tr>)}</tbody>
+          <tbody>
+            {reverse(sortBy(props.models, 'timestamp')).map((model, i) => (
+              <tr key={i}>{renderTds(model)}</tr>
+            ))}
+          </tbody>
         </table>
       </div>
     );
