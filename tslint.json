@@ -15,6 +15,7 @@
     "variable-name": false,
     "no-console": false,
     "interface-over-type-literal": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "member-access": false
   }
 }
