@@ -7,12 +7,10 @@ import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
 export default renderFromStore(
   __filename,
   state => ({
-    remoteDbUrl: state.config.remoteDbUrl,
-    models: state.timelineData.models,
-    modelTypes: state.timelineData.modelTypes,
-    range: state.timelineData.range,
+    remoteDbUrl: state.configVars.remoteDbUrl,
+    timelineData: state.timelineData,
   }),
-  (React, { remoteDbUrl, models, modelTypes, range }, dispatch) => (
+  (React, { remoteDbUrl, timelineData }, dispatch) => (
     <div>
       <DbStatusBar />
       {!!remoteDbUrl && <pre>dbUrl = {remoteDbUrl}</pre>}
@@ -27,8 +25,8 @@ export default renderFromStore(
       <ModelTypeSelector
         onChange={newType =>
           dispatch({
-            type: 'TIMELINE_DATA_REQUESTED',
-            range,
+            type: 'TIMELINE_FILTERS_CHANGED',
+            range: timelineData.filters.range,
             rangeEnd: Date.now(),
             modelTypes: [newType],
           })
@@ -36,11 +34,16 @@ export default renderFromStore(
       />
       <TimeRangeSelector
         onChange={range =>
-          dispatch({ type: 'TIMELINE_DATA_REQUESTED', range, rangeEnd: Date.now(), modelTypes })
+          dispatch({
+            type: 'TIMELINE_FILTERS_CHANGED',
+            range,
+            rangeEnd: Date.now(),
+            modelTypes: timelineData.filters.modelTypes,
+          })
         }
       />
-      {typeof models === 'string' && models}
-      {typeof models !== 'string' && <TimelineModelTable models={models} />}
+      {timelineData.status === 'READY' && <TimelineModelTable models={timelineData.models} />}
+      {timelineData.status !== 'READY' && timelineData.status}
     </div>
   ),
 );
