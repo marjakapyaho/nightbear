@@ -1,5 +1,5 @@
-import { ReplicationDirection } from 'nightbear/web/app/reducers';
-import { TimelineModelType, TimelineModel } from 'nightbear/core/models/model';
+import { ReplicationDirection } from 'web/app/reducers';
+import { TimelineModelType, TimelineModel } from 'core/models/model';
 
 export type Action = Readonly<
   | { type: 'DB_URL_SET'; newDbUrl: string }

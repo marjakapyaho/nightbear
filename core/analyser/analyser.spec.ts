@@ -11,8 +11,8 @@ import {
   STATUS_RISING,
   STATUS_PERSISTENT_HIGH,
 } from './analyser';
-import { activeProfile } from 'nightbear/server/utils/test';
-import { Alarm, DeviceStatus, Insulin } from 'nightbear/core/models/model';
+import { activeProfile } from 'server/utils/test';
+import { Alarm, DeviceStatus, Insulin } from 'core/models/model';
 import { entriesLow } from './test-data/low';
 import { entriesNoSituation } from './test-data/no-situation';
 import { entriesHigh } from './test-data/high';

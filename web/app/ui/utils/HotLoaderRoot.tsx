@@ -1,5 +1,5 @@
 import * as React from 'react';
-import NightbearUi from 'nightbear/web/app/ui/NightbearUi';
+import NightbearUi from 'web/app/ui/NightbearUi';
 import { hot } from 'react-hot-loader';
 
 // The only purpose of this component is to wrap the main UI root component with react-hot-loader.

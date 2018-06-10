@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "..",
+    "baseUrl": ".",
     "target": "es5",
     "jsx": "react",
     "module": "commonjs",
@@ -12,6 +12,11 @@
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    /*
+    "paths": {
+      "nightbear/*": ["./*"]
+    },
+    */
     "types": [
       "node"
     ],

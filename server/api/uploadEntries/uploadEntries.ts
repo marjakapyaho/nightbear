@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'nightbear/core/models/api';
-import { MeterEntry, Insulin, Carbs } from 'nightbear/core/models/model';
+import { Response, Context, createResponse, Request } from 'core/models/api';
+import { MeterEntry, Insulin, Carbs } from 'core/models/model';
 
 export function uploadEntries(request: Request, context: Context): Response {
   const { bloodSugar, insulin, carbs } = request.requestBody as any;

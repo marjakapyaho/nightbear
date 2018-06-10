@@ -3,10 +3,10 @@ import PouchDBDefault from 'pouchdb';
 // tslint:disable-next-line:no-var-requires
 const PouchDB = PouchDBDefault || require('pouchdb');
 
-import { Middleware, Dispatch } from 'nightbear/web/app/utils/redux';
-import { ReplicationDirection } from 'nightbear/web/app/reducers';
+import { Middleware, Dispatch } from 'web/app/utils/redux';
+import { ReplicationDirection } from 'web/app/reducers';
 import { debounce } from 'lodash';
-import { createCouchDbStorage } from 'nightbear/core/storage/couchDbStorage';
+import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;

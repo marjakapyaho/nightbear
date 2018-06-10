@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import { Model, Carbs, Settings } from 'nightbear/core/models/model';
+import { Model, Carbs, Settings } from 'core/models/model';
 import { Storage } from './storage';
-import { activeProfile, assertEqualWithoutMeta } from 'nightbear/server/utils/test';
+import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',

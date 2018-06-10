@@ -1,9 +1,9 @@
-import { Action } from 'nightbear/web/app/actions';
-import { assertExhausted, assertNumber } from 'nightbear/web/app/utils/types';
+import { Action } from 'web/app/actions';
+import { assertExhausted, assertNumber } from 'web/app/utils/types';
 import { isArray } from 'lodash';
-import { DB_REPLICATION_BATCH_SIZE } from 'nightbear/web/app/middleware/database';
-import { TimelineModelType, TimelineModel, isTimelineModel } from 'nightbear/core/models/model';
-import { reviveCouchDbRowIntoModel } from 'nightbear/core/storage/couchDbStorage';
+import { DB_REPLICATION_BATCH_SIZE } from 'web/app/middleware/database';
+import { TimelineModelType, TimelineModel, isTimelineModel } from 'core/models/model';
+import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 
 export type ReplicationDirection = 'UP' | 'DOWN';
 export type DbStatePart = ReplicationDirection | 'LOCAL';
