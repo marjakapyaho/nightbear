@@ -3,7 +3,7 @@ import { ReduxAction } from 'web/app/modules/actions';
 import { ReduxState } from 'web/app/modules/state';
 
 export function configVarsReducer(
-  state = configVarsInitState,
+  state: ConfigVarsState = configVarsInitState,
   action: ReduxAction,
   _rootState: ReduxState,
 ): ConfigVarsState {
