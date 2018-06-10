@@ -1,4 +1,4 @@
-import { Situation, State } from 'nightbear/core/models/model';
+import { Situation, State } from 'core/models/model';
 
 export function getMockState(situation?: Situation): State {
   const state = {

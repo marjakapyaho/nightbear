@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "..",
+    "baseUrl": ".",
     "target": "es5",
     "jsx": "react",
     "module": "commonjs",
@@ -12,11 +12,16 @@
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    /*
+    "paths": {
+      "nightbear/*": ["./*"]
+    },
+    */
     "types": [
       "node"
     ],
     "lib": [
-      "es2015",
+      "es2017",
       "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
     ]
   },

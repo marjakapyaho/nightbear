@@ -1,4 +1,4 @@
-import { renderFromProps } from 'nightbear/web/app/utils/react';
+import { renderFromProps } from 'web/app/utils/react';
 
 const options = [
   ['hour', 1000 * 60 * 60],

@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'nightbear/core/models/api';
-import { getMergedEntriesFeed } from 'nightbear/core/entries/entries';
+import { Response, Context, createResponse, Request } from 'core/models/api';
+import { getMergedEntriesFeed } from 'core/entries/entries';
 
 export function getEntries(request: Request, context: Context): Response {
   const { range, rangeEnd } = request.requestParams;

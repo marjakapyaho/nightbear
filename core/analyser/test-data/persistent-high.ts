@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from '../../calculations/calculations';
-import { DexcomSensorEntry } from 'nightbear/core/models/model';
+import { DexcomSensorEntry } from 'core/models/model';
 import { range } from 'lodash';
 
 export function entriesPersistentHigh(currentTimestamp: number): DexcomSensorEntry[] {

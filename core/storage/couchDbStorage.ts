@@ -5,8 +5,8 @@ const PouchDB = PouchDBDefault || require('pouchdb');
 
 import * as PouchDBFind from 'pouchdb-find';
 import { Storage } from './storage';
-import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'nightbear/core/models/model';
-import { assert, assertExhausted } from 'nightbear/server/utils/types';
+import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
+import { assert, assertExhausted } from 'server/utils/types';
 
 PouchDB.plugin(PouchDBFind);
 

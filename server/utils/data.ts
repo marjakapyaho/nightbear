@@ -1,4 +1,4 @@
-import { SensorEntry } from 'nightbear/core/models/model';
+import { SensorEntry } from 'core/models/model';
 
 export type ObjMap<K extends string, V> = { [P in K]: V };
 

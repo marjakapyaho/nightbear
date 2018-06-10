@@ -1,6 +1,6 @@
-import { SensorEntry } from 'nightbear/core/models/model';
+import { SensorEntry } from 'core/models/model';
 import { reduce } from 'lodash';
-import { hasBloodGlucose } from 'nightbear/server/utils/data';
+import { hasBloodGlucose } from 'server/utils/data';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;

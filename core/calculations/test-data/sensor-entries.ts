@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from '../calculations';
-import { SensorEntry } from 'nightbear/core/models/model';
+import { SensorEntry } from 'core/models/model';
 
 const currentTimestamp = 1508672249758;
 

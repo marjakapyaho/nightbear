@@ -1,13 +1,13 @@
-import { renderFromStore } from 'nightbear/web/app/utils/react';
+import { renderFromStore } from 'web/app/utils/react';
 import {
   State,
   DbState,
   DbStatePart,
   getSummaryDbState,
   getSummaryReplicationProgress,
-} from 'nightbear/web/app/reducers';
+} from 'web/app/reducers';
 import { CSSProperties } from 'react';
-import { assertExhausted, objectKeys } from 'nightbear/web/app/utils/types';
+import { assertExhausted, objectKeys } from 'web/app/utils/types';
 
 export default renderFromStore(
   __filename,

@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { Action } from 'nightbear/web/app/actions';
-import { rootReducer, State } from 'nightbear/web/app/reducers';
+import { Action } from 'web/app/actions';
+import { rootReducer, State } from 'web/app/reducers';
 
 export type Store = Readonly<{ getState: () => State; dispatch: Dispatch }>;
 export type Dispatch = (action: Action) => Action;

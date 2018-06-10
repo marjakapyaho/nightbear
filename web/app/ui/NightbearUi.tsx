@@ -1,8 +1,8 @@
-import { renderFromStore } from 'nightbear/web/app/utils/react';
-import DbStatusBar from 'nightbear/web/app/ui/utils/DbStatusBar';
-import TimeRangeSelector from 'nightbear/web/app/ui/utils/TimeRangeSelector';
-import ModelTypeSelector from 'nightbear/web/app/ui/utils/ModelTypeSelector';
-import TimelineModelTable from 'nightbear/web/app/ui/utils/TimelineModelTable';
+import { renderFromStore } from 'web/app/utils/react';
+import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
+import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
+import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
+import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
 
 export default renderFromStore(
   __filename,

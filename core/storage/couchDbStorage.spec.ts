@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { getStorageKey } from './couchDbStorage';
 import { MODEL_1, MODEL_2, storageTestSuite } from './storage.spec';
-import { withStorage } from 'nightbear/server/utils/test';
+import { withStorage } from 'server/utils/test';
 
 describe('storage/couchDbStorage', () => {
 

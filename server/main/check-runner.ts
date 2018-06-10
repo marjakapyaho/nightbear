@@ -1,4 +1,4 @@
-import { MIN_IN_MS } from 'nightbear/core/calculations/calculations';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 
 let nextCheck: NodeJS.Timer;
 

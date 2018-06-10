@@ -1,8 +1,8 @@
 import 'mocha';
-import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'nightbear/server/utils/test';
-import { DexcomCalibration, Hba1c } from 'nightbear/core/models/model';
+import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'server/utils/test';
+import { DexcomCalibration, Hba1c } from 'core/models/model';
 import { uploadDexcomEntry } from '../uploadDexcomEntry/uploadDexcomEntry';
-import { Request } from 'nightbear/core/models/api';
+import { Request } from 'core/models/api';
 import { calculateHba1cForDate } from './calculateHba1c';
 import { getHba1cHistory } from '../getHba1cHistory/getHba1cHistory';
 

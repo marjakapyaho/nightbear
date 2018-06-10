@@ -6,12 +6,12 @@ const PouchDB = PouchDBDefault || require('pouchdb');
 import 'mocha';
 import { assert } from 'chai';
 import * as PouchDBMemory from 'pouchdb-adapter-memory';
-import { Context, Request } from 'nightbear/core/models/api';
+import { Context, Request } from 'core/models/api';
 import { NO_LOGGING } from './logging';
-import { NO_STORAGE } from 'nightbear/core/storage/storage';
-import { Profile, Model } from 'nightbear/core/models/model';
-import { Storage } from 'nightbear/core/storage/storage';
-import { createCouchDbStorage } from 'nightbear/core/storage/couchDbStorage';
+import { NO_STORAGE } from 'core/storage/storage';
+import { Profile, Model } from 'core/models/model';
+import { Storage } from 'core/storage/storage';
+import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { getUuid } from './uuid';
 
 PouchDB.plugin(PouchDBMemory); // @see https://www.npmjs.com/package/pouchdb-adapter-memory

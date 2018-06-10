@@ -1,5 +1,5 @@
-import { Context } from 'nightbear/core/models/api';
-import { SensorEntry } from 'nightbear/core/models/model';
+import { Context } from 'core/models/api';
+import { SensorEntry } from 'core/models/model';
 
 export function getMergedEntriesFeed(
   context: Context,

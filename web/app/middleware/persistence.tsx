@@ -1,4 +1,4 @@
-import { Middleware } from 'nightbear/web/app/utils/redux';
+import { Middleware } from 'web/app/utils/redux';
 
 const CONFIG_DB_URL = 'nightbear:config:dbUrl';
 

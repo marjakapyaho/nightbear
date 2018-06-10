@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { State } from 'nightbear/web/app/reducers';
+import { State } from 'web/app/reducers';
 import { connect } from 'react-redux';
 import { ReactNode } from 'react';
 import { createCssNs } from 'css-ns';
-import { Dispatch } from 'nightbear/web/app/utils/redux';
+import { Dispatch } from 'web/app/utils/redux';
 
 export type ReactApi = typeof React;
 export type ReactComponent<P> = React.ComponentClass<P>;

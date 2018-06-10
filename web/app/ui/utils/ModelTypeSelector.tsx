@@ -1,5 +1,5 @@
-import { renderFromProps } from 'nightbear/web/app/utils/react';
-import { TimelineModelType } from 'nightbear/core/models/model';
+import { renderFromProps } from 'web/app/utils/react';
+import { TimelineModelType } from 'core/models/model';
 
 const options: TimelineModelType[] = ['ParakeetSensorEntry', 'DexcomSensorEntry'];
 
