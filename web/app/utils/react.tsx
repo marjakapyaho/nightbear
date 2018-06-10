@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { State } from 'web/app/reducers';
 import { connect } from 'react-redux';
 import { ReactNode } from 'react';
 import { createCssNs } from 'css-ns';
 import { Dispatch } from 'web/app/utils/redux';
+import { ReduxState } from 'web/app/modules/state';
 
 export type ReactApi = typeof React;
 export type ReactComponent<P> = React.ComponentClass<P>;
@@ -34,7 +34,7 @@ const dispatchMapper = (dispatch: Dispatch) => ({ _dispatch: dispatch });
 
 export function renderFromStore<OwnProps, IntProps>(
   filename: string,
-  stateMapper: (state: State, ownProps: OwnProps) => IntProps,
+  stateMapper: (state: ReduxState, ownProps: OwnProps) => IntProps,
   renderFunc: (
     React: ReactApi,
     props: Readonly<IntProps & DispatchProp>,
@@ -48,5 +48,8 @@ export function renderFromStore<OwnProps, IntProps>(
       return renderFunc(NsReact, this.props, this.props._dispatch);
     }
   };
-  return connect(stateMapper, dispatchMapper)(Component) as any; // not sure why connect() returns Component<IntProps> instead of Component<OwnProps> here :shrug:
+  return connect(
+    stateMapper,
+    dispatchMapper,
+  )(Component) as any; // not sure why connect() returns Component<IntProps> instead of Component<OwnProps> here :shrug:
 }

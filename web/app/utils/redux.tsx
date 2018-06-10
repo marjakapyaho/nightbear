@@ -1,14 +1,15 @@
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { Action } from 'web/app/actions';
-import { rootReducer, State } from 'web/app/reducers';
+import { ReduxState } from 'web/app/modules/state';
+import { ReduxAction } from 'web/app/modules/actions';
+import { rootReducer } from 'web/app/modules/reducer';
 
-export type Store = Readonly<{ getState: () => State; dispatch: Dispatch }>;
-export type Dispatch = (action: Action) => Action;
-export type Reducer = (state: State | undefined, action: Action) => State;
-export type Middleware = (store: Store) => (next: Dispatch) => (action: Action) => Action;
+export type Store = Readonly<{ getState: () => ReduxState; dispatch: Dispatch }>;
+export type Dispatch = (action: ReduxAction) => ReduxAction;
+export type Reducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
+export type Middleware = (store: Store) => (next: Dispatch) => (action: ReduxAction) => ReduxAction;
 
-export function configureStore(initialState?: State, middleware: Middleware[] = []): Store {
+export function configureStore(initialState?: ReduxState, middleware: Middleware[] = []): Store {
   let appliedMiddleware = applyMiddleware.apply(null, middleware);
 
   if (process.env.NODE_ENV !== 'production') {

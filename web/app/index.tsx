@@ -3,14 +3,14 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import HotLoaderRoot from 'web/app/ui/utils/HotLoaderRoot';
 import { configureStore } from 'web/app/utils/redux';
-import { defaultState, State } from 'web/app/reducers';
 import defaultMiddleware from 'web/app/middleware';
 import { Store as ReduxStore } from 'redux';
+import { ReduxState } from 'web/app/modules/state';
 
-const store = configureStore(defaultState, defaultMiddleware);
+const store = configureStore(undefined, defaultMiddleware);
 
 render(
-  <Provider store={store as ReduxStore<State>}>
+  <Provider store={store as ReduxStore<ReduxState>}>
     <HotLoaderRoot />
   </Provider>,
   document.getElementById('root'),
