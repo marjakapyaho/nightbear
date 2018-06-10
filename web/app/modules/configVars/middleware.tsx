@@ -1,13 +1,13 @@
 import { Middleware } from 'web/app/utils/redux';
 
-const CONFIG_DB_URL = 'nightbear:config:dbUrl';
+const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
-export const persistence: Middleware = store => {
+const middleware: Middleware = store => {
   setTimeout(read, 0);
   return next => action => {
-    const oldValue = store.getState().config.remoteDbUrl;
+    const oldValue = store.getState().configVars.remoteDbUrl;
     const result = next(action);
-    const newValue = store.getState().config.remoteDbUrl;
+    const newValue = store.getState().configVars.remoteDbUrl;
     if (oldValue !== newValue) write(newValue);
     return result;
   };
@@ -23,3 +23,5 @@ export const persistence: Middleware = store => {
     localStorage.setItem(CONFIG_DB_URL, newDbUrl);
   }
 };
+
+export default middleware;
