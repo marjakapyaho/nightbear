@@ -62,7 +62,8 @@ export function rootReducer(state: State = defaultState, action: Action): State 
       return updateDbState(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_CHANGE':
       const newModel = reviveCouchDbRowIntoModel(action.change.doc);
-      if (!isTimelineModel(newModel)) return state;
+      if (!isTimelineModel(newModel) || !state.timelineData.modelTypes.includes(newModel.modelType))
+        return state;
       const update = updateDbState(state, 'LOCAL', 'ACTIVE');
       if (isArray(state.timelineData.models)) {
         return {
