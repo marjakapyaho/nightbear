@@ -6,7 +6,7 @@ const ns = 'TODO';
 type Props = { ts: number };
 
 export default class Clock extends React.Component<Props> {
-  timerID: NodeJS.Timer;
+  timerID: NodeJS.Timer | null;
 
   constructor(props: Props) {
     super(props);
@@ -16,8 +16,20 @@ export default class Clock extends React.Component<Props> {
     this.timerID = global.setInterval(() => this.forceUpdate(), 1000);
   }
 
+  /*
+  componentDidUpdate() {
+    const age = Date.now() - this.props.ts;
+    if (age > 1000 * 60 * 5 && this.timerID) {
+      if (this.timerID) global.clearInterval(this.timerID);
+      this.timerID = null;
+      this.forceUpdate();
+    }
+  }
+  */
+
   componentWillUnmount() {
-    global.clearInterval(this.timerID);
+    if (this.timerID) global.clearInterval(this.timerID);
+    this.timerID = null;
   }
 
   render() {
