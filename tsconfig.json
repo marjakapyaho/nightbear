@@ -16,7 +16,7 @@
       "node"
     ],
     "lib": [
-      "es2015",
+      "es2017",
       "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
     ]
   },
