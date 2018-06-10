@@ -1,5 +1,5 @@
 import { ReplicationDirection } from 'nightbear/web/app/reducers';
-import { Model } from 'nightbear/core/models/model';
+import { TimelineModelType, TimelineModel } from 'nightbear/core/models/model';
 
 export type Action = Readonly<
   | { type: 'DB_URL_SET'; newDbUrl: string }
@@ -51,10 +51,11 @@ export type Action = Readonly<
       type: 'TIMELINE_DATA_REQUESTED';
       range: number;
       rangeEnd: number;
+      modelTypes: TimelineModelType[];
     }
   | {
       type: 'TIMELINE_DATA_RECEIVED';
-      models: Model[];
+      models: TimelineModel[];
     }
   | {
       type: 'TIMELINE_DATA_FAILED';
