@@ -4,7 +4,7 @@ import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration
 import { Request } from 'nightbear/core/models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'nightbear/core/models/model';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'nightbear/server/utils/test';
-import { MIN_IN_MS } from '../../../core/calculations/calculations';
+import { MIN_IN_MS } from 'nightbear/core/calculations/calculations';
 
 describe('api/uploadDexcomEntry', () => {
 

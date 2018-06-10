@@ -4,7 +4,7 @@ import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './
 import { Request } from 'nightbear/core/models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'nightbear/core/models/model';
 import { createTestContext, withStorage, assertEqualWithoutMeta } from 'nightbear/server/utils/test';
-import { MIN_IN_MS } from '../../../core/calculations/calculations';
+import { MIN_IN_MS } from 'nightbear/core/calculations/calculations';
 
 describe('api/uploadParakeetEntry', () => {
 
