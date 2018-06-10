@@ -19,7 +19,10 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
     alias: {
-      nightbear: `${__dirname}/../../nightbear`, // allow non-relative imports from "nightbear/..."
+      // Support absolute imports across top-level "modules"
+      core: `${__dirname}/../core`,
+      web: `${__dirname}/../web`,
+      server: `${__dirname}/../server`,
     },
   },
   node: {
