@@ -3,7 +3,7 @@ import { MeterEntry, Insulin, Carbs } from 'nightbear/core/models/model';
 
 export function uploadEntries(request: Request, context: Context): Response {
   const { bloodSugar, insulin, carbs } = request.requestBody as any;
-  const timestamp = context.timestamp();
+  const timestamp = context.timestamp(); // TODO: we should get timestamp from user
   const modelsToSave = [];
 
   if (bloodSugar) {
@@ -31,9 +31,8 @@ export function parseMeterEntry(
 ): MeterEntry {
   return {
     modelType: 'MeterEntry',
-    timestamp: 1508672249758,
+    timestamp,
     bloodGlucose,
-    measuredAt: timestamp,
   };
 }
 

@@ -12,12 +12,11 @@ describe('api/calculateHba1c', () => {
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: 1508672249758,
+    timestamp: 1508672249758 - 3 * 14934,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: 1508672249758,
+      timestamp: 1508672249758 - 3 * 14934,
       bloodGlucose: 8.0,
-      measuredAt: 1508672249758,
     }],
     isInitialCalibration: false,
     slope: 828.3002146147081,
@@ -40,7 +39,7 @@ describe('api/calculateHba1c', () => {
       sgv: 150, // 8.3 mmol/l
       dateString: 'Sun Nov 22 23:27:50 EET 2015',
       type: 'sgv',
-      date: 1448227670000,
+      date: 1508672249758 - 2 * 14934,
       noise: 1,
     },
   };
@@ -53,7 +52,7 @@ describe('api/calculateHba1c', () => {
       const mockHba1c: Hba1c = {
         modelType: 'Hba1c',
         source: 'calculated',
-        timestamp: context.timestamp(),
+        timestamp: 1508672249758,
         hba1cValue: 6.218815331010453,
       };
 
