@@ -23,8 +23,8 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
   ) as Store;
 
   if ((module as any).hot) {
-    (module as any).hot.accept('web/app/reducers', () => {
-      const nextReducer = require('web/app/reducers');
+    (module as any).hot.accept('web/app/modules/reducer', () => {
+      const nextReducer = require('web/app/modules/reducer');
       (store as any).replaceReducer(nextReducer);
     });
   }
