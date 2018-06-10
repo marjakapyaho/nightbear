@@ -4,19 +4,19 @@ import PouchDBDefault from 'pouchdb';
 const PouchDB = PouchDBDefault || require('pouchdb');
 
 import { Middleware, Dispatch } from 'web/app/utils/redux';
-import { ReplicationDirection } from 'web/app/reducers';
 import { debounce } from 'lodash';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
 
-export const database: Middleware = store => {
+const middleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
   return next => action => {
-    const oldValue = store.getState().config.remoteDbUrl;
+    const oldValue = store.getState().configVars.remoteDbUrl;
     const result = next(action);
-    const newValue = store.getState().config.remoteDbUrl;
+    const newValue = store.getState().configVars.remoteDbUrl;
     if (oldValue !== newValue) {
       if (existingReplication) {
         existingReplication.dispose();
@@ -26,7 +26,7 @@ export const database: Middleware = store => {
         existingReplication = startReplication(newValue, store.dispatch);
       }
     }
-    if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
+    if (action.type === 'TIMELINE_FILTERS_CHANGED' && existingReplication) {
       existingReplication.storage
         .loadTimelineModels(action.modelTypes[0], action.range, action.rangeEnd)
         .then(
@@ -176,3 +176,5 @@ function dispatchFromReplication(
       }),
     );
 }
+
+export default middleware;

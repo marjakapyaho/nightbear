@@ -8,7 +8,7 @@ import {
 } from 'web/app/modules/pouchDb/state';
 import { isArray } from 'lodash';
 import { assertNumber } from 'web/app/utils/types';
-import { DB_REPLICATION_BATCH_SIZE } from 'web/app/middleware/database';
+import { DB_REPLICATION_BATCH_SIZE } from 'web/app/modules/pouchDb/middleware';
 
 export function pouchDbReducer(
   state: PouchDbState = pouchDbInitState,
