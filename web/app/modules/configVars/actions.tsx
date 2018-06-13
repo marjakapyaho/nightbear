@@ -1,8 +1,5 @@
-export function DB_URL_SET(newDbUrl: string) {
-  return {
-    type: 'DB_URL_SET' as 'DB_URL_SET',
-    newDbUrl,
-  };
-}
+import { actionsWithType } from 'web/app/utils/redux';
 
-export type ConfigVarsAction = Readonly<ReturnType<typeof DB_URL_SET>>;
+export const configVarsActions = actionsWithType({
+  DB_URL_SET: (newDbUrl: string) => ({ newDbUrl }),
+});
