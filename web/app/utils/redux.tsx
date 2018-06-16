@@ -3,6 +3,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { ReduxState } from 'web/app/modules/state';
 import { ReduxAction } from 'web/app/modules/actions';
 import { rootReducer } from 'web/app/modules/reducer';
+import { isEqual } from 'lodash';
 
 export type Store = Readonly<{ getState: () => ReduxState; dispatch: Dispatch }>;
 export type Dispatch = (action: ReduxAction) => ReduxAction;
@@ -30,6 +31,39 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
   }
 
   return store as any;
+}
+
+export function createChangeObserver(store: Store, next: Dispatch) {
+  const selectors: Array<(state: ReduxState) => any> = [];
+  const handlers: Array<
+    (newSelection: any, oldSelection: any, newState: ReduxState, oldState: ReduxState) => void
+  > = [];
+  return {
+    add<T>(
+      selector: (state: ReduxState) => T,
+      handler: (
+        newSelection: T,
+        oldSelection: T,
+        newState: ReduxState,
+        oldState: ReduxState,
+      ) => void,
+    ) {
+      selectors.push(selector);
+      handlers.push(handler);
+    },
+    run(action: ReduxAction) {
+      const oldState = store.getState();
+      const oldValues = selectors.map(selector => selector(oldState));
+      const result = next(action);
+      const newState = store.getState();
+      const newValues = selectors.map(selector => selector(newState));
+      handlers.forEach((handler, i) => {
+        if (isEqual(newValues[i], oldValues[i])) return;
+        handler(newValues[i], oldValues[i], newState, oldState);
+      });
+      return result;
+    },
+  };
 }
 
 type valueof<T> = T[keyof T];

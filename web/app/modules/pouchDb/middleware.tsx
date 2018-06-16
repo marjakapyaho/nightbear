@@ -3,11 +3,12 @@ import PouchDBDefault from 'pouchdb';
 // tslint:disable-next-line:no-var-requires
 const PouchDB = PouchDBDefault || require('pouchdb');
 
-import { Middleware, Dispatch } from 'web/app/utils/redux';
+import { Middleware, Dispatch, createChangeObserver } from 'web/app/utils/redux';
 import { debounce } from 'lodash';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actions } from 'web/app/modules/actions';
+import { ReduxState } from 'web/app/modules/state';
 
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
 export const LOCAL_DB_CHANGES_BUFFER = 500;
@@ -15,29 +16,33 @@ export const DB_REPLICATION_BATCH_SIZE = 250;
 
 export const pouchDbMiddleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
-  return next => action => {
-    const oldValue = store.getState().configVars.remoteDbUrl;
-    const result = next(action);
-    const newValue = store.getState().configVars.remoteDbUrl;
-    if (oldValue !== newValue) {
-      if (existingReplication) {
-        existingReplication.dispose();
-        existingReplication = null;
-      }
-      if (newValue) {
-        existingReplication = startReplication(newValue, store.dispatch);
-      }
-    }
-    if (action.type === 'TIMELINE_FILTERS_CHANGED' && existingReplication) {
-      existingReplication.storage
-        .loadTimelineModels(action.modelTypes[0], action.range, action.rangeEnd)
-        .then(
-          models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
-          err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
-        );
-    }
-    return result;
+
+  return next => {
+    const observer = createChangeObserver(store, next);
+    observer.add(state => state.configVars.remoteDbUrl, remoteDbUrlChanged);
+    observer.add(state => state.timelineData.filters, timelineFiltersChanged);
+    return observer.run;
   };
+
+  function remoteDbUrlChanged(newUrl: string) {
+    if (existingReplication) {
+      existingReplication.dispose();
+      existingReplication = null;
+    }
+    if (newUrl) {
+      existingReplication = startReplication(newUrl, store.dispatch);
+    }
+  }
+
+  function timelineFiltersChanged(filters: ReduxState['timelineData']['filters']) {
+    if (!existingReplication) return;
+    existingReplication.storage
+      .loadTimelineModels(filters.modelTypes[0], filters.range, filters.rangeEnd)
+      .then(
+        models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
+        err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
+      );
+  }
 };
 
 function startReplication(remoteDbUrl: string, dispatch: Dispatch) {

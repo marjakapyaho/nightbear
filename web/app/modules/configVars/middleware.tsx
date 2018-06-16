@@ -1,16 +1,15 @@
-import { Middleware } from 'web/app/utils/redux';
+import { Middleware, createChangeObserver } from 'web/app/utils/redux';
 import { actions } from 'web/app/modules/actions';
 
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
 export const configVarsMiddleware: Middleware = store => {
   setTimeout(read, 0);
-  return next => action => {
-    const oldValue = store.getState().configVars.remoteDbUrl;
-    const result = next(action);
-    const newValue = store.getState().configVars.remoteDbUrl;
-    if (oldValue !== newValue) write(newValue);
-    return result;
+
+  return next => {
+    const observer = createChangeObserver(store, next);
+    observer.add(state => state.configVars.remoteDbUrl, write);
+    return observer.run;
   };
 
   function read() {
