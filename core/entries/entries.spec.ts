@@ -7,7 +7,7 @@ import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntr
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { DexcomCalibration } from 'core/models/model';
 
-describe.only('core/entries', () => {
+describe('core/entries', () => {
   const timestamp = 1508672249758;
 
   // Mock requests
