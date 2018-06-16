@@ -10,19 +10,17 @@ export function timelineDataReducer(
   _rootState: ReduxState,
 ): TimelineDataState {
   switch (action.type) {
-    case 'DB_EMITTED_CHANGE':
-      const newModel = reviveCouchDbRowIntoModel(action.change.doc);
-      if (!isTimelineModel(newModel) || !state.filters.modelTypes.includes(newModel.modelType)) {
-        return state; // doesn't match our filters
-      }
-      // TODO: updateDbState(state, 'LOCAL', 'ACTIVE')..?
-      if (state.status !== 'READY') {
-        return state; // we're in the middle of a fetch -> ignore the change
-      }
+    case 'DB_EMITTED_CHANGES':
+      if (state.status !== 'READY') return state; // we're in the middle of a fetch -> ignore the change
+      const newModels = action.changes
+        .map(change => reviveCouchDbRowIntoModel(change.doc))
+        .filter(isTimelineModel)
+        .filter(newModel => state.filters.modelTypes.includes(newModel.modelType));
+      if (!newModels.length) return state; // nothing passed our filters -> no change
       return {
         ...state,
         filters: { ...state.filters, rangeEnd: Date.now() },
-        models: [newModel, ...state.models],
+        models: [...newModels, ...state.models],
       };
     case 'TIMELINE_FILTERS_CHANGED':
       const { range, rangeEnd, modelTypes } = action;

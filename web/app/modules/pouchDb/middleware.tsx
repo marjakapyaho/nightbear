@@ -10,8 +10,8 @@ import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actions } from 'web/app/modules/actions';
 
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
-export const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
-export const DB_REPLICATION_BATCH_SIZE = 500;
+export const LOCAL_DB_CHANGES_BUFFER = 500;
+export const DB_REPLICATION_BATCH_SIZE = 250;
 
 export const pouchDbMiddleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
@@ -96,23 +96,25 @@ function eventToPromise(emitter: EventEmitter, event: string): Promise<null> {
 }
 
 function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
-  const postChangeReady = debounce(
-    () => dispatch(actions.DB_EMITTED_READY()),
-    LOCAL_DB_ACTIVE_DEBOUNCE,
-  );
-  dispatch(actions.DB_EMITTED_READY());
+  let changes: Array<PouchDB.Core.ChangesResponseChange<{}>> = [];
+  const changeBuffer = debounce(() => {
+    dispatch(actions.DB_EMITTED_CHANGES(changes));
+    changes = [];
+  }, LOCAL_DB_CHANGES_BUFFER);
+  dispatch(actions.DB_EMITTED_CHANGES([]));
   changeFeed
     .on('change', change => {
-      dispatch(actions.DB_EMITTED_CHANGE(change));
-      postChangeReady();
+      if (!changes.length) dispatch(actions.DB_EMITTED_CHANGES_BUFFERING());
+      changes.push(change);
+      changeBuffer();
     })
     .on('complete', info => {
+      changeBuffer.flush();
       dispatch(actions.DB_EMITTED_COMPLETE(info));
-      postChangeReady.cancel();
     })
     .on('error', err => {
+      changeBuffer.flush();
       dispatch(actions.DB_EMITTED_ERROR(err));
-      postChangeReady.cancel();
     });
 }
 
