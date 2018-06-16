@@ -12,7 +12,7 @@ import { actions } from 'web/app/modules/actions';
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
 
-const middleware: Middleware = store => {
+export const pouchDbMiddleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
   return next => action => {
     const oldValue = store.getState().configVars.remoteDbUrl;
@@ -128,5 +128,3 @@ function dispatchFromReplication(
     .on('complete', info => dispatch(actions.REPLICATION_EMITTED_COMPLETE(direction, info)))
     .on('error', err => dispatch(actions.REPLICATION_EMITTED_ERROR(direction, err)));
 }
-
-export default middleware;

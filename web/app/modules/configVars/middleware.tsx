@@ -3,7 +3,7 @@ import { actions } from 'web/app/modules/actions';
 
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
-const middleware: Middleware = store => {
+export const configVarsMiddleware: Middleware = store => {
   setTimeout(read, 0);
   return next => action => {
     const oldValue = store.getState().configVars.remoteDbUrl;
@@ -21,5 +21,3 @@ const middleware: Middleware = store => {
     localStorage.setItem(CONFIG_DB_URL, newDbUrl);
   }
 };
-
-export default middleware;
