@@ -1,10 +1,12 @@
 import { Context } from 'core/models/api';
-import { SensorEntry } from 'core/models/model';
+import { SensorEntry, TimelineModel } from 'core/models/model';
+import { sortBy, unionBy } from 'lodash';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 
 export function getMergedEntriesFeed(
   context: Context,
   range: number,
-  rangeEnd: number) {
+  rangeEnd: number): Promise<SensorEntry[]> {
 
   return Promise.all([
     context.storage.loadTimelineModels('DexcomSensorEntry', range, rangeEnd),
@@ -13,7 +15,13 @@ export function getMergedEntriesFeed(
     context.storage.loadTimelineModels('MeterEntry', range, rangeEnd),
   ])
     .then(([dexcomSensorEntries, dexcomRawSensorEntries, parakeetSensorEntries, meterEntries ]) => {
-      console.log('do merger of', dexcomSensorEntries, dexcomRawSensorEntries, parakeetSensorEntries, meterEntries);
-      return dexcomSensorEntries as SensorEntry[];
+      return sortBy(unionBy(
+        dexcomSensorEntries as TimelineModel[],
+        dexcomRawSensorEntries as TimelineModel[],
+        parakeetSensorEntries as TimelineModel[],
+        meterEntries as TimelineModel[],
+        (entry) => {
+          return Math.round(entry.timestamp / (5 * MIN_IN_MS));
+        }), 'timestamp') as SensorEntry[];
     });
 }
