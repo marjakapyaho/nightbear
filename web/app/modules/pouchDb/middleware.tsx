@@ -9,7 +9,8 @@ import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actions } from 'web/app/modules/actions';
 
-const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
+export const LOCAL_DB_NAME = 'nightbear_web_ui';
+export const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
 
 export const pouchDbMiddleware: Middleware = store => {
@@ -46,8 +47,8 @@ function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
     navigator.userAgent &&
     !navigator.userAgent.match('CriOS');
   const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
-  const storage = createCouchDbStorage('nightbear_web_ui', pouchDb7057Workaround);
-  const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
+  const storage = createCouchDbStorage(LOCAL_DB_NAME, pouchDb7057Workaround);
+  const localDb = new PouchDB(LOCAL_DB_NAME, pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
   // Start replication in both directions:
   const replOptions = {
