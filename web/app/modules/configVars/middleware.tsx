@@ -1,4 +1,5 @@
 import { Middleware } from 'web/app/utils/redux';
+import { actions } from 'web/app/modules/actions';
 
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
@@ -13,10 +14,7 @@ const middleware: Middleware = store => {
   };
 
   function read() {
-    store.dispatch({
-      type: 'DB_URL_SET',
-      newDbUrl: localStorage.getItem(CONFIG_DB_URL) || '',
-    });
+    store.dispatch(actions.DB_URL_SET(localStorage.getItem(CONFIG_DB_URL) || ''));
   }
 
   function write(newDbUrl: string) {
