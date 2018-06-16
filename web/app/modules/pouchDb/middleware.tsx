@@ -4,19 +4,20 @@ import PouchDBDefault from 'pouchdb';
 const PouchDB = PouchDBDefault || require('pouchdb');
 
 import { Middleware, Dispatch } from 'web/app/utils/redux';
-import { ReplicationDirection } from 'web/app/reducers';
 import { debounce } from 'lodash';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
+import { actions } from 'web/app/modules/actions';
 
 const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
 export const DB_REPLICATION_BATCH_SIZE = 500;
 
-export const database: Middleware = store => {
+export const pouchDbMiddleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
   return next => action => {
-    const oldValue = store.getState().config.remoteDbUrl;
+    const oldValue = store.getState().configVars.remoteDbUrl;
     const result = next(action);
-    const newValue = store.getState().config.remoteDbUrl;
+    const newValue = store.getState().configVars.remoteDbUrl;
     if (oldValue !== newValue) {
       if (existingReplication) {
         existingReplication.dispose();
@@ -26,12 +27,12 @@ export const database: Middleware = store => {
         existingReplication = startReplication(newValue, store.dispatch);
       }
     }
-    if (action.type === 'TIMELINE_DATA_REQUESTED' && existingReplication) {
+    if (action.type === 'TIMELINE_FILTERS_CHANGED' && existingReplication) {
       existingReplication.storage
         .loadTimelineModels(action.modelTypes[0], action.range, action.rangeEnd)
         .then(
-          models => store.dispatch({ type: 'TIMELINE_DATA_RECEIVED', models }),
-          err => store.dispatch({ type: 'TIMELINE_DATA_FAILED', err }),
+          models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
+          err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
         );
     }
     return result;
@@ -95,35 +96,21 @@ function eventToPromise(emitter: EventEmitter, event: string): Promise<null> {
 
 function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
   const postChangeReady = debounce(
-    () =>
-      dispatch({
-        type: 'DB_EMITTED_READY',
-      }),
+    () => dispatch(actions.DB_EMITTED_READY()),
     LOCAL_DB_ACTIVE_DEBOUNCE,
   );
-  dispatch({
-    type: 'DB_EMITTED_READY',
-  });
+  dispatch(actions.DB_EMITTED_READY());
   changeFeed
     .on('change', change => {
-      dispatch({
-        type: 'DB_EMITTED_CHANGE',
-        change,
-      });
+      dispatch(actions.DB_EMITTED_CHANGE(change));
       postChangeReady();
     })
     .on('complete', info => {
-      dispatch({
-        type: 'DB_EMITTED_COMPLETE',
-        info,
-      });
+      dispatch(actions.DB_EMITTED_COMPLETE(info));
       postChangeReady.cancel();
     })
     .on('error', err => {
-      dispatch({
-        type: 'DB_EMITTED_ERROR',
-        err,
-      });
+      dispatch(actions.DB_EMITTED_ERROR(err));
       postChangeReady.cancel();
     });
 }
@@ -134,45 +121,10 @@ function dispatchFromReplication(
   dispatch: Dispatch,
 ) {
   replication
-    .on('change', info =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_CHANGE',
-        direction,
-        info,
-      }),
-    )
-    .on('paused', err =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_PAUSED',
-        direction,
-        err,
-      }),
-    )
-    .on('active', () =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_ACTIVE',
-        direction,
-      }),
-    )
-    .on('denied', err =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_DENIED',
-        direction,
-        err,
-      }),
-    )
-    .on('complete', info =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_COMPLETE',
-        direction,
-        info,
-      }),
-    )
-    .on('error', err =>
-      dispatch({
-        type: 'REPLICATION_EMITTED_ERROR',
-        direction,
-        err,
-      }),
-    );
+    .on('change', info => dispatch(actions.REPLICATION_EMITTED_CHANGE(direction, info)))
+    .on('paused', err => dispatch(actions.REPLICATION_EMITTED_PAUSED(direction, err)))
+    .on('active', () => dispatch(actions.REPLICATION_EMITTED_ACTIVE(direction)))
+    .on('denied', err => dispatch(actions.REPLICATION_EMITTED_DENIED(direction, err)))
+    .on('complete', info => dispatch(actions.REPLICATION_EMITTED_COMPLETE(direction, info)))
+    .on('error', err => dispatch(actions.REPLICATION_EMITTED_ERROR(direction, err)));
 }

@@ -3,44 +3,40 @@ import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
+import { actions } from 'web/app/modules/actions';
 
 export default renderFromStore(
   __filename,
   state => ({
-    remoteDbUrl: state.config.remoteDbUrl,
-    models: state.timelineData.models,
-    modelTypes: state.timelineData.modelTypes,
-    range: state.timelineData.range,
+    remoteDbUrl: state.configVars.remoteDbUrl,
+    timelineData: state.timelineData,
   }),
-  (React, { remoteDbUrl, models, modelTypes, range }, dispatch) => (
+  (React, { remoteDbUrl, timelineData }, dispatch) => (
     <div>
       <DbStatusBar />
       {!!remoteDbUrl && <pre>dbUrl = {remoteDbUrl}</pre>}
       <button
-        onClick={() =>
-          dispatch({ type: 'DB_URL_SET', newDbUrl: prompt('Please enter new DB URL:') || '' })
-        }
+        onClick={() => dispatch(actions.DB_URL_SET(prompt('Please enter new DB URL:') || ''))}
       >
         Log in
       </button>
-      <button onClick={() => dispatch({ type: 'DB_URL_SET', newDbUrl: '' })}>Log out</button>
+      <button onClick={() => dispatch(actions.DB_URL_SET(''))}>Log out</button>
       <ModelTypeSelector
         onChange={newType =>
-          dispatch({
-            type: 'TIMELINE_DATA_REQUESTED',
-            range,
-            rangeEnd: Date.now(),
-            modelTypes: [newType],
-          })
+          dispatch(
+            actions.TIMELINE_FILTERS_CHANGED(timelineData.filters.range, Date.now(), [newType]),
+          )
         }
       />
       <TimeRangeSelector
         onChange={range =>
-          dispatch({ type: 'TIMELINE_DATA_REQUESTED', range, rangeEnd: Date.now(), modelTypes })
+          dispatch(
+            actions.TIMELINE_FILTERS_CHANGED(range, Date.now(), timelineData.filters.modelTypes),
+          )
         }
       />
-      {typeof models === 'string' && models}
-      {typeof models !== 'string' && <TimelineModelTable models={models} />}
+      {timelineData.status === 'READY' && <TimelineModelTable models={timelineData.models} />}
+      {timelineData.status !== 'READY' && timelineData.status}
     </div>
   ),
 );

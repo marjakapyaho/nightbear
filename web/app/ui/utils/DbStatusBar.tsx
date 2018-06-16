@@ -1,40 +1,35 @@
 import { renderFromStore } from 'web/app/utils/react';
-import {
-  State,
-  DbState,
-  DbStatePart,
-  getSummaryDbState,
-  getSummaryReplicationProgress,
-} from 'web/app/reducers';
 import { CSSProperties } from 'react';
 import { assertExhausted, objectKeys } from 'web/app/utils/types';
+import { getSummaryDbStatus, getSummaryReplicationProgress } from 'web/app/modules/pouchDb/getters';
+import { PouchDbState, PouchDbStatePart, PouchDbStatus } from 'web/app/modules/pouchDb/state';
 
 export default renderFromStore(
   __filename,
   state => state,
-  (React, { dbState }) => {
-    const parts = objectKeys(dbState);
-    const summaryState = getSummaryDbState(parts.map(key => dbState[key].state));
-    const summaryProgress = getSummaryReplicationProgress(parts.map(key => dbState[key]));
+  (React, { pouchDb }) => {
+    const parts = objectKeys(pouchDb);
+    const summaryState = getSummaryDbStatus(parts.map(key => pouchDb[key].status));
+    const summaryProgress = getSummaryReplicationProgress(parts.map(key => pouchDb[key]));
     return (
       <div className="this">
-        <div className="parts">{parts.map(part => renderState(part, dbState[part]))}</div>
+        <div className="parts">{parts.map(part => renderState(part, pouchDb[part]))}</div>
         <div className="summary" style={getStyle(summaryState)}>
           {summaryState} {summaryProgress === null ? null : `(${summaryProgress} %)`}
         </div>
       </div>
     );
-    function renderState(part: DbStatePart, state: State['dbState'][DbStatePart]) {
+    function renderState(part: PouchDbStatePart, state: PouchDbState[PouchDbStatePart]) {
       return (
-        <div key={part} className="dir" style={getStyle(state.state)}>
-          {part}: {state.state}
+        <div key={part} className="dir" style={getStyle(state.status)}>
+          {part}: {state.status}
         </div>
       );
     }
   },
 );
 
-function getStyle(state: DbState): CSSProperties {
+function getStyle(state: PouchDbStatus): CSSProperties {
   switch (state) {
     case 'DISABLED':
       return {
