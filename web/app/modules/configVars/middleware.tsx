@@ -1,9 +1,9 @@
-import { Middleware, createChangeObserver } from 'web/app/utils/redux';
+import { ReduxMiddleware, createChangeObserver } from 'web/app/utils/redux';
 import { actions } from 'web/app/modules/actions';
 
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
-export const configVarsMiddleware: Middleware = store => {
+export const configVarsMiddleware: ReduxMiddleware = store => {
   setTimeout(read, 0);
 
   return next => {

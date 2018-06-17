@@ -3,7 +3,7 @@ import PouchDBDefault from 'pouchdb';
 // tslint:disable-next-line:no-var-requires
 const PouchDB = PouchDBDefault || require('pouchdb');
 
-import { Middleware, Dispatch, createChangeObserver } from 'web/app/utils/redux';
+import { ReduxMiddleware, ReduxDispatch, createChangeObserver } from 'web/app/utils/redux';
 import { debounce } from 'lodash';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
@@ -15,7 +15,7 @@ export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
 export const MODELS_FETCH_DEBOUNCE = 100;
 
-export const pouchDbMiddleware: Middleware = store => {
+export const pouchDbMiddleware: ReduxMiddleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
   const debouncedTimelineFiltersChanged = debounce(timelineFiltersChanged, MODELS_FETCH_DEBOUNCE);
 
@@ -49,7 +49,7 @@ export const pouchDbMiddleware: Middleware = store => {
   }
 };
 
-function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
+function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
   const isSafari = // https://stackoverflow.com/a/31732310 ;__;
     navigator.vendor &&
     navigator.vendor.indexOf('Apple') > -1 &&
@@ -104,7 +104,7 @@ function eventToPromise(emitter: EventEmitter, event: string): Promise<null> {
   return new Promise(resolve => emitter.once(event, resolve)).then(() => null);
 }
 
-function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
+function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: ReduxDispatch) {
   let changes: Array<PouchDB.Core.ChangesResponseChange<{}>> = [];
   const changeBuffer = debounce(() => {
     dispatch(actions.DB_EMITTED_CHANGES(changes));
@@ -130,7 +130,7 @@ function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dis
 function dispatchFromReplication(
   replication: PouchDB.Replication.Replication<{}>,
   direction: ReplicationDirection,
-  dispatch: Dispatch,
+  dispatch: ReduxDispatch,
 ) {
   replication
     .on('change', info => dispatch(actions.REPLICATION_EMITTED_CHANGE(direction, info)))

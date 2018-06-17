@@ -5,12 +5,17 @@ import { ReduxAction } from 'web/app/modules/actions';
 import { rootReducer } from 'web/app/modules/reducer';
 import { isEqual } from 'lodash';
 
-export type Store = Readonly<{ getState: () => ReduxState; dispatch: Dispatch }>;
-export type Dispatch = (action: ReduxAction) => ReduxAction;
-export type Reducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
-export type Middleware = (store: Store) => (next: Dispatch) => (action: ReduxAction) => ReduxAction;
+export type ReduxStore = Readonly<{ getState: () => ReduxState; dispatch: ReduxDispatch }>;
+export type ReduxDispatch = (action: ReduxAction) => ReduxAction;
+export type ReduxReducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
+export type ReduxMiddleware = (
+  store: ReduxStore,
+) => (next: ReduxDispatch) => (action: ReduxAction) => ReduxAction;
 
-export function configureStore(initialState?: ReduxState, middleware: Middleware[] = []): Store {
+export function configureStore(
+  initialState?: ReduxState,
+  middleware: ReduxMiddleware[] = [],
+): ReduxStore {
   let appliedMiddleware = applyMiddleware.apply(null, middleware);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -21,7 +26,7 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
     rootReducer as any /* redux types are a bit sloppy here */,
     initialState,
     appliedMiddleware,
-  ) as Store;
+  ) as ReduxStore;
 
   if ((module as any).hot) {
     (module as any).hot.accept('web/app/modules/reducer', () => {
@@ -33,7 +38,7 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
   return store as any;
 }
 
-export function createChangeObserver(store: Store, next: Dispatch) {
+export function createChangeObserver(store: ReduxStore, next: ReduxDispatch) {
   const selectors: Array<(state: ReduxState) => any> = [];
   const handlers: Array<
     (newSelection: any, oldSelection: any, newState: ReduxState, oldState: ReduxState) => void
