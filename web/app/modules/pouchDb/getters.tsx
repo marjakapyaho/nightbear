@@ -1,5 +1,5 @@
 import { PouchDbStatus, PouchDbStatePart, PouchDbState } from 'web/app/modules/pouchDb/state';
-import { isArray, isNumber } from 'lodash';
+import { isArray, isNumber, max } from 'lodash';
 import { assertNumber, objectKeys } from 'web/app/utils/types';
 
 export type SummaryDbStatus = PouchDbStatus | 'REPLICATION_INITIAL' | 'REPLICATION_CATCHUP';
@@ -9,15 +9,18 @@ export function getSummaryDbStatus(
 ): {
   summaryStatus: SummaryDbStatus;
   summaryProgress: number | null;
+  summaryLastChangedAt: number;
 } {
   const stateParts = objectKeys(state).map(key => state[key]);
   const summaryProgress = getSummaryReplicationProgress(stateParts);
+  const summaryLastChangedAt = max(stateParts.map(p => p.lastChangedAt)) || 0;
   if (isNumber(summaryProgress)) {
     const summaryStatus =
       state.LOCAL.status === 'DISABLED' ? 'REPLICATION_INITIAL' : 'REPLICATION_CATCHUP';
     return {
       summaryStatus,
       summaryProgress,
+      summaryLastChangedAt,
     };
   }
   const allStatuses = stateParts.map(p => p.status);
@@ -25,6 +28,7 @@ export function getSummaryDbStatus(
   return {
     summaryStatus,
     summaryProgress,
+    summaryLastChangedAt,
   };
 }
 

@@ -7,6 +7,7 @@ export type PouchDbState = Readonly<
     [part in PouchDbStatePart]: {
       status: PouchDbStatus;
       details: string | [number, number];
+      lastChangedAt: number;
     }
   }
 >;
@@ -15,13 +16,16 @@ export const pouchDbInitState: PouchDbState = {
   LOCAL: {
     status: 'DISABLED',
     details: '',
+    lastChangedAt: Date.now(),
   },
   UP: {
     status: 'DISABLED',
     details: '',
+    lastChangedAt: Date.now(),
   },
   DOWN: {
     status: 'DISABLED',
     details: '',
+    lastChangedAt: Date.now(),
   },
 };

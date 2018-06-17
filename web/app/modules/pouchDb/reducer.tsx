@@ -61,6 +61,6 @@ function updateDbStatus(
 ): PouchDbState {
   return {
     ...state,
-    [part]: { ...state[part], status: newStatus, details },
+    [part]: { ...state[part], status: newStatus, details, lastChangedAt: Date.now() },
   };
 }
