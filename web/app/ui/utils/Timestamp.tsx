@@ -10,7 +10,8 @@ const ns = 'TODO';
 type Props = { ts: number };
 
 export default class Timestamp extends React.Component<Props> {
-  timerID: NodeJS.Timer | null;
+  slowTimer: NodeJS.Timer | null;
+  fastTimer: NodeJS.Timer | null;
 
   constructor(props: Props) {
     super(props);
@@ -23,12 +24,12 @@ export default class Timestamp extends React.Component<Props> {
 
   _reconsiderTimer() {
     const liveAge = this._getLiveAge();
-    if (liveAge !== null && !this.timerID) {
-      this.timerID = global.setInterval(() => this.forceUpdate(), 1000);
+    if (liveAge !== null && !this.fastTimer) {
+      this.fastTimer = global.setInterval(() => this.forceUpdate(), 1000);
       this.forceUpdate();
-    } else if (liveAge === null && this.timerID) {
-      global.clearInterval(this.timerID);
-      this.timerID = null;
+    } else if (liveAge === null && this.fastTimer) {
+      global.clearInterval(this.fastTimer);
+      this.fastTimer = null;
       this.forceUpdate();
     }
   }
@@ -47,6 +48,7 @@ export default class Timestamp extends React.Component<Props> {
   }
 
   componentDidMount() {
+    this.slowTimer = global.setInterval(() => this.forceUpdate(), HOUR_IN_MS); // re-evaluate once per hour, regardless of live formatting, so stuff like "today" vs "yesterday" works
     this._reconsiderTimer();
   }
 
@@ -55,8 +57,10 @@ export default class Timestamp extends React.Component<Props> {
   }
 
   componentWillUnmount() {
-    if (this.timerID) global.clearInterval(this.timerID);
-    this.timerID = null;
+    if (this.slowTimer) global.clearInterval(this.slowTimer);
+    if (this.fastTimer) global.clearInterval(this.fastTimer);
+    this.slowTimer = null;
+    this.fastTimer = null;
   }
 
   render() {
