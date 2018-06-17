@@ -13,14 +13,18 @@ import { ReduxState } from 'web/app/modules/state';
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
 export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
+export const MODELS_FETCH_DEBOUNCE = 100;
 
 export const pouchDbMiddleware: Middleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
+  const debouncedTimelineFiltersChanged = debounce(timelineFiltersChanged, MODELS_FETCH_DEBOUNCE);
+
+  setTimeout(() => timelineFiltersChanged(store.getState().timelineData.filters), 0); // react to the initial filter values
 
   return next => {
     const observer = createChangeObserver(store, next);
     observer.add(state => state.configVars.remoteDbUrl, remoteDbUrlChanged);
-    observer.add(state => state.timelineData.filters, timelineFiltersChanged);
+    observer.add(state => state.timelineData.filters, debouncedTimelineFiltersChanged);
     return observer.run;
   };
 
