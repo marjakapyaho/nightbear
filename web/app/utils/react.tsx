@@ -53,3 +53,13 @@ export function renderFromStore<OwnProps, IntProps>(
     dispatchMapper,
   )(Component) as any; // not sure why connect() returns Component<IntProps> instead of Component<OwnProps> here :shrug:
 }
+
+export function namespaceReactClass<T>(
+  filename: string,
+  definitionFunc: (React: ReactApi) => T,
+): T {
+  const { displayName, NsReact } = namespaceReact(filename);
+  const componentClass = definitionFunc(NsReact);
+  Object.assign(componentClass, { displayName });
+  return componentClass;
+}
