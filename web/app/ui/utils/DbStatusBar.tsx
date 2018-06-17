@@ -1,21 +1,20 @@
 import { renderFromStore } from 'web/app/utils/react';
 import { CSSProperties } from 'react';
 import { assertExhausted, objectKeys } from 'web/app/utils/types';
-import { getSummaryDbStatus, getSummaryReplicationProgress } from 'web/app/modules/pouchDb/getters';
-import { PouchDbState, PouchDbStatePart, PouchDbStatus } from 'web/app/modules/pouchDb/state';
+import { getSummaryDbStatus, SummaryDbStatus } from 'web/app/modules/pouchDb/getters';
+import { PouchDbState, PouchDbStatePart } from 'web/app/modules/pouchDb/state';
 
 export default renderFromStore(
   __filename,
   state => state,
   (React, { pouchDb }) => {
     const parts = objectKeys(pouchDb);
-    const summaryState = getSummaryDbStatus(parts.map(key => pouchDb[key].status));
-    const summaryProgress = getSummaryReplicationProgress(parts.map(key => pouchDb[key]));
+    const { summaryStatus, summaryProgress } = getSummaryDbStatus(pouchDb);
     return (
       <div className="this">
         <div className="parts">{parts.map(part => renderState(part, pouchDb[part]))}</div>
-        <div className="summary" style={getStyle(summaryState)}>
-          {summaryState} {summaryProgress === null ? null : `(${summaryProgress} %)`}
+        <div className="summary" style={getStyle(summaryStatus)}>
+          {summaryStatus} {summaryProgress === null ? null : `(${summaryProgress} %)`}
         </div>
       </div>
     );
@@ -29,13 +28,15 @@ export default renderFromStore(
   },
 );
 
-function getStyle(state: PouchDbStatus): CSSProperties {
+function getStyle(state: SummaryDbStatus): CSSProperties {
   switch (state) {
     case 'DISABLED':
       return {
         background: 'darkgray',
         color: 'gray',
       };
+    case 'REPLICATION_INITIAL':
+    case 'REPLICATION_CATCHUP':
     case 'ACTIVE':
       return {
         background: 'green',

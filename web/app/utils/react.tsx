@@ -2,12 +2,12 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { ReactNode } from 'react';
 import { createCssNs } from 'css-ns';
-import { Dispatch } from 'web/app/utils/redux';
+import { ReduxDispatch } from 'web/app/utils/redux';
 import { ReduxState } from 'web/app/modules/state';
 
 export type ReactApi = typeof React;
 export type ReactComponent<P> = React.ComponentClass<P>;
-export type DispatchProp = { readonly _dispatch: Dispatch };
+export type DispatchProp = { readonly _dispatch: ReduxDispatch };
 
 function namespaceReact(namespace: string) {
   const ns = createCssNs({ prefix: 'nb-', namespace, React, self: /this/ });
@@ -30,7 +30,7 @@ export function renderFromProps<Props>(
   };
 }
 
-const dispatchMapper = (dispatch: Dispatch) => ({ _dispatch: dispatch });
+const dispatchMapper = (dispatch: ReduxDispatch) => ({ _dispatch: dispatch });
 
 export function renderFromStore<OwnProps, IntProps>(
   filename: string,
@@ -38,7 +38,7 @@ export function renderFromStore<OwnProps, IntProps>(
   renderFunc: (
     React: ReactApi,
     props: Readonly<IntProps & DispatchProp>,
-    dispatch: Dispatch,
+    dispatch: ReduxDispatch,
   ) => ReactNode,
 ): ReactComponent<OwnProps> {
   const { displayName, NsReact } = namespaceReact(filename);

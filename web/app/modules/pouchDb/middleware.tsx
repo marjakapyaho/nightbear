@@ -3,51 +3,61 @@ import PouchDBDefault from 'pouchdb';
 // tslint:disable-next-line:no-var-requires
 const PouchDB = PouchDBDefault || require('pouchdb');
 
-import { Middleware, Dispatch } from 'web/app/utils/redux';
+import { ReduxMiddleware, ReduxDispatch, createChangeObserver } from 'web/app/utils/redux';
 import { debounce } from 'lodash';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actions } from 'web/app/modules/actions';
+import { ReduxState } from 'web/app/modules/state';
 
-const LOCAL_DB_ACTIVE_DEBOUNCE = 100;
-export const DB_REPLICATION_BATCH_SIZE = 500;
+export const LOCAL_DB_NAME = 'nightbear_web_ui';
+export const LOCAL_DB_CHANGES_BUFFER = 500;
+export const DB_REPLICATION_BATCH_SIZE = 250;
+export const MODELS_FETCH_DEBOUNCE = 100;
 
-export const pouchDbMiddleware: Middleware = store => {
+export const pouchDbMiddleware: ReduxMiddleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
-  return next => action => {
-    const oldValue = store.getState().configVars.remoteDbUrl;
-    const result = next(action);
-    const newValue = store.getState().configVars.remoteDbUrl;
-    if (oldValue !== newValue) {
-      if (existingReplication) {
-        existingReplication.dispose();
-        existingReplication = null;
-      }
-      if (newValue) {
-        existingReplication = startReplication(newValue, store.dispatch);
-      }
-    }
-    if (action.type === 'TIMELINE_FILTERS_CHANGED' && existingReplication) {
-      existingReplication.storage
-        .loadTimelineModels(action.modelTypes[0], action.range, action.rangeEnd)
-        .then(
-          models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
-          err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
-        );
-    }
-    return result;
+  const debouncedTimelineFiltersChanged = debounce(timelineFiltersChanged, MODELS_FETCH_DEBOUNCE);
+
+  setTimeout(() => timelineFiltersChanged(store.getState().timelineData.filters), 0); // react to the initial filter values
+
+  return next => {
+    const observer = createChangeObserver(store, next);
+    observer.add(state => state.configVars.remoteDbUrl, remoteDbUrlChanged);
+    observer.add(state => state.timelineData.filters, debouncedTimelineFiltersChanged);
+    return observer.run;
   };
+
+  function remoteDbUrlChanged(newUrl: string) {
+    if (existingReplication) {
+      existingReplication.dispose();
+      existingReplication = null;
+    }
+    if (newUrl) {
+      existingReplication = startReplication(newUrl, store.dispatch);
+    }
+  }
+
+  function timelineFiltersChanged(filters: ReduxState['timelineData']['filters']) {
+    if (!existingReplication) return;
+    existingReplication.storage
+      .loadTimelineModels(filters.modelTypes[0], filters.range, filters.rangeEnd)
+      .then(
+        models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
+        err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
+      );
+  }
 };
 
-function startReplication(remoteDbUrl: string, dispatch: Dispatch) {
+function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
   const isSafari = // https://stackoverflow.com/a/31732310 ;__;
     navigator.vendor &&
     navigator.vendor.indexOf('Apple') > -1 &&
     navigator.userAgent &&
     !navigator.userAgent.match('CriOS');
   const pouchDb7057Workaround = isSafari ? { adapter: 'websql' } : undefined; // https://github.com/pouchdb/pouchdb/issues/7057 ;__;
-  const storage = createCouchDbStorage('nightbear_web_ui', pouchDb7057Workaround);
-  const localDb = new PouchDB('nightbear_web_ui', pouchDb7057Workaround);
+  const storage = createCouchDbStorage(LOCAL_DB_NAME, pouchDb7057Workaround);
+  const localDb = new PouchDB(LOCAL_DB_NAME, pouchDb7057Workaround);
   const remoteDb = new PouchDB(remoteDbUrl);
   // Start replication in both directions:
   const replOptions = {
@@ -94,31 +104,33 @@ function eventToPromise(emitter: EventEmitter, event: string): Promise<null> {
   return new Promise(resolve => emitter.once(event, resolve)).then(() => null);
 }
 
-function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: Dispatch) {
-  const postChangeReady = debounce(
-    () => dispatch(actions.DB_EMITTED_READY()),
-    LOCAL_DB_ACTIVE_DEBOUNCE,
-  );
-  dispatch(actions.DB_EMITTED_READY());
+function dispatchFromChanges(changeFeed: PouchDB.Core.Changes<{}>, dispatch: ReduxDispatch) {
+  let changes: Array<PouchDB.Core.ChangesResponseChange<{}>> = [];
+  const changeBuffer = debounce(() => {
+    dispatch(actions.DB_EMITTED_CHANGES(changes));
+    changes = [];
+  }, LOCAL_DB_CHANGES_BUFFER);
+  dispatch(actions.DB_EMITTED_CHANGES([]));
   changeFeed
     .on('change', change => {
-      dispatch(actions.DB_EMITTED_CHANGE(change));
-      postChangeReady();
+      if (!changes.length) dispatch(actions.DB_EMITTED_CHANGES_BUFFERING());
+      changes.push(change);
+      changeBuffer();
     })
     .on('complete', info => {
+      changeBuffer.flush();
       dispatch(actions.DB_EMITTED_COMPLETE(info));
-      postChangeReady.cancel();
     })
     .on('error', err => {
+      changeBuffer.flush();
       dispatch(actions.DB_EMITTED_ERROR(err));
-      postChangeReady.cancel();
     });
 }
 
 function dispatchFromReplication(
   replication: PouchDB.Replication.Replication<{}>,
   direction: ReplicationDirection,
-  dispatch: Dispatch,
+  dispatch: ReduxDispatch,
 ) {
   replication
     .on('change', info => dispatch(actions.REPLICATION_EMITTED_CHANGE(direction, info)))

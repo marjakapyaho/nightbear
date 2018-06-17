@@ -1,4 +1,5 @@
 import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { HOUR_IN_MS } from 'core/calculations/calculations';
 
 export type TimelineDataState = Readonly<
   {
@@ -15,9 +16,9 @@ export type TimelineDataState = Readonly<
 
 export const timelineDataInitState: TimelineDataState = {
   filters: {
-    range: 0,
-    rangeEnd: 0,
-    modelTypes: [],
+    range: HOUR_IN_MS,
+    rangeEnd: Date.now(),
+    modelTypes: ['ParakeetSensorEntry'],
   },
   status: 'FETCHING',
 };

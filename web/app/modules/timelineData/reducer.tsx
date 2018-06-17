@@ -1,8 +1,6 @@
 import { ReduxAction } from 'web/app/modules/actions';
 import { ReduxState } from 'web/app/modules/state';
 import { timelineDataInitState, TimelineDataState } from 'web/app/modules/timelineData/state';
-import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
-import { isTimelineModel } from 'core/models/model';
 
 export function timelineDataReducer(
   state: TimelineDataState = timelineDataInitState,
@@ -10,19 +8,14 @@ export function timelineDataReducer(
   _rootState: ReduxState,
 ): TimelineDataState {
   switch (action.type) {
-    case 'DB_EMITTED_CHANGE':
-      const newModel = reviveCouchDbRowIntoModel(action.change.doc);
-      if (!isTimelineModel(newModel) || !state.filters.modelTypes.includes(newModel.modelType)) {
-        return state; // doesn't match our filters
-      }
-      // TODO: updateDbState(state, 'LOCAL', 'ACTIVE')..?
-      if (state.status !== 'READY') {
-        return state; // we're in the middle of a fetch -> ignore the change
-      }
+    case 'DB_EMITTED_CHANGES':
+      if (state.status !== 'READY') return state; // we're in the middle of a fetch -> ignore the change
+      // Because we have a change observer on the filters, which will re-fetch the range whenever the filters change,
+      // and because fetches from the local DB are cheap, we just react by updating the filters (and discard the models)
+      // because the fetch that will be triggered will retrieve everything it needs to from the DB.
       return {
         ...state,
         filters: { ...state.filters, rangeEnd: Date.now() },
-        models: [newModel, ...state.models],
       };
     case 'TIMELINE_FILTERS_CHANGED':
       const { range, rangeEnd, modelTypes } = action;

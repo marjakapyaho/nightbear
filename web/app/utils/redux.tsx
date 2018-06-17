@@ -3,13 +3,19 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { ReduxState } from 'web/app/modules/state';
 import { ReduxAction } from 'web/app/modules/actions';
 import { rootReducer } from 'web/app/modules/reducer';
+import { isEqual } from 'lodash';
 
-export type Store = Readonly<{ getState: () => ReduxState; dispatch: Dispatch }>;
-export type Dispatch = (action: ReduxAction) => ReduxAction;
-export type Reducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
-export type Middleware = (store: Store) => (next: Dispatch) => (action: ReduxAction) => ReduxAction;
+export type ReduxStore = Readonly<{ getState: () => ReduxState; dispatch: ReduxDispatch }>;
+export type ReduxDispatch = (action: ReduxAction) => ReduxAction;
+export type ReduxReducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
+export type ReduxMiddleware = (
+  store: ReduxStore,
+) => (next: ReduxDispatch) => (action: ReduxAction) => ReduxAction;
 
-export function configureStore(initialState?: ReduxState, middleware: Middleware[] = []): Store {
+export function configureStore(
+  initialState?: ReduxState,
+  middleware: ReduxMiddleware[] = [],
+): ReduxStore {
   let appliedMiddleware = applyMiddleware.apply(null, middleware);
 
   if (process.env.NODE_ENV !== 'production') {
@@ -20,7 +26,7 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
     rootReducer as any /* redux types are a bit sloppy here */,
     initialState,
     appliedMiddleware,
-  ) as Store;
+  ) as ReduxStore;
 
   if ((module as any).hot) {
     (module as any).hot.accept('web/app/modules/reducer', () => {
@@ -30,6 +36,41 @@ export function configureStore(initialState?: ReduxState, middleware: Middleware
   }
 
   return store as any;
+}
+
+export function createChangeObserver(store: ReduxStore, next: ReduxDispatch) {
+  const selectors: Array<(state: ReduxState) => any> = [];
+  const handlers: Array<
+    (newSelection: any, oldSelection: any, newState: ReduxState, oldState: ReduxState) => void
+  > = [];
+  return {
+    add<T>(
+      selector: (state: ReduxState) => T,
+      handler: (
+        newSelection: T,
+        oldSelection: T,
+        newState: ReduxState,
+        oldState: ReduxState,
+      ) => void,
+    ) {
+      selectors.push(selector);
+      handlers.push(handler);
+    },
+    run(action: ReduxAction) {
+      const oldState = store.getState();
+      const oldValues = selectors.map(selector => selector(oldState));
+      const result = next(action);
+      const newState = store.getState();
+      const newValues = selectors.map(selector => selector(newState));
+      handlers.forEach((handler, i) => {
+        if (isEqual(newValues[i], oldValues[i])) return;
+        // prettier-ignore
+        console.log('createChangeObserver()', 'FROM', oldValues[i], 'TO', newValues[i], 'CALLING', handler.name);
+        handler(newValues[i], oldValues[i], newState, oldState);
+      });
+      return result;
+    },
+  };
 }
 
 type valueof<T> = T[keyof T];

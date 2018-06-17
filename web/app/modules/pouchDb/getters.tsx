@@ -1,16 +1,42 @@
 import { PouchDbStatus, PouchDbStatePart, PouchDbState } from 'web/app/modules/pouchDb/state';
-import { isArray } from 'lodash';
-import { assertNumber } from 'web/app/utils/types';
+import { isArray, isNumber } from 'lodash';
+import { assertNumber, objectKeys } from 'web/app/utils/types';
 
-export function getSummaryDbStatus(states: PouchDbStatus[]): PouchDbStatus {
-  if (states.some(s => s === 'ERROR')) return 'ERROR';
-  if (states.some(s => s === 'DISABLED')) return 'DISABLED';
-  if (states.some(s => s === 'OFFLINE')) return 'OFFLINE';
-  if (states.some(s => s === 'ACTIVE')) return 'ACTIVE';
+export type SummaryDbStatus = PouchDbStatus | 'REPLICATION_INITIAL' | 'REPLICATION_CATCHUP';
+
+export function getSummaryDbStatus(
+  state: PouchDbState,
+): {
+  summaryStatus: SummaryDbStatus;
+  summaryProgress: number | null;
+} {
+  const stateParts = objectKeys(state).map(key => state[key]);
+  const summaryProgress = getSummaryReplicationProgress(stateParts);
+  if (isNumber(summaryProgress)) {
+    const summaryStatus =
+      state.LOCAL.status === 'DISABLED' ? 'REPLICATION_INITIAL' : 'REPLICATION_CATCHUP';
+    return {
+      summaryStatus,
+      summaryProgress,
+    };
+  }
+  const allStatuses = stateParts.map(p => p.status);
+  const summaryStatus = getSummaryStatus(allStatuses);
+  return {
+    summaryStatus,
+    summaryProgress,
+  };
+}
+
+function getSummaryStatus(ss: PouchDbStatus[]): SummaryDbStatus {
+  if (ss.some(s => s === 'ERROR')) return 'ERROR';
+  if (ss.some(s => s === 'DISABLED')) return 'DISABLED';
+  if (ss.some(s => s === 'OFFLINE')) return 'OFFLINE';
+  if (ss.some(s => s === 'ACTIVE')) return 'ACTIVE';
   return 'ONLINE';
 }
 
-export function getSummaryReplicationProgress(
+function getSummaryReplicationProgress(
   parts: Array<PouchDbState[PouchDbStatePart]>,
 ): number | null {
   const tally = (index: 0 | 1) =>

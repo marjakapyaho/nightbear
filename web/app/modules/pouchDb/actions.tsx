@@ -2,10 +2,10 @@ import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actionsWithType } from 'web/app/utils/redux';
 
 export const pouchDbActions = actionsWithType({
-  DB_EMITTED_READY: () => ({}),
+  DB_EMITTED_CHANGES_BUFFERING: () => ({}),
 
-  DB_EMITTED_CHANGE: (change: PouchDB.Core.ChangesResponseChange<{}>) => ({
-    change,
+  DB_EMITTED_CHANGES: (changes: Array<PouchDB.Core.ChangesResponseChange<{}>>) => ({
+    changes,
   }),
 
   DB_EMITTED_COMPLETE: (info: PouchDB.Core.ChangesResponse<{}>) => ({

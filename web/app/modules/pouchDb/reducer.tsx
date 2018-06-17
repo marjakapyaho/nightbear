@@ -16,7 +16,9 @@ export function pouchDbReducer(
   _rootState: ReduxState,
 ): PouchDbState {
   switch (action.type) {
-    case 'DB_EMITTED_READY':
+    case 'DB_EMITTED_CHANGES_BUFFERING':
+      return updateDbStatus(state, 'LOCAL', 'ACTIVE');
+    case 'DB_EMITTED_CHANGES':
       return updateDbStatus(state, 'LOCAL', 'ONLINE');
     case 'DB_EMITTED_COMPLETE':
       return updateDbStatus(state, 'LOCAL', 'DISABLED');
