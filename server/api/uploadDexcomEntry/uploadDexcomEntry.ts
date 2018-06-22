@@ -8,7 +8,12 @@ import {
   MeterEntry,
   Model,
 } from 'core/models/model';
-import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
+import {
+  calculateRaw,
+  isDexcomEntryValid,
+  changeBloodGlucoseUnitToMmoll,
+  MIN_IN_MS,
+} from 'core/calculations/calculations';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',
@@ -42,13 +47,8 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         }
       }
 
-      // Calibration needs initialized calibration
-      if (!latestCalibration) {
-        return Promise.reject('Could not find incomplete DexcomCalibration for uploading actual Dexcom calibration');
-      }
-
       if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
-        const updatedDexcomCalibration: DexcomCalibration | null = amendCalibration(requestObject, latestCalibration);
+        const updatedDexcomCalibration: DexcomCalibration | null = amendOrInitCalibration(requestObject, latestCalibration);
         if (updatedDexcomCalibration) {
           return context.storage.saveModel(updatedDexcomCalibration);
         }
@@ -139,18 +139,34 @@ export function initCalibration(
   }
 }
 
-export function amendCalibration(
+export function amendOrInitCalibration(
   requestObject: { [key: string]: string },
   cal: DexcomCalibration,
 ): DexcomCalibration | null {
 
+  const timestamp = parseInt(requestObject.date, 10);
   const slope = parseFloat(requestObject.slope);
   const intercept = parseFloat(requestObject.intercept);
   const scale = parseFloat(requestObject.scale);
 
-  // Only proceed if we don't already have this calibration data
-  if (cal && cal.meterEntries.length && !cal.slope && !cal.intercept && !cal.scale) {
+  const proximityToPreviousCal = cal ? Math.abs(cal.timestamp - timestamp) < 5 * MIN_IN_MS : false;
+
+  // If we have previous calibration that doesn't have cal data
+  if (cal && cal.meterEntries.length && proximityToPreviousCal && !cal.slope && !cal.intercept && !cal.scale) {
     return { ...cal, slope, intercept, scale };
+  }
+
+  // If there are no matching calibrations, make a new one
+  else if (!cal || !(cal.slope === slope && cal.intercept === intercept && cal.scale === scale)) {
+    return {
+      modelType: 'DexcomCalibration',
+      timestamp,
+      meterEntries: [],
+      isInitialCalibration: false,
+      slope,
+      intercept,
+      scale,
+    };
   }
   else {
     return null;

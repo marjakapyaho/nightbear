@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendCalibration } from './uploadDexcomEntry';
+import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendOrInitCalibration } from './uploadDexcomEntry';
 import { Request } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
@@ -40,7 +40,7 @@ describe('api/uploadDexcomEntry', () => {
     requestBody: {
       device: 'dexcom',
       type: 'mbg',
-      date: timestampNow - 2 * MIN_IN_MS,
+      date: timestampNow - 10 * MIN_IN_MS,
       dateString: 'Sat Feb 24 14:13:42 EET 2018',
       mbg: 153,
     },
@@ -55,11 +55,28 @@ describe('api/uploadDexcomEntry', () => {
     requestBody: {
       device: 'dexcom',
       type: 'cal',
-      date: timestampNow - MIN_IN_MS,
+      date: timestampNow - 9 * MIN_IN_MS,
       dateString: 'Sat Feb 24 11:55:48 EET 2018',
       slope: 828.3002146147081,
       intercept: 30000,
       scale: 0.9980735302684531,
+    },
+  };
+
+  const mockRequestLonelyCalibration: Request = {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestHeaders: {},
+    requestParams: {},
+    requestBody: {
+      device: 'dexcom',
+      type: 'cal',
+      date: timestampNow - MIN_IN_MS,
+      dateString: 'Sat Feb 24 11:55:48 EET 2018',
+      slope: 900.3002146147081,
+      intercept: 40000,
+      scale: 0.7980735302684531,
     },
   };
 
@@ -83,6 +100,16 @@ describe('api/uploadDexcomEntry', () => {
     noiseLevel: 1,
   };
 
+  const mockCalibrationWithoutMeterEntry: DexcomCalibration = {
+    modelType: 'DexcomCalibration',
+    timestamp: timestampNow - MIN_IN_MS,
+    meterEntries: [],
+    isInitialCalibration: false,
+    slope: 900.3002146147081,
+    intercept: 40000,
+    scale: 0.7980735302684531,
+  };
+
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 3 * MIN_IN_MS,
@@ -99,10 +126,10 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterEntry: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: timestampNow - 2 * MIN_IN_MS,
+    timestamp: timestampNow - 10 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: timestampNow - 2 * MIN_IN_MS,
+      timestamp: timestampNow - 10 * MIN_IN_MS,
       bloodGlucose: 8.5,
     }],
     isInitialCalibration: false,
@@ -113,10 +140,10 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterAndCalEntries: DexcomCalibration = {
     modelType: 'DexcomCalibration',
-    timestamp: timestampNow - 2 * MIN_IN_MS,
+    timestamp: timestampNow - 10 * MIN_IN_MS,
     meterEntries: [{
       modelType: 'MeterEntry',
-      timestamp: timestampNow - 2 * MIN_IN_MS,
+      timestamp: timestampNow - 10 * MIN_IN_MS,
       bloodGlucose: 8.5,
     }],
     isInitialCalibration: false,
@@ -171,7 +198,16 @@ describe('api/uploadDexcomEntry', () => {
           );
         })
         .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
-        .then(models => assertEqualWithoutMeta(models, [mockDexcomCalWithMeterAndCalEntries]));
+        .then(models => assertEqualWithoutMeta(models, [mockDexcomCalWithMeterAndCalEntries]))
+        .then(() => uploadDexcomEntry(mockRequestLonelyCalibration, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestLonelyCalibration.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockCalibrationWithoutMeterEntry, mockDexcomCalWithMeterAndCalEntries]));
     });
 
     it('uploads Dexcom device status with correct response', () => {
@@ -213,7 +249,7 @@ describe('api/uploadDexcomEntry', () => {
 
   it('adds calibration data to correct initalized calibration', () => {
     assert.deepEqual(
-      amendCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
+      amendOrInitCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
       mockDexcomCalWithMeterAndCalEntries,
     );
   });
