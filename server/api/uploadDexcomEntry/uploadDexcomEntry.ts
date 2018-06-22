@@ -5,7 +5,6 @@ import {
   DexcomCalibration,
   DexcomRawSensorEntry,
   DexcomSensorEntry,
-  MeterEntry,
   Model,
 } from 'core/models/model';
 import { calculateRaw, isDexcomEntryValid, changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
@@ -32,7 +31,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 
       const latestCalibration = latestCalibrations[0] as DexcomCalibration;
 
-      if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
+      if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
         const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration);
         if (newDexcomCalibration) {
           return context.storage.saveModel(newDexcomCalibration);
@@ -42,12 +41,12 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         }
       }
 
-      // Calibration needs initialized calibration
+      // Meter entry needs initialized calibration
       if (!latestCalibration) {
-        return Promise.reject('Could not find incomplete DexcomCalibration for uploading actual Dexcom calibration');
+        return Promise.reject('Could not find incomplete DexcomCalibration for uploading matching meter entry');
       }
 
-      if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
+      if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
         const updatedDexcomCalibration: DexcomCalibration | null = amendCalibration(requestObject, latestCalibration);
         if (updatedDexcomCalibration) {
           return context.storage.saveModel(updatedDexcomCalibration);
@@ -115,26 +114,24 @@ export function initCalibration(
   cal: DexcomCalibration | undefined,
   ): DexcomCalibration | null {
 
-  const bgTimestamp = parseInt(requestObject.date, 10);
-  const bloodGlucose = parseInt(requestObject.mbg, 10);
+  const timestamp = parseInt(requestObject.date, 10);
+  const slope = parseFloat(requestObject.slope);
+  const intercept = parseFloat(requestObject.intercept);
+  const scale = parseFloat(requestObject.scale);
 
-  // Only proceed if we don't already have this meter entry
-  if (cal && find(cal.meterEntries, (entry: MeterEntry) => entry.timestamp === bgTimestamp)) {
+  // Only proceed if we don't already have this calibration
+  if (cal && timestamp === cal.timestamp) {
     return null;
   }
   else {
     return {
       modelType: 'DexcomCalibration',
-      timestamp: bgTimestamp,
-      meterEntries: [{
-        modelType: 'MeterEntry',
-        timestamp: bgTimestamp,
-        bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
-      }],
+      timestamp,
+      meterEntries: [],
       isInitialCalibration: false,
-      slope: null,
-      intercept: null,
-      scale: null,
+      slope,
+      intercept,
+      scale,
     };
   }
 }
@@ -144,13 +141,17 @@ export function amendCalibration(
   cal: DexcomCalibration,
 ): DexcomCalibration | null {
 
-  const slope = parseFloat(requestObject.slope);
-  const intercept = parseFloat(requestObject.intercept);
-  const scale = parseFloat(requestObject.scale);
+  const bgTimestamp = parseInt(requestObject.date, 10);
+  const bloodGlucose = parseInt(requestObject.mbg, 10);
 
-  // Only proceed if we don't already have this calibration data
-  if (cal && cal.meterEntries.length && !cal.slope && !cal.intercept && !cal.scale) {
-    return { ...cal, slope, intercept, scale };
+  // Only proceed if we don't already have this meter entry in latest calibration
+  if (cal && cal.meterEntries.length === 0) {
+    return { ...cal,  meterEntries: [{
+        modelType: 'MeterEntry',
+        timestamp: bgTimestamp,
+        bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
+      }],
+    };
   }
   else {
     return null;
