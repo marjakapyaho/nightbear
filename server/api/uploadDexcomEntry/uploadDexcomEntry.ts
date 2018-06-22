@@ -149,7 +149,7 @@ export function amendOrInitCalibration(
   const intercept = parseFloat(requestObject.intercept);
   const scale = parseFloat(requestObject.scale);
 
-  const proximityToPreviousCal = Math.abs(cal.timestamp - timestamp) < 5 * MIN_IN_MS;
+  const proximityToPreviousCal = cal ? Math.abs(cal.timestamp - timestamp) < 5 * MIN_IN_MS : false;
 
   // If we have previous calibration that doesn't have cal data
   if (cal && cal.meterEntries.length && proximityToPreviousCal && !cal.slope && !cal.intercept && !cal.scale) {

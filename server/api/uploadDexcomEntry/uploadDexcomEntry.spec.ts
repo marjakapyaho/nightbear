@@ -63,6 +63,23 @@ describe('api/uploadDexcomEntry', () => {
     },
   };
 
+  const mockRequestLonelyCalibration: Request = {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestHeaders: {},
+    requestParams: {},
+    requestBody: {
+      device: 'dexcom',
+      type: 'cal',
+      date: timestampNow - 10 * MIN_IN_MS,
+      dateString: 'Sat Feb 24 11:55:48 EET 2018',
+      slope: 900.3002146147081,
+      intercept: 40000,
+      scale: 0.7980735302684531,
+    },
+  };
+
   const mockRequestDeviceStatus: Request = {
     requestId: '',
     requestMethod: '',
@@ -81,6 +98,16 @@ describe('api/uploadDexcomEntry', () => {
     bloodGlucose: 7.5,
     signalStrength: 168,
     noiseLevel: 1,
+  };
+
+  const mockCalibrationWithoutMeterEntry: DexcomCalibration = {
+    modelType: 'DexcomCalibration',
+    timestamp: timestampNow - 10 * MIN_IN_MS,
+    meterEntries: [],
+    isInitialCalibration: false,
+    slope: 900.3002146147081,
+    intercept: 40000,
+    scale: 0.7980735302684531,
   };
 
   const mockDexcomCalibration: DexcomCalibration = {
@@ -149,6 +176,20 @@ describe('api/uploadDexcomEntry', () => {
         })
         .then(() => context.storage.loadLatestTimelineModels('DexcomSensorEntry', 100))
         .then(models => assertEqualWithoutMeta(models, [mockDexcomSensorEntry]));
+    });
+
+    it('uploads lonely calibration with correct response', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => uploadDexcomEntry(mockRequestLonelyCalibration, context))
+        .then(res => {
+          assert.equal(
+            res.responseBody,
+            mockRequestLonelyCalibration.requestBody,
+          );
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+        .then(models => assertEqualWithoutMeta(models, [mockCalibrationWithoutMeterEntry]));
     });
 
     it('uploads Dexcom meter entry and calibration with correct responses', () => {
