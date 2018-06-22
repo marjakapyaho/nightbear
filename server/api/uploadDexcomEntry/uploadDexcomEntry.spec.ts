@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendCalibration } from './uploadDexcomEntry';
+import { uploadDexcomEntry, parseDexcomEntry, parseDexcomStatus, initCalibration, amendOrInitCalibration } from './uploadDexcomEntry';
 import { Request } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
@@ -213,7 +213,7 @@ describe('api/uploadDexcomEntry', () => {
 
   it('adds calibration data to correct initalized calibration', () => {
     assert.deepEqual(
-      amendCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
+      amendOrInitCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
       mockDexcomCalWithMeterAndCalEntries,
     );
   });
