@@ -75,7 +75,7 @@ export function createCouchDbStorage(dbUrl: string, options: PouchDB.Configurati
       return db.allDocs({
         include_docs: true,
         startkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd - range)}`,
-        endkey: `${PREFIX_TIMELINE}/_`,
+        endkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd)}`,
       })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
