@@ -1,6 +1,6 @@
 export type ConfigVarsState = Readonly<{
   remoteDbUrl: string;
-  selectedScreen: 'DebugScreen';
+  selectedScreen: 'DebugScreen' | 'BgGraphScreen';
 }>;
 
 export const configVarsInitState: ConfigVarsState = {

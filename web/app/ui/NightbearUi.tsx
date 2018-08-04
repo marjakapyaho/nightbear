@@ -2,6 +2,7 @@ import { renderFromStore } from 'web/app/utils/react';
 import { assertExhausted } from 'web/app/utils/types';
 import DebugScreen from 'web/app/ui/screens/DebugScreen';
 import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
+import BgGraphScreen from 'web/app/ui/screens/BgGraphScreen';
 
 export default renderFromStore(
   __filename,
@@ -18,6 +19,8 @@ export default renderFromStore(
       switch (selectedScreen) {
         case 'DebugScreen':
           return <DebugScreen />;
+        case 'BgGraphScreen':
+          return <BgGraphScreen />;
         default:
           return assertExhausted(selectedScreen);
       }
