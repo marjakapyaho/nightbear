@@ -1,5 +1,7 @@
-export type ConfigVarsState = Readonly<typeof configVarsInitState>;
+export type ConfigVarsState = Readonly<{
+  remoteDbUrl: string;
+}>;
 
-export const configVarsInitState = {
+export const configVarsInitState: ConfigVarsState = {
   remoteDbUrl: '',
 };
