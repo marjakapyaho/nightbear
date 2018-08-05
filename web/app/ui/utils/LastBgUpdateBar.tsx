@@ -9,7 +9,7 @@ export default renderFromStore(
     const lastBg =
       state.status === 'READY'
         ? state.models
-            .filter(is('ParakeetSensorEntry'))
+            .filter(is('DexcomSensorEntry', 'ParakeetSensorEntry'))
             .sort(by('timestamp'))
             .find(last)
         : null;
