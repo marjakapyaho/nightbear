@@ -4,6 +4,7 @@ import DebugScreen from 'web/app/ui/screens/DebugScreen';
 import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
 import BgGraphScreen from 'web/app/ui/screens/BgGraphScreen';
 import { actions } from 'web/app/modules/actions';
+import LastBgUpdateBar from 'web/app/ui/utils/LastBgUpdateBar';
 
 export default renderFromStore(
   __filename,
@@ -12,6 +13,7 @@ export default renderFromStore(
     return (
       <div className="this">
         <DbStatusBar />
+        <LastBgUpdateBar />
         {renderScreenSelector()}
         {renderSelectedScreen()}
       </div>

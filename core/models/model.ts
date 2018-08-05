@@ -18,10 +18,6 @@ export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
 export type TimelineModel = Extract<Model, { timestamp: number }>;
 export type TimelineModelType = TimelineModel['modelType'];
 
-export function isTimelineModel(model: any): model is TimelineModel {
-  return !!model.timestamp;
-}
-
 export type ModelMeta = object; // this is storage-type specific
 
 export interface Sensor {
