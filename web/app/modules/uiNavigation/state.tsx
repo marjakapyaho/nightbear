@@ -1,5 +1,5 @@
 export type UiNavigationState = Readonly<{
-  selectedScreen: 'DebugScreen' | 'BgGraphScreen';
+  selectedScreen: 'DebugScreen' | 'BgGraphScreen' | 'DailySummaryScreen';
 }>;
 
 export const uiNavigationInitState: UiNavigationState = {

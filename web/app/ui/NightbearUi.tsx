@@ -5,6 +5,7 @@ import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
 import BgGraphScreen from 'web/app/ui/screens/BgGraphScreen';
 import { actions } from 'web/app/modules/actions';
 import LastBgUpdateBar from 'web/app/ui/utils/LastBgUpdateBar';
+import DailySummaryScreen from 'web/app/ui/screens/DailySummaryScreen';
 
 export default renderFromStore(
   __filename,
@@ -31,6 +32,9 @@ export default renderFromStore(
           <option key="DebugScreen" value="DebugScreen">
             DebugScreen
           </option>
+          <option key="DailySummaryScreen" value="DailySummaryScreen">
+            DailySummaryScreen
+          </option>
         </select>
       );
     }
@@ -41,6 +45,8 @@ export default renderFromStore(
           return <DebugScreen />;
         case 'BgGraphScreen':
           return <BgGraphScreen />;
+        case 'DailySummaryScreen':
+          return <DailySummaryScreen />;
         default:
           return assertExhausted(selectedScreen);
       }
