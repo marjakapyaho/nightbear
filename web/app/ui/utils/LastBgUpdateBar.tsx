@@ -1,29 +1,28 @@
 import { renderFromStore } from 'web/app/utils/react';
 import Timestamp from 'web/app/ui/utils/Timestamp';
+import { is, by, last } from 'core/models/utils';
 
 export default renderFromStore(
   __filename,
   state => state.timelineData,
-  (React, state) => (
-    <div className="this">
-      {(() => {
-        if (state.status === 'READY') {
-          const last =
-            state.models
-              .filter(
-                m =>
-                  m.modelType === 'ParakeetSensorEntry' || m.modelType === 'DexcomRawSensorEntry',
-              )
-              .sort((a, b) => b.timestamp - a.timestamp)[0] || null;
-          if (last)
-            return (
-              <span>
-                Last BG update received <Timestamp ts={last.timestamp} />
-              </span>
-            );
-        }
-        return '(last BG not available)';
-      })()}
-    </div>
-  ),
+  (React, state) => {
+    const lastBg =
+      state.status === 'READY'
+        ? state.models
+            .filter(is('ParakeetSensorEntry'))
+            .sort(by('timestamp'))
+            .find(last)
+        : null;
+    return (
+      <div className="this">
+        {lastBg ? (
+          <span>
+            Last BG update <Timestamp ts={lastBg.timestamp} />
+          </span>
+        ) : (
+          '(last BG not available)'
+        )}
+      </div>
+    );
+  },
 );
