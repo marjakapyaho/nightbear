@@ -1,3 +1,14 @@
 .nb-MainNavBar {
-  // TODO
+  display: flex;
+  flex-direction: row;
+
+  > button {
+    border: 1px solid blue;
+    flex: 1;
+    outline: none;
+  }
+
+  &-selected {
+    background: lightblue;
+  }
 }
