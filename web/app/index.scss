@@ -1,3 +1,4 @@
+@import 'ui/NightbearUi';
 @import 'ui/screens/DailySummaryScreen';
 @import 'ui/utils/DbStatusBar';
 @import 'ui/utils/LastBgUpdateBar';
@@ -11,4 +12,9 @@ html,
   margin: 0;
   padding: 0;
   overflow: hidden; // scrolling will be implemented by containers, where needed
+
+  > .nb-NightbearUi {
+    width: 100%;
+    height: 100%;
+  }
 }
