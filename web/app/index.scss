@@ -2,3 +2,13 @@
 @import 'ui/utils/DbStatusBar';
 @import 'ui/utils/LastBgUpdateBar';
 @import 'ui/utils/TimelineModelTable';
+
+body,
+html,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; // scrolling will be implemented by containers, where needed
+}
