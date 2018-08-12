@@ -16,7 +16,7 @@ export type TimelineDataState = Readonly<
 
 export const timelineDataInitState: TimelineDataState = {
   filters: {
-    range: HOUR_IN_MS,
+    range: 4 * HOUR_IN_MS,
     rangeEnd: Date.now(),
     modelTypes: ['ParakeetSensorEntry'],
   },

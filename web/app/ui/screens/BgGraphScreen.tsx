@@ -6,6 +6,7 @@ import { TimelineModel } from 'core/models/model';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import { actions } from 'web/app/modules/actions';
+import { HOUR_IN_MS } from 'core/calculations/calculations';
 
 export default renderFromStore(
   __filename,
@@ -34,8 +35,47 @@ export default renderFromStore(
 function getOptions(models: TimelineModel[]): Highcharts.Options {
   return {
     title: { text: null },
-    xAxis: { type: 'datetime' },
+    xAxis: {
+      type: 'datetime',
+      minTickInterval: HOUR_IN_MS,
+    },
+    yAxis: {
+      max: 20,
+      min: 2,
+      tickAmount: 10,
+      title: {
+        text: null,
+      },
+    },
+    plotOptions: {
+      line: {
+        marker: {
+          enabled: true,
+          symbol: 'circle',
+          radius: 4,
+        },
+      },
+      series: {
+        zones: [
+          {
+            value: 6,
+            color: '#ff5722',
+          },
+            {
+            value: 10,
+            color: '#4caf50',
+          },
+            {
+            color: '#ff9800',
+          },
+        ],
+      },
+    },
+    legend: {
+      enabled: false,
+    },
     series: [
+      /*
       {
         name: 'Dexcom',
         data: models
@@ -49,8 +89,12 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
           )
           .filter(isNotNull),
       },
+      */
       {
         name: 'Parakeet',
+        threshold: 10,
+        negativeColor: 'green',
+        color: 'red',
         data: models
           .map(model => (model.modelType === 'ParakeetSensorEntry' ? model : null))
           .filter(isNotNull)
@@ -61,7 +105,10 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
                 : null,
           )
           .filter(isNotNull),
-      },
+      } as any,
     ],
+    credits: {
+      enabled: false,
+    },
   };
 }
