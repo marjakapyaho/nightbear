@@ -21,7 +21,7 @@ export default renderFromProps<{ onChange: (newRange: number) => void }>(
       <select onChange={event => props.onChange(parseInt(event.target.value, 10))}>
         {options.map(([title, value]) => (
           <option key={value} value={value}>
-            last {title}
+            Last {title}
           </option>
         ))}
       </select>
