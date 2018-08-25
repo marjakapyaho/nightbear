@@ -16,4 +16,4 @@ COPY nightbear/server /app/server
 # Configure container
 EXPOSE 3000
 ENTRYPOINT ["npm", "run"]
-CMD ["start"]
+CMD ["server-start"]
