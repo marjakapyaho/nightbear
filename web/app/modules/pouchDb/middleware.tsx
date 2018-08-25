@@ -21,6 +21,8 @@ export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
 export const MODELS_FETCH_DEBOUNCE = 100;
 
+const LOCAL_REPLICATION_RANGE = 'week'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)
+
 export const pouchDbMiddleware: ReduxMiddleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
   const debouncedTimelineFiltersChanged = debounce(timelineFiltersChanged, MODELS_FETCH_DEBOUNCE);
@@ -72,7 +74,7 @@ function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
     batch_size: DB_REPLICATION_BATCH_SIZE,
   };
   const replStartDate = DateTime.local()
-    .startOf('week')
+    .startOf(LOCAL_REPLICATION_RANGE)
     .toFormat('yyyy-MM-dd');
   const upReplication = PouchDB.replicate(localDb, remoteDb, {
     ...replOptions,
