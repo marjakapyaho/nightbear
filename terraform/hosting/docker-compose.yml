@@ -19,7 +19,7 @@ services:
       NIGHTBEAR_DB_URL: "https://admin:${db_admin_password}@${db_domain_name}/nightbear_stage"
 
   db:
-    image: couchdb:2.1.1
+    image: couchdb:2.2.0
     restart: always
     expose:
       - "5984"
