@@ -29,6 +29,8 @@ if [[ ! "$SSH_COMMAND" =~ ^ssh ]]; then
   echo "Error: The SSH command '$SSH_COMMAND' doesn't look right"
   exit
 fi
+echo "The following may take a long time if the host is already down."
+echo "Wait patiently, the command will time out, and then we'll continue."
 $SSH_COMMAND "sudo shutdown -h now" || true # don't exit on non-0 exit code (the host might be down already)
 
 # Re-provision the relevant resources

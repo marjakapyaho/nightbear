@@ -11,6 +11,8 @@ COPY nightbear/package-lock.json /app/
 RUN npm install
 
 # Install our own sources (doesn't take long)
+COPY nightbear/tsconfig.json /app/
+COPY nightbear/core /app/core
 COPY nightbear/server /app/server
 
 # Configure container
