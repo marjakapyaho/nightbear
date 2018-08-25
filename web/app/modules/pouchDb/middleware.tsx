@@ -5,10 +5,16 @@ const PouchDB = PouchDBDefault || require('pouchdb');
 
 import { ReduxMiddleware, ReduxDispatch, createChangeObserver } from 'web/app/utils/redux';
 import { debounce } from 'lodash';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import {
+  createCouchDbStorage,
+  HIGH_UNICODE_TERMINATOR,
+  PREFIX_GLOBAL,
+  PREFIX_TIMELINE,
+} from 'core/storage/couchDbStorage';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { actions } from 'web/app/modules/actions';
 import { ReduxState } from 'web/app/modules/state';
+import { DateTime } from 'luxon';
 
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
 export const LOCAL_DB_CHANGES_BUFFER = 500;
@@ -65,6 +71,9 @@ function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
     retry: true,
     batch_size: DB_REPLICATION_BATCH_SIZE,
   };
+  const replStartDate = DateTime.local()
+    .startOf('week')
+    .toFormat('yyyy-MM-dd');
   const upReplication = PouchDB.replicate(localDb, remoteDb, {
     ...replOptions,
     checkpoint: 'source',
@@ -72,6 +81,23 @@ function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
   const downReplication = PouchDB.replicate(remoteDb, localDb, {
     ...replOptions,
     checkpoint: 'target',
+    selector: {
+      // Because the remote DB can be huge, limit the docs that will be replicated to the local DB
+      $or: [
+        {
+          _id: {
+            $gt: `${PREFIX_GLOBAL}/`,
+            $lt: `${PREFIX_GLOBAL}/${HIGH_UNICODE_TERMINATOR}`,
+          },
+        },
+        {
+          _id: {
+            $gt: `${PREFIX_TIMELINE}/${replStartDate}`,
+            $lt: `${PREFIX_TIMELINE}/${HIGH_UNICODE_TERMINATOR}`,
+          },
+        },
+      ],
+    },
   });
   dispatchFromReplication(upReplication, 'UP', dispatch);
   dispatchFromReplication(downReplication, 'DOWN', dispatch);
