@@ -1,5 +1,5 @@
 # https://registry.hub.docker.com/_/node/
-FROM node:8.7
+FROM node:8.10
 
 # Create workspace
 RUN mkdir -p /app
