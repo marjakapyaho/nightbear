@@ -6,11 +6,12 @@ RUN mkdir -p /app
 WORKDIR /app
 
 # Install npm deps (takes long)
-COPY package.json /app/
+COPY nightbear/package.json /app/
+COPY nightbear/package-lock.json /app/
 RUN npm install
 
 # Install our own sources (doesn't take long)
-COPY . /app/
+COPY nightbear/server /app/server
 
 # Configure container
 EXPOSE 3000

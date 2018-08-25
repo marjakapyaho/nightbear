@@ -6,7 +6,9 @@ version: "3"
 services:
 
   server:
-    build: ./nightbear/server
+    build: # note: this assumes the disk layout created by provision-server.sh
+      context: .
+      dockerfile: nightbear/server/Dockerfile
     restart: always
     expose:
       - "3000"
