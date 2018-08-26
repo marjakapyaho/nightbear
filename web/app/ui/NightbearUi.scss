@@ -1,5 +1,14 @@
 .nb-NightbearUi {
+  display: flex;
+   flex-direction: column;
+
   > .nb-MainNavBar {
     height: 100px;
+  }
+
+  &-screen {
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
