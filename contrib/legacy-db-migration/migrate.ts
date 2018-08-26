@@ -10,84 +10,91 @@ import {
   MeterEntry,
   ParakeetSensorEntry,
 } from 'core/models/model';
-import { changeBloodGlucoseUnitToMmoll, DAY_IN_MS } from 'core/calculations/calculations';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
-import { flatten, padStart } from 'lodash';
+import { changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
+import { createCouchDbStorage, StorageError, isStorageError } from 'core/storage/couchDbStorage';
+import { chunk } from 'lodash';
+import * as cliProgress from 'cli-progress';
+import { isNotNull } from 'server/utils/types';
 
-const sourceDb = new PouchDB('https://admin:***@db-prod.nightbear.fi/legacy');
+const DB_PASSWORD = '***';
+const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
+
+const bar = new cliProgress.Bar({});
+const sourceDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
 const targetStorage = createCouchDbStorage(
-  'https://admin:***@db-stage.nightbear.fi/migrate_test_6',
+  `https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_7`,
 );
+const warnings: Error[] = [];
+const skipped: string[] = [];
 
-runAllTasks().then(() => console.log('Finished'), err => console.log(err));
+main();
 
-function runAllTasks(): Promise<any> {
-  const ops = getAllTasks().map(
-    ([type, date], i, tasks) => () =>
-      migrateModels(type, date)
-        .then(models => targetStorage.saveModels(models))
-        .then(models =>
-          console.log(
-            `${padStart(i + 1 + '', 8)}/${tasks.length} - Migrated "${type}" for "${date}" = ${
-              models.length
-            } models`,
-          ),
-        ),
-    // To wait a bit between tasks:
-    // .then(() => new Promise(resolve => setTimeout(resolve, 50))),
-  );
-  return ops.reduce((memo, next) => memo.then(next), Promise.resolve().then(
-    () => [] as Model[],
-  ) as any);
+function main() {
+  Promise.resolve()
+    .then(() => console.warn("Preparing list of ID's to migrate (this may take a long time)"))
+    .then(getDocIdsToMigrate)
+    .then(batchDocIds)
+    .then(runBatchesSerially)
+    .catch(err => console.warn('\nMigration failed:', err))
+    .then(() => bar.stop())
+    .then(() => skipped.length && console.warn(`${skipped.length} items skipped`))
+    .then(() => warnings.length && console.warn(`${warnings.length} warnings generated`))
+    .then(() => console.log({ warnings, skipped }))
+    .then(() => console.log('ProTip: Run the script with "> migrate.log" to reduce output'));
 }
 
-function getAllTasks() {
-  return flatten(getAllTypes().map(type => getAllDates().map(date => [type, date])));
+function getDocIdsToMigrate() {
+  return sourceDb
+    .allDocs({ startkey: 'sensor-entries/', endkey: 'sensor-entries/_' })
+    .then(res => res.rows.map(row => row.id));
 }
 
-function getAllTypes() {
-  return [
-    // 'alarms',
-    // 'device-status',
-    // 'device-status-parakeet',
-    // 'hba1c-history',
-    'calibrations',
-    'sensor-entries',
-    'sensor-entries-raw',
-    // 'sensors',
-    // 'settings',
-    // 'test-data',
-    // 'treatments',
-  ];
+function batchDocIds(ids: string[]): string[][] {
+  return chunk(ids, BATCH_SIZE);
 }
 
-function timeToDate(ts: number): string {
-  return new Date(ts).toISOString().split('T')[0];
+function runBatchesSerially(ids: string[][]) {
+  const total = ids.reduce((memo, next) => memo + next.length, 0);
+  bar.start(total, 0);
+  return ids
+    .reduce(
+      (memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)),
+      Promise.resolve(),
+    )
+    .then(() => bar.update(total));
 }
 
-function getAllDates() {
-  const OLDEST = '2015-11-29T00:00:00Z';
-  const NEWEST = Date.now(); // or e.g. new Date('2018-01-01T00:00:00Z').getTime();
-  const ret: string[] = [];
-  let cursor = new Date(OLDEST).getTime();
-  while (true) {
-    const date = timeToDate(cursor);
-    ret.push(date);
-    cursor += DAY_IN_MS;
-    if (cursor > NEWEST) break;
-  }
-  return ret;
-}
-
-function migrateModels(type: string, date: string) {
+function runBatch(ids: string[]): Promise<any> {
   return sourceDb
     .allDocs({
       include_docs: true,
-      startkey: `${type}/${date}`,
-      endkey: `${type}/${date}_`,
+      keys: ids,
     })
-    .then(res => res.rows.map(row => row.doc))
-    .then(docs => Promise.all(docs.map(toModernModel)));
+    .then(res => res.rows.map(row => row.doc).filter(isNotNull))
+    .then(toModernModels);
+}
+
+function toModernModels(docs: object[]) {
+  return Promise.all(
+    docs
+      .map(doc => {
+        try {
+          return toModernModel(doc);
+        } catch (err) {
+          warnings.push(err);
+          return null;
+        }
+      })
+      .filter(isNotNull),
+  )
+    .then(models => targetStorage.saveModels(models))
+    .catch((err: Error | StorageError) => {
+      if (isStorageError(err)) {
+        skipped.push(...err.saveFailedForModels);
+      } else {
+        throw err;
+      }
+    });
 }
 
 function toModernModel(x: any): Promise<Model> {
@@ -124,30 +131,7 @@ function toModernModel(x: any): Promise<Model> {
       scale: x.scale,
     } as DexcomCalibration;
     return Promise.resolve(cal);
-    // return Promise.all([
-    //   migrateModels('meter-entries', timeToDate(cal.timestamp - DAY_IN_MS)),
-    //   migrateModels('meter-entries', timeToDate(cal.timestamp)),
-    //   migrateModels('meter-entries', timeToDate(cal.timestamp + DAY_IN_MS)),
-    // ]).then(res => {
-    //   const pairedMeterEntryCandidates: MeterEntry[] = flatten(res)
-    //     .filter(isNotNull)
-    //     .filter(
-    //       m =>
-    //         m.modelType === 'MeterEntry' &&
-    //         Math.abs(m.timestamp - cal.timestamp) / MIN_IN_MS <= 2.5,
-    //     ) as any;
-    //   // if (pairedMeterEntryCandidates.length > 1) {
-    //   //   console.log(addHumanReadableTimestamp(cal));
-    //   //   console.log(pairedMeterEntryCandidates.map(addHumanReadableTimestamp));
-    //   //   throw new Error(
-    //   //     `Found ${
-    //   //       pairedMeterEntryCandidates.length
-    //   //     } MeterEntry candidates for pairing with DexcomCalibration ("${x._id}")`,
-    //   //   );
-    //   // }
-    //   return { ...cal, meterEntries: pairedMeterEntryCandidates };
-    // });
   } else {
-    throw new Error(`WARN: Not sure what to do with "${x._id}"` + JSON.stringify(x, null, 4));
+    throw new Error(`WARN: Not sure what to do with "${x._id}": ` + JSON.stringify(x, null, 4));
   }
 }
