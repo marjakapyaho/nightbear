@@ -1,7 +1,7 @@
 import { renderFromProps } from 'web/app/utils/react';
 
 const options = [
-  ['hour', 1000 * 60 * 60],
+  ['4 hours', 1000 * 60 * 60 * 4],
   ['12 hours', 1000 * 60 * 60 * 12],
   ['day', 1000 * 60 * 60 * 24],
   ['week', 1000 * 60 * 60 * 24 * 7],
@@ -21,7 +21,7 @@ export default renderFromProps<{ onChange: (newRange: number) => void }>(
       <select onChange={event => props.onChange(parseInt(event.target.value, 10))}>
         {options.map(([title, value]) => (
           <option key={value} value={value}>
-            last {title}
+            Last {title}
           </option>
         ))}
       </select>

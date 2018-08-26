@@ -17,7 +17,7 @@ export default renderFromStore(
     function renderTab(screen: UiNavigationState['selectedScreen'], title: string) {
       return (
         <button
-          className={screen === state.selectedScreen ? 'selected' : undefined}
+          className={`button ${screen === state.selectedScreen ? 'button-selected' : ''}`}
           onClick={() => dispatch(actions.UI_NAVIGATED(screen))}
         >
           {title}

@@ -3,5 +3,5 @@ export type UiNavigationState = Readonly<{
 }>;
 
 export const uiNavigationInitState: UiNavigationState = {
-  selectedScreen: 'DebugScreen',
+  selectedScreen: 'BgGraphScreen',
 };

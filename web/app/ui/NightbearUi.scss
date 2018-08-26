@@ -1,9 +1,10 @@
 .nb-NightbearUi {
   display: flex;
-   flex-direction: column;
+  flex-direction: column;
 
   > .nb-MainNavBar {
-    height: 100px;
+    height: 45px;
+    margin-bottom: 10px;
   }
 
   &-screen {
