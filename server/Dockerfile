@@ -1,18 +1,21 @@
 # https://registry.hub.docker.com/_/node/
-FROM node:8.7
+FROM node:8.10
 
 # Create workspace
 RUN mkdir -p /app
 WORKDIR /app
 
 # Install npm deps (takes long)
-COPY package.json /app/
+COPY nightbear/package.json /app/
+COPY nightbear/package-lock.json /app/
 RUN npm install
 
 # Install our own sources (doesn't take long)
-COPY . /app/
+COPY nightbear/tsconfig.json /app/
+COPY nightbear/core /app/core
+COPY nightbear/server /app/server
 
 # Configure container
 EXPOSE 3000
 ENTRYPOINT ["npm", "run"]
-CMD ["start"]
+CMD ["server-start"]

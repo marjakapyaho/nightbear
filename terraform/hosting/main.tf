@@ -87,4 +87,9 @@ resource "null_resource" "provisioners" {
   provisioner "remote-exec" {
     script = "${path.module}/provision-db.sh"
   }
+
+  # Post a reminder to the operator about server deployment
+  provisioner "local-exec" {
+    command = "echo -e '\n\n\nIMPORTANT: The server process will NOT be ready until the deploy script has been run once!\n\n\n'"
+  }
 }

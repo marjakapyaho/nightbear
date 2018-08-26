@@ -16,8 +16,9 @@ export interface CouchDbModelMeta {
   readonly modelVersion: number; // MODEL_VERSION at the time the Model was persisted
 }
 
-const PREFIX_TIMELINE = 'timeline';
-const PREFIX_GLOBAL = 'global';
+export const HIGH_UNICODE_TERMINATOR = '\uffff'; // @see https://pouchdb.com/api.html#prefix-search
+export const PREFIX_TIMELINE = 'timeline';
+export const PREFIX_GLOBAL = 'global';
 
 type PouchDbResult = PouchDB.Core.Response | PouchDB.Core.Error;
 
