@@ -74,7 +74,7 @@ export default app => {
                 log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
                 alarm.level = neededLevel;
                 operations.push(
-                    app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE)
+                    app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE, app)
                         .then(receipt => { // only persist the level upgrade IF the alarm got sent (so we get retries)
                             alarm.pushoverReceipts = alarm.pushoverReceipts || [];
                             alarm.pushoverReceipts.push(receipt);

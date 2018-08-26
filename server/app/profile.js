@@ -4,6 +4,17 @@ export default app => {
 
     return {
 
+        // HACK: update if day times change
+        getActiveProfileName() {
+            const currentTimestamp = app.currentTime();
+            if (new Date(currentTimestamp).getHours() > 6 && new Date(currentTimestamp).getHours() < 20) {
+                return 'day';
+            }
+            else {
+                return 'night';
+            }
+        },
+
         getActiveProfile(settingsObj) {
             log('Getting active profile');
             const currentTimestamp = app.currentTime();

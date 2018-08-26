@@ -1,5 +1,6 @@
 import Pushover from 'pushover-notifications';
 import axios from 'axios';
+import _ from 'lodash';
 
 export default function(logger, user, token) {
 
@@ -8,7 +9,7 @@ export default function(logger, user, token) {
     
     return {
         
-        sendAlarm(level, message, retry, expire) {
+        sendAlarm(level, message, retry, expire, app) {
             let msg = {
                 message,
                 title: "NightBear alert",
@@ -28,6 +29,18 @@ export default function(logger, user, token) {
             }
             else if (level === 4) {
                 msg.device = process.env['PUSHOVER_LEVEL_3'];
+            }
+
+            if (app.profile.getActiveProfileName() === 'night') {
+                const copyOfMsg = _.assign({}, msg, { device: process.env['PUSHOVER_LEVEL_2'] });
+                api.send(copyOfMsg, (err) => {
+                    if (err) {
+                        log.error('Could not send extra alarm:', err);
+                    }
+                    else {
+                        log('Extra alarm sent without receipt');
+                    }
+                });
             }
 
             return new Promise((resolve, reject) => {
