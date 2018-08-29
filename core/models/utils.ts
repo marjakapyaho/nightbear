@@ -7,11 +7,11 @@ export function isModel(x: any): x is Model {
 
 // @example array.filter(is('Alarm'))
 // prettier-ignore
-export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType>(mt1: T1): (model: Model, _index: number, array: ArrayType[]) => model is ModelOfType<T1>;
+export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType>(mt1: T1): (model: Model, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1>;
 // prettier-ignore
-export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2): (model: Model, _index: number, array: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2>;
+export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2): (model: Model, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2>;
 // prettier-ignore
-export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType, T3 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2, mt3: T3): (model: Model, _index: number, array: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2> | ModelOfType<T3>;
+export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType, T3 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2, mt3: T3): (model: Model, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2> | ModelOfType<T3>;
 export function is(...modelTypes: string[]) {
   return (model: Model, _index: number, _array: any[]) => modelTypes.includes(model.modelType);
 }
