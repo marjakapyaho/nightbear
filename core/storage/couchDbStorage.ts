@@ -4,7 +4,7 @@ import PouchDBDefault from 'pouchdb';
 const PouchDB = PouchDBDefault || require('pouchdb');
 
 import * as PouchDBFind from 'pouchdb-find';
-import { Storage } from './storage';
+import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
 
@@ -21,14 +21,6 @@ export const PREFIX_TIMELINE = 'timeline';
 export const PREFIX_GLOBAL = 'global';
 export const REV_CONFLICT_SAVE_ERROR = 'Document update conflict.';
 export const UNKNOWN_SAVE_ERROR = 'UNKNOWN_SAVE_ERROR';
-
-export type StorageErrorDetails = Readonly<{
-  saveSucceededForModels: Model[];
-  saveFailedForModels: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_SAVE_ERROR ]
-}>;
-export type StorageError = Error & StorageErrorDetails;
-export const isStorageError = (err: Error): err is StorageError =>
-  'saveSucceededForModels' in err && 'saveFailedForModels' in err;
 
 type PouchDbResult = PouchDB.Core.Response | PouchDB.Core.Error;
 

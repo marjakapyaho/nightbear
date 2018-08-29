@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from 'core/models/model';
-import { Storage } from './storage';
+import { Storage, StorageError } from 'core/storage/storage';
 import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
-import { StorageError, REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
 import { is } from 'core/models/utils';
 
 export const MODEL_1: Carbs = {
