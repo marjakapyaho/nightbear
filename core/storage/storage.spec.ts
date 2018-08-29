@@ -3,7 +3,8 @@ import { assert } from 'chai';
 import { Model, Carbs, Settings } from 'core/models/model';
 import { Storage } from './storage';
 import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
-import { StorageError } from 'core/storage/couchDbStorage';
+import { StorageError, REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { is } from 'core/models/utils';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -51,9 +52,17 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         },
         err => {
           assert.match(err.message, /Couldn't save model.*global.*Settings.*update conflict/);
+          // Check that success is reported:
           assert.equal(err.saveSucceededForModels.length, 0);
+          // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
-          assert.match(err.saveFailedForModels[0], /global.*Settings/);
+          const [failedModel, reason] = err.saveFailedForModels[0];
+          if (is('Settings')(failedModel)) {
+            assert.equal(failedModel.activeProfile, MODEL_2.activeProfile);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
         },
       );
   });
@@ -80,10 +89,23 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           err.message,
           /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/,
         );
+        // Check that success is reported:
         assert.equal(err.saveSucceededForModels.length, 1);
-        assert.match(err.saveSucceededForModels[0], /timeline.*Carbs/);
+        const succeededModel = err.saveSucceededForModels[0];
+        if (is('Carbs')(succeededModel)) {
+          assert.equal(succeededModel.timestamp, model.timestamp);
+        } else {
+          assert.fail('Did not get the expected Model back');
+        }
+        // Check that failure is reported:
         assert.equal(err.saveFailedForModels.length, 1);
-        assert.match(err.saveFailedForModels[0], /timeline.*Carbs/);
+        const [failedModel, reason] = err.saveFailedForModels[0];
+        if (is('Carbs')(failedModel)) {
+          assert.equal(failedModel.timestamp, model.timestamp);
+        } else {
+          assert.fail('Did not get the expected Model back');
+        }
+        assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
       },
     );
   });

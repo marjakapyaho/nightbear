@@ -19,10 +19,12 @@ export interface CouchDbModelMeta {
 export const HIGH_UNICODE_TERMINATOR = '\uffff'; // @see https://pouchdb.com/api.html#prefix-search
 export const PREFIX_TIMELINE = 'timeline';
 export const PREFIX_GLOBAL = 'global';
+export const REV_CONFLICT_SAVE_ERROR = 'Document update conflict.';
+export const UNKNOWN_SAVE_ERROR = 'UNKNOWN_SAVE_ERROR';
 
 export type StorageErrorDetails = Readonly<{
-  saveSucceededForModels: string[];
-  saveFailedForModels: string[];
+  saveSucceededForModels: Model[];
+  saveFailedForModels: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_SAVE_ERROR ]
 }>;
 export type StorageError = Error & StorageErrorDetails;
 export const isStorageError = (err: Error): err is StorageError =>
@@ -67,12 +69,20 @@ export function createCouchDbStorage(
             .join('\n');
           const errorDetails: StorageErrorDetails = {
             saveSucceededForModels: res
-              .filter(isNotErrorResult)
-              .map(res => res.id)
+              .map((res, i) => (isNotErrorResult(res) ? models[i] : null))
               .filter(isNotNull),
             saveFailedForModels: res
-              .filter(isErrorResult)
-              .map(res => res.id)
+              .map(
+                (res, i) =>
+                  isErrorResult(res)
+                    ? ([
+                        models[i],
+                        res.name === 'conflict'
+                          ? REV_CONFLICT_SAVE_ERROR
+                          : res.reason || UNKNOWN_SAVE_ERROR,
+                      ] as [Model, string])
+                    : null,
+              )
               .filter(isNotNull),
           };
           if (res.length === 1) {
