@@ -1,4 +1,9 @@
 import { Model, ModelType, ModelOfType } from 'core/models/model';
+import { isPlainObject } from 'lodash';
+
+export function isModel(x: any): x is Model {
+  return isPlainObject(x) && 'modelType' in x;
+}
 
 // @example array.filter(is('Alarm'))
 // prettier-ignore
