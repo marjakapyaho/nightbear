@@ -3,8 +3,15 @@ import { Model, ModelOfType, ModelType } from 'core/models/model';
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
   saveModels<T extends Model>(models: T[]): Promise<T[]>;
-  loadTimelineModels<T extends ModelType>(modelType: T, range: number, rangeEnd: number): Promise<Array<ModelOfType<T>>>;
-  loadLatestTimelineModels<T extends ModelType>(modelType: T, limit?: number): Promise<Array<ModelOfType<T>>>;
+  loadTimelineModels<T extends ModelType>(
+    modelType: T,
+    range: number,
+    rangeEnd: number,
+  ): Promise<Array<ModelOfType<T>>>;
+  loadLatestTimelineModels<T extends ModelType>(
+    modelType: T,
+    limit?: number,
+  ): Promise<Array<ModelOfType<T>>>;
   loadGlobalModels(): Promise<Model[]>;
 }
 
