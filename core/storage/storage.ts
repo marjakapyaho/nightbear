@@ -2,7 +2,7 @@ import { Model, ModelOfType, ModelType } from 'core/models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
-  saveModels<T extends Model>(models: T[]): Promise<T[]>;
+  saveModels<T extends Model>(models: T[], upsert?: boolean): Promise<T[]>;
   loadTimelineModels<T extends ModelType>(
     modelType: T,
     range: number,

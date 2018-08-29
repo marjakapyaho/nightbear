@@ -42,7 +42,7 @@ export function createCouchDbStorage(
       return self.saveModels([model]).then(models => models[0]);
     },
 
-    saveModels(models) {
+    saveModels(models, upsert = false) {
       const metas = models.map(createModelMeta);
       const docs = models.map((model, i) => {
         const { _id, _rev, modelVersion } = metas[i];
@@ -54,46 +54,64 @@ export function createCouchDbStorage(
         };
         return doc;
       });
-      return db.bulkDocs(docs).then((res: PouchDbResult[]) => {
-        if (res.some(isErrorResult)) {
-          const resMap = res
-            .map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`)
-            .join('\n');
-          const errorDetails: StorageErrorDetails = {
-            saveSucceededForModels: res
-              .map((res, i) => (isNotErrorResult(res) ? models[i] : null))
-              .filter(isNotNull),
-            saveFailedForModels: res
-              .map(
-                (res, i) =>
-                  isErrorResult(res)
-                    ? ([
-                        models[i],
-                        res.name === 'conflict'
-                          ? REV_CONFLICT_SAVE_ERROR
-                          : res.reason || UNKNOWN_SAVE_ERROR,
-                      ] as [Model, string])
-                    : null,
-              )
-              .filter(isNotNull),
-          };
-          if (res.length === 1) {
-            throw Object.assign(new Error(`Couldn't save model: ${resMap.trim()}`), errorDetails);
-          } else {
-            throw Object.assign(new Error(`Couldn't save some models:\n${resMap}`), errorDetails);
+      return Promise.resolve()
+        .then(
+          () =>
+            upsert
+              ? Promise.resolve()
+                  .then(() => db.allDocs({ keys: metas.map(meta => meta._id) }))
+                  .then(res => res.rows.map(row => (row.value && row.value.rev) || null))
+                  .then(revs =>
+                    docs.map(
+                      (doc, i) =>
+                        revs[i]
+                          ? ({ ...doc, _rev: revs[i] } as PouchDB.Core.PutDocument<Model>)
+                          : doc,
+                    ),
+                  )
+              : docs,
+        )
+        .then(docs => db.bulkDocs(docs))
+        .then((res: PouchDbResult[]) => {
+          if (res.some(isErrorResult)) {
+            const resMap = res
+              .map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`)
+              .join('\n');
+            const errorDetails: StorageErrorDetails = {
+              saveSucceededForModels: res
+                .map((res, i) => (isNotErrorResult(res) ? models[i] : null))
+                .filter(isNotNull),
+              saveFailedForModels: res
+                .map(
+                  (res, i) =>
+                    isErrorResult(res)
+                      ? ([
+                          models[i],
+                          res.name === 'conflict'
+                            ? REV_CONFLICT_SAVE_ERROR
+                            : res.reason || UNKNOWN_SAVE_ERROR,
+                        ] as [Model, string])
+                      : null,
+                )
+                .filter(isNotNull),
+            };
+            if (res.length === 1) {
+              throw Object.assign(new Error(`Couldn't save model: ${resMap.trim()}`), errorDetails);
+            } else {
+              throw Object.assign(new Error(`Couldn't save some models:\n${resMap}`), errorDetails);
+            }
           }
-        }
-        return models.map((model, i) => {
-          const updatedMeta: CouchDbModelMeta = {
-            ...metas[i],
-            _rev: (res[i] as PouchDB.Core.Response).rev, // update the model meta with the _rev assigned by the DB
-          };
-          return {
-            ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
-            modelMeta: updatedMeta,
-          } as any;
+          return models.map((model, i) => {
+            const updatedMeta: CouchDbModelMeta = {
+              ...metas[i],
+              _rev: (res[i] as PouchDB.Core.Response).rev, // update the model meta with the _rev assigned by the DB
+            };
+            return {
+              ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
+              modelMeta: updatedMeta,
+            } as any;
+          });
         });
-      });
     },
 
     loadTimelineModels<T extends ModelType>(
