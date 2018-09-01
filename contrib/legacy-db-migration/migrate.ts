@@ -189,15 +189,15 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const model1: DeviceStatus = {
       modelType: 'DeviceStatus',
       deviceName: 'parakeet',
-      timestamp: x.date,
+      timestamp: x.date + 1, // TODO: This is very hacky
       batteryLevel: parseFloat(x.parakeetBattery),
       geolocation: x.geoLocation,
     };
     const model2: DeviceStatus = {
       modelType: 'DeviceStatus',
       deviceName: 'dexcom-transmitter',
-      timestamp: x.date,
-      batteryLevel: parseFloat(x.transmitterBattery) + 1, // TODO: This is very hacky
+      timestamp: x.date + 2, // TODO: This is very hacky
+      batteryLevel: parseFloat(x.transmitterBattery),
       geolocation: null,
     };
     return Promise.resolve([model1, model2]);
@@ -213,7 +213,7 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const model: DexcomCalibration = {
       modelType: 'DexcomCalibration',
       timestamp: x.date,
-      meterEntries: [], // will be attached below
+      meterEntries: [], // will be filled in below
       isInitialCalibration: false,
       slope: x.slope,
       intercept: x.intercept,
