@@ -31,7 +31,7 @@ export default function(logger, user, token) {
                 msg.device = process.env['PUSHOVER_LEVEL_3'];
             }
 
-            if (app.profile.getActiveProfileName() === 'night') {
+/*            if (app.profile.getActiveProfileName() === 'night') {
                 const copyOfMsg = _.assign({}, msg, { device: process.env['PUSHOVER_LEVEL_2'] });
                 api.send(copyOfMsg, (err) => {
                     if (err) {
@@ -41,7 +41,7 @@ export default function(logger, user, token) {
                         log('Extra alarm sent without receipt');
                     }
                 });
-            }
+            }*/
 
             return new Promise((resolve, reject) => {
                 api.send(msg, (err, result) => {
