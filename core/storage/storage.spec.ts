@@ -1,8 +1,10 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Model, Carbs, Settings } from 'core/models/model';
-import { Storage } from './storage';
+import { Storage, StorageError } from 'core/storage/storage';
 import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
+import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { is } from 'core/models/utils';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -18,13 +20,14 @@ export const MODEL_2: Settings = {
 };
 
 export function storageTestSuite(createTestStorage: () => Storage) {
-
   let storage: Storage;
   let timestamp: number;
   let model: Carbs;
 
   function findModel(models: Model[]): Model {
-    const found = models.find(m => m.modelType === model.modelType && m.timestamp === model.timestamp);
+    const found = models.find(
+      m => m.modelType === model.modelType && m.timestamp === model.timestamp,
+    );
     if (found) return found;
     throw new Error(`Couldn't find the Model this test case is operating on`);
   }
@@ -36,28 +39,40 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   });
 
   it('saves models individually', () => {
-    return storage.saveModel(model)
-      .then(actual => assertEqualWithoutMeta(actual, model));
+    return storage.saveModel(model).then(actual => assertEqualWithoutMeta(actual, model));
   });
 
   it('reports save errors individually', () => {
-    return storage.saveModel(MODEL_2)
+    return storage
+      .saveModel(MODEL_2)
       .then(() => storage.saveModel(MODEL_2)) // make sure we conflict
       .then(
-        () => { throw new Error('Expecting a failure'); },
-        err => assert.match(err.message, /Couldn't save model.*global.*Settings.*update conflict/),
+        () => {
+          throw new Error('Expecting a failure');
+        },
+        err => {
+          assert.match(err.message, /Couldn't save model.*global.*Settings.*update conflict/);
+          // Check that success is reported:
+          assert.equal(err.saveSucceededForModels.length, 0);
+          // Check that failure is reported:
+          assert.equal(err.saveFailedForModels.length, 1);
+          const [failedModel, reason] = err.saveFailedForModels[0];
+          if (is('Settings')(failedModel)) {
+            assert.equal(failedModel.activeProfile, MODEL_2.activeProfile);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
+        },
       );
   });
 
   it('saves models in bulk', () => {
-    const models = [
-      model,
-    ];
-    return storage.saveModels(models)
-      .then(actuals => {
-        assert.equal(actuals.length, 1);
-        actuals.forEach((actual, i) => assertEqualWithoutMeta(actual, models[i]));
-      });
+    const models = [model];
+    return storage.saveModels(models).then(actuals => {
+      assert.equal(actuals.length, 1);
+      actuals.forEach((actual, i) => assertEqualWithoutMeta(actual, models[i]));
+    });
   });
 
   it('reports save errors in bulk', () => {
@@ -65,51 +80,74 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       model,
       model, // make sure we conflict
     ];
-    return storage.saveModels(models)
-      .then(
-        () => { throw new Error('Expecting a failure'); },
-        err => assert.match(err.message, /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/),
-      );
+    return storage.saveModels(models).then(
+      () => {
+        throw new Error('Expecting a failure');
+      },
+      (err: StorageError) => {
+        assert.match(
+          err.message,
+          /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/,
+        );
+        // Check that success is reported:
+        assert.equal(err.saveSucceededForModels.length, 1);
+        const succeededModel = err.saveSucceededForModels[0];
+        if (is('Carbs')(succeededModel)) {
+          assert.equal(succeededModel.timestamp, model.timestamp);
+        } else {
+          assert.fail('Did not get the expected Model back');
+        }
+        // Check that failure is reported:
+        assert.equal(err.saveFailedForModels.length, 1);
+        const [failedModel, reason] = err.saveFailedForModels[0];
+        if (is('Carbs')(failedModel)) {
+          assert.equal(failedModel.timestamp, model.timestamp);
+        } else {
+          assert.fail('Did not get the expected Model back');
+        }
+        assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
+      },
+    );
   });
 
   it('loads timeline models', () => {
-    return storage.saveModel(model)
+    return storage
+      .saveModel(model)
       .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
   });
 
   it('loads global models', () => {
-    return storage.saveModel(MODEL_2)
+    return storage
+      .saveModel(MODEL_2)
       .catch(() => null) // if the Model already existed, this will fail, but for the purposes of this test, it doesn't matter
       .then(() => storage.loadGlobalModels())
-      .then(loadedModels => assertEqualWithoutMeta(
-        loadedModels.find(model => model.modelType === MODEL_2.modelType) as any, // cheating is allowed in test code
-        MODEL_2,
-      ));
+      .then(loadedModels =>
+        assertEqualWithoutMeta(
+          loadedModels.find(model => model.modelType === MODEL_2.modelType) as any, // cheating is allowed in test code
+          MODEL_2,
+        ),
+      );
   });
 
   it('saves models that have been saved before', () => {
     assert.equal(model.amount, 10); // check baseline assumptions
-    return storage.saveModel(model)
+    return storage
+      .saveModel(model)
       .then(savedModel => ({ ...savedModel, amount: 123 }))
       .then(storage.saveModel)
-      .then(savedModel => assertEqualWithoutMeta(
-        savedModel,
-        { ...model, amount: 123 },
-      ));
+      .then(savedModel => assertEqualWithoutMeta(savedModel, { ...model, amount: 123 }));
   });
 
   it('saves models that have been loaded before', () => {
     assert.equal(model.amount, 10); // check baseline assumptions
-    return storage.saveModel(model)
+    return storage
+      .saveModel(model)
       .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
       .then(loadedModels => findModel(loadedModels))
       .then(loadedModel => ({ ...loadedModel, amount: 123 }))
       .then(storage.saveModel)
-      .then(savedModel => assertEqualWithoutMeta(
-        savedModel,
-        { ...model, amount: 123 },
-      ));
+      .then(savedModel => assertEqualWithoutMeta(savedModel, { ...model, amount: 123 }));
   });
 
   it('loads latest timeline models by type', () => {
@@ -126,5 +164,4 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         assertEqualWithoutMeta(models[0], { ...model, timestamp: timestamp - 0, amount: 3 });
       });
   });
-
 }
