@@ -24,6 +24,7 @@ import { is } from 'core/models/utils';
 
 const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
+const BATCH_RETRY_LIMIT = 10;
 
 const bar = new cliProgress.Bar({});
 const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
@@ -107,13 +108,30 @@ function runBatchesSerially(ids: string[][]) {
 }
 
 function runBatch(ids: string[]): Promise<any> {
-  return sourceDb
-    .allDocs({
-      include_docs: true,
-      keys: ids,
-    })
-    .then(res => res.rows.map(row => row.doc).filter(isNotNull))
-    .then(toModernModels);
+  let tries = 0;
+  return attempt();
+  function run() {
+    return sourceDb
+      .allDocs({
+        include_docs: true,
+        keys: ids,
+      })
+      .then(res => res.rows.map(row => row.doc).filter(isNotNull))
+      .then(toModernModels);
+  }
+  function attempt() {
+    return new Promise((resolve, reject) => {
+      run().then(resolve, err => {
+        if (tries++ >= BATCH_RETRY_LIMIT) {
+          console.log(`Error: runBatch() reached retry limit (${BATCH_RETRY_LIMIT})`, err);
+          reject(err);
+        } else {
+          console.log(`Warn: runBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT})`, err);
+          attempt().then(resolve, reject);
+        }
+      });
+    });
+  }
 }
 
 function toModernModels(docs: object[]) {
