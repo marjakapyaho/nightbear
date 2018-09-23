@@ -25,16 +25,18 @@ import { is } from 'core/models/utils';
 const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
+const INCREMENTAL = true;
 
 const bar = new cliProgress.Bar({});
 const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
 const sourceDb = new PouchDB(`migrate_temp`);
 const targetStorage = createCouchDbStorage(
-  `https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_10`,
+  `https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`,
 );
 const warnings: Error[] = [];
 let nestedIdTotal: number = 0;
 let remainingNestedIds: string[] = [];
+let incrementalIdsToMigrate: string[] = [];
 
 main();
 
@@ -60,6 +62,9 @@ function migrateToLocalDb() {
   });
   let total: number = -1;
   downReplication.on('change', info => {
+    if (INCREMENTAL) {
+      incrementalIdsToMigrate = incrementalIdsToMigrate.concat(info.docs.map(doc => doc._id));
+    }
     if (total === -1) {
       total = info.docs_written + (info.pending || 0);
       bar.start(total, 0);
@@ -83,7 +88,12 @@ function reportFinished() {
 }
 
 function getDocIdsToMigrate() {
-  return sourceDb.allDocs().then(res => res.rows.map(row => row.id));
+  if (INCREMENTAL) {
+    console.log('Migrating in incremental mode:', incrementalIdsToMigrate);
+    return incrementalIdsToMigrate;
+  } else {
+    return sourceDb.allDocs().then(res => res.rows.map(row => row.id));
+  }
 }
 
 function recordNestedModelIds(ids: string[]): string[] {
