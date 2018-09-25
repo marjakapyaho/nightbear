@@ -174,12 +174,8 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
       rawUnfiltered: x.unfiltered,
     };
     return Promise.resolve([model]);
-  } else if (
-    nested &&
-    x._id.match(/^meter-entries\//) &&
-    x.type === 'mbg' &&
-    x.device === 'dexcom'
-  ) {
+  } else if (x._id.match(/^meter-entries\//) && x.type === 'mbg' && x.device === 'dexcom') {
+    if (!nested) return Promise.resolve([]); // if we're not looking for a nested model, this doc can be ignored
     remainingNestedIds = remainingNestedIds.filter(id => id !== x._id); // remove this from the list of ID's that we expect to nest
     const model: MeterEntry = {
       modelType: 'MeterEntry',
