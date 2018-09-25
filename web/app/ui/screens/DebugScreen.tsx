@@ -20,9 +20,10 @@ export default renderFromStore(
       </button>
       <button onClick={() => dispatch(actions.DB_URL_SET(''))}>Log out</button>
       <ModelTypeSelector
+        multiple
         onChange={newType =>
           dispatch(
-            actions.TIMELINE_FILTERS_CHANGED(timelineData.filters.range, Date.now(), [newType]),
+            actions.TIMELINE_FILTERS_CHANGED(timelineData.filters.range, Date.now(), newType),
           )
         }
       />
