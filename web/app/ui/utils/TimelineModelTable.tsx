@@ -41,6 +41,8 @@ export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, 
       } else {
         return val + '';
       }
+    } else if (val === null) {
+      return <code>null</code>;
     } else if (typeof val === 'object') {
       return <span title={JSON.stringify(val, null, 4)}>[object]</span>;
     } else {
