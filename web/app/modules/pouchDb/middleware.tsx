@@ -1,6 +1,6 @@
 import PouchDB from 'core/storage/PouchDb';
 import { ReduxMiddleware, ReduxDispatch, createChangeObserver } from 'web/app/utils/redux';
-import { debounce } from 'lodash';
+import { debounce, flatten } from 'lodash';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
@@ -44,12 +44,21 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
 
   function timelineFiltersChanged(filters: ReduxState['timelineData']['filters']) {
     if (!existingReplication) return;
-    existingReplication.storage
-      .loadTimelineModels(filters.modelTypes[0], filters.range, filters.rangeEnd)
-      .then(
-        models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)),
-        err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
-      );
+    Promise.all(
+      filters.modelTypes.map(
+        modelType =>
+          existingReplication
+            ? existingReplication.storage.loadTimelineModels(
+                modelType,
+                filters.range,
+                filters.rangeEnd,
+              )
+            : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
+      ),
+    ).then(
+      models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(flatten(models))),
+      err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
+    );
   }
 };
 
