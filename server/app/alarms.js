@@ -86,9 +86,33 @@ export default app => {
 
         });
 
-        _.each(alarmsToCreate, function(alarmType) {
+        _.each(alarmsToCreate, function (alarmType) {
             log.debug('Create new alarm with status:', alarmType);
-            operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
+            if (app.profile.getActiveProfileName() === 'day') { // Use traditional alarm logic
+                operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
+            } else { // During night-time, send alarm immediately to level-0 device
+                operations.push(
+                    Promise.resolve()
+                        .then(() => app.data.createAlarm(alarmType, 1)) // Initial alarm level
+                        .then(() => app.data.getTimelineContent(0))
+                        .then(timelineContent => timelineContent.activeAlarms.filter(alarm => alarm.level === 1))
+                        .then(alarms => {
+                            log.debug(`Found the new alarms we just created`, alarms);
+                            return alarms;
+                        })
+                        .then(alarms => {
+                            alarms.forEach(alarm => {
+                                app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE, app)
+                                    .then(receipt => {
+                                        alarm.pushoverReceipts = alarm.pushoverReceipts || [];
+                                        alarm.pushoverReceipts.push(receipt);
+                                        return app.data.updateAlarm(alarm);
+                                    })
+                            });
+                        })
+                        .catch(err => log.error('Sending initial alarms failed:', err))
+                );
+            }
         });
 
         return Promise.all(operations);

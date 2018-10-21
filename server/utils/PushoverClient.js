@@ -21,7 +21,10 @@ export default function(logger, user, token) {
                 callback: 'http://legacy.nightbear.fi/api/v1/status' // TODO: Make this configurable
             };
 
-            if (level === 2) {
+            if (level === 1) {
+                msg.device = process.env['PUSHOVER_LEVEL_0'];
+            }
+            else if (level === 2) {
                 msg.device = process.env['PUSHOVER_LEVEL_1'];
             }
             else if (level === 3) {
