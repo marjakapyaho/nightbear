@@ -117,6 +117,74 @@ function getDefaultSettings() {
                         "snooze": 60
                     }
                 }
+            },
+            "night": { // identical to "day"
+                "HIGH_LEVEL_REL": 10,
+                "HIGH_LEVEL_ABS": 15,
+                "LOW_LEVEL_REL": 9,
+                "LOW_LEVEL_ABS": 5,
+                "TIME_SINCE_SGV_LIMIT": 1200000,
+                "BATTERY_LIMIT": 30,
+                "ALARM_RETRY": 120,
+                "ALARM_EXPIRE": 1200,
+                "alarmSettings": {
+                    "outdated": {
+                        "levels": [
+                            10,
+                            20,
+                            20
+                        ],
+                        "snooze": 120
+                    },
+                    "high": {
+                        "levels": [
+                            10,
+                            20,
+                            20
+                        ],
+                        "snooze": 90
+                    },
+                    "persistent_high": {
+                        "levels": [
+                            10,
+                            20,
+                            20
+                        ],
+                        "snooze": 90
+                    },
+                    "low": {
+                        "levels": [
+                            6,
+                            7,
+                            10
+                        ],
+                        "snooze": 15
+                    },
+                    "rising": {
+                        "levels": [
+                            8,
+                            15,
+                            15
+                        ],
+                        "snooze": 20
+                    },
+                    "falling": {
+                        "levels": [
+                            6,
+                            7,
+                            10
+                        ],
+                        "snooze": 10
+                    },
+                    "battery": {
+                        "levels": [
+                            10,
+                            20,
+                            20
+                        ],
+                        "snooze": 60
+                    }
+                }
             }
         }
     };
