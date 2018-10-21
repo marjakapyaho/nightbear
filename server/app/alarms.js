@@ -88,7 +88,7 @@ export default app => {
 
         _.each(alarmsToCreate, function (alarmType) {
             log.debug('Create new alarm with status:', alarmType);
-            if (app.profile.getActiveProfileName() === 'day') { // Use traditional alarm logic
+            if (app.profile.getActiveProfileName() !== 'day') { // Use traditional alarm logic
                 operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
             } else { // During night-time, send alarm immediately to level-0 device
                 operations.push(
