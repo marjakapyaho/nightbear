@@ -17,7 +17,7 @@ export default app => {
 
         // Clear previous timer (if exists) and set next one
         if (nextCheck) { clearTimeout(nextCheck); }
-        nextCheck = setTimeout(runChecks, 6 * helpers.MIN_IN_MS, queryThrottleMs);
+        nextCheck = setTimeout(runChecks, 1 * helpers.MIN_IN_MS, queryThrottleMs);
 
         return app.data.getTimelineContent(queryThrottleMs)
             .then(doChecks)
@@ -70,7 +70,7 @@ export default app => {
             const accumulatedTimes = _.map(levelUpTimes, (x, i) => _.sum(_.take(levelUpTimes, i + 1)));
             const neededLevel = _.findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
 
-            if (neededLevel !== alarm.level) {
+            if (neededLevel !== alarm.level || usePushForLevelOne(alarm)) {
                 log('Level-upping alarm from ' + alarm.level + ' to ' + neededLevel);
                 alarm.level = neededLevel;
                 operations.push(
@@ -86,36 +86,16 @@ export default app => {
 
         });
 
-        _.each(alarmsToCreate, function (alarmType) {
+        _.each(alarmsToCreate, function(alarmType) {
             log.debug('Create new alarm with status:', alarmType);
-            if (app.profile.getActiveProfileName() === 'day') { // Use traditional alarm logic
-                operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
-            } else { // During night-time, send alarm immediately to level-0 device
-                operations.push(
-                    Promise.resolve()
-                        .then(() => app.data.createAlarm(alarmType, 1)) // Initial alarm level
-                        .then(() => app.data.getTimelineContent(0))
-                        .then(timelineContent => timelineContent.activeAlarms.filter(alarm => alarm.level === 1))
-                        .then(alarms => {
-                            log.debug(`Found the new alarms we just created`, alarms);
-                            return alarms;
-                        })
-                        .then(alarms => {
-                            alarms.forEach(alarm => {
-                                app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE, app)
-                                    .then(receipt => {
-                                        alarm.pushoverReceipts = alarm.pushoverReceipts || [];
-                                        alarm.pushoverReceipts.push(receipt);
-                                        return app.data.updateAlarm(alarm);
-                                    })
-                            });
-                        })
-                        .catch(err => log.error('Sending initial alarms failed:', err))
-                );
-            }
+            operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
         });
 
         return Promise.all(operations);
+    }
+
+    function usePushForLevelOne(alarm) {
+        return alarm.level === 1 && (!alarm.pushoverReceipts || alarm.pushoverReceipts.length === 0) && app.profile.getActiveProfileName() === 'night';
     }
 
 }
