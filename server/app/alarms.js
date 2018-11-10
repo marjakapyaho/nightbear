@@ -25,7 +25,6 @@ export default app => {
     }
 
     function doChecks(timelineContent) {
-        log('Active alarms count: ' + timelineContent.activeAlarms.length);
         log.debug('Active alarms:', timelineContent.activeAlarms);
 
         if (!timelineContent.profileSettings.alarmsOn) {
@@ -52,6 +51,8 @@ export default app => {
             if (_.find(alarmsToKeep, { type: key })) return;
             return key;
         }));
+
+        log.debug('Remove:' + alarmsToRemove.length + ', Keep:' + alarmsToKeep.length + ', Create:' + alarmsToCreate.length);
 
         _.each(alarmsToRemove, function(alarm) {
             alarm.status = 'inactive';
