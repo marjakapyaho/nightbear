@@ -25,6 +25,7 @@ export default app => {
     }
 
     function doChecks(timelineContent) {
+        log('Active alarms count: ' + timelineContent.activeAlarms.length);
         log.debug('Active alarms:', timelineContent.activeAlarms);
 
         if (!timelineContent.profileSettings.alarmsOn) {
