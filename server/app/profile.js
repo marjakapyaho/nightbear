@@ -7,7 +7,7 @@ export default app => {
         // HACK: update if day times change
         getActiveProfileName() {
             const currentTimestamp = app.currentTime();
-            if (new Date(currentTimestamp).getHours() > 6 && new Date(currentTimestamp).getHours() < 20) {
+            if (new Date(currentTimestamp).getHours() > 7 && new Date(currentTimestamp).getHours() < 21) {
                 return 'day';
             }
             else {
@@ -17,8 +17,8 @@ export default app => {
 
         getActiveProfile(settingsObj) {
             const currentTimestamp = app.currentTime();
-            // utc 6 = fi 9, utc 20 = fi 23
-            if (new Date(currentTimestamp).getHours() > 6 && new Date(currentTimestamp).getHours() < 20) { // DAY
+            // utc 7 = fi 9, utc 21 = fi 23
+            if (new Date(currentTimestamp).getHours() > 7 && new Date(currentTimestamp).getHours() < 21) { // DAY
                 log.debug('Selected active profile: DAY', new Date(currentTimestamp).getHours());
                 return settingsObj.profiles.day;
             }
