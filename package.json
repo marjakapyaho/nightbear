@@ -14,7 +14,7 @@
     "==================== GLOBAL QA ====================": "",
     "lint": "concurrently \"check-node-version --package\" \"tsc --noEmit --project .\" \"tslint --project .\"",
     "lint-watch": "chokidar '**/*.{ts,tsx}' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
-    "test": "check-node-version --package && NODE_PATH=. mocha --require ts-node/register $(npm run --silent test-list)",
+    "test": "check-node-version --package && NODE_PATH=. mocha --require ts-node/register --require core/storage/PouchDb.mocha $(npm run --silent test-list)",
     "test-watch": "NODE_PATH=. mocha --require ts-node/register --watch --watch-extensions ts $(npm run --silent test-list)",
     "test-list": "find . -name '*.spec.ts' -not -path '*/node_modules/*'",
     "==================== SERVER ====================": "",

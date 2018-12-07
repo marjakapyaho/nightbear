@@ -1,14 +1,7 @@
-// @see https://github.com/pouchdb/pouchdb/issues/6692
-import PouchDBDefault from 'pouchdb';
-// tslint:disable-next-line:no-var-requires
-const PouchDB = PouchDBDefault || require('pouchdb');
-
-import * as PouchDBFind from 'pouchdb-find';
+import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
-
-PouchDB.plugin(PouchDBFind);
 
 export interface CouchDbModelMeta {
   readonly _id: string;
