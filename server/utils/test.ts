@@ -1,11 +1,6 @@
-// @see https://github.com/pouchdb/pouchdb/issues/6692
-import PouchDBDefault from 'pouchdb';
-// tslint:disable-next-line:no-var-requires
-const PouchDB = PouchDBDefault || require('pouchdb');
-
 import 'mocha';
+import PouchDB from 'core/storage/PouchDb';
 import { assert } from 'chai';
-import * as PouchDBMemory from 'pouchdb-adapter-memory';
 import { Context, Request } from 'core/models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from 'core/storage/storage';
@@ -13,8 +8,6 @@ import { Profile, Model } from 'core/models/model';
 import { Storage } from 'core/storage/storage';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { getUuid } from './uuid';
-
-PouchDB.plugin(PouchDBMemory); // @see https://www.npmjs.com/package/pouchdb-adapter-memory
 
 export type TestSuite = (storage: () => Storage) => void;
 
