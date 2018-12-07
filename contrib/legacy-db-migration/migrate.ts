@@ -147,7 +147,7 @@ function toModernModels(docs: object[]) {
       try {
         return toModernModel(doc);
       } catch (err) {
-        warnings.push(err);
+        warnings.push(err.message);
         return null;
       }
     }),
