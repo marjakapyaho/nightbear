@@ -16,7 +16,7 @@ export function configureStore(
   initialState?: ReduxState,
   middleware: ReduxMiddleware[] = [],
 ): ReduxStore {
-  let appliedMiddleware = applyMiddleware.apply(null, middleware);
+  let appliedMiddleware = applyMiddleware.apply(null, middleware as any); // cast to any to smooth over subtle disagreement with redux types
 
   if (process.env.NODE_ENV !== 'production') {
     appliedMiddleware = composeWithDevTools(appliedMiddleware);
