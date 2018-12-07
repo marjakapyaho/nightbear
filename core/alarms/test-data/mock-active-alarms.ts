@@ -16,14 +16,14 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
   }];
 }
 
-export function getMockAlarm(currentTimestamp: number, situation: Situation): Alarm {
+export function getMockAlarm(currentTimestamp: number, situation: Situation, isActive: boolean = true): Alarm {
   return {
     modelType: 'Alarm',
     timestamp: currentTimestamp,
     validAfterTimestamp: currentTimestamp,
     alarmLevel: 1,
     situationType: situation,
-    isActive: true,
+    isActive,
     pushoverReceipts: [],
   };
 }
