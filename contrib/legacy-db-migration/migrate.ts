@@ -17,6 +17,7 @@ import { chunk, flatten } from 'lodash';
 import * as cliProgress from 'cli-progress';
 import { isNotNull } from 'server/utils/types';
 import { is } from 'core/models/utils';
+import { inspect } from 'util';
 
 const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
@@ -79,7 +80,7 @@ function reportFinished() {
   if (warnings.length) console.warn(`${warnings.length} warnings generated`);
   if (remainingNestedIds.length)
     console.warn(`${remainingNestedIds.length}/${nestedIdTotal} nested models got left out`);
-  console.log({ warnings, remainingNestedIds });
+  console.log(inspect({ warnings, remainingNestedIds }, { maxArrayLength: Infinity }));
   console.log('ProTip: Run the script with "> migrate.log" to reduce output');
 }
 
