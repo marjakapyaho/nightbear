@@ -191,7 +191,7 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const ts = new Date(x._id.replace(/.*\//, '')).getTime();
     const model: Alarm = {
       modelType: 'Alarm',
-      creationTimestamp: ts,
+      timestamp: ts,
       validAfterTimestamp: x.validAfter || ts,
       alarmLevel: x.level,
       situationType: x.type,

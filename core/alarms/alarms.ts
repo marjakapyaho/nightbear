@@ -1,18 +1,22 @@
-import { Alarm, Profile, Situation, State } from 'core/models/model';
+import { Alarm, Model, Profile, Situation, State } from 'core/models/model';
 import { filter, compact, map, find, sum, take, findIndex } from 'lodash';
 import { MIN_IN_MS } from '../calculations/calculations';
+import { Context } from 'core/models/api';
+
+const INITIAL_ALARM_LEVEL = 1;
 
 export function runAlarmChecks(
   state: State,
+  context: Context,
   currentTimestamp: number,
   activeProfile: Profile,
   activeAlarms: Alarm[]) {
 
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
 
-  handleAlarmsToRemove(alarmsToRemove);
-  handleAlarmsToKeep(alarmsToKeep, currentTimestamp, activeProfile);
-  handleAlarmsToCreate(alarmsToCreate);
+  handleAlarmsToRemove(alarmsToRemove, context);
+  handleAlarmsToKeep(alarmsToKeep, currentTimestamp, activeProfile, context);
+  handleAlarmsToCreate(alarmsToCreate, context);
 }
 
 export function detectAlarmActions(
@@ -34,20 +38,29 @@ export function detectAlarmActions(
   };
 }
 
-function handleAlarmsToRemove(alarms: Alarm[]) {
+function handleAlarmsToRemove(alarms: Alarm[], context: Context) {
+  const modelsToSave: Model[] = [];
+
   alarms.forEach((alarm) => {
-    const changedAlarm = Object.assign(alarm, ({ isActive: false }));
-    console.log('Save changed alarm', changedAlarm);
+    const changedAlarm = Object.assign(alarm, ({
+      isActive: false,
+      pushoverReceipts: [],
+    }));
+    modelsToSave.push(changedAlarm);
+
     // We're not waiting for the results of pushover acks
-    // TODO: pushover.ackAlarms(alarm.pushoverReceipts);
-    // TODO: operations.push(app.data.updateAlarm(alarm));
+    context.pushover.ackAlarms(alarm.pushoverReceipts);
   });
+
+  context.storage.saveModels(modelsToSave)
+    .then(() => console.log('Removed alarms'));
 }
 
 function handleAlarmsToKeep(
   alarms: Alarm[],
   currentTimestamp: number,
   activeProfile: Profile,
+  context: Context,
 )  {
   alarms.forEach((alarm) => {
 
@@ -61,37 +74,54 @@ function handleAlarmsToKeep(
     const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
     const neededLevel = findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
 
-    // TODO: find out correct level from settings.profile
-    // this doesn't do anything yet
     const pushoverLevels = activeProfile.pushoverLevels;
-    const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : null;
-    console.log(pushoverRecipient);
+    const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : 'none';
 
     if (neededLevel !== alarm.alarmLevel) {
-      const changedAlarm = Object.assign(alarm, ({ alarmLevel: neededLevel }));
-      console.log('Save changed alarm', changedAlarm); // Note: only if pushover is successful
 
-      /*
-      TODO: retry pushover logic here
-      operations.push(
-        app.pushover.sendAlarm(alarm.level, alarm.type, activeProfile.ALARM_RETRY, activeProfile.ALARM_EXPIRE)
-          .then(receipt => { // only persist the level upgrade IF the alarm got sent (so we get retries)
-            alarm.pushoverReceipts = alarm.pushoverReceipts || [];
-            alarm.pushoverReceipts.push(receipt);
-            return app.data.updateAlarm(alarm);
+      const changedAlarm = Object.assign(alarm, ({ alarmLevel: neededLevel }));
+
+      // If recipient is none, just hold alarm for this level (used for pull notifications)
+      if (pushoverRecipient === 'none') {
+        return context.storage.saveModels([changedAlarm]);
+      }
+      else {
+        return context.pushover.sendAlarm(changedAlarm.situationType, pushoverRecipient)
+          .then((receipt: string) => { // only persist the level upgrade IF the alarm got sent (so we get retries)
+            changedAlarm.pushoverReceipts.push(receipt);
+            return context.storage.saveModels([changedAlarm]);
           })
-          .catch(err => log.error('Sending alarm failed:', err))
-      );
-      */
+          .catch(() => console.log('Sending Pushover alarm failed:'));
+      }
     }
 
   });
 
 }
 
-function handleAlarmsToCreate(alarmTypes: Situation[]) {
-  alarmTypes.forEach((alarmType) => {
-    console.log('creating new alarm with type', alarmType);
-    // TODO: operations.push(app.data.createAlarm(alarmType, 1)); // Initial alarm level
+function handleAlarmsToCreate(situationTypes: Situation[], context: Context) {
+  const modelsToSave: Model[] = [];
+
+  situationTypes.forEach((situationType) => {
+    modelsToSave.push(createAlarm(situationType, INITIAL_ALARM_LEVEL, context));
   });
+
+  context.storage.saveModels(modelsToSave)
+    .then(() => console.log('Saved new alarms'));
+}
+
+export function createAlarm(
+  situationType: Situation,
+  alarmLevel: number,
+  context: Context,
+  ): Model {
+  return {
+    modelType: 'Alarm',
+    timestamp: context.timestamp(),
+    validAfterTimestamp: context.timestamp(),
+    alarmLevel,
+    situationType,
+    isActive: true,
+    pushoverReceipts: [],
+  };
 }

@@ -7,7 +7,7 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
 
   return [{
     modelType: 'Alarm',
-    creationTimestamp: currentTimestamp,
+    timestamp: currentTimestamp,
     validAfterTimestamp: currentTimestamp,
     alarmLevel: 1,
     situationType: situation,
@@ -19,7 +19,7 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
 export function getMockAlarm(currentTimestamp: number, situation: Situation): Alarm {
   return {
     modelType: 'Alarm',
-    creationTimestamp: currentTimestamp,
+    timestamp: currentTimestamp,
     validAfterTimestamp: currentTimestamp,
     alarmLevel: 1,
     situationType: situation,

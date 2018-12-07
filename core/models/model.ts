@@ -179,7 +179,7 @@ export interface Alarm {
   readonly modelType: 'Alarm';
   readonly modelMeta?: ModelMeta;
   // Alarm:
-  readonly creationTimestamp: number;
+  readonly timestamp: number;
   readonly validAfterTimestamp: number;
   readonly alarmLevel: number;
   readonly situationType: Situation;
@@ -215,10 +215,10 @@ export interface Profile {
     readonly TIME_SINCE_BG_LIMIT: number; // minutes
     readonly BATTERY_LIMIT: number;
     readonly LOW_LEVEL_ABS: number;
-    readonly ALARM_EXPIRE: number; // minutes
     readonly LOW_LEVEL_REL: number;
     readonly HIGH_LEVEL_ABS: number;
-    readonly ALARM_RETRY: number; // minutes
+    readonly ALARM_RETRY: number; // seconds, min in Pushover 30
+    readonly ALARM_EXPIRE: number; // seconds, max in Pushover 10800
   };
   readonly alarmSettings: {
     readonly [S in Situation]: {
