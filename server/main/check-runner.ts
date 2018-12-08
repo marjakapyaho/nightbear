@@ -22,7 +22,7 @@ export function runChecks(context: Context) {
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels('Insulin', ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
-    context.storage.loadTimelineModels('Alarm', ANALYSIS_RANGE, context.timestamp()), // TODO: all active
+    context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
   ])
     .then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms ]) => {
       const activeSettings: Settings = settings[0];
