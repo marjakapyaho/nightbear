@@ -1,4 +1,4 @@
-import { Model, ModelOfType, ModelType } from 'core/models/model';
+import { Alarm, Model, ModelOfType, ModelType } from 'core/models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
@@ -13,6 +13,7 @@ export interface Storage {
     limit?: number,
   ): Promise<Array<ModelOfType<T>>>;
   loadGlobalModels(): Promise<Model[]>;
+  loadActiveAlarms(): Promise<Alarm[]>;
 }
 
 export const NO_STORAGE: Storage = {
@@ -21,6 +22,7 @@ export const NO_STORAGE: Storage = {
   loadTimelineModels: () => Promise.resolve([]),
   loadLatestTimelineModels: () => Promise.resolve([]),
   loadGlobalModels: () => Promise.resolve([]),
+  loadActiveAlarms: () => Promise.resolve([]),
 };
 
 export type StorageErrorDetails = Readonly<{
