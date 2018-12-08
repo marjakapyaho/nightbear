@@ -230,7 +230,7 @@ function createModelMeta(model: Model): CouchDbModelMeta {
 export function getStorageKey(model: Model): string {
   switch (model.modelType) {
     case 'Alarm':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.creationTimestamp)}/${model.modelType}`;
+      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}`;
     case 'Sensor':
       return `${PREFIX_TIMELINE}/${timestampToString(model.startTimestamp)}/${model.modelType}`;
     case 'DexcomSensorEntry':

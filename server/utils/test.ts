@@ -4,6 +4,7 @@ import { assert } from 'chai';
 import { Context, Request } from 'core/models/api';
 import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from 'core/storage/storage';
+import { NO_PUSHOVER } from 'core/alarms/pushover-client';
 import { Profile, Model } from 'core/models/model';
 import { Storage } from 'core/storage/storage';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
@@ -63,6 +64,7 @@ export function createTestContext(storage = NO_STORAGE, timestamp = () => 150867
     timestamp,
     log: NO_LOGGING,
     storage,
+    pushover: NO_PUSHOVER,
   };
 }
 

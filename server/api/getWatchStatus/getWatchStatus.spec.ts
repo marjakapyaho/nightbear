@@ -12,7 +12,7 @@ describe('api/getWatchStatus', () => {
   const mockResponseJson: object = {
     alarms: [{
       modelType: 'Alarm',
-      creationTimestamp: 324234324,
+      timestamp: 324234324,
       validAfterTimestamp: 234432423,
       alarmLevel: 1,
       situationType: 'PERSISTENT_HIGH',
