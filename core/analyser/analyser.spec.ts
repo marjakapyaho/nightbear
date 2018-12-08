@@ -1,18 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import {
-  runAnalysis,
-  STATUS_BATTERY,
-  STATUS_OUTDATED,
-  STATUS_LOW,
-  STATUS_FALLING,
-  STATUS_COMPRESSION_LOW,
-  STATUS_HIGH,
-  STATUS_RISING,
-  STATUS_PERSISTENT_HIGH,
-} from './analyser';
+import { runAnalysis } from './analyser';
 import { activeProfile } from 'server/utils/test';
-import { Alarm, DeviceStatus, Insulin } from 'core/models/model';
+import { Alarm, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
 import { entriesLow } from './test-data/low';
 import { entriesNoSituation } from './test-data/no-situation';
 import { entriesHigh } from './test-data/high';
@@ -48,16 +38,7 @@ describe('utils/analyser', () => {
         deviceStatus,
         latestAlarms,
       ),
-      {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
-      },
+      DEFAULT_STATE,
     );
   });
 
@@ -80,14 +61,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: true,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        BATTERY: true,
       },
     );
   });
@@ -103,14 +78,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: true,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        OUTDATED: true,
       },
     );
   });
@@ -126,14 +95,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: true,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        LOW: true,
       },
     );
   });
@@ -149,14 +112,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: true,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        FALLING: true,
       },
     );
   });
@@ -172,14 +129,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: true,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        COMPRESSION_LOW: true,
       },
     );
   });
@@ -195,14 +146,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: true,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        HIGH: true,
       },
     );
   });
@@ -218,14 +163,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: true,
-        [STATUS_PERSISTENT_HIGH]: false,
+        ...DEFAULT_STATE,
+        RISING: true,
       },
     );
   });
@@ -241,14 +180,8 @@ describe('utils/analyser', () => {
         latestAlarms,
       ),
       {
-        [STATUS_BATTERY]: false,
-        [STATUS_OUTDATED]: false,
-        [STATUS_LOW]: false,
-        [STATUS_FALLING]: false,
-        [STATUS_COMPRESSION_LOW]: false,
-        [STATUS_HIGH]: false,
-        [STATUS_RISING]: false,
-        [STATUS_PERSISTENT_HIGH]: true,
+        ...DEFAULT_STATE,
+        PERSISTENT_HIGH: true,
       },
     );
   });

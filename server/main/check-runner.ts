@@ -1,19 +1,40 @@
-import { MIN_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { Profile, Settings } from 'core/models/model';
+import { Context } from 'core/models/api';
+import { getMergedEntriesFeed } from 'core/entries/entries';
+import { runAnalysis } from 'core/analyser/analyser';
+import { runAlarmChecks } from 'core/alarms/alarms';
 
+const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 let nextCheck: NodeJS.Timer;
 
-export function runChecks() {
+export function runChecks(context: Context) {
   // Clear previous timer (if exists)
   if (nextCheck) {
     global.clearTimeout(nextCheck);
   }
 
   // And set next one
-  nextCheck = global.setTimeout(runChecks, 6 * MIN_IN_MS);
+  nextCheck = global.setTimeout(runChecks, 2 * MIN_IN_MS);
 
-  // TODO: Load content from db and pass it to check functions
-  console.log('Running checks');
-  /* return getAnalysisContent()
-     .then(runAnalysis)
-     .then(runAlarmChecks);*/
+  return Promise.all([
+    context.storage.loadLatestTimelineModels('Settings', 1),
+    getMergedEntriesFeed(context, ANALYSIS_RANGE),
+    context.storage.loadTimelineModels('Insulin', ANALYSIS_RANGE, context.timestamp()),
+    context.storage.loadLatestTimelineModels('DeviceStatus', 1),
+    context.storage.loadTimelineModels('Alarm', ANALYSIS_RANGE, context.timestamp()), // TODO: all active
+  ])
+    .then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms ]) => {
+      const activeSettings: Settings = settings[0];
+      const activeProfile: Profile = activeSettings.activeProfile;
+      const state = runAnalysis(
+        context.timestamp(),
+        activeProfile,
+        sensorEntries,
+        insulin,
+        latestDeviceStatus[0],
+        alarms,
+      );
+      return runAlarmChecks(context, state, activeProfile, alarms);
+    });
 }

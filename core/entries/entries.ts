@@ -6,7 +6,7 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 export function getMergedEntriesFeed(
   context: Context,
   range: number,
-  rangeEnd: number): Promise<SensorEntry[]> {
+  rangeEnd: number = context.timestamp()): Promise<SensorEntry[]> {
 
   return Promise.all([
     context.storage.loadTimelineModels('DexcomSensorEntry', range, rangeEnd),
