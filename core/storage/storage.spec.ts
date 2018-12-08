@@ -165,7 +165,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       });
   });
 
-  describe('loadActiveAlarms()', () => {
+  describe('loading active alarms', () => {
     const alarm: Alarm = {
       modelType: 'Alarm',
       timestamp: 0,

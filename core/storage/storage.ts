@@ -11,6 +11,7 @@ export interface Storage {
   loadLatestTimelineModels<T extends ModelType>(
     modelType: T,
     limit?: number,
+    mustMatch?: Partial<ModelOfType<T>>,
   ): Promise<Array<ModelOfType<T>>>;
   loadGlobalModels(): Promise<Model[]>;
   loadActiveAlarms(): Promise<Alarm[]>;

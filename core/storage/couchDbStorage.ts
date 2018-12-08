@@ -131,12 +131,18 @@ export function createCouchDbStorage(
     loadLatestTimelineModels<T extends ModelType>(
       modelType: T,
       limit?: number,
+      mustMatch?: Partial<ModelOfType<T>>,
     ): Promise<Array<ModelOfType<T>>> {
+      const fields = [
+        'modelType', // first, we only care about a specific modelType
+        ...Object.keys(mustMatch || {}), // then, index by all the extra keys that were requested (if any)
+        '_id', // finally, include "_id" in the index, so we get temporal ordering
+      ];
       return Promise.resolve()
         .then(() =>
           db
             .createIndex({
-              index: { fields: ['modelType', '_id'] }, // index first by "modelType", and then by "_id", since that gives us temporal ordering
+              index: { fields },
             })
             .catch((errObj: PouchDB.Core.Error) => {
               throw new Error(
@@ -152,12 +158,12 @@ export function createCouchDbStorage(
         .then(() =>
           db
             .find({
-              selector: { modelType },
+              selector: { ...mustMatch, modelType },
               limit,
-              sort: [{ modelType: 'desc' }, { _id: 'desc' }], // { _id: 'desc' } gives us the latest first
+              sort: fields.map(name => ({ [name]: 'desc' as 'desc' })), // note: the last condition becoming { _id: 'desc' } gives us the latest first (because all preceding fields will have the same values)
             })
             .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't query index: ${errObj.message}`); // refine the error before giving it out
+              throw new Error(`Couldn't query index (loadLatestTimelineModels): ${errObj.message}`); // refine the error before giving it out
             }),
         )
         .then(res => res.docs.map(reviveCouchDbRowIntoModel))
