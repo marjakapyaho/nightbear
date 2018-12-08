@@ -2,7 +2,6 @@ import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
-import { is } from 'core/models/utils';
 
 export interface CouchDbModelMeta {
   readonly _id: string;
@@ -185,39 +184,6 @@ export function createCouchDbStorage(
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
-        });
-    },
-
-    loadActiveAlarms() {
-      return Promise.resolve()
-        .then(() =>
-          db
-            .createIndex({
-              index: { fields: ['modelType', 'isActive', '_id'] }, // index first by "modelType", and then by "_id", since that gives us temporal ordering
-            })
-            .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't create index (loadAllActiveAlarms): ${errObj.message}`); // refine the error before giving it out
-            }),
-        )
-        .then(res => {
-          if (res.result !== 'exists') {
-            // TODO: log res as info/warning
-          }
-        })
-        .then(() =>
-          db
-            .find({
-              selector: { modelType: 'Alarm', isActive: true },
-              sort: [{ modelType: 'desc' }, { isActive: 'desc' }, { _id: 'desc' }], // { _id: 'desc' } gives us the latest first
-            })
-            .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't query index (loadActiveAlarms): ${errObj.message}`); // refine the error before giving it out
-            }),
-        )
-        .then(res => res.docs.map(reviveCouchDbRowIntoModel))
-        .then(models => models.filter(is('Alarm')))
-        .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't load active alarms: ${errObj.message}`); // refine the error before giving it out
         });
     },
   });

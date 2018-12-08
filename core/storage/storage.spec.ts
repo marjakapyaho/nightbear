@@ -178,7 +178,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
     it("doesn't load anything if there's nothing to load", () => {
       return Promise.resolve()
-        .then(() => storage.loadActiveAlarms())
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 0);
         });
@@ -188,7 +188,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       return Promise.resolve()
         .then(() => [{ ...alarm, timestamp }])
         .then(storage.saveModels)
-        .then(() => storage.loadActiveAlarms())
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 0);
         });
@@ -199,7 +199,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       return Promise.resolve()
         .then(() => [a1])
         .then(storage.saveModels)
-        .then(() => storage.loadActiveAlarms())
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 1);
           assertEqualWithoutMeta(models[0], a1);
@@ -214,7 +214,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       return Promise.resolve()
         .then(() => [a1, a4, a2, a3]) // intentionally inserted out-of-order
         .then(storage.saveModels)
-        .then(() => storage.loadActiveAlarms())
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 2);
           assertEqualWithoutMeta(models[0], a3);
