@@ -3,6 +3,8 @@ import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
 import { actions } from 'web/app/modules/actions';
+import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
+import LastBgUpdateBar from 'web/app/ui/utils/LastBgUpdateBar';
 
 export default renderFromStore(
   __filename,
@@ -12,6 +14,8 @@ export default renderFromStore(
   }),
   (React, { remoteDbUrl, timelineData }, dispatch) => (
     <div className="this">
+      <DbStatusBar />
+      <LastBgUpdateBar />
       {!!remoteDbUrl && <pre>dbUrl = {remoteDbUrl}</pre>}
       <button
         onClick={() => dispatch(actions.DB_URL_SET(prompt('Please enter new DB URL:') || ''))}
@@ -20,9 +24,10 @@ export default renderFromStore(
       </button>
       <button onClick={() => dispatch(actions.DB_URL_SET(''))}>Log out</button>
       <ModelTypeSelector
+        multiple
         onChange={newType =>
           dispatch(
-            actions.TIMELINE_FILTERS_CHANGED(timelineData.filters.range, Date.now(), [newType]),
+            actions.TIMELINE_FILTERS_CHANGED(timelineData.filters.range, Date.now(), newType),
           )
         }
       />
