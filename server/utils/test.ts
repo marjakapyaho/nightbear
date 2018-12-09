@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { NO_PUSHOVER } from 'core/alarms/pushover-client';
 import { Context, Request } from 'core/models/api';
-import { Model, Profile } from 'core/models/model';
+import { Model, Profile, Settings } from 'core/models/model';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { NO_STORAGE } from 'core/storage/storage';
@@ -77,6 +77,14 @@ export function assertEqualWithoutMeta(
     Array.isArray(actual) ? actual.map(withoutMeta) : withoutMeta(actual),
     Array.isArray(expected) ? expected.map(withoutMeta) : withoutMeta(expected),
   );
+}
+
+export function activeSettings(name: string): Settings {
+  return {
+    modelType: 'Settings',
+    alarmsEnabled: true,
+    activeProfile: activeProfile(name),
+  };
 }
 
 export function activeProfile(name: string): Profile {

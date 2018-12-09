@@ -9,15 +9,19 @@ const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
 let nextCheck: NodeJS.Timer;
 
-export function runChecks(context: Context) {
+export function checkRunnerTimer(context: Context) {
   // Clear previous timer (if exists)
   if (nextCheck) {
     global.clearTimeout(nextCheck);
   }
 
   // And set next one
-  nextCheck = global.setTimeout(runChecks, CHECK_RUN_INTERVAL);
+  nextCheck = global.setTimeout(checkRunnerTimer, CHECK_RUN_INTERVAL);
 
+  return runChecks(context);
+}
+
+export function runChecks(context: Context) {
   return Promise.all([
     context.storage.loadLatestTimelineModels('Settings', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
