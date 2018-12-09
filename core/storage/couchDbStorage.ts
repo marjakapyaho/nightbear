@@ -220,6 +220,9 @@ function createModelMeta(model: Model): CouchDbModelMeta {
 }
 
 export function getStorageKey(model: Model): string {
+  if (isModelMeta(model.modelMeta) && model.modelMeta._id) {
+    return model.modelMeta._id; // the Model already has an assigned storage key -> use it
+  }
   switch (model.modelType) {
     case 'Alarm':
     case 'Sensor':
