@@ -12,7 +12,7 @@
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "precommit": "npm run lint && npm test",
     "==================== GLOBAL QA ====================": "",
-    "lint": "concurrently \"check-node-version --package\" \"tsc --noEmit --project .\" \"tslint --project .\"",
+    "lint": "concurrently 'check-node-version --package' 'tsc --noEmit --project .' 'tslint --project .'",
     "lint-watch": "chokidar '**/*.{ts,tsx}' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
     "lint-fix": "prettier --write '{core,server,web}/**/*.{ts,tsx,scss}'",
     "test": "check-node-version --package && NODE_PATH=. mocha --require ts-node/register --require core/storage/PouchDb.mocha $(npm run --silent test-list)",
