@@ -1,6 +1,7 @@
 import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
+import { first } from 'lodash';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
 
 export interface CouchDbModelMeta {
@@ -32,7 +33,11 @@ export function createCouchDbStorage(
 
   return (self = {
     saveModel(model) {
-      return self.saveModels([model]).then(models => models[0]);
+      return self.saveModels([model]).then(models => {
+        const model = first(models);
+        if (!model) throw new Error(`No model returned after saveModels()`);
+        return model;
+      });
     },
 
     saveModels(models, upsert = false) {

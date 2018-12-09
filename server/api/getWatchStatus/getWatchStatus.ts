@@ -1,4 +1,5 @@
 import { Context, createResponse, Request, Response } from 'core/models/api';
+import { first } from 'lodash';
 
 export function getWatchStatus(_request: Request, context: Context): Response {
   return Promise.all([
@@ -7,7 +8,7 @@ export function getWatchStatus(_request: Request, context: Context): Response {
   ]).then(([alarms, deviceStatus]) =>
     createResponse({
       alarms,
-      deviceStatus: deviceStatus[0] || {},
+      deviceStatus: first(deviceStatus) || {},
     }),
   );
 }
