@@ -2,13 +2,13 @@ import 'mocha';
 import PouchDB from 'core/storage/PouchDb';
 import { assert } from 'chai';
 import { Context, Request } from 'core/models/api';
-import { NO_LOGGING } from './logging';
 import { NO_STORAGE } from 'core/storage/storage';
 import { NO_PUSHOVER } from 'core/alarms/pushover-client';
 import { Profile, Model } from 'core/models/model';
 import { Storage } from 'core/storage/storage';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
-import { getUuid } from './uuid';
+import { getUuid } from 'server/utils/uuid';
+import { NO_LOGGING } from 'server/utils/logging';
 
 export type TestSuite = (storage: () => Storage) => void;
 

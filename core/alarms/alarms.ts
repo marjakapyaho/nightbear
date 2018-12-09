@@ -1,8 +1,8 @@
 import { Alarm, Profile, Situation, State } from 'core/models/model';
 import { filter, compact, map, find, sum, take, findIndex } from 'lodash';
-import { MIN_IN_MS } from '../calculations/calculations';
 import { Context } from 'core/models/api';
 import { isNotNull } from 'server/utils/types';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 
 const INITIAL_ALARM_LEVEL = 1;
 

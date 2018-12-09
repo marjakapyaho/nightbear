@@ -1,6 +1,6 @@
 import { AnalyserEntry, SensorEntry } from 'core/models/model';
-import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from '../calculations/calculations';
 import { slice, sum, reduce } from 'lodash';
+import { TIME_LIMIT_FOR_SLOPE, roundTo2Decimals, MIN_IN_MS } from 'core/calculations/calculations';
 
 export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
   const analyserEntries: AnalyserEntry[] = entries

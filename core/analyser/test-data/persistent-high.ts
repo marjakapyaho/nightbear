@@ -1,6 +1,6 @@
-import { MIN_IN_MS } from '../../calculations/calculations';
 import { DexcomSensorEntry } from 'core/models/model';
 import { range } from 'lodash';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 
 export function entriesPersistentHigh(currentTimestamp: number): DexcomSensorEntry[] {
   return range(30).map(index => {

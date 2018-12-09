@@ -1,16 +1,16 @@
 import 'mocha';
 import { assert } from 'chai';
-import { runAnalysis } from './analyser';
 import { activeProfile } from 'server/utils/test';
 import { Alarm, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
-import { entriesLow } from './test-data/low';
-import { entriesNoSituation } from './test-data/no-situation';
-import { entriesHigh } from './test-data/high';
-import { entriesFalling } from './test-data/falling';
-import { entriesRising } from './test-data/rising';
-import { entriesPersistentHigh } from './test-data/persistent-high';
-import { entriesCompressionLow } from './test-data/compression-low';
-import { entriesOutdated } from './test-data/outdated';
+import { runAnalysis } from 'core/analyser/analyser';
+import { entriesNoSituation } from 'core/analyser/test-data/no-situation';
+import { entriesOutdated } from 'core/analyser/test-data/outdated';
+import { entriesLow } from 'core/analyser/test-data/low';
+import { entriesFalling } from 'core/analyser/test-data/falling';
+import { entriesCompressionLow } from 'core/analyser/test-data/compression-low';
+import { entriesHigh } from 'core/analyser/test-data/high';
+import { entriesRising } from 'core/analyser/test-data/rising';
+import { entriesPersistentHigh } from 'core/analyser/test-data/persistent-high';
 
 describe('utils/analyser', () => {
   // Mock objects

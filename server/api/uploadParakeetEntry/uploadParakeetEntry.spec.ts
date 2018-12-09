@@ -1,10 +1,14 @@
 import 'mocha';
 import { assert } from 'chai';
-import { uploadParakeetEntry, parseParakeetEntry, parseParakeetStatus } from './uploadParakeetEntry';
 import { Request } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'core/models/model';
 import { createTestContext, withStorage, assertEqualWithoutMeta } from 'server/utils/test';
 import { MIN_IN_MS } from 'core/calculations/calculations';
+import {
+  parseParakeetEntry,
+  parseParakeetStatus,
+  uploadParakeetEntry,
+} from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 
 describe('api/uploadParakeetEntry', () => {
   const context = createTestContext();

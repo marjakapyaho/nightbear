@@ -1,11 +1,11 @@
 import 'mocha';
-import { getMergedEntriesFeed } from './entries';
-import { HOUR_IN_MS, MIN_IN_MS } from '../calculations/calculations';
 import { Request } from 'core/models/api';
 import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { DexcomCalibration } from 'core/models/model';
+import { MIN_IN_MS, HOUR_IN_MS } from 'core/calculations/calculations';
+import { getMergedEntriesFeed } from 'core/entries/entries';
 
 describe('core/entries', () => {
   const timestamp = 1508672249758;

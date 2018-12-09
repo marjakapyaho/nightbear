@@ -1,7 +1,7 @@
 import 'mocha';
 import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'server/utils/test';
 import { Hba1c } from 'core/models/model';
-import { getHba1cHistory } from './getHba1cHistory';
+import { getHba1cHistory } from 'server/api/getHba1cHistory/getHba1cHistory';
 
 describe('api/getHba1cHistory', () => {
   const request = createTestRequest();

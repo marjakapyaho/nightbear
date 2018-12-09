@@ -1,10 +1,10 @@
 import 'mocha';
 import { assertEqualWithoutMeta, createTestContext, createTestRequest, withStorage } from 'server/utils/test';
 import { DexcomCalibration, Hba1c } from 'core/models/model';
-import { uploadDexcomEntry } from '../uploadDexcomEntry/uploadDexcomEntry';
 import { Request } from 'core/models/api';
-import { calculateHba1cForDate } from './calculateHba1c';
-import { getHba1cHistory } from '../getHba1cHistory/getHba1cHistory';
+import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
+import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
+import { getHba1cHistory } from 'server/api/getHba1cHistory/getHba1cHistory';
 
 describe('api/calculateHba1c', () => {
   const request = createTestRequest();

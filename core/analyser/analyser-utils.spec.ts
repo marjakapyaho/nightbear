@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
-import { parseAnalyserEntries } from './analyser-utils';
-import { MIN_IN_MS } from '../calculations/calculations';
 import { AnalyserEntry, SensorEntry } from 'core/models/model';
+import { MIN_IN_MS } from 'core/calculations/calculations';
+import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
 
 describe('utils/analyser-utils', () => {
   // Mock objects

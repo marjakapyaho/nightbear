@@ -1,16 +1,16 @@
 import { assert } from 'chai';
 import 'mocha';
 import {
-  MIN_IN_MS,
-  calculateHba1c,
-  calculateRaw,
-  changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
+  changeBloodGlucoseUnitToMgdl,
+  calculateRaw,
   isDexcomEntryValid,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
-} from './calculations';
-import { sensorEntries1, sensorEntries2 } from './test-data/sensor-entries';
+  MIN_IN_MS,
+  calculateHba1c,
+} from 'core/calculations/calculations';
+import { sensorEntries1, sensorEntries2 } from 'core/calculations/test-data/sensor-entries';
 
 describe('core/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
