@@ -3,8 +3,7 @@ import { DexcomSensorEntry } from 'core/models/model';
 import { range } from 'lodash';
 
 export function entriesPersistentHigh(currentTimestamp: number): DexcomSensorEntry[] {
-
-  return range(30).map((index) => {
+  return range(30).map(index => {
     return {
       modelType: 'DexcomSensorEntry',
       timestamp: currentTimestamp - index * 5 * MIN_IN_MS,
@@ -13,5 +12,4 @@ export function entriesPersistentHigh(currentTimestamp: number): DexcomSensorEnt
       noiseLevel: 1,
     };
   }) as DexcomSensorEntry[];
-
 }

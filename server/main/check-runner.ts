@@ -23,18 +23,17 @@ export function runChecks(context: Context) {
     context.storage.loadTimelineModels('Insulin', ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
-  ])
-    .then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms ]) => {
-      const activeSettings: Settings = settings[0];
-      const activeProfile: Profile = activeSettings.activeProfile;
-      const state = runAnalysis(
-        context.timestamp(),
-        activeProfile,
-        sensorEntries,
-        insulin,
-        latestDeviceStatus[0],
-        alarms,
-      );
-      return runAlarmChecks(context, state, activeProfile, alarms);
-    });
+  ]).then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
+    const activeSettings: Settings = settings[0];
+    const activeProfile: Profile = activeSettings.activeProfile;
+    const state = runAnalysis(
+      context.timestamp(),
+      activeProfile,
+      sensorEntries,
+      insulin,
+      latestDeviceStatus[0],
+      alarms,
+    );
+    return runAlarmChecks(context, state, activeProfile, alarms);
+  });
 }

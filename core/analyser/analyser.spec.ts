@@ -13,7 +13,6 @@ import { entriesCompressionLow } from './test-data/compression-low';
 import { entriesOutdated } from './test-data/outdated';
 
 describe('utils/analyser', () => {
-
   // Mock objects
   const currentTimestamp = 1508672249758;
   const insulin: Insulin[] = [];

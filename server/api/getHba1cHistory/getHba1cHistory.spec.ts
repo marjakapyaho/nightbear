@@ -4,7 +4,6 @@ import { Hba1c } from 'core/models/model';
 import { getHba1cHistory } from './getHba1cHistory';
 
 describe('api/getHba1cHistory', () => {
-
   const request = createTestRequest();
 
   const mockHba1c: Hba1c = {
@@ -17,7 +16,6 @@ describe('api/getHba1cHistory', () => {
   const mockResponseJson = [mockHba1c];
 
   withStorage(createTestStorage => {
-
     it('get Hba1c history', () => {
       const context = createTestContext(createTestStorage());
       return Promise.resolve()
@@ -25,6 +23,5 @@ describe('api/getHba1cHistory', () => {
         .then(() => getHba1cHistory(request, context))
         .then(res => assertEqualWithoutMeta(res.responseBody as any, mockResponseJson));
     });
-
   });
 });

@@ -25,9 +25,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   let model: Carbs;
 
   function findModel(models: Model[]): Model {
-    const found = models.find(
-      m => m.modelType === model.modelType && m.timestamp === model.timestamp,
-    );
+    const found = models.find(m => m.modelType === model.modelType && m.timestamp === model.timestamp);
     if (found) return found;
     throw new Error(`Couldn't find the Model this test case is operating on`);
   }

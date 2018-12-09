@@ -21,14 +21,9 @@ export function changeBloodGlucoseUnitToMgdl(glucoseInMmoll: number): number {
 }
 
 // Calculates actual blood glucose in mmol/L
-export function calculateRaw(
-  unfiltered: number,
-  slope: number,
-  intercept: number,
-  scale = 1,
-): number | null {
+export function calculateRaw(unfiltered: number, slope: number, intercept: number, scale = 1): number | null {
   if (unfiltered !== 0 && slope !== 0 && scale !== 0) {
-    const raw = scale * (unfiltered - intercept) / slope;
+    const raw = (scale * (unfiltered - intercept)) / slope;
     return changeBloodGlucoseUnitToMmoll(raw);
   }
 
@@ -47,20 +42,24 @@ export function roundTo2Decimals(num: number) {
 export function timestampIsUnderMaxAge(
   currentTimestamp: number,
   timestampToCheck: number,
-  maxAgeInMinutes: number): boolean
-{
+  maxAgeInMinutes: number,
+): boolean {
   const maxAgeInMs = maxAgeInMinutes * MIN_IN_MS;
-  return timestampToCheck > (currentTimestamp - maxAgeInMs);
+  return timestampToCheck > currentTimestamp - maxAgeInMs;
 }
 
 export function calculateHba1c(entries: SensorEntry[]) {
   const numericEntries = entries.filter(hasBloodGlucose);
-  const sumOfEntries = reduce(numericEntries, (sum, entry) => {
-    return sum + changeBloodGlucoseUnitToMgdl(entry.bloodGlucose);
-  }, 0);
+  const sumOfEntries = reduce(
+    numericEntries,
+    (sum, entry) => {
+      return sum + changeBloodGlucoseUnitToMgdl(entry.bloodGlucose);
+    },
+    0,
+  );
 
   const avgGlucose = sumOfEntries / numericEntries.length;
 
   // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
-  return ((avgGlucose + 46.7) / 28.7) - 0.6;
+  return (avgGlucose + 46.7) / 28.7 - 0.6;
 }

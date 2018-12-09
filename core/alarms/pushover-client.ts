@@ -13,11 +13,7 @@ export function createPushoverClient(user: string, token: string, callbackUrl: s
   const api = new Pushover({ user, token });
 
   return {
-
-    sendAlarm(
-      situationType: Situation,
-      recipient: string,
-    ): Promise<string> {
+    sendAlarm(situationType: Situation, recipient: string): Promise<string> {
       const message = {
         title: 'Nightbear alarm',
         sound: 'persistent',
@@ -43,14 +39,15 @@ export function createPushoverClient(user: string, token: string, callbackUrl: s
     },
 
     ackAlarms(receipts: string[] = []): Promise<null> {
-      return Promise.all(receipts.map(receipt => {
+      return Promise.all(
+        receipts.map(receipt => {
           return axios.post(
             'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json',
             'token=' + encodeURIComponent(token),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
           );
-        }))
-        .then(() => null);
+        }),
+      ).then(() => null);
     },
   };
 }

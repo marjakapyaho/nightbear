@@ -1,7 +1,7 @@
 export const MODEL_VERSION = 1;
 
-export type Model
-  = Sensor
+export type Model =
+  | Sensor
   | SensorEntry
   | Calibration
   | DeviceStatus
@@ -31,10 +31,7 @@ export interface Sensor {
   readonly placementNote: string;
 }
 
-export type SensorEntry
-  = DexcomSensorEntry
-  | DexcomRawSensorEntry
-  | ParakeetSensorEntry;
+export type SensorEntry = DexcomSensorEntry | DexcomRawSensorEntry | ParakeetSensorEntry;
 
 export interface DexcomSensorEntry {
   // Model:
@@ -81,10 +78,7 @@ export interface AnalyserEntry {
   readonly rawSlope: number | null;
 }
 
-export type Calibration
-  = DexcomCalibration
-  | NightbearCalibration
-  ;
+export type Calibration = DexcomCalibration | NightbearCalibration;
 
 export interface MeterEntry {
   readonly modelType: 'MeterEntry';
@@ -131,7 +125,7 @@ export interface DeviceStatus {
   readonly deviceName: string;
   readonly timestamp: number;
   readonly batteryLevel: number;
-  readonly geolocation: string | null;
+  readonly geolocation: string | null;
 }
 
 export interface Hba1c {

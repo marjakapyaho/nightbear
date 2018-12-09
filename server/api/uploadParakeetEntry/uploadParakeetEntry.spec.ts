@@ -7,7 +7,6 @@ import { createTestContext, withStorage, assertEqualWithoutMeta } from 'server/u
 import { MIN_IN_MS } from 'core/calculations/calculations';
 
 describe('api/uploadParakeetEntry', () => {
-
   const context = createTestContext();
   const timestampNow = context.timestamp();
 
@@ -37,11 +36,13 @@ describe('api/uploadParakeetEntry', () => {
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 2 * MIN_IN_MS,
-    meterEntries: [{
-      modelType: 'MeterEntry',
-      timestamp: timestampNow - 2 * MIN_IN_MS,
-      bloodGlucose: 8.0,
-    }],
+    meterEntries: [
+      {
+        modelType: 'MeterEntry',
+        timestamp: timestampNow - 2 * MIN_IN_MS,
+        bloodGlucose: 8.0,
+      },
+    ],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -72,31 +73,22 @@ describe('api/uploadParakeetEntry', () => {
   });
 
   it('produces correct DeviceStatus', () => {
-    assert.deepEqual(
-      parseParakeetStatus(mockRequest.requestParams, context.timestamp()),
-      mockDeviceStatus,
-    );
+    assert.deepEqual(parseParakeetStatus(mockRequest.requestParams, context.timestamp()), mockDeviceStatus);
   });
 
   withStorage(createTestStorage => {
-
     it('uploads parakeet entry with correct response', () => {
       const context = createTestContext(createTestStorage());
       return Promise.resolve()
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => uploadParakeetEntry(mockRequest, context))
         .then(res => {
-          assert.equal(
-            res.responseBody,
-            '!ACK  0!',
-          );
+          assert.equal(res.responseBody, '!ACK  0!');
         })
         .then(() => context.storage.loadLatestTimelineModels('ParakeetSensorEntry', 100))
         .then(models => assertEqualWithoutMeta(models, [mockParakeetSensorEntry]))
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
         .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
     });
-
   });
-
 });

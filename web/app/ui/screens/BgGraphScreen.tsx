@@ -32,11 +32,13 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
     xAxis: {
       type: 'datetime',
       minTickInterval: HOUR_IN_MS,
-      plotLines: [{
-        color: '#ff5722',
-        value: Date.now() - 2.3 * HOUR_IN_MS,
-        width: 1,
-      }],
+      plotLines: [
+        {
+          color: '#ff5722',
+          value: Date.now() - 2.3 * HOUR_IN_MS,
+          width: 1,
+        },
+      ],
     },
     yAxis: {
       max: 15,
@@ -51,7 +53,7 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
           from: 8,
           to: 16,
         },
-/*        {
+        /*        {
           color: 'rgba(75, 175, 80, 0.06)',
           from: 4,
           to: 10,
@@ -77,11 +79,11 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
             value: 4,
             color: '#ff5722',
           },
-            {
+          {
             value: 8,
             color: '#4caf50',
           },
-            {
+          {
             color: '#ff9800',
           },
         ],
@@ -99,11 +101,8 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
         data: models
           .map(model => (model.modelType === 'ParakeetSensorEntry' ? model : null))
           .filter(isNotNull)
-          .map(
-            model =>
-              model.bloodGlucose
-                ? ([model.timestamp, model.bloodGlucose] as [number, number])
-                : null,
+          .map(model =>
+            model.bloodGlucose ? ([model.timestamp, model.bloodGlucose] as [number, number]) : null,
           )
           .filter(isNotNull),
       } as any,

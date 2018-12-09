@@ -6,12 +6,7 @@ export function initPushoverClient(user: string, token: string) {
   // api = new Pushover({ user, token });
 }
 
-export function sendPushoverAlarm(
-  recipient: string,
-  message: string,
-  retry: number,
-  expire: number) {
-
+export function sendPushoverAlarm(recipient: string, message: string, retry: number, expire: number) {
   const pushoverAlarm = {
     message,
     title: 'NightBear alert',
@@ -36,9 +31,10 @@ export function sendPushoverAlarm(
 }
 
 export function ackPushoverAlarms(receipts: string[] = []) {
-  return Promise.all(receipts.map(receipt => {
-    return receipt;
-    /*
+  return Promise.all(
+    receipts.map(receipt => {
+      return receipt;
+      /*
     return axios.post(
       'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json',
       'token=' + encodeURIComponent(token),
@@ -51,5 +47,6 @@ export function ackPushoverAlarms(receipts: string[] = []) {
       }
     );
     */
-  }));
+    }),
+  );
 }

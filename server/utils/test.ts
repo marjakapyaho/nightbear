@@ -38,9 +38,7 @@ function withCouchDbStorage(suite: TestSuite) {
       return createCouchDbStorage(dbUrl);
     });
     after(() => {
-      return Promise.all(
-        createdDbs.map(dbUrl => new PouchDB(dbUrl).destroy()),
-      ).then(() => {
+      return Promise.all(createdDbs.map(dbUrl => new PouchDB(dbUrl).destroy())).then(() => {
         createdDbs = [];
       });
     });
@@ -74,15 +72,9 @@ export function assertEqualWithoutMeta(actual: Model[], expected: Model[]): void
 export function assertEqualWithoutMeta(actual: any, expected: any): void {
   const withoutMeta = (model: Model) => Object.assign({}, model, { modelMeta: undefined });
   if (Array.isArray(actual)) {
-    assert.deepEqual(
-      actual.map(withoutMeta),
-      expected.map(withoutMeta),
-    );
+    assert.deepEqual(actual.map(withoutMeta), expected.map(withoutMeta));
   } else {
-    assert.deepEqual(
-      withoutMeta(actual),
-      withoutMeta(expected),
-    );
+    assert.deepEqual(withoutMeta(actual), withoutMeta(expected));
   }
 }
 

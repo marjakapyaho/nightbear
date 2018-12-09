@@ -7,17 +7,18 @@ import { calculateHba1cForDate } from './calculateHba1c';
 import { getHba1cHistory } from '../getHba1cHistory/getHba1cHistory';
 
 describe('api/calculateHba1c', () => {
-
   const request = createTestRequest();
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: 1508672249758 - 3 * 14934,
-    meterEntries: [{
-      modelType: 'MeterEntry',
-      timestamp: 1508672249758 - 3 * 14934,
-      bloodGlucose: 8.0,
-    }],
+    meterEntries: [
+      {
+        modelType: 'MeterEntry',
+        timestamp: 1508672249758 - 3 * 14934,
+        bloodGlucose: 8.0,
+      },
+    ],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -45,7 +46,6 @@ describe('api/calculateHba1c', () => {
   };
 
   withStorage(createTestStorage => {
-
     it('calculate hba1c for date', () => {
       const context = createTestContext(createTestStorage());
 
@@ -65,6 +65,5 @@ describe('api/calculateHba1c', () => {
         .then(() => getHba1cHistory(request, context))
         .then(res => assertEqualWithoutMeta(res.responseBody as any, mockResponseJson));
     });
-
   });
 });

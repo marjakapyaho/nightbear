@@ -7,25 +7,28 @@ import { find } from 'lodash';
 const PARAKEET_RESPONSE = '!ACK  0!';
 
 export function uploadParakeetEntry(request: Request, context: Context): Response {
-
   const { requestParams } = request;
 
   return Promise.resolve()
     .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 2))
-    .then((latestCalibrations) => {
-      const latestCalibration = find(latestCalibrations as DexcomCalibration[], (cal) => cal.slope !== null); // TODO
+    .then(latestCalibrations => {
+      const latestCalibration = find(latestCalibrations as DexcomCalibration[], cal => cal.slope !== null); // TODO
       if (!latestCalibration) {
         return Promise.reject('Could not find DexcomCalibration for uploading Parakeet entry');
       }
 
       // Parse parakeet entry
-      const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(requestParams, latestCalibration, context.timestamp());
+      const parakeetEntry: ParakeetSensorEntry = parseParakeetEntry(
+        requestParams,
+        latestCalibration,
+        context.timestamp(),
+      );
 
       // Parse parakeet status
       const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
 
       // Save entries to db
-      return context.storage.saveModels([ parakeetEntry, parakeetStatus ]);
+      return context.storage.saveModels([parakeetEntry, parakeetStatus]);
     })
     .then(() => Promise.resolve(createResponse(PARAKEET_RESPONSE)));
 }
@@ -34,7 +37,7 @@ export function parseParakeetEntry(
   params: { [key: string]: string },
   latestCalibration: DexcomCalibration,
   timestamp: number,
-  ): ParakeetSensorEntry {
+): ParakeetSensorEntry {
   const { slope, intercept, scale } = latestCalibration;
 
   const filtered = parseInt(params.lf, 10);
@@ -50,10 +53,7 @@ export function parseParakeetEntry(
   };
 }
 
-export function parseParakeetStatus(
-  params: { [key: string]: string },
-  timestamp: number,
-  ): DeviceStatus {
+export function parseParakeetStatus(params: { [key: string]: string }, timestamp: number): DeviceStatus {
   const batteryLevel = parseInt(params.bp, 10);
   const geolocation = params.gl;
 

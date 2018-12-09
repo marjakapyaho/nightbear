@@ -3,10 +3,9 @@ import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from '../calculatio
 import { slice, sum, reduce } from 'lodash';
 
 export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
-
   const analyserEntries: AnalyserEntry[] = entries
     .filter(entry => entry.bloodGlucose)
-    .map((entry) => ({
+    .map(entry => ({
       bloodGlucose: entry.bloodGlucose || 0, // TODO
       timestamp: entry.timestamp,
       slope: null,
@@ -25,7 +24,7 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
       const timeBetweenEntries = currentTimestamp - previousTimestamp;
 
       if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE) {
-        currentSlope = roundTo2Decimals((currentBg - previousBg) / timeBetweenEntries * MIN_IN_MS * 5);
+        currentSlope = roundTo2Decimals(((currentBg - previousBg) / timeBetweenEntries) * MIN_IN_MS * 5);
       }
     }
     return {
@@ -46,20 +45,19 @@ function detectNoise(entries: AnalyserEntry[]): number[] {
     const previousEntry = entries[i - 1];
     let changedDirection = 0;
     if (previousEntry && previousEntry.slope && entry.slope) {
-      changedDirection = previousEntry.slope > 0 && entry.slope < 0 || previousEntry.slope < 0 && entry.slope > 0 ? 1 : 0;
+      changedDirection =
+        (previousEntry.slope > 0 && entry.slope < 0) || (previousEntry.slope < 0 && entry.slope > 0) ? 1 : 0;
     }
 
     return changedDirection;
   });
 
-  return directionChanges
-    .map(window)
-    .map(changeSum);
+  return directionChanges.map(window).map(changeSum);
 }
 
 function window(_number: number, index: number, numbers: number[]): number[] {
   const start = Math.max(0, index - 1);
-  const end   = Math.min(numbers.length, index + 1 + 1);
+  const end = Math.min(numbers.length, index + 1 + 1);
   return slice(numbers, start, end);
 }
 
@@ -68,9 +66,7 @@ function changeSum(numbers: number[]): number {
 }
 
 function smoothSlopesWithNoise(entries: AnalyserEntry[], noiseArray: number[]) {
-  return entries
-    .map(makeWindow(noiseArray))
-    .map(average);
+  return entries.map(makeWindow(noiseArray)).map(average);
 }
 
 function sumOfSlopes(entries: AnalyserEntry[]) {
@@ -94,7 +90,7 @@ function makeWindow(noiseArray: number[]) {
   return (_number: AnalyserEntry, index: number, entries: AnalyserEntry[]): AnalyserEntry[] => {
     const noise = noiseArray[index];
     const start = Math.max(0, index - noise);
-    const end   = Math.min(entries.length, index + noise + 1);
+    const end = Math.min(entries.length, index + noise + 1);
     return slice(entries, start, end);
   };
 }

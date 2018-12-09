@@ -96,11 +96,13 @@ describe('core/entries', () => {
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestamp - 30 * MIN_IN_MS,
-    meterEntries: [{
-      modelType: 'MeterEntry',
-      timestamp: timestamp - 30 * MIN_IN_MS,
-      bloodGlucose: 8.0,
-    }],
+    meterEntries: [
+      {
+        modelType: 'MeterEntry',
+        timestamp: timestamp - 30 * MIN_IN_MS,
+        bloodGlucose: 8.0,
+      },
+    ],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -108,7 +110,6 @@ describe('core/entries', () => {
   };
 
   withStorage(createTestStorage => {
-
     it('getMergedEntriesFeed', () => {
       let currentTime = timestamp;
       const context = createTestContext(createTestStorage(), () => currentTime);
@@ -117,13 +118,12 @@ describe('core/entries', () => {
         .then(() => uploadDexcomEntry(mockRequestDexcomEntry, context))
         .then(() => uploadParakeetEntry(mockRequestParakeetEntryHidden, context))
         .then(() => uploadDexcomEntry(mockRequestRawDexcomEntry, context))
-        .then(() => currentTime += 100)
+        .then(() => (currentTime += 100))
         .then(() => uploadParakeetEntry(mockRequestParakeetEntry, context))
         .then(() => getMergedEntriesFeed(context, 24 * HOUR_IN_MS, timestamp))
         .then(entries => {
-          assertEqualWithoutMeta(
-            entries,
-            [{
+          assertEqualWithoutMeta(entries, [
+            {
               bloodGlucose: 7.5,
               modelType: 'DexcomSensorEntry',
               noiseLevel: 1,
@@ -145,8 +145,8 @@ describe('core/entries', () => {
               rawFiltered: 165824,
               rawUnfiltered: 168416,
               timestamp: timestamp - 5 * MIN_IN_MS + 100,
-            }],
-          );
+            },
+          ]);
         });
     });
   });

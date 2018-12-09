@@ -48,43 +48,32 @@ export function createCouchDbStorage(
         return doc;
       });
       return Promise.resolve()
-        .then(
-          () =>
-            upsert
-              ? Promise.resolve()
-                  .then(() => db.allDocs({ keys: metas.map(meta => meta._id) }))
-                  .then(res => res.rows.map(row => (row.value && row.value.rev) || null))
-                  .then(revs =>
-                    docs.map(
-                      (doc, i) =>
-                        revs[i]
-                          ? ({ ...doc, _rev: revs[i] } as PouchDB.Core.PutDocument<Model>)
-                          : doc,
-                    ),
-                  )
-              : docs,
+        .then(() =>
+          upsert
+            ? Promise.resolve()
+                .then(() => db.allDocs({ keys: metas.map(meta => meta._id) }))
+                .then(res => res.rows.map(row => (row.value && row.value.rev) || null))
+                .then(revs =>
+                  docs.map((doc, i) =>
+                    revs[i] ? ({ ...doc, _rev: revs[i] } as PouchDB.Core.PutDocument<Model>) : doc,
+                  ),
+                )
+            : docs,
         )
         .then(docs => db.bulkDocs(docs))
         .then((res: PouchDbResult[]) => {
           if (res.some(isErrorResult)) {
-            const resMap = res
-              .map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`)
-              .join('\n');
+            const resMap = res.map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`).join('\n');
             const errorDetails: StorageErrorDetails = {
-              saveSucceededForModels: res
-                .map((res, i) => (isNotErrorResult(res) ? models[i] : null))
-                .filter(isNotNull),
+              saveSucceededForModels: res.map((res, i) => (isNotErrorResult(res) ? models[i] : null)).filter(isNotNull),
               saveFailedForModels: res
-                .map(
-                  (res, i) =>
-                    isErrorResult(res)
-                      ? ([
-                          models[i],
-                          res.name === 'conflict'
-                            ? REV_CONFLICT_SAVE_ERROR
-                            : res.reason || UNKNOWN_SAVE_ERROR,
-                        ] as [Model, string])
-                      : null,
+                .map((res, i) =>
+                  isErrorResult(res)
+                    ? ([
+                        models[i],
+                        res.name === 'conflict' ? REV_CONFLICT_SAVE_ERROR : res.reason || UNKNOWN_SAVE_ERROR,
+                      ] as [Model, string])
+                    : null,
                 )
                 .filter(isNotNull),
             };
@@ -119,9 +108,7 @@ export function createCouchDbStorage(
           endkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd)}_`,
         })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
-        .then(models =>
-          models.filter((model): model is ModelOfType<T> => model.modelType === modelType),
-        )
+        .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
         });
@@ -144,9 +131,7 @@ export function createCouchDbStorage(
               index: { fields },
             })
             .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(
-                `Couldn't create index (loadLatestTimelineModels): ${errObj.message}`,
-              ); // refine the error before giving it out
+              throw new Error(`Couldn't create index (loadLatestTimelineModels): ${errObj.message}`); // refine the error before giving it out
             }),
         )
         .then(res => {
@@ -166,9 +151,7 @@ export function createCouchDbStorage(
             }),
         )
         .then(res => res.docs.map(reviveCouchDbRowIntoModel))
-        .then(models =>
-          models.filter((model): model is ModelOfType<T> => model.modelType === modelType),
-        )
+        .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load latest timeline models: ${errObj.message}`); // refine the error before giving it out
         });
@@ -193,18 +176,10 @@ export function createCouchDbStorage(
 export function reviveCouchDbRowIntoModel(doc: any): Model {
   // Perform some basic runtime sanity checks:
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
-  assert(
-    typeof doc.modelType === 'string',
-    'Expected string "modelType" property when reviving',
-    doc,
-  );
+  assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
   assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
   assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
-  assert(
-    typeof doc.modelMeta.modelVersion === 'number',
-    'Expected a "modelVersion" property when reviving',
-    doc,
-  );
+  assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
 
   // Strip away the CouchDB document metadata:
   const {

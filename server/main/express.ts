@@ -7,14 +7,14 @@ import { getUuid } from 'server/utils/uuid';
 import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
 
 export type HttpMethod = 'get' | 'post';
-export type RequestHandlerTuple = [ HttpMethod, string, RequestHandler ];
+export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
 
 export function startExpressServer(context: Context, ...handlers: RequestHandlerTuple[]): Promise<number> {
   return new Promise((resolve, reject) => {
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());
-    handlers.forEach(([ method, path, handler ]) => {
+    handlers.forEach(([method, path, handler]) => {
       app[method](path, (req, res) => {
         const requestId = req.get('X-Request-ID') || getUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
@@ -28,12 +28,12 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
               res.status(responseStatus);
               if (typeof responseBody === 'string') {
                 res.send(responseBody);
-              }
-              else {
+              } else {
                 res.json(responseBody);
               }
             },
-            () => res.status(500).json({ errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})` }),
+            () =>
+              res.status(500).json({ errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})` }),
           );
       });
     });

@@ -17,10 +17,7 @@ export function is(...modelTypes: string[]) {
 }
 
 // @example array.sort(by('timestamp'))
-export function by<T extends Model>(
-  property: keyof T,
-  order: 'largest-first' | 'largest-last' = 'largest-last',
-) {
+export function by<T extends Model>(property: keyof T, order: 'largest-first' | 'largest-last' = 'largest-last') {
   return (a: T, b: T) => {
     if (a[property] < b[property]) return order === 'largest-last' ? -1 : 1;
     if (a[property] > b[property]) return order === 'largest-last' ? 1 : -1;

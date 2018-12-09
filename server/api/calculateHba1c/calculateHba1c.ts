@@ -11,12 +11,14 @@ export function calculateHba1cForDate(request: Request, context: Context): Respo
 
   return Promise.resolve()
     .then(() => getMergedEntriesFeed(context, timePeriodInMs, dateAsMs))
-    .then((sensorEntries) => calculateHba1c(sensorEntries))
-    .then((hba1cValue) => context.storage.saveModel({
-      modelType: 'Hba1c',
-      source: 'calculated',
-      timestamp: dateAsMs,
-      hba1cValue,
-    }))
+    .then(sensorEntries => calculateHba1c(sensorEntries))
+    .then(hba1cValue =>
+      context.storage.saveModel({
+        modelType: 'Hba1c',
+        source: 'calculated',
+        timestamp: dateAsMs,
+        hba1cValue,
+      }),
+    )
     .then(() => Promise.resolve(createResponse()));
 }

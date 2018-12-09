@@ -5,7 +5,6 @@ import { MIN_IN_MS } from '../calculations/calculations';
 import { AnalyserEntry, SensorEntry } from 'core/models/model';
 
 describe('utils/analyser-utils', () => {
-
   // Mock objects
   const currentTimestamp = 1508672249758;
 
@@ -82,10 +81,6 @@ describe('utils/analyser-utils', () => {
 
   // Assertations
   it('parses correct slopes for analyser entries', () => {
-    assert.deepEqual(
-      parseAnalyserEntries(entriesBefore),
-      entriesAfter,
-    );
+    assert.deepEqual(parseAnalyserEntries(entriesBefore), entriesAfter);
   });
-
 });

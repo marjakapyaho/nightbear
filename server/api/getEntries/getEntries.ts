@@ -11,10 +11,11 @@ export function getEntries(request: Request, context: Context): Response {
     getMergedEntriesFeed(context, rangeInt, rangeEndInt),
     context.storage.loadTimelineModels('Insulin', rangeInt, rangeEndInt),
     context.storage.loadTimelineModels('Carbs', rangeInt, rangeEndInt),
-  ])
-    .then(([ sensorEntries, insulin, carbs ]) => createResponse({
+  ]).then(([sensorEntries, insulin, carbs]) =>
+    createResponse({
       sensorEntries,
       insulin,
       carbs,
-    }));
+    }),
+  );
 }

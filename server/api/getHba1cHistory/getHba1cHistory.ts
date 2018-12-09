@@ -10,5 +10,5 @@ export function getHba1cHistory(request: Request, context: Context): Response {
 
   return Promise.resolve()
     .then(() => context.storage.loadTimelineModels('Hba1c', timePeriodInMs, context.timestamp()))
-    .then((hba1cHistory) => createResponse(hba1cHistory));
+    .then(hba1cHistory => createResponse(hba1cHistory));
 }

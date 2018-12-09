@@ -21,14 +21,10 @@ export function uploadEntries(request: Request, context: Context): Response {
     modelsToSave.push(carbsEntry);
   }
 
-  return context.storage.saveModels(modelsToSave)
-    .then(() => createResponse());
+  return context.storage.saveModels(modelsToSave).then(() => createResponse());
 }
 
-export function parseMeterEntry(
-  bloodGlucose: number,
-  timestamp: number,
-): MeterEntry {
+export function parseMeterEntry(bloodGlucose: number, timestamp: number): MeterEntry {
   return {
     modelType: 'MeterEntry',
     timestamp,
@@ -36,10 +32,7 @@ export function parseMeterEntry(
   };
 }
 
-export function parseInsulinEntry(
-  insulin: number,
-  timestamp: number,
-): Insulin {
+export function parseInsulinEntry(insulin: number, timestamp: number): Insulin {
   return {
     modelType: 'Insulin',
     timestamp,
@@ -48,10 +41,7 @@ export function parseInsulinEntry(
   };
 }
 
-export function parseCarbsEntry(
-  carbs: number,
-  timestamp: number,
-): Carbs {
+export function parseCarbsEntry(carbs: number, timestamp: number): Carbs {
   return {
     modelType: 'Carbs',
     timestamp,
