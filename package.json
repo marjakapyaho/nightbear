@@ -11,6 +11,7 @@
     "==================== GLOBAL HOOKS ====================": "",
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "precommit": "npm run lint && npm test",
+    "prepush": "npm run lint && npm test",
     "==================== GLOBAL QA ====================": "",
     "lint": "concurrently 'check-node-version --package' 'tsc --noEmit --project .' 'tslint --project .' 'npm run --silent prettier-check'",
     "lint-watch": "chokidar '**/*.{ts,tsx}' --ignore node_modules --debounce 100 --initial --command 'npm run --silent lint'",
