@@ -19,6 +19,10 @@ export type TimelineModel = Extract<Model, { timestamp: number }>;
 export type TimelineModelType = TimelineModel['modelType'];
 
 export type ModelMeta = object; // this is storage-type specific
+export type ModelRef<T extends Model> = {
+  readonly modelType: T['modelType'];
+  readonly modelRef: string; // this is storage-type specific
+};
 
 export interface Sensor {
   // Model:
@@ -92,7 +96,7 @@ export interface DexcomCalibration {
   readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
-  readonly meterEntries: MeterEntry[];
+  readonly meterEntries: Array<ModelRef<MeterEntry>>;
   readonly isInitialCalibration: boolean;
   readonly slope: number | null;
   readonly intercept: number | null;
@@ -106,7 +110,7 @@ export interface NightbearCalibration {
   readonly modelMeta?: ModelMeta;
   // Calibration:
   readonly timestamp: number;
-  readonly meterEntries: MeterEntry[];
+  readonly meterEntries: Array<ModelRef<MeterEntry>>;
   readonly isInitialCalibration: boolean;
   readonly slope: number;
   readonly intercept: number;

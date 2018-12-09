@@ -1,4 +1,5 @@
-import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
+import { Model, MODEL_VERSION, ModelOfType, ModelRef, ModelType } from 'core/models/model';
+import { is } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { first } from 'lodash';
@@ -178,6 +179,24 @@ export function createCouchDbStorage(
           throw new Error(`Couldn't load global models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
+
+    loadModelRef<T extends Model>(ref: ModelRef<T>): Promise<T> {
+      const { modelType, modelRef } = ref;
+      return db
+        .get(modelRef)
+        .then(reviveCouchDbRowIntoModel)
+        .then(model => {
+          const retrievedType = model.modelType;
+          if (is(modelType)(model)) {
+            return model as T;
+          } else {
+            throw new Error(`Got unexpected modelType "${retrievedType}", expecting "${modelType}"`);
+          }
+        })
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't load modelRef "${modelRef}" (caused by\n${errObj.message}\n)`); // refine the error before giving it out
+        });
+    },
   });
 }
 
@@ -263,4 +282,13 @@ export function generateUniqueId(length = 8): string {
     uid += char;
   }
   return uid; // possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion = enough
+}
+
+export function getModelRef<T extends Model>(model: T): ModelRef<T> {
+  const { modelMeta } = model;
+  if (isModelMeta(modelMeta) && modelMeta._id) {
+    return { modelType: model.modelType, modelRef: modelMeta._id };
+  } else {
+    throw new Error(`Can't create ModelRef for given ${model.modelType}: it doesn't have its modelMeta set`);
+  }
 }
