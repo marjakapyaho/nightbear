@@ -29,6 +29,7 @@ export function createCouchDbStorage(
   assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
 
   const db = new PouchDB(dbUrl, options);
+  const indexPrepLookup: { [key: string]: Promise<void> } = {};
 
   let self: Storage;
 
@@ -131,20 +132,7 @@ export function createCouchDbStorage(
         '_id', // finally, include "_id" in the index, so we get temporal ordering
       ];
       return Promise.resolve()
-        .then(() =>
-          db
-            .createIndex({
-              index: { fields },
-            })
-            .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
-            }),
-        )
-        .then(res => {
-          if (res.result !== 'exists') {
-            // TODO: log res as info/warning
-          }
-        })
+        .then(() => ensureIndexExists(fields))
         .then(() =>
           db
             .find({
@@ -193,11 +181,27 @@ export function createCouchDbStorage(
             throw new Error(`Got unexpected modelType "${retrievedType}", expecting "${modelType}"`);
           }
         })
-        .catch((errObj: PouchDB.Core.Error) => {
+        .catch((errObj: PouchDB.Core.Error | Error) => {
           throw new Error(`Couldn't load modelRef "${modelRef}" (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
   });
+
+  // Promises that an index for the given fields exists in the DB; until we try, we don't know.
+  // Also ensures two db.createIndex() calls aren't ran in parallel, as that can cause a document update conflict.
+  function ensureIndexExists(fields: string[]): Promise<void> {
+    const key = fields.join(',');
+    if (!indexPrepLookup[key]) {
+      console.log(`Running createIndex() for "${key}"`);
+      indexPrepLookup[key] = Promise.resolve() // once started, don't allow others to start the creation of this specific index
+        .then(() => db.createIndex({ index: { fields } }))
+        .then(res => console.log(`Finished createIndex() for "${key}" with result "${res.result}"`))
+        .catch((errObj: PouchDB.Core.Error) => {
+          throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
+        });
+    }
+    return indexPrepLookup[key];
+  }
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
