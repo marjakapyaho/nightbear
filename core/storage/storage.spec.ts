@@ -76,8 +76,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
   it('reports save errors in bulk', () => {
     const models = [
-      model,
-      model, // make sure we conflict
+      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } },
+      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } }, // make sure we conflict, as we have the exact same _id
     ];
     return storage.saveModels(models).then(
       () => {
