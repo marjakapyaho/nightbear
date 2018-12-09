@@ -162,6 +162,10 @@ export function createCouchDbStorage(
         });
     },
 
+    loadLatestTimelineModel<T extends ModelType>(modelType: T): Promise<ModelOfType<T> | undefined> {
+      return self.loadLatestTimelineModels(modelType, 1).then(([model]) => model);
+    },
+
     loadGlobalModels() {
       return db
         .allDocs({

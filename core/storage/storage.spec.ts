@@ -164,6 +164,34 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       });
   });
 
+  it('loads single latest timeline model by type', () => {
+    return Promise.resolve()
+      .then(() => [
+        { ...model, timestamp: timestamp - 2, amount: 1 },
+        { ...model, timestamp: timestamp - 1, amount: 2 },
+        { ...model, timestamp: timestamp - 0, amount: 3 },
+      ])
+      .then(storage.saveModels)
+      .then(() => storage.loadLatestTimelineModel('Carbs'))
+      .then(maybeModel => {
+        assertEqualWithoutMeta(maybeModel, { ...model, timestamp: timestamp - 0, amount: 3 });
+      });
+  });
+
+  it('gives undefined when single latest timeline model by type is not found', () => {
+    return Promise.resolve()
+      .then(() => [
+        { ...model, timestamp: timestamp - 2, amount: 1 },
+        { ...model, timestamp: timestamp - 1, amount: 2 },
+        { ...model, timestamp: timestamp - 0, amount: 3 },
+      ])
+      .then(storage.saveModels)
+      .then(() => storage.loadLatestTimelineModel('Alarm'))
+      .then(maybeModel => {
+        assertEqualWithoutMeta(maybeModel, undefined);
+      });
+  });
+
   describe('loading active alarms', () => {
     const alarm: Alarm = {
       modelType: 'Alarm',

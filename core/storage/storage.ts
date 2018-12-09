@@ -13,6 +13,7 @@ export interface Storage {
     limit?: number,
     mustMatch?: Partial<ModelOfType<T>>,
   ): Promise<Array<ModelOfType<T>>>;
+  loadLatestTimelineModel<T extends ModelType>(modelType: T): Promise<ModelOfType<T> | undefined>;
   loadGlobalModels(): Promise<Model[]>;
 }
 
@@ -21,6 +22,7 @@ export const NO_STORAGE: Storage = {
   saveModels: models => Promise.resolve(models),
   loadTimelineModels: () => Promise.resolve([]),
   loadLatestTimelineModels: () => Promise.resolve([]),
+  loadLatestTimelineModel: () => Promise.resolve(undefined),
   loadGlobalModels: () => Promise.resolve([]),
 };
 
