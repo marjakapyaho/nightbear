@@ -1,7 +1,7 @@
 import { RequestHandler } from 'core/models/api';
 import { noop } from 'lodash';
-import { getUuid } from 'server/utils/uuid';
 import { mapObject } from 'server/utils/data';
+import { getUuid } from 'server/utils/uuid';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LoggerMethod = (message: string, meta?: any) => void;

@@ -1,7 +1,7 @@
-import { ReduxState, initReduxState } from 'web/app/modules/state';
 import { ReduxAction } from 'web/app/modules/actions';
 import { configVarsReducer } from 'web/app/modules/configVars/reducer';
 import { pouchDbReducer } from 'web/app/modules/pouchDb/reducer';
+import { initReduxState, ReduxState } from 'web/app/modules/state';
 import { timelineDataReducer } from 'web/app/modules/timelineData/reducer';
 import { uiNavigationReducer } from 'web/app/modules/uiNavigation/reducer';
 

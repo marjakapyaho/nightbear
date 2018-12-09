@@ -1,14 +1,14 @@
+import { isArray } from 'lodash';
 import { ReduxAction } from 'web/app/modules/actions';
-import { ReduxState } from 'web/app/modules/state';
+import { DB_REPLICATION_BATCH_SIZE } from 'web/app/modules/pouchDb/middleware';
 import {
   pouchDbInitState,
   PouchDbState,
   PouchDbStatePart,
   PouchDbStatus,
 } from 'web/app/modules/pouchDb/state';
-import { isArray } from 'lodash';
+import { ReduxState } from 'web/app/modules/state';
 import { assertNumber } from 'web/app/utils/types';
-import { DB_REPLICATION_BATCH_SIZE } from 'web/app/modules/pouchDb/middleware';
 
 export function pouchDbReducer(
   state: PouchDbState = pouchDbInitState,

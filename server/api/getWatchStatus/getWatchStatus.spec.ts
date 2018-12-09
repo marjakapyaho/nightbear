@@ -1,7 +1,7 @@
-import 'mocha';
 import { assert } from 'chai';
-import { createTestContext, createTestRequest } from 'server/utils/test';
+import 'mocha';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
+import { createTestContext, createTestRequest } from 'server/utils/test';
 
 describe('api/getWatchStatus', () => {
   const request = createTestRequest();

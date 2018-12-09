@@ -1,5 +1,5 @@
-import { SensorEntry } from 'core/models/model';
 import { MIN_IN_MS } from 'core/calculations/calculations';
+import { SensorEntry } from 'core/models/model';
 
 const currentTimestamp = 1508672249758;
 

@@ -1,6 +1,6 @@
-import { renderFromStore } from 'web/app/utils/react';
+import { by, is, last } from 'core/models/utils';
 import Timestamp from 'web/app/ui/utils/Timestamp';
-import { is, by, last } from 'core/models/utils';
+import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
   __filename,

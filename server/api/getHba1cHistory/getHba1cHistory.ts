@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'core/models/api';
 import { MONTH_IN_MS } from 'core/calculations/calculations';
+import { Context, createResponse, Request, Response } from 'core/models/api';
 import { isNaN } from 'lodash';
 
 export function getHba1cHistory(request: Request, context: Context): Response {

@@ -1,8 +1,8 @@
-import { ActionUnionFrom } from 'web/app/utils/redux';
 import { configVarsActions } from 'web/app/modules/configVars/actions';
 import { pouchDbActions } from 'web/app/modules/pouchDb/actions';
 import { timelineDataActions } from 'web/app/modules/timelineData/actions';
 import { uiNavigationActions } from 'web/app/modules/uiNavigation/actions';
+import { ActionUnionFrom } from 'web/app/utils/redux';
 
 export const actions = {
   ...configVarsActions,

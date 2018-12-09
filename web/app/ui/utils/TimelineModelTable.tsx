@@ -1,8 +1,8 @@
 import { TimelineModel } from 'core/models/model';
+import { reverse, sortBy } from 'lodash';
+import Timestamp from 'web/app/ui/utils/Timestamp';
 import { renderFromProps } from 'web/app/utils/react';
 import { objectKeys } from 'web/app/utils/types';
-import Timestamp from 'web/app/ui/utils/Timestamp';
-import { sortBy, reverse } from 'lodash';
 
 export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, props) => {
   if (props.models.length === 0) {

@@ -1,5 +1,5 @@
-import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { TimelineModel, TimelineModelType } from 'core/models/model';
 
 export type TimelineDataState = Readonly<
   {

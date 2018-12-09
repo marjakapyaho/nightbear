@@ -1,10 +1,10 @@
-import 'mocha';
 import { assert } from 'chai';
-import { Model, Carbs, Settings, Alarm } from 'core/models/model';
-import { Storage, StorageError } from 'core/storage/storage';
-import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
-import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { Alarm, Carbs, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
+import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { Storage, StorageError } from 'core/storage/storage';
+import 'mocha';
+import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',

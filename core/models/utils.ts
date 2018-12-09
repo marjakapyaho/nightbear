@@ -1,4 +1,4 @@
-import { Model, ModelType, ModelOfType } from 'core/models/model';
+import { Model, ModelOfType, ModelType } from 'core/models/model';
 import { isPlainObject } from 'lodash';
 
 export function isModel(x: any): x is Model {

@@ -1,9 +1,9 @@
-import { renderFromStore } from 'web/app/utils/react';
-import { assertExhausted } from 'web/app/utils/types';
-import DebugScreen from 'web/app/ui/screens/DebugScreen';
 import BgGraphScreen from 'web/app/ui/screens/BgGraphScreen';
 import DailySummaryScreen from 'web/app/ui/screens/DailySummaryScreen';
+import DebugScreen from 'web/app/ui/screens/DebugScreen';
 import MainNavBar from 'web/app/ui/utils/MainNavBar';
+import { renderFromStore } from 'web/app/utils/react';
+import { assertExhausted } from 'web/app/utils/types';
 
 export default renderFromStore(
   __filename,

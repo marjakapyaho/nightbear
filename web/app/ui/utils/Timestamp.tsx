@@ -1,5 +1,5 @@
+import { DAY_IN_MS, HOUR_IN_MS } from 'core/calculations/calculations';
 import { DateTime, Duration } from 'luxon';
-import { HOUR_IN_MS, DAY_IN_MS } from 'core/calculations/calculations';
 import { namespaceReactClass } from 'web/app/utils/react';
 
 const LIVE_FORMAT_AGE_LIMIT = HOUR_IN_MS;

@@ -1,9 +1,9 @@
-import { DateTime } from 'luxon';
-import { renderFromStore } from 'web/app/utils/react';
-import { groupBy, map, mean } from 'lodash';
 import { ParakeetSensorEntry } from 'core/models/model';
 import { is } from 'core/models/utils';
+import { groupBy, map, mean } from 'lodash';
+import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
+import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
   __filename,

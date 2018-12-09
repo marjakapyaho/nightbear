@@ -1,9 +1,9 @@
-import 'mocha';
 import { assert } from 'chai';
-import { activeProfile, createTestContext } from 'server/utils/test';
-import { getMockState } from 'core/alarms/test-data/mock-state';
-import { getMockActiveAlarms, getMockAlarm } from 'core/alarms/test-data/mock-active-alarms';
 import { detectAlarmActions, runAlarmChecks } from 'core/alarms/alarms';
+import { getMockActiveAlarms, getMockAlarm } from 'core/alarms/test-data/mock-active-alarms';
+import { getMockState } from 'core/alarms/test-data/mock-state';
+import 'mocha';
+import { activeProfile, createTestContext } from 'server/utils/test';
 
 const currentTimestamp = 1508672249758;
 

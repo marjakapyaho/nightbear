@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'core/models/api';
-import { MeterEntry, Insulin, Carbs } from 'core/models/model';
+import { Context, createResponse, Request, Response } from 'core/models/api';
+import { Carbs, Insulin, MeterEntry } from 'core/models/model';
 
 export function uploadEntries(request: Request, context: Context): Response {
   const { bloodSugar, insulin, carbs } = request.requestBody as any;

@@ -1,9 +1,9 @@
-import { renderFromStore } from 'web/app/utils/react';
 import { CSSProperties } from 'react';
-import { assertExhausted, objectKeys } from 'web/app/utils/types';
 import { getSummaryDbStatus, SummaryDbStatus } from 'web/app/modules/pouchDb/getters';
 import { PouchDbState, PouchDbStatePart } from 'web/app/modules/pouchDb/state';
 import Timestamp from 'web/app/ui/utils/Timestamp';
+import { renderFromStore } from 'web/app/utils/react';
+import { assertExhausted, objectKeys } from 'web/app/utils/types';
 
 export default renderFromStore(
   __filename,

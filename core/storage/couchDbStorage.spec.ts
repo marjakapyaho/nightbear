@@ -1,8 +1,8 @@
-import 'mocha';
 import { assert } from 'chai';
-import { withStorage } from 'server/utils/test';
 import { getStorageKey } from 'core/storage/couchDbStorage';
 import { MODEL_1, MODEL_2, storageTestSuite } from 'core/storage/storage.spec';
+import 'mocha';
+import { withStorage } from 'server/utils/test';
 
 describe('storage/couchDbStorage', () => {
   describe('getStorageKey()', () => {

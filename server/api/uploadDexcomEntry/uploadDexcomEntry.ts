@@ -1,5 +1,10 @@
-import { find } from 'lodash';
-import { Response, Request, createResponse, Context } from 'core/models/api';
+import {
+  calculateRaw,
+  changeBloodGlucoseUnitToMmoll,
+  isDexcomEntryValid,
+  MIN_IN_MS,
+} from 'core/calculations/calculations';
+import { Context, createResponse, Request, Response } from 'core/models/api';
 import {
   DeviceStatus,
   DexcomCalibration,
@@ -8,12 +13,7 @@ import {
   MeterEntry,
   Model,
 } from 'core/models/model';
-import {
-  calculateRaw,
-  isDexcomEntryValid,
-  changeBloodGlucoseUnitToMmoll,
-  MIN_IN_MS,
-} from 'core/calculations/calculations';
+import { find } from 'lodash';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',

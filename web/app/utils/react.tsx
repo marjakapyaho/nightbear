@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { ReactNode } from 'react';
 import { createCssNs } from 'css-ns';
-import { ReduxDispatch } from 'web/app/utils/redux';
+import * as React from 'react';
+import { ReactNode } from 'react';
+import { connect } from 'react-redux';
 import { ReduxState } from 'web/app/modules/state';
+import { ReduxDispatch } from 'web/app/utils/redux';
 
 export type ReactApi = typeof React;
 export type ReactComponent<P> = React.ComponentClass<P>;

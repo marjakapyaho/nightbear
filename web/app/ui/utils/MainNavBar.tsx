@@ -1,6 +1,6 @@
-import { renderFromStore } from 'web/app/utils/react';
-import { UiNavigationState } from 'web/app/modules/uiNavigation/state';
 import { actions } from 'web/app/modules/actions';
+import { UiNavigationState } from 'web/app/modules/uiNavigation/state';
+import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
   __filename,

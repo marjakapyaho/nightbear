@@ -1,4 +1,5 @@
-import { chain, find, filter, some } from 'lodash';
+import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import {
   Alarm,
   AnalyserEntry,
@@ -10,8 +11,7 @@ import {
   Situation,
   State,
 } from 'core/models/model';
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
-import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
+import { chain, filter, find, some } from 'lodash';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 2;

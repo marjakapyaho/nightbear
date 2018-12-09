@@ -1,11 +1,11 @@
-import { renderFromStore } from 'web/app/utils/react';
+import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { TimelineModel } from 'core/models/model';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { isNotNull } from 'server/utils/types';
-import { TimelineModel } from 'core/models/model';
-import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import { actions } from 'web/app/modules/actions';
-import { HOUR_IN_MS } from 'core/calculations/calculations';
+import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
+import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
   __filename,

@@ -1,10 +1,10 @@
-import { renderFromStore } from 'web/app/utils/react';
-import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
-import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
-import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
 import { actions } from 'web/app/modules/actions';
 import DbStatusBar from 'web/app/ui/utils/DbStatusBar';
 import LastBgUpdateBar from 'web/app/ui/utils/LastBgUpdateBar';
+import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
+import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
+import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
+import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
   __filename,

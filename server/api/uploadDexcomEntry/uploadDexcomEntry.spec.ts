@@ -1,16 +1,16 @@
-import 'mocha';
 import { assert } from 'chai';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Request } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
-import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
-import { MIN_IN_MS } from 'core/calculations/calculations';
+import 'mocha';
 import {
-  uploadDexcomEntry,
-  parseDexcomEntry,
-  initCalibration,
   amendOrInitCalibration,
+  initCalibration,
+  parseDexcomEntry,
   parseDexcomStatus,
+  uploadDexcomEntry,
 } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
+import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
 
 describe('api/uploadDexcomEntry', () => {
   const timestampNow = 1508672249758;

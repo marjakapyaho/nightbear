@@ -1,22 +1,22 @@
-import PouchDB from 'core/storage/PouchDb';
+import * as cliProgress from 'cli-progress';
+import { changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
 import {
-  Model,
-  DexcomSensorEntry,
-  DexcomCalibration,
-  MeterEntry,
-  ParakeetSensorEntry,
   Alarm,
+  Carbs,
   DeviceStatus,
+  DexcomCalibration,
+  DexcomSensorEntry,
   Hba1c,
   Insulin,
-  Carbs,
+  MeterEntry,
+  Model,
+  ParakeetSensorEntry,
 } from 'core/models/model';
-import { changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
-import { chunk, flatten } from 'lodash';
-import * as cliProgress from 'cli-progress';
-import { isNotNull } from 'server/utils/types';
 import { is } from 'core/models/utils';
+import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import PouchDB from 'core/storage/PouchDb';
+import { chunk, flatten } from 'lodash';
+import { isNotNull } from 'server/utils/types';
 import { inspect } from 'util';
 
 const DB_PASSWORD = '***';

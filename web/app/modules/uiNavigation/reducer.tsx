@@ -1,6 +1,6 @@
 import { ReduxAction } from 'web/app/modules/actions';
 import { ReduxState } from 'web/app/modules/state';
-import { UiNavigationState, uiNavigationInitState } from 'web/app/modules/uiNavigation/state';
+import { uiNavigationInitState, UiNavigationState } from 'web/app/modules/uiNavigation/state';
 
 export function uiNavigationReducer(
   state: UiNavigationState = uiNavigationInitState,

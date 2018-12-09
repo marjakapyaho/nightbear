@@ -1,5 +1,5 @@
-import { ReduxMiddleware, createChangeObserver } from 'web/app/utils/redux';
 import { actions } from 'web/app/modules/actions';
+import { createChangeObserver, ReduxMiddleware } from 'web/app/utils/redux';
 
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 

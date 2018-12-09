@@ -1,5 +1,5 @@
-import { ConfigVarsState, configVarsInitState } from 'web/app/modules/configVars/state';
 import { ReduxAction } from 'web/app/modules/actions';
+import { configVarsInitState, ConfigVarsState } from 'web/app/modules/configVars/state';
 import { ReduxState } from 'web/app/modules/state';
 
 export function configVarsReducer(

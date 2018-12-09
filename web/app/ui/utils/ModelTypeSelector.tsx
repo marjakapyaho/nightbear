@@ -1,6 +1,6 @@
-import { renderFromProps } from 'web/app/utils/react';
 import { TimelineModelType } from 'core/models/model';
 import { isNotNull } from 'server/utils/types';
+import { renderFromProps } from 'web/app/utils/react';
 
 const options: TimelineModelType[] = [
   'DexcomSensorEntry',

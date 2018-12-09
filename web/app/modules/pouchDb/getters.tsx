@@ -1,5 +1,5 @@
-import { PouchDbStatus, PouchDbStatePart, PouchDbState } from 'web/app/modules/pouchDb/state';
 import { isArray, isNumber, max } from 'lodash';
+import { PouchDbState, PouchDbStatePart, PouchDbStatus } from 'web/app/modules/pouchDb/state';
 import { assertNumber, objectKeys } from 'web/app/utils/types';
 
 export type SummaryDbStatus = PouchDbStatus | 'REPLICATION_INITIAL' | 'REPLICATION_CATCHUP';

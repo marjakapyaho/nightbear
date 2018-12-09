@@ -1,6 +1,6 @@
-import { Response, Context, createResponse, Request } from 'core/models/api';
 import { calculateHba1c, DAY_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
+import { Context, createResponse, Request, Response } from 'core/models/api';
 
 const HBA1C_WEEKS = 4;
 

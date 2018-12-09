@@ -1,9 +1,9 @@
-import { createStore, applyMiddleware } from 'redux';
+import { isEqual } from 'lodash';
+import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import { ReduxState } from 'web/app/modules/state';
 import { ReduxAction } from 'web/app/modules/actions';
 import { rootReducer } from 'web/app/modules/reducer';
-import { isEqual } from 'lodash';
+import { ReduxState } from 'web/app/modules/state';
 
 export type ReduxStore = Readonly<{ getState: () => ReduxState; dispatch: ReduxDispatch }>;
 export type ReduxDispatch = (action: ReduxAction) => ReduxAction;

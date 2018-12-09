@@ -1,6 +1,6 @@
-import { ConfigVarsState, configVarsInitState } from 'web/app/modules/configVars/state';
-import { PouchDbState, pouchDbInitState } from 'web/app/modules/pouchDb/state';
-import { TimelineDataState, timelineDataInitState } from 'web/app/modules/timelineData/state';
+import { configVarsInitState, ConfigVarsState } from 'web/app/modules/configVars/state';
+import { pouchDbInitState, PouchDbState } from 'web/app/modules/pouchDb/state';
+import { timelineDataInitState, TimelineDataState } from 'web/app/modules/timelineData/state';
 import { uiNavigationInitState, UiNavigationState } from 'web/app/modules/uiNavigation/state';
 
 export const initReduxState: ReduxState = {

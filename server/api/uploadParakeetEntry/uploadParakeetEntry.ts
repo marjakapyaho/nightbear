@@ -1,6 +1,6 @@
-import { Response, Request, createResponse, Context } from 'core/models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'core/models/model';
 import { calculateRaw } from 'core/calculations/calculations';
+import { Context, createResponse, Request, Response } from 'core/models/api';
+import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'core/models/model';
 import { find } from 'lodash';
 
 // parakeet needs this response to work

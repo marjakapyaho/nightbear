@@ -1,9 +1,9 @@
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
-import { Profile, Settings } from 'core/models/model';
-import { Context } from 'core/models/api';
-import { getMergedEntriesFeed } from 'core/entries/entries';
-import { runAnalysis } from 'core/analyser/analyser';
 import { runAlarmChecks } from 'core/alarms/alarms';
+import { runAnalysis } from 'core/analyser/analyser';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { getMergedEntriesFeed } from 'core/entries/entries';
+import { Context } from 'core/models/api';
+import { Profile, Settings } from 'core/models/model';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 let nextCheck: NodeJS.Timer;

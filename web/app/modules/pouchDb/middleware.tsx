@@ -1,16 +1,16 @@
-import PouchDB from 'core/storage/PouchDb';
-import { ReduxMiddleware, ReduxDispatch, createChangeObserver } from 'web/app/utils/redux';
-import { debounce, flatten } from 'lodash';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
   PREFIX_GLOBAL,
   PREFIX_TIMELINE,
 } from 'core/storage/couchDbStorage';
-import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
-import { actions } from 'web/app/modules/actions';
-import { ReduxState } from 'web/app/modules/state';
+import PouchDB from 'core/storage/PouchDb';
+import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
+import { actions } from 'web/app/modules/actions';
+import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
+import { ReduxState } from 'web/app/modules/state';
+import { createChangeObserver, ReduxDispatch, ReduxMiddleware } from 'web/app/utils/redux';
 
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
 export const LOCAL_DB_CHANGES_BUFFER = 500;

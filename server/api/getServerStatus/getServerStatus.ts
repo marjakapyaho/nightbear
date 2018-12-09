@@ -1,4 +1,4 @@
-import { Response, Context, Request, createResponse } from 'core/models/api';
+import { Context, createResponse, Request, Response } from 'core/models/api';
 
 export function getServerStatus(request: Request, context: Context): Response {
   return createResponse({

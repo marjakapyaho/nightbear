@@ -1,7 +1,7 @@
-import { Logger, createConsoleLogger } from 'server/utils/logging';
+import { createPushoverClient, PushoverClient } from 'core/alarms/pushover-client';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
-import { createPushoverClient, PushoverClient } from 'core/alarms/pushover-client';
+import { createConsoleLogger, Logger } from 'server/utils/logging';
 
 export function createNodeContext(): Context {
   const { NIGHTBEAR_DB_URL, PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK } = process.env;

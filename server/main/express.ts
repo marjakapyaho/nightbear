@@ -1,10 +1,10 @@
+import * as bodyParser from 'body-parser';
+import { Context, Headers, Request, RequestHandler } from 'core/models/api';
+import * as cors from 'cors';
 import * as express from 'express';
 import { Request as ExpressRequest } from 'express';
-import * as cors from 'cors';
-import * as bodyParser from 'body-parser';
-import { RequestHandler, Request, Headers, Context } from 'core/models/api';
-import { getUuid } from 'server/utils/uuid';
 import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
+import { getUuid } from 'server/utils/uuid';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];

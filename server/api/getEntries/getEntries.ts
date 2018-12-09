@@ -1,5 +1,5 @@
-import { Response, Context, createResponse, Request } from 'core/models/api';
 import { getMergedEntriesFeed } from 'core/entries/entries';
+import { Context, createResponse, Request, Response } from 'core/models/api';
 
 export function getEntries(request: Request, context: Context): Response {
   const { range, rangeEnd } = request.requestParams;

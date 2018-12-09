@@ -1,7 +1,7 @@
+import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { SensorEntry, TimelineModel } from 'core/models/model';
 import { sortBy, unionBy } from 'lodash';
-import { MIN_IN_MS } from 'core/calculations/calculations';
 
 export function getMergedEntriesFeed(
   context: Context,
