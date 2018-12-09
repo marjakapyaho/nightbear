@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
+import { generateUniqueId, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -76,8 +76,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
   it('reports save errors in bulk', () => {
     const models = [
-      model,
-      model, // make sure we conflict
+      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } },
+      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } }, // make sure we conflict, as we have the exact same _id
     ];
     return storage.saveModels(models).then(
       () => {
@@ -247,6 +247,31 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assertEqualWithoutMeta(first(models), a3);
           assertEqualWithoutMeta(last(models), a1);
         });
+    });
+  });
+
+  describe('generateUniqueId()', () => {
+    const TEST_ITERATIONS = 1000;
+
+    it('generates ' + TEST_ITERATIONS + " successive ID's that look right", () => {
+      for (let i = 0; i < TEST_ITERATIONS; i++) {
+        assert.match(generateUniqueId(), /^[0-9a-zA-Z]{8}$/);
+      }
+    });
+
+    it('generates ' + TEST_ITERATIONS + " successive, unique ID's", () => {
+      const ids: { [uuid: string]: string } = {};
+      for (let i = 0; i < TEST_ITERATIONS; i++) {
+        const id = generateUniqueId();
+        if (ids[id]) throw new Error('Duplicate ID generated');
+        ids[id] = id;
+      }
+    });
+  });
+
+  describe('timestampToString()', () => {
+    it('generates timestamp strings of the expected type', () => {
+      assert.equal(timestampToString(1544367587513), '2018-12-09T14:59:47.513Z');
     });
   });
 }

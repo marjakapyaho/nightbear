@@ -220,11 +220,12 @@ function createModelMeta(model: Model): CouchDbModelMeta {
 }
 
 export function getStorageKey(model: Model): string {
+  if (isModelMeta(model.modelMeta) && model.modelMeta._id) {
+    return model.modelMeta._id; // the Model already has an assigned storage key -> use it
+  }
   switch (model.modelType) {
     case 'Alarm':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}`;
     case 'Sensor':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.startTimestamp)}/${model.modelType}`;
     case 'DexcomSensorEntry':
     case 'DexcomRawSensorEntry':
     case 'ParakeetSensorEntry':
@@ -235,7 +236,7 @@ export function getStorageKey(model: Model): string {
     case 'Insulin':
     case 'Carbs':
     case 'Hba1c':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}`;
+      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models of the same type with the same timestamp
     case 'Settings':
       return `${PREFIX_GLOBAL}/${model.modelType}`;
     case 'Profile':
@@ -245,6 +246,21 @@ export function getStorageKey(model: Model): string {
   }
 }
 
-function timestampToString(timestamp: number): string {
+// Formats the given timestamp for use in persistence-related contexts
+// @example "2018-12-09T14:59:47.513Z"
+// Importantly, because our queries use this for ordering, it should include milliseconds.
+export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
+}
+
+// Generates a random string for similar purposes as UUID's, but easier for a human to remember.
+// @example generateUniqueId(8) => "TEvGnkwr"
+export function generateUniqueId(length = 8): string {
+  let uid = '';
+  while (uid.length < length) {
+    const char = String.fromCharCode(Math.round(Math.random() * 255));
+    if (!char.match(/[9-9a-zA-Z]/)) continue; // result space: 0-9 + a-z + A-Z = 10 + 26 + 26 = 62
+    uid += char;
+  }
+  return uid; // possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion = enough
 }
