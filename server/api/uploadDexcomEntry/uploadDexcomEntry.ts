@@ -37,10 +37,6 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 
         const latestCalibration = first(latestCalibrations);
 
-        if (!latestCalibration) {
-          throw new Error(`Couldn't find latest calibration`);
-        }
-
         if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
           const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration);
           if (newDexcomCalibration) {
@@ -48,6 +44,10 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
           } else {
             return Promise.resolve(null);
           }
+        }
+
+        if (!latestCalibration) {
+          throw new Error(`Couldn't find latest calibration`);
         }
 
         if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
