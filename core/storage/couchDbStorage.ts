@@ -197,6 +197,7 @@ export function createCouchDbStorage(
         .then(() => db.createIndex({ index: { fields } }))
         .then(res => console.log(`Finished createIndex() for "${key}" with result "${res.result}"`))
         .catch((errObj: PouchDB.Core.Error) => {
+          delete indexPrepLookup[key]; // if the operation failed, allow it to be retried later
           throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     }
