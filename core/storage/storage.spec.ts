@@ -3,6 +3,7 @@ import { Alarm, Carbs, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
+import { first, last } from 'lodash';
 import 'mocha';
 import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
 
@@ -54,7 +55,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assert.equal(err.saveSucceededForModels.length, 0);
           // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
-          const [failedModel, reason] = err.saveFailedForModels[0];
+          const [failedModel, reason] = first(err.saveFailedForModels);
           if (is('Settings')(failedModel)) {
             assert.equal(failedModel.activeProfile, MODEL_2.activeProfile);
           } else {
@@ -89,7 +90,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         );
         // Check that success is reported:
         assert.equal(err.saveSucceededForModels.length, 1);
-        const succeededModel = err.saveSucceededForModels[0];
+        const succeededModel = first(err.saveSucceededForModels);
         if (is('Carbs')(succeededModel)) {
           assert.equal(succeededModel.timestamp, model.timestamp);
         } else {
@@ -97,7 +98,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         }
         // Check that failure is reported:
         assert.equal(err.saveFailedForModels.length, 1);
-        const [failedModel, reason] = err.saveFailedForModels[0];
+        const [failedModel, reason] = first(err.saveFailedForModels);
         if (is('Carbs')(failedModel)) {
           assert.equal(failedModel.timestamp, model.timestamp);
         } else {
@@ -159,7 +160,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       .then(() => storage.loadLatestTimelineModels('Carbs', 1))
       .then(models => {
         assert.equal(models.length, 1);
-        assertEqualWithoutMeta(models[0], { ...model, timestamp: timestamp - 0, amount: 3 });
+        assertEqualWithoutMeta(first(models), { ...model, timestamp: timestamp - 0, amount: 3 });
       });
   });
 
@@ -200,7 +201,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 1);
-          assertEqualWithoutMeta(models[0], a1);
+          assertEqualWithoutMeta(first(models), a1);
         });
     });
 
@@ -215,8 +216,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
         .then(models => {
           assert.equal(models.length, 2);
-          assertEqualWithoutMeta(models[0], a3);
-          assertEqualWithoutMeta(models[1], a1);
+          assertEqualWithoutMeta(first(models), a3);
+          assertEqualWithoutMeta(last(models), a1);
         });
     });
   });

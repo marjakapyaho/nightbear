@@ -67,11 +67,12 @@ export function createTestContext(storage = NO_STORAGE, timestamp = () => 150867
 }
 
 // Asserts deep equality of 2 Models, ignoring their metadata
-export function assertEqualWithoutMeta(actual: Model, expected: Model): void;
+export function assertEqualWithoutMeta(actual: Model | undefined, expected: Model | undefined): void;
 export function assertEqualWithoutMeta(actual: Model[], expected: Model[]): void;
 export function assertEqualWithoutMeta(actual: any, expected: any): void {
-  const withoutMeta = (model: Model) => Object.assign({}, model, { modelMeta: undefined });
-  if (Array.isArray(actual)) {
+  const withoutMeta = (model?: Model) =>
+    typeof model === 'undefined' ? undefined : Object.assign({}, model, { modelMeta: undefined });
+  if (Array.isArray(actual) && Array.isArray(expected)) {
     assert.deepEqual(actual.map(withoutMeta), expected.map(withoutMeta));
   } else {
     assert.deepEqual(withoutMeta(actual), withoutMeta(expected));

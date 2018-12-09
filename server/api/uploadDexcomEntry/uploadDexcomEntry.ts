@@ -13,7 +13,7 @@ import {
   MeterEntry,
   Model,
 } from 'core/models/model';
-import { find } from 'lodash';
+import { find, first } from 'lodash';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',
@@ -35,7 +35,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
           return context.storage.saveModel(dexcomStatus);
         }
 
-        const latestCalibration = latestCalibrations[0] as DexcomCalibration;
+        const latestCalibration = first(latestCalibrations);
 
         if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
           const newDexcomCalibration: DexcomCalibration | null = initCalibration(requestObject, latestCalibration);
@@ -44,6 +44,10 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
           } else {
             return Promise.resolve(null);
           }
+        }
+
+        if (!latestCalibration) {
+          throw new Error(`Couldn't find latest calibration`);
         }
 
         if (requestObject.type === ENTRY_TYPES.CALIBRATION) {

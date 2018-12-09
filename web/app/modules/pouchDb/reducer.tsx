@@ -1,4 +1,4 @@
-import { isArray } from 'lodash';
+import { isArray, last } from 'lodash';
 import { ReduxAction } from 'web/app/modules/actions';
 import { DB_REPLICATION_BATCH_SIZE } from 'web/app/modules/pouchDb/middleware';
 import {
@@ -27,8 +27,9 @@ export function pouchDbReducer(
     case 'REPLICATION_EMITTED_CHANGE':
       if (action.info.pending) {
         // We know how much replication work is left!
-        const total = isArray(state[action.direction].details)
-          ? assertNumber(state[action.direction].details[1]) // this isn't the first batch, so use the "total" from the previous action
+        const { details } = state[action.direction];
+        const total = isArray(details)
+          ? assertNumber(last(details)) // this isn't the first batch, so use the "total" from the previous action
           : action.info.pending + DB_REPLICATION_BATCH_SIZE; // this is the first batch, but since it's finished, the total needs to include the already-finished batch too
         return updateDbStatus(state, action.direction, 'ACTIVE', [
           Math.min(total - action.info.pending, total),

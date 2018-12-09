@@ -1,5 +1,5 @@
 import { TimelineModel } from 'core/models/model';
-import { reverse, sortBy } from 'lodash';
+import { first, reverse, sortBy } from 'lodash';
 import Timestamp from 'web/app/ui/utils/Timestamp';
 import { renderFromProps } from 'web/app/utils/react';
 import { objectKeys } from 'web/app/utils/types';
@@ -12,7 +12,7 @@ export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, 
       <div className="this">
         <table>
           <thead>
-            <tr>{renderThs(props.models[0])}</tr>
+            <tr>{renderThs(first(props.models))}</tr>
           </thead>
           <tbody>
             {reverse(sortBy(props.models, 'timestamp')).map((model, i) => (
@@ -24,7 +24,8 @@ export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, 
     );
   }
 
-  function renderThs(model: TimelineModel): JSX.Element[] {
+  function renderThs(model?: TimelineModel): JSX.Element[] | null {
+    if (!model) return null;
     return objectKeys(model).map(key => <th key={key}>{key}</th>);
   }
 

@@ -3,7 +3,7 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context } from 'core/models/api';
-import { Profile, Settings } from 'core/models/model';
+import { first } from 'lodash';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 let nextCheck: NodeJS.Timer;
@@ -24,16 +24,12 @@ export function runChecks(context: Context) {
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
   ]).then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
-    const activeSettings: Settings = settings[0];
-    const activeProfile: Profile = activeSettings.activeProfile;
-    const state = runAnalysis(
-      context.timestamp(),
-      activeProfile,
-      sensorEntries,
-      insulin,
-      latestDeviceStatus[0],
-      alarms,
-    );
+    const activeSettings = first(settings);
+    const deviceStatus = first(latestDeviceStatus);
+    if (!activeSettings) throw new Error(`Couldn't load active settings`);
+    if (!deviceStatus) throw new Error(`Couldn't load device status`);
+    const activeProfile = activeSettings.activeProfile;
+    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
     return runAlarmChecks(context, state, activeProfile, alarms);
   });
 }
