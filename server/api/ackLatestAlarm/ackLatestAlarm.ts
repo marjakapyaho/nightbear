@@ -4,9 +4,10 @@ import { extend, first } from 'lodash';
 
 export function ackLatestAlarm(_request: Request, context: Context): Response {
   return Promise.all([
-    context.storage.loadLatestTimelineModels('Alarm', 1, { isActive: true }),
+    context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
     context.storage.loadLatestTimelineModels('Settings', 1),
   ]).then(([latestActiveAlarms, latestSettings]) => {
+    // TODO: ack correct alarm with pushover receipt (https://pushover.net/api/receipts#callback)
     const latestActiveAlarm = first(latestActiveAlarms);
     const activeSettings = first(latestSettings);
 
