@@ -245,7 +245,10 @@ export function getStorageKey(model: Model): string {
   }
 }
 
-function timestampToString(timestamp: number): string {
+// Formats the given timestamp for use in persistence-related contexts
+// @example "2018-12-09T14:59:47.513Z"
+// Importantly, because our queries use this for ordering, it should include milliseconds.
+export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
 }
 

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { REV_CONFLICT_SAVE_ERROR, generateUniqueId } from 'core/storage/couchDbStorage';
+import { REV_CONFLICT_SAVE_ERROR, generateUniqueId, timestampToString } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -266,6 +266,12 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         if (ids[id]) throw new Error('Duplicate ID generated');
         ids[id] = id;
       }
+    });
+  });
+
+  describe('timestampToString()', () => {
+    it('generates timestamp strings of the expected type', () => {
+      assert.equal(timestampToString(1544367587513), '2018-12-09T14:59:47.513Z');
     });
   });
 }
