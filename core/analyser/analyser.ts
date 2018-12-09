@@ -1,31 +1,20 @@
 import { chain, find, filter, some } from 'lodash';
-import { Alarm, AnalyserEntry, DeviceStatus, Insulin, Profile, SensorEntry } from 'core/models/model';
+import {
+  Alarm,
+  AnalyserEntry,
+  DEFAULT_STATE,
+  DeviceStatus,
+  Insulin,
+  Profile,
+  SensorEntry, Situation,
+  State,
+} from 'core/models/model';
 import { HOUR_IN_MS, MIN_IN_MS } from '../calculations/calculations';
 import { parseAnalyserEntries } from './analyser-utils';
-
-export const STATUS_OUTDATED = 'outdated';
-export const STATUS_HIGH = 'high';
-export const STATUS_PERSISTENT_HIGH = 'persistent_high';
-export const STATUS_LOW = 'low';
-export const STATUS_RISING = 'rising';
-export const STATUS_FALLING = 'falling';
-export const STATUS_BATTERY = 'battery';
-export const STATUS_COMPRESSION_LOW = 'compression';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 2;
 const LOW_CLEARING_THRESHOLD = 2;
-
-const state = {
-  [STATUS_BATTERY]: false,
-  [STATUS_OUTDATED]: false,
-  [STATUS_LOW]: false,
-  [STATUS_FALLING]: false,
-  [STATUS_COMPRESSION_LOW]: false,
-  [STATUS_HIGH]: false,
-  [STATUS_RISING]: false,
-  [STATUS_PERSISTENT_HIGH]: false,
-};
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -39,64 +28,91 @@ export function runAnalysis(
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
   deviceStatus: DeviceStatus,
-  latestAlarms: Alarm[]) {
+  latestAlarms: Alarm[]): State {
 
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries).sortBy('timestamp').last().value();
+  let state = DEFAULT_STATE;
 
-  state[STATUS_BATTERY] = detectBattery(
-    activeProfile,
-    deviceStatus,
-  );
+  state = {
+    ...state,
+    BATTERY: detectBattery(
+      activeProfile,
+      deviceStatus,
+    ),
+  };
 
   if (!latestEntry) {
     return state;
   }
 
-  state[STATUS_OUTDATED] = detectOutdated(
-    activeProfile,
-    latestEntry,
-    currentTimestamp,
-  );
+  state = {
+    ...state,
+    OUTDATED: detectOutdated(
+      activeProfile,
+      latestEntry,
+      currentTimestamp,
+    ),
+  };
 
-  if (state[STATUS_OUTDATED] || !latestEntry.bloodGlucose) {
+  if (state.OUTDATED || !latestEntry.bloodGlucose) {
     return state;
   }
 
-  state[STATUS_LOW] = detectLow(
-    activeProfile,
-    latestEntry,
-    latestAlarms,
-  );
+  state = {
+    ...state,
+    LOW: detectLow(
+      activeProfile,
+      latestEntry,
+      latestAlarms,
+    ),
+  };
 
-  state[STATUS_FALLING] = detectFalling(
-    activeProfile,
-    latestEntry,
-  );
+  state = {
+    ...state,
+    FALLING: detectFalling(
+      state,
+      activeProfile,
+      latestEntry,
+    ),
+  };
 
-  state[STATUS_COMPRESSION_LOW] = detectCompressionLow(
-    activeProfile,
-    entries,
-    insulin,
-  );
+  state = {
+    ...state,
+    COMPRESSION_LOW: detectCompressionLow(
+      activeProfile,
+      entries,
+      insulin,
+    ),
+  };
 
-  state[STATUS_HIGH] = detectHigh(
-    activeProfile,
-    latestEntry,
-    latestAlarms,
-  );
+  state = {
+    ...state,
+    HIGH: detectHigh(
+      activeProfile,
+      latestEntry,
+      latestAlarms,
+    ),
+  };
 
-  state[STATUS_RISING] = detectRising(
-    activeProfile,
-    latestEntry,
-  );
+  state = {
+    ...state,
+    RISING: detectRising(
+      state,
+      activeProfile,
+      latestEntry,
+    ),
+  };
 
-  state[STATUS_PERSISTENT_HIGH] = detectPersistentHigh(
-    activeProfile,
-    latestEntry,
-    entries,
-    currentTimestamp,
-  );
+  state = {
+    ...state,
+    PERSISTENT_HIGH: detectPersistentHigh(
+      activeProfile,
+      latestEntry,
+      entries,
+      currentTimestamp,
+    ),
+  };
 
   return state;
 }
@@ -126,14 +142,16 @@ function detectLow(
   latestEntry: AnalyserEntry,
   latestAlarms: Alarm[],
 ) {
-  return latestEntry.bloodGlucose < profile.analyserSettings.LOW_LEVEL_ABS + (find(latestAlarms, { type: STATUS_LOW }) ? LOW_CLEARING_THRESHOLD : 0);
+  const situationType: Situation = 'LOW';
+  return latestEntry.bloodGlucose < profile.analyserSettings.LOW_LEVEL_ABS + (find(latestAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0);
 }
 
 function detectFalling(
+  state: State,
   profile: Profile,
   entry: AnalyserEntry,
 ) {
-  return !state[STATUS_LOW] && entry.bloodGlucose < profile.analyserSettings.LOW_LEVEL_REL && !!entry.slope && entry.slope < -slopeLimits.MEDIUM;
+  return !state.LOW && entry.bloodGlucose < profile.analyserSettings.LOW_LEVEL_REL && !!entry.slope && entry.slope < -slopeLimits.MEDIUM;
 }
 
 function detectCompressionLow(
@@ -157,15 +175,17 @@ function detectHigh(
   latestEntry: AnalyserEntry,
   latestAlarms: Alarm[],
 ) {
-  const correctionIfAlreadyHigh = find(latestAlarms, { situationType: STATUS_HIGH }) ? HIGH_CLEARING_THRESHOLD : 0;
+  const situationType: Situation = 'HIGH';
+  const correctionIfAlreadyHigh = find(latestAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
   return latestEntry.bloodGlucose > (profile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh);
 }
 
 function detectRising(
+  state: State,
   profile: Profile,
   entry: AnalyserEntry,
 ) {
-  return !state[STATUS_HIGH] && entry.bloodGlucose > profile.analyserSettings.HIGH_LEVEL_REL && !!entry.slope && entry.slope > slopeLimits.MEDIUM;
+  return !state.HIGH && entry.bloodGlucose > profile.analyserSettings.HIGH_LEVEL_REL && !!entry.slope && entry.slope > slopeLimits.MEDIUM;
 }
 
 function detectPersistentHigh(

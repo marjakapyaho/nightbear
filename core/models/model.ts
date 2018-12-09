@@ -164,15 +164,22 @@ export interface Carbs {
   readonly carbsType: 'fast' | 'normal' | 'slow';
 }
 
-export type Situation
-  = 'BATTERY'
-  | 'OUTDATED'
-  | 'LOW'
-  | 'FALLING'
-  | 'COMPRESSION_LOW'
-  | 'HIGH'
-  | 'RISING'
-  | 'PERSISTENT_HIGH';
+const defaultState = {
+  BATTERY: false,
+  OUTDATED: false,
+  LOW: false,
+  FALLING: false,
+  COMPRESSION_LOW: false,
+  HIGH: false,
+  RISING: false,
+  PERSISTENT_HIGH: false,
+};
+
+export const DEFAULT_STATE: State = defaultState;
+
+export type State = Readonly<typeof defaultState>;
+
+export type Situation = keyof State;
 
 export interface Alarm {
   // Model:
@@ -186,10 +193,6 @@ export interface Alarm {
   readonly isActive: boolean;
   readonly pushoverReceipts: string[];
 }
-
-export type State = {
-  [S in Situation]: false
-};
 
 export interface Settings {
   // Model:

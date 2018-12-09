@@ -56,7 +56,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithFalling, currentTimestamp, activeProfile('day'), activeAlarms)
+    runAlarmChecks(context, stateWithFalling, activeProfile('day'), activeAlarms)
       .then((alarms) => {
         assert.deepEqual(
           alarms,
@@ -70,7 +70,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'FALLING');
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithFalling, currentTimestamp, activeProfile('day'), activeAlarms)
+    runAlarmChecks(context, stateWithFalling, activeProfile('day'), activeAlarms)
       .then((alarms) => {
         assert.deepEqual(
           alarms,
@@ -84,7 +84,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithHigh, currentTimestamp, activeProfile('day'), activeAlarms)
+    runAlarmChecks(context, stateWithHigh, activeProfile('day'), activeAlarms)
       .then((alarms) => {
         assert.deepEqual(
           alarms,

@@ -9,7 +9,6 @@ const INITIAL_ALARM_LEVEL = 1;
 export function runAlarmChecks(
   context: Context,
   state: State,
-  currentTimestamp: number,
   activeProfile: Profile,
   activeAlarms: Alarm[]) {
 
@@ -17,7 +16,7 @@ export function runAlarmChecks(
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
-    handleAlarmsToKeep(alarmsToKeep, currentTimestamp, activeProfile, context),
+    handleAlarmsToKeep(alarmsToKeep, context.timestamp(), activeProfile, context),
     handleAlarmsToCreate(alarmsToCreate, context),
   ])
     .then((modelArrays) => {

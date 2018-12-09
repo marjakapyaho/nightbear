@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { Model, Carbs, Settings } from 'core/models/model';
+import { Model, Carbs, Settings, Alarm } from 'core/models/model';
 import { Storage, StorageError } from 'core/storage/storage';
 import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
 import { REV_CONFLICT_SAVE_ERROR } from 'core/storage/couchDbStorage';
@@ -163,5 +163,63 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         assert.equal(models.length, 1);
         assertEqualWithoutMeta(models[0], { ...model, timestamp: timestamp - 0, amount: 3 });
       });
+  });
+
+  describe('loading active alarms', () => {
+    const alarm: Alarm = {
+      modelType: 'Alarm',
+      timestamp: 0,
+      validAfterTimestamp: 0,
+      alarmLevel: 0,
+      situationType: 'HIGH',
+      isActive: false,
+      pushoverReceipts: [],
+    };
+
+    it("doesn't load anything if there's nothing to load", () => {
+      return Promise.resolve()
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
+        .then(models => {
+          assert.equal(models.length, 0);
+        });
+    });
+
+    it('ignores inactive alarms', () => {
+      return Promise.resolve()
+        .then(() => [{ ...alarm, timestamp }])
+        .then(storage.saveModels)
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
+        .then(models => {
+          assert.equal(models.length, 0);
+        });
+    });
+
+    it('loads an active alarm', () => {
+      const a1 = { ...alarm, timestamp, isActive: true };
+      return Promise.resolve()
+        .then(() => [a1])
+        .then(storage.saveModels)
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
+        .then(models => {
+          assert.equal(models.length, 1);
+          assertEqualWithoutMeta(models[0], a1);
+        });
+    });
+
+    it('loads correct alarms, in correct order', () => {
+      const a1 = { ...alarm, timestamp: timestamp - 1000, isActive: true };
+      const a2 = { ...alarm, timestamp: timestamp - 500, isActive: false };
+      const a3 = { ...alarm, timestamp: timestamp - 100, isActive: true };
+      const a4 = { ...alarm, timestamp: timestamp - 10, isActive: false };
+      return Promise.resolve()
+        .then(() => [a1, a4, a2, a3]) // intentionally inserted out-of-order
+        .then(storage.saveModels)
+        .then(() => storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }))
+        .then(models => {
+          assert.equal(models.length, 2);
+          assertEqualWithoutMeta(models[0], a3);
+          assertEqualWithoutMeta(models[1], a1);
+        });
+    });
   });
 }
