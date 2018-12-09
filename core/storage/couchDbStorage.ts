@@ -248,3 +248,15 @@ export function getStorageKey(model: Model): string {
 function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
 }
+
+// Generates a random string for similar purposes as UUID's, but easier for a human to remember.
+// @example generateUniqueId(8) => "TEvGnkwr"
+export function generateUniqueId(length = 8): string {
+  let uid = '';
+  while (uid.length < length) {
+    const char = String.fromCharCode(Math.round(Math.random() * 255));
+    if (!char.match(/[9-9a-zA-Z]/)) continue; // result space: 0-9 + a-z + A-Z = 10 + 26 + 26 = 62
+    uid += char;
+  }
+  return uid; // possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion = enough
+}
