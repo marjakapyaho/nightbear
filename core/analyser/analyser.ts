@@ -28,7 +28,7 @@ export function runAnalysis(
   activeProfile: Profile,
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
-  deviceStatus: DeviceStatus,
+  deviceStatus: DeviceStatus | undefined,
   latestAlarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
@@ -38,10 +38,12 @@ export function runAnalysis(
     .value();
   let state = DEFAULT_STATE;
 
-  state = {
-    ...state,
-    BATTERY: detectBattery(activeProfile, deviceStatus),
-  };
+  if (deviceStatus) {
+    state = {
+      ...state,
+      BATTERY: detectBattery(activeProfile, deviceStatus),
+    };
+  }
 
   if (!latestEntry) {
     return state;

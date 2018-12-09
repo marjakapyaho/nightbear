@@ -6,17 +6,22 @@ import { Context } from 'core/models/api';
 import { first } from 'lodash';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
+const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
 let nextCheck: NodeJS.Timer;
 
-export function runChecks(context: Context) {
+export function checkRunnerTimer(context: Context) {
   // Clear previous timer (if exists)
   if (nextCheck) {
     global.clearTimeout(nextCheck);
   }
 
   // And set next one
-  nextCheck = global.setTimeout(runChecks, 2 * MIN_IN_MS);
+  nextCheck = global.setTimeout(checkRunnerTimer, CHECK_RUN_INTERVAL);
 
+  return runChecks(context);
+}
+
+export function runChecks(context: Context) {
   return Promise.all([
     context.storage.loadLatestTimelineModels('Settings', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -26,10 +31,12 @@ export function runChecks(context: Context) {
   ]).then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
     const activeSettings = first(settings);
     const deviceStatus = first(latestDeviceStatus);
+
     if (!activeSettings) throw new Error(`Couldn't load active settings`);
-    if (!deviceStatus) throw new Error(`Couldn't load device status`);
+
     const activeProfile = activeSettings.activeProfile;
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
+
     return runAlarmChecks(context, state, activeProfile, alarms);
   });
 }
