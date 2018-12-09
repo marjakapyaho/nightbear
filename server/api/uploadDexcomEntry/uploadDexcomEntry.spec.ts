@@ -134,13 +134,7 @@ describe('api/uploadDexcomEntry', () => {
   const mockDexcomCalWithMeterEntry: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 10 * MIN_IN_MS,
-    meterEntries: [
-      {
-        modelType: 'MeterEntry',
-        timestamp: timestampNow - 10 * MIN_IN_MS,
-        bloodGlucose: 8.5,
-      },
-    ],
+    meterEntries: [],
     isInitialCalibration: false,
     slope: null,
     intercept: null,
@@ -230,10 +224,14 @@ describe('api/uploadDexcomEntry', () => {
   });
 
   it('produces correct DexcomCalibration with new meter entry', () => {
-    assert.deepEqual(
-      initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalibration),
+    assert.deepEqual(initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalibration), [
       mockDexcomCalWithMeterEntry,
-    );
+      {
+        modelType: 'MeterEntry',
+        timestamp: timestampNow - 10 * MIN_IN_MS,
+        bloodGlucose: 8.5,
+      },
+    ]);
   });
 
   it('does not regenerate new calibration with same meter entry', () => {
