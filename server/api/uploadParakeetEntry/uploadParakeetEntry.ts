@@ -14,7 +14,7 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
     .then(latestCalibrations => {
       const latestCalibration = find(latestCalibrations as DexcomCalibration[], cal => cal.slope !== null); // TODO
       if (!latestCalibration) {
-        return Promise.reject('Could not find DexcomCalibration for uploading Parakeet entry');
+        throw new Error('Could not find DexcomCalibration for uploading Parakeet entry');
       }
 
       // Parse parakeet entry
