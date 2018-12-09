@@ -27,9 +27,7 @@ const INCREMENTAL = true;
 const bar = new cliProgress.Bar({});
 const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
 const sourceDb = new PouchDB(`migrate_temp`);
-const targetStorage = createCouchDbStorage(
-  `https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`,
-);
+const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`);
 const warnings: Error[] = [];
 let nestedIdTotal: number = 0;
 let remainingNestedIds: string[] = [];
@@ -107,10 +105,7 @@ function runBatchesSerially(ids: string[][]) {
   const total = ids.reduce((memo, next) => memo + next.length, 0);
   bar.start(total, 0);
   return ids
-    .reduce(
-      (memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)),
-      Promise.resolve(),
-    )
+    .reduce((memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)), Promise.resolve())
     .then(() => bar.update(total));
 }
 
