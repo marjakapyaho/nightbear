@@ -25,8 +25,7 @@ export interface Sensor {
   readonly modelType: 'Sensor';
   readonly modelMeta?: ModelMeta;
   // Sensor:
-  readonly sensorId: string; // UUID
-  readonly startTimestamp: number;
+  readonly timestamp: number;
   readonly endTimestamp: number;
   readonly placementNote: string;
 }
