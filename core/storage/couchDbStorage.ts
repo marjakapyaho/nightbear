@@ -115,7 +115,7 @@ export function createCouchDbStorage(
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't load timeline models: ${errObj.message}`); // refine the error before giving it out
+          throw new Error(`Couldn't load timeline models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
 
@@ -136,7 +136,7 @@ export function createCouchDbStorage(
               index: { fields },
             })
             .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't create index (loadLatestTimelineModels): ${errObj.message}`); // refine the error before giving it out
+              throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
             }),
         )
         .then(res => {
@@ -152,13 +152,13 @@ export function createCouchDbStorage(
               sort: fields.map(name => ({ [name]: 'desc' as 'desc' })), // note: the last condition becoming { _id: 'desc' } gives us the latest first (because all preceding fields will have the same values)
             })
             .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't query index (loadLatestTimelineModels): ${errObj.message}`); // refine the error before giving it out
+              throw new Error(`Couldn't query index in loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
             }),
         )
         .then(res => res.docs.map(reviveCouchDbRowIntoModel))
         .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
         .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't load latest timeline models: ${errObj.message}`); // refine the error before giving it out
+          throw new Error(`Couldn't load latest timeline models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
 
@@ -171,7 +171,7 @@ export function createCouchDbStorage(
         })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
         .catch((errObj: PouchDB.Core.Error) => {
-          throw new Error(`Couldn't load global models: ${errObj.message}`); // refine the error before giving it out
+          throw new Error(`Couldn't load global models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
   });

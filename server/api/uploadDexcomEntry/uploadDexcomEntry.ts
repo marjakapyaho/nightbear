@@ -66,7 +66,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 
         // Bg entry needs full calibration
         if (!latestFullCalibration) {
-          return Promise.reject('Could not find complete DexcomCalibration for uploading Dexcom sensor entry');
+          throw new Error('Could not find complete DexcomCalibration for uploading Dexcom sensor entry');
         }
 
         if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
@@ -77,7 +77,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
           return context.storage.saveModel(dexcomEntry);
         }
 
-        return Promise.reject('Unknown Dexcom entry type');
+        throw new Error('Unknown Dexcom entry type');
       },
     )
     .then(() => Promise.resolve(createResponse(requestObject)));
