@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { REV_CONFLICT_SAVE_ERROR, generateUniqueId, timestampToString } from 'core/storage/couchDbStorage';
+import { generateUniqueId, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
