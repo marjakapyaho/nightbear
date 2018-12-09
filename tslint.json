@@ -8,7 +8,7 @@
     "interface-name": false,
     "max-line-length": [ false ],
     "object-literal-sort-keys": false,
-    "ordered-imports": [ false ],
+    "ordered-imports": true,
     "quotemark": [ true, "single", "avoid-escape", "jsx-double" ],
     "one-line": false,
     "no-shadowed-variable": false,
