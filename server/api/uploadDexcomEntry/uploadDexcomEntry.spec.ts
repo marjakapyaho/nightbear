@@ -10,7 +10,7 @@ import {
   parseDexcomStatus,
   uploadDexcomEntry,
 } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
-import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
 
 describe('api/uploadDexcomEntry', () => {
   const timestampNow = 1508672249758;
@@ -118,13 +118,7 @@ describe('api/uploadDexcomEntry', () => {
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 3 * MIN_IN_MS,
-    meterEntries: [
-      {
-        modelType: 'MeterEntry',
-        timestamp: timestampNow - 3 * MIN_IN_MS,
-        bloodGlucose: 8.0,
-      },
-    ],
+    meterEntries: [],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -170,11 +164,15 @@ describe('api/uploadDexcomEntry', () => {
     it('uploads Dexcom sensor entry with correct response', () => {
       const context = createTestContext(createTestStorage());
       return Promise.resolve()
-        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() =>
+          saveAndAssociate(context, mockDexcomCalibration, {
+            modelType: 'MeterEntry',
+            timestamp: timestampNow - 3 * MIN_IN_MS,
+            bloodGlucose: 8.0,
+          }),
+        )
         .then(() => uploadDexcomEntry(mockRequestBgEntry, context))
-        .then(res => {
-          assert.equal(res.responseBody, mockRequestBgEntry.requestBody);
-        })
+        .then(res => assert.equal(res.responseBody, mockRequestBgEntry.requestBody))
         .then(() => context.storage.loadLatestTimelineModels('DexcomSensorEntry', 100))
         .then(models => assertEqualWithoutMeta(models, [mockDexcomSensorEntry]));
     });
