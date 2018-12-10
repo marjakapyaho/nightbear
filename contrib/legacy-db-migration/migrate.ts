@@ -176,6 +176,7 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const model: MeterEntry = {
       modelType: 'MeterEntry',
       timestamp: x.date,
+      deviceName: 'dexcom',
       bloodGlucose: changeBloodGlucoseUnitToMmoll(x.mbg),
     };
     return Promise.resolve([model]);
@@ -267,6 +268,7 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const model3: MeterEntry = {
       modelType: 'MeterEntry',
       timestamp: x.date,
+      deviceName: 'ui',
       bloodGlucose: parseFloat(x.sugar),
     };
     return Promise.resolve(

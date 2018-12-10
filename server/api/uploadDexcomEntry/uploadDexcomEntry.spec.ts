@@ -168,6 +168,7 @@ describe('api/uploadDexcomEntry', () => {
           saveAndAssociate(context, mockDexcomCalibration, {
             modelType: 'MeterEntry',
             timestamp: timestampNow - 3 * MIN_IN_MS,
+            deviceName: 'dexcom',
             bloodGlucose: 8.0,
           }),
         )

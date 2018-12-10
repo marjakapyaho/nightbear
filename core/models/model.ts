@@ -87,6 +87,7 @@ export interface MeterEntry {
   readonly modelType: 'MeterEntry';
   readonly modelMeta?: ModelMeta;
   readonly timestamp: number;
+  readonly deviceName: string; // TODO: Make into enum 'dexcom' | 'manual'..?
   readonly bloodGlucose: number;
 }
 

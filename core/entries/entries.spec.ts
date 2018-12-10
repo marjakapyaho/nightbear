@@ -112,6 +112,7 @@ describe('core/entries', () => {
             {
               modelType: 'MeterEntry',
               timestamp: timestamp - 30 * MIN_IN_MS,
+              deviceName: 'dexcom',
               bloodGlucose: 8.0,
             },
           ),
@@ -127,6 +128,7 @@ describe('core/entries', () => {
             {
               modelType: 'MeterEntry',
               timestamp: timestamp - 30 * MIN_IN_MS,
+              deviceName: 'dexcom',
               bloodGlucose: 8.0,
             },
             {
