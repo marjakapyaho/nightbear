@@ -1,7 +1,13 @@
 import { assert } from 'chai';
-import { Alarm, Carbs, Model, Settings } from 'core/models/model';
+import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, Settings } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { generateUniqueId, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
+import {
+  generateUniqueId,
+  getModelRef,
+  getStorageKey,
+  REV_CONFLICT_SAVE_ERROR,
+  timestampToString,
+} from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -272,6 +278,87 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   describe('timestampToString()', () => {
     it('generates timestamp strings of the expected type', () => {
       assert.equal(timestampToString(1544367587513), '2018-12-09T14:59:47.513Z');
+    });
+  });
+
+  describe('model references', () => {
+    const entry: MeterEntry = {
+      modelType: 'MeterEntry',
+      timestamp: 1544372705829 - 1000,
+      bloodGlucose: 8,
+    };
+
+    const cal: DexcomCalibration = {
+      modelType: 'DexcomCalibration',
+      timestamp: 1544372705829,
+      meterEntries: [],
+      isInitialCalibration: true,
+      slope: null,
+      intercept: null,
+      scale: null,
+    };
+
+    it("complains when modelMeta isn't set", () => {
+      return Promise.resolve()
+        .then(() => ({ ...cal, meterEntries: [getModelRef(entry)] }))
+        .then(() => assert.fail(), err => assert.match(err.message, /MeterEntry.*modelMeta/));
+    });
+
+    it('saves models with references', () => {
+      return Promise.resolve()
+        .then(() => entry)
+        .then(storage.saveModel)
+        .then(entry => {
+          return Promise.resolve()
+            .then(() => ({ ...cal, meterEntries: [getModelRef(entry)] }))
+            .then(storage.saveModel)
+            .then(() => storage.loadLatestTimelineModel('DexcomCalibration'))
+            .then(cal => {
+              if (cal) {
+                assert.deepEqual(cal.meterEntries, [{ modelType: 'MeterEntry', modelRef: getStorageKey(entry) }]);
+              } else {
+                assert.fail();
+              }
+            });
+        });
+    });
+
+    it('loads models with references', () => {
+      return Promise.resolve()
+        .then(() => entry)
+        .then(storage.saveModel)
+        .then(entry => {
+          return Promise.resolve()
+            .then(() => ({ ...cal, meterEntries: [getModelRef(entry)] }))
+            .then(storage.saveModel)
+            .then(() => storage.loadLatestTimelineModel('DexcomCalibration'))
+            .then(cal => (cal ? cal.meterEntries : []))
+            .then(refs => Promise.all(refs.map(ref => storage.loadModelRef(ref))))
+            .then(models =>
+              models.forEach(model => {
+                if (model) {
+                  assert.equal(model.modelType, 'MeterEntry');
+                  assert.equal(getStorageKey(model), getStorageKey(entry));
+                } else {
+                  assert.fail();
+                }
+              }),
+            );
+        });
+    });
+
+    it("complains when models with references can't be found", () => {
+      return Promise.resolve()
+        .then(() =>
+          storage.loadModelRef({
+            modelType: 'MeterEntry',
+            modelRef: 'timeline/2018-12-09T16:25:04.829Z/MeterEntry/Tos9mfFf',
+          }),
+        )
+        .then(
+          assert.fail, // expecting a failure
+          err => assert.match(err.message, /modelRef.*MeterEntry.*Tos9mfFf/),
+        );
     });
   });
 }
