@@ -63,23 +63,6 @@ describe('api/uploadDexcomEntry', () => {
     },
   };
 
-  const mockRequestLonelyCalibration: Request = {
-    requestId: '',
-    requestMethod: '',
-    requestPath: '',
-    requestHeaders: {},
-    requestParams: {},
-    requestBody: {
-      device: 'dexcom',
-      type: 'cal',
-      date: timestampNow - MIN_IN_MS,
-      dateString: 'Sat Feb 24 11:55:48 EET 2018',
-      slope: 900.3002146147081,
-      intercept: 40000,
-      scale: 0.7980735302684531,
-    },
-  };
-
   const mockRequestDeviceStatus: Request = {
     requestId: '',
     requestMethod: '',
@@ -100,16 +83,6 @@ describe('api/uploadDexcomEntry', () => {
     noiseLevel: 1,
   };
 
-  const mockCalibrationWithoutMeterEntry: DexcomCalibration = {
-    modelType: 'DexcomCalibration',
-    timestamp: timestampNow - MIN_IN_MS,
-    meterEntries: [],
-    isInitialCalibration: false,
-    slope: 900.3002146147081,
-    intercept: 40000,
-    scale: 0.7980735302684531,
-  };
-
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 3 * MIN_IN_MS,
@@ -118,16 +91,6 @@ describe('api/uploadDexcomEntry', () => {
     slope: 828.3002146147081,
     intercept: 30000,
     scale: 0.9980735302684531,
-  };
-
-  const mockDexcomCalWithMeterEntry: DexcomCalibration = {
-    modelType: 'DexcomCalibration',
-    timestamp: timestampNow - 10 * MIN_IN_MS,
-    meterEntries: [],
-    isInitialCalibration: false,
-    slope: null,
-    intercept: null,
-    scale: null,
   };
 
   const mockDexcomCalWithMeterAndCalEntries: DexcomCalibration = {
