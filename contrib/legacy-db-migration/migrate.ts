@@ -1,5 +1,5 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll } from 'core/calculations/calculations';
+import { changeBloodGlucoseUnitToMmoll, MIN_IN_MS } from 'core/calculations/calculations';
 import {
   Alarm,
   Carbs,
@@ -12,7 +12,8 @@ import {
   Model,
   ParakeetSensorEntry,
 } from 'core/models/model';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import { is } from 'core/models/utils';
+import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
 import { isNotNull } from 'server/utils/types';
@@ -21,16 +22,18 @@ import { inspect } from 'util';
 const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
-const INCREMENTAL = true;
+const INCREMENTAL = false;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
 const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
 const sourceDb = new PouchDB(`migrate_temp`);
-const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`);
+const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_18`);
 
 const warnings: Error[] = [];
 let incrementalIdsToMigrate: string[] = [];
+const maybeLinkedMeterEntries: MeterEntry[] = [];
+const maybeLinkedDexcomCalibrations: DexcomCalibration[] = [];
 
 main();
 
@@ -43,6 +46,9 @@ function main() {
     .then(outputModelTypes)
     .then(batchDocIds)
     .then(runBatchesSerially)
+    .then(linkCalibrationsAndMeterEntries)
+    .then(batchLinkedCalibrations)
+    .then(runBatchedCalibrationUpdatesSerially)
     .then(finalizeDb)
     .catch(err => console.warn('\nMigration failed:', err))
     .then(reportFinished);
@@ -73,7 +79,6 @@ function migrateToLocalDb() {
 }
 
 function reportFinished() {
-  bar.stop();
   if (warnings.length) console.warn(`${warnings.length} warnings generated`);
   console.log('Warnings:\n' + inspect(warnings, { maxArrayLength: Infinity }));
   console.warn('Finished!');
@@ -108,7 +113,8 @@ function runBatchesSerially(ids: string[][]) {
   bar.start(total, 0);
   return ids
     .reduce((memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)), Promise.resolve())
-    .then(() => bar.update(total));
+    .then(() => bar.update(total))
+    .then(() => bar.stop());
 }
 
 function runBatch(ids: string[]): Promise<any> {
@@ -148,7 +154,13 @@ function toModernModels(docs: object[]) {
         return null;
       }
     }),
-  ).then(models => targetStorage.saveModels(flatten(models.filter(isNotNull)), true));
+  )
+    .then(models => targetStorage.saveModels(flatten(models.filter(isNotNull)), true))
+    .then(models => {
+      maybeLinkedMeterEntries.push(...models.filter(is('MeterEntry')));
+      maybeLinkedDexcomCalibrations.push(...models.filter(is('DexcomCalibration')));
+      return models;
+    });
 }
 
 function toModernModel(x: any): Promise<Model[] | null> {
@@ -265,6 +277,68 @@ function toModernModel(x: any): Promise<Model[] | null> {
     );
   } else {
     throw new Error(`WARN: Not sure what to do with "${x._id}": ` + JSON.stringify(x, null, 4));
+  }
+}
+
+function linkCalibrationsAndMeterEntries() {
+  console.warn(
+    `Attempting to link ${maybeLinkedMeterEntries.length} MeterEntry's with ${
+      maybeLinkedDexcomCalibrations.length
+    } DexcomCalibration's`,
+  );
+  console.log({ maybeLinkedMeterEntries, maybeLinkedDexcomCalibrations });
+  const updates = maybeLinkedDexcomCalibrations.map(cal => {
+    const entries = maybeLinkedMeterEntries.filter(entry => Math.abs(cal.timestamp - entry.timestamp) <= MIN_IN_MS * 3);
+    const deltas = entries.map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec').join(', ');
+    console.log(
+      `"${(cal as any).modelMeta._id}" got ${
+        entries.length
+      } linked MeterEntry's which are [ ${deltas} ] ahead of the parent ${cal.modelType}`,
+    );
+    return {
+      ...cal,
+      meterEntries: entries.map(getModelRef),
+    };
+  });
+  const actualUpdates = updates.filter(cal => !!cal.meterEntries.length);
+  console.warn(`Found MeterEntry's for ${actualUpdates.length} of ${updates.length} DexcomCalibration's`);
+  return actualUpdates;
+}
+
+function batchLinkedCalibrations(cals: DexcomCalibration[]): DexcomCalibration[][] {
+  return chunk(cals, BATCH_SIZE);
+}
+
+function runBatchedCalibrationUpdatesSerially(cals: DexcomCalibration[][]) {
+  const total = cals.reduce((memo, next) => memo + next.length, 0);
+  bar.start(total, 0);
+  return cals
+    .reduce(
+      (memo, next) => memo.then(() => runCalibrationBatch(next)).then(() => bar.increment(next.length)),
+      Promise.resolve(),
+    )
+    .then(() => bar.update(total))
+    .then(() => bar.stop());
+}
+
+function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
+  let tries = 0;
+  return attempt();
+  function run() {
+    return targetStorage.saveModels(cals);
+  }
+  function attempt() {
+    return new Promise((resolve, reject) => {
+      run().then(resolve, err => {
+        if (tries++ >= BATCH_RETRY_LIMIT) {
+          console.log(`Error: runCalibrationBatch() reached retry limit (${BATCH_RETRY_LIMIT})`, err);
+          reject(err);
+        } else {
+          console.log(`Warn: runCalibrationBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT})`, err);
+          attempt().then(resolve, reject);
+        }
+      });
+    });
   }
 }
 
