@@ -43,6 +43,7 @@ function main() {
     .then(migrateToLocalDb)
     .then(() => console.warn("Preparing list of ID's to migrate (this may take a long time)"))
     .then(getDocIdsToMigrate)
+    .then(outputModelTypes)
     .then(recordNestedModelIds)
     .then(batchDocIds)
     .then(runBatchesSerially)
@@ -93,6 +94,16 @@ function getDocIdsToMigrate() {
       .allDocs()
       .then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
   }
+}
+
+function outputModelTypes(ids: string[]): string[] {
+  const x: string[] = [];
+  ids.forEach(id => {
+    const [a] = id.split('/');
+    if (!x.includes(a)) x.push(a);
+  });
+  console.log('Found distinct model types:', x);
+  return ids;
 }
 
 function recordNestedModelIds(ids: string[]): string[] {
