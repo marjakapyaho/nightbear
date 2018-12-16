@@ -23,11 +23,13 @@ const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
 const INCREMENTAL = true;
+const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
 const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
 const sourceDb = new PouchDB(`migrate_temp`);
 const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`);
+
 const warnings: Error[] = [];
 let nestedIdTotal: number = 0;
 let remainingNestedIds: string[] = [];
@@ -87,7 +89,9 @@ function getDocIdsToMigrate() {
     console.log('Migrating in incremental mode:', incrementalIdsToMigrate);
     return incrementalIdsToMigrate;
   } else {
-    return sourceDb.allDocs().then(res => res.rows.map(row => row.id));
+    return sourceDb
+      .allDocs()
+      .then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
   }
 }
 
