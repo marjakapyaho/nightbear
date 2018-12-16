@@ -12,7 +12,6 @@ import {
   Model,
   ParakeetSensorEntry,
 } from 'core/models/model';
-import { is } from 'core/models/utils';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
@@ -31,8 +30,6 @@ const sourceDb = new PouchDB(`migrate_temp`);
 const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_11`);
 
 const warnings: Error[] = [];
-let nestedIdTotal: number = 0;
-let remainingNestedIds: string[] = [];
 let incrementalIdsToMigrate: string[] = [];
 
 main();
@@ -44,7 +41,6 @@ function main() {
     .then(() => console.warn("Preparing list of ID's to migrate (this may take a long time)"))
     .then(getDocIdsToMigrate)
     .then(outputModelTypes)
-    .then(recordNestedModelIds)
     .then(batchDocIds)
     .then(runBatchesSerially)
     .then(finalizeDb)
@@ -79,9 +75,8 @@ function migrateToLocalDb() {
 function reportFinished() {
   bar.stop();
   if (warnings.length) console.warn(`${warnings.length} warnings generated`);
-  if (remainingNestedIds.length)
-    console.warn(`${remainingNestedIds.length}/${nestedIdTotal} nested models got left out`);
-  console.log(inspect({ warnings, remainingNestedIds }, { maxArrayLength: Infinity }));
+  console.log('Warnings:\n' + inspect(warnings, { maxArrayLength: Infinity }));
+  console.warn('Finished!');
   console.log('ProTip: Run the script with "> migrate.log" to reduce output');
 }
 
@@ -90,9 +85,7 @@ function getDocIdsToMigrate() {
     console.log('Migrating in incremental mode:', incrementalIdsToMigrate);
     return incrementalIdsToMigrate;
   } else {
-    return sourceDb
-      .allDocs()
-      .then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
+    return sourceDb.allDocs().then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
   }
 }
 
@@ -103,12 +96,6 @@ function outputModelTypes(ids: string[]): string[] {
     if (!x.includes(a)) x.push(a);
   });
   console.log('Found distinct model types:', x);
-  return ids;
-}
-
-function recordNestedModelIds(ids: string[]): string[] {
-  remainingNestedIds = ids.filter(id => !!id.match(/^meter-entries\//));
-  nestedIdTotal = remainingNestedIds.length;
   return ids;
 }
 
@@ -164,7 +151,7 @@ function toModernModels(docs: object[]) {
   ).then(models => targetStorage.saveModels(flatten(models.filter(isNotNull)), true));
 }
 
-function toModernModel(x: any, nested = false): Promise<Model[] | null> {
+function toModernModel(x: any): Promise<Model[] | null> {
   if (x._id.match(/^_/) || x._id.match(/^sensors\//)) {
     return Promise.resolve(null);
   } else if (x._id.match(/^sensor-entries\//) && x.type === 'sgv' && x.device === 'dexcom') {
@@ -186,8 +173,6 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     };
     return Promise.resolve([model]);
   } else if (x._id.match(/^meter-entries\//) && x.type === 'mbg' && x.device === 'dexcom') {
-    if (!nested) return Promise.resolve([]); // if we're not looking for a nested model, this doc can be ignored
-    remainingNestedIds = remainingNestedIds.filter(id => id !== x._id); // remove this from the list of ID's that we expect to nest
     const model: MeterEntry = {
       modelType: 'MeterEntry',
       timestamp: x.date,
@@ -245,41 +230,13 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
     const model: DexcomCalibration = {
       modelType: 'DexcomCalibration',
       timestamp: x.date,
-      meterEntries: [], // will be filled in below
+      meterEntries: [], // will be filled in later
       isInitialCalibration: false,
       slope: x.slope,
       intercept: x.intercept,
       scale: x.scale,
     };
-    return Promise.resolve()
-      .then(() =>
-        sourceDb.allDocs({
-          startkey: `meter-entries/${timestampToString(model.timestamp - 1000 * 60)}`,
-          endkey: `meter-entries/${timestampToString(model.timestamp + 1000 * 60)}`,
-          include_docs: true,
-        }),
-      )
-      .then(res => res.rows.map(row => row.doc))
-      .then(docs => Promise.all(docs.filter(isNotNull).map(doc => toModernModel(doc, true))))
-      .then(models => [
-        {
-          ...model,
-          meterEntries: flatten(models.filter(isNotNull)).filter(is('MeterEntry')),
-        },
-      ])
-      .then(models => {
-        models.forEach(model => {
-          const deltas = model.meterEntries
-            .map(e => ((e.timestamp - model.timestamp) / 1000).toFixed(1) + ' sec')
-            .join(', ');
-          console.log(
-            `"${x._id}" got ${
-              model.meterEntries.length
-            } nested MeterEntry's which are [ ${deltas} ] ahead of the parent ${model.modelType}`,
-          );
-        });
-        return models;
-      });
+    return Promise.resolve([model]);
   } else if (x._id.match(/^treatments\//)) {
     const model1: Insulin = {
       modelType: 'Insulin',
@@ -313,8 +270,4 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
 
 function finalizeDb() {
   return targetStorage.loadLatestTimelineModels('Alarm').catch(() => null); // this will just trigger an index build; the result can be ignored
-}
-
-function timestampToString(timestamp: number): string {
-  return new Date(timestamp).toISOString();
 }
