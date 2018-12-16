@@ -1,4 +1,4 @@
-import { Model, ModelOfType, ModelType } from 'core/models/model';
+import { Model, ModelOfType, ModelRef, ModelType } from 'core/models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
@@ -15,6 +15,7 @@ export interface Storage {
   ): Promise<Array<ModelOfType<T>>>;
   loadLatestTimelineModel<T extends ModelType>(modelType: T): Promise<ModelOfType<T> | undefined>;
   loadGlobalModels(): Promise<Model[]>;
+  loadModelRef<T extends Model>(ref: ModelRef<T>): Promise<T | undefined>;
 }
 
 export const NO_STORAGE: Storage = {
@@ -24,6 +25,7 @@ export const NO_STORAGE: Storage = {
   loadLatestTimelineModels: () => Promise.resolve([]),
   loadLatestTimelineModel: () => Promise.resolve(undefined),
   loadGlobalModels: () => Promise.resolve([]),
+  loadModelRef: () => Promise.resolve(undefined),
 };
 
 export type StorageErrorDetails = Readonly<{

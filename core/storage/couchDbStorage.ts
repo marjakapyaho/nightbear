@@ -1,4 +1,5 @@
-import { Model, MODEL_VERSION, ModelOfType, ModelType } from 'core/models/model';
+import { Model, MODEL_VERSION, ModelOfType, ModelRef, ModelType } from 'core/models/model';
+import { is } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { first } from 'lodash';
@@ -28,6 +29,7 @@ export function createCouchDbStorage(
   assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
 
   const db = new PouchDB(dbUrl, options);
+  const indexPrepLookup: { [key: string]: Promise<void> } = {};
 
   let self: Storage;
 
@@ -45,9 +47,10 @@ export function createCouchDbStorage(
       const docs = models.map((model, i) => {
         const { _id, _rev, modelVersion } = metas[i];
         const doc: PouchDB.Core.PutDocument<Model> = {
-          ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           _id,
           _rev: _rev || undefined,
+          ...{ modelType: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
+          ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
         };
         return doc;
@@ -130,20 +133,7 @@ export function createCouchDbStorage(
         '_id', // finally, include "_id" in the index, so we get temporal ordering
       ];
       return Promise.resolve()
-        .then(() =>
-          db
-            .createIndex({
-              index: { fields },
-            })
-            .catch((errObj: PouchDB.Core.Error) => {
-              throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
-            }),
-        )
-        .then(res => {
-          if (res.result !== 'exists') {
-            // TODO: log res as info/warning
-          }
-        })
+        .then(() => ensureIndexExists(fields))
         .then(() =>
           db
             .find({
@@ -178,7 +168,42 @@ export function createCouchDbStorage(
           throw new Error(`Couldn't load global models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
     },
+
+    loadModelRef<T extends Model>(ref: ModelRef<T>): Promise<T> {
+      const { modelType, modelRef } = ref;
+      return db
+        .get(modelRef)
+        .then(reviveCouchDbRowIntoModel)
+        .then(model => {
+          const retrievedType = model.modelType;
+          if (is(modelType)(model)) {
+            return model as T;
+          } else {
+            throw new Error(`Got unexpected modelType "${retrievedType}", expecting "${modelType}"`);
+          }
+        })
+        .catch((errObj: PouchDB.Core.Error | Error) => {
+          throw new Error(`Couldn't load modelRef "${modelRef}" (caused by\n${errObj.message}\n)`); // refine the error before giving it out
+        });
+    },
   });
+
+  // Promises that an index for the given fields exists in the DB; until we try, we don't know.
+  // Also ensures two db.createIndex() calls aren't ran in parallel, as that can cause a document update conflict.
+  function ensureIndexExists(fields: string[]): Promise<void> {
+    const key = fields.join(',');
+    if (!indexPrepLookup[key]) {
+      console.log(`Running createIndex() for "${key}"`);
+      indexPrepLookup[key] = Promise.resolve() // once started, don't allow others to start the creation of this specific index
+        .then(() => db.createIndex({ index: { fields } }))
+        .then(res => console.log(`Finished createIndex() for "${key}" with result "${res.result}"`))
+        .catch((errObj: PouchDB.Core.Error) => {
+          delete indexPrepLookup[key]; // if the operation failed, allow it to be retried later
+          throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
+        });
+    }
+    return indexPrepLookup[key];
+  }
 }
 
 // Note that here we need to do some runtime checking and/or leaps of faith, as we're at the edge of the system and the DB could (theoretically) give us anything
@@ -236,7 +261,7 @@ export function getStorageKey(model: Model): string {
     case 'Insulin':
     case 'Carbs':
     case 'Hba1c':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelType}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models of the same type with the same timestamp
+      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
     case 'Settings':
       return `${PREFIX_GLOBAL}/${model.modelType}`;
     case 'Profile':
@@ -263,4 +288,13 @@ export function generateUniqueId(length = 8): string {
     uid += char;
   }
   return uid; // possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion = enough
+}
+
+export function getModelRef<T extends Model>(model: T): ModelRef<T> {
+  const { modelMeta } = model;
+  if (isModelMeta(modelMeta) && modelMeta._id) {
+    return { modelType: model.modelType, modelRef: modelMeta._id };
+  } else {
+    throw new Error(`Can't create ModelRef for given ${model.modelType}: it doesn't have its modelMeta set`);
+  }
 }

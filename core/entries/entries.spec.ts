@@ -1,11 +1,10 @@
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Request } from 'core/models/api';
-import { DexcomCalibration } from 'core/models/model';
 import 'mocha';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
 
 describe('core/entries', () => {
   const timestamp = 1508672249758;
@@ -93,28 +92,31 @@ describe('core/entries', () => {
     },
   };
 
-  const mockDexcomCalibration: DexcomCalibration = {
-    modelType: 'DexcomCalibration',
-    timestamp: timestamp - 30 * MIN_IN_MS,
-    meterEntries: [
-      {
-        modelType: 'MeterEntry',
-        timestamp: timestamp - 30 * MIN_IN_MS,
-        bloodGlucose: 8.0,
-      },
-    ],
-    isInitialCalibration: false,
-    slope: 828.3002146147081,
-    intercept: 30000,
-    scale: 0.9980735302684531,
-  };
-
   withStorage(createTestStorage => {
     it('getMergedEntriesFeed', () => {
       let currentTime = timestamp;
       const context = createTestContext(createTestStorage(), () => currentTime);
       return Promise.resolve()
-        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() =>
+          saveAndAssociate(
+            context,
+            {
+              modelType: 'DexcomCalibration',
+              timestamp: timestamp - 30 * MIN_IN_MS,
+              meterEntries: [],
+              isInitialCalibration: false,
+              slope: 828.3002146147081,
+              intercept: 30000,
+              scale: 0.9980735302684531,
+            },
+            {
+              modelType: 'MeterEntry',
+              timestamp: timestamp - 30 * MIN_IN_MS,
+              source: 'dexcom',
+              bloodGlucose: 8.0,
+            },
+          ),
+        )
         .then(() => uploadDexcomEntry(mockRequestDexcomEntry, context))
         .then(() => uploadParakeetEntry(mockRequestParakeetEntryHidden, context))
         .then(() => uploadDexcomEntry(mockRequestRawDexcomEntry, context))
@@ -123,6 +125,12 @@ describe('core/entries', () => {
         .then(() => getMergedEntriesFeed(context, 24 * HOUR_IN_MS, timestamp))
         .then(entries => {
           assertEqualWithoutMeta(entries, [
+            {
+              modelType: 'MeterEntry',
+              timestamp: timestamp - 30 * MIN_IN_MS,
+              source: 'dexcom',
+              bloodGlucose: 8.0,
+            },
             {
               bloodGlucose: 7.5,
               modelType: 'DexcomSensorEntry',

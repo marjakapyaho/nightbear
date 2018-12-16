@@ -7,7 +7,7 @@ import { withStorage } from 'server/utils/test';
 describe('storage/couchDbStorage', () => {
   describe('getStorageKey()', () => {
     it('works for timeline models', () => {
-      assert.match(getStorageKey(MODEL_1), /^timeline\/2017-10-15T18:37:47.717Z\/Carbs\/\w{8}$/);
+      assert.match(getStorageKey(MODEL_1), /^timeline\/2017-10-15T18:37:47.717Z\/\w{8}$/);
     });
 
     it('works for global models', () => {

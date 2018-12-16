@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { NO_PUSHOVER } from 'core/alarms/pushover-client';
 import { Context, Request } from 'core/models/api';
-import { Model, Profile, Settings } from 'core/models/model';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import { DexcomCalibration, MeterEntry, Model, Profile, Settings } from 'core/models/model';
+import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { NO_STORAGE } from 'core/storage/storage';
 import { Storage } from 'core/storage/storage';
@@ -64,6 +64,14 @@ export function createTestContext(storage = NO_STORAGE, timestamp = () => 150867
     storage,
     pushover: NO_PUSHOVER,
   };
+}
+
+// This is just a common occurrence in test code
+export function saveAndAssociate(context: Context, cal: DexcomCalibration, entry: MeterEntry) {
+  return Promise.resolve()
+    .then(() => context.storage.saveModel(entry))
+    .then(entry => ({ ...cal, meterEntries: [getModelRef(entry)] }))
+    .then(context.storage.saveModel);
 }
 
 // Asserts deep equality of 2 Models, ignoring their metadata
