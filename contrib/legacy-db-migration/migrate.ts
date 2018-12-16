@@ -218,14 +218,14 @@ function toModernModel(x: any): Promise<Model[] | null> {
     const model1: DeviceStatus = {
       modelType: 'DeviceStatus',
       deviceName: 'parakeet',
-      timestamp: x.date + 1, // TODO: This is very hacky
+      timestamp: x.date,
       batteryLevel: parseFloat(x.parakeetBattery),
       geolocation: x.geoLocation,
     };
     const model2: DeviceStatus = {
       modelType: 'DeviceStatus',
       deviceName: 'dexcom-transmitter',
-      timestamp: x.date + 2, // TODO: This is very hacky
+      timestamp: x.date,
       batteryLevel: parseFloat(x.transmitterBattery),
       geolocation: null,
     };
