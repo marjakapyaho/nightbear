@@ -135,8 +135,11 @@ function runBatch(ids: string[]): Promise<any> {
           console.log(`Error: runBatch() reached retry limit (${BATCH_RETRY_LIMIT})`, err);
           reject(err);
         } else {
-          console.log(`Warn: runBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT})`, err);
-          attempt().then(resolve, reject);
+          console.log(
+            `Warn: runBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT}) in ${BATCH_RETRY_WAIT_SEC} seconds`,
+            err,
+          );
+          setTimeout(() => attempt().then(resolve, reject), BATCH_RETRY_WAIT_SEC * 1000);
         }
       });
     });
@@ -333,8 +336,11 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
           console.log(`Error: runCalibrationBatch() reached retry limit (${BATCH_RETRY_LIMIT})`, err);
           reject(err);
         } else {
-          console.log(`Warn: runCalibrationBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT})`, err);
-          attempt().then(resolve, reject);
+          console.log(
+            `Warn: runCalibrationBatch() failed, retrying (${tries}/${BATCH_RETRY_LIMIT}) in ${BATCH_RETRY_WAIT_SEC} seconds`,
+            err,
+          );
+          setTimeout(() => attempt().then(resolve, reject), BATCH_RETRY_WAIT_SEC * 1000);
         }
       });
     });
