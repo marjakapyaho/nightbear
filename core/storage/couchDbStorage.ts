@@ -47,9 +47,10 @@ export function createCouchDbStorage(
       const docs = models.map((model, i) => {
         const { _id, _rev, modelVersion } = metas[i];
         const doc: PouchDB.Core.PutDocument<Model> = {
-          ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           _id,
           _rev: _rev || undefined,
+          ...{ modelType: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
+          ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
         };
         return doc;
