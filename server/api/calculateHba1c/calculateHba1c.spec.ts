@@ -18,7 +18,7 @@ describe('api/calculateHba1c', () => {
   const mockDexcomMeterEntry: MeterEntry = {
     modelType: 'MeterEntry',
     timestamp: 1508672249758 - 3 * 14934,
-    deviceName: 'dexcom',
+    source: 'dexcom',
     bloodGlucose: 8.0,
   };
   const mockDexcomCalibration: DexcomCalibration = {

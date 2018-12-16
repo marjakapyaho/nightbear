@@ -285,7 +285,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     const entry: MeterEntry = {
       modelType: 'MeterEntry',
       timestamp: 1544372705829 - 1000,
-      deviceName: 'dexcom',
+      source: 'dexcom',
       bloodGlucose: 8,
     };
 

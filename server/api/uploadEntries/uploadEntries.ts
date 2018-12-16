@@ -28,7 +28,7 @@ export function parseMeterEntry(bloodGlucose: number, timestamp: number): MeterE
   return {
     modelType: 'MeterEntry',
     timestamp,
-    deviceName: 'manual',
+    source: 'ui',
     bloodGlucose,
   };
 }

@@ -40,7 +40,7 @@ describe('api/uploadParakeetEntry', () => {
   const mockDexcomEntry: MeterEntry = {
     modelType: 'MeterEntry',
     timestamp: timestampNow - 2 * MIN_IN_MS,
-    deviceName: 'dexcom',
+    source: 'dexcom',
     bloodGlucose: 8.0,
   };
 

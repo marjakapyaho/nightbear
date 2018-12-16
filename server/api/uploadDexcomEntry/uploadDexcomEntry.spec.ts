@@ -120,7 +120,7 @@ describe('api/uploadDexcomEntry', () => {
           saveAndAssociate(context, mockDexcomCalibration, {
             modelType: 'MeterEntry',
             timestamp: timestampNow - 3 * MIN_IN_MS,
-            deviceName: 'dexcom',
+            source: 'dexcom',
             bloodGlucose: 8.0,
           }),
         )
@@ -142,7 +142,7 @@ describe('api/uploadDexcomEntry', () => {
           assertEqualWithoutMeta(model, {
             modelType: 'MeterEntry',
             timestamp: timestampNow - 10 * MIN_IN_MS,
-            deviceName: 'dexcom',
+            source: 'dexcom',
             bloodGlucose: 8.5,
           }),
         )

@@ -60,7 +60,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
               const rangeEnd = timestamp + range / 2;
               return Promise.resolve()
                 .then(() => context.storage.loadTimelineModels('MeterEntry', range, rangeEnd))
-                .then(entries => entries.filter(entry => entry.deviceName === 'dexcom'))
+                .then(entries => entries.filter(entry => entry.source === 'dexcom'))
                 .then(entries => {
                   if (entries.length === 0) return Promise.resolve(null); // TODO: Retry until it's found..?
                   if (entries.length > 1) return Promise.resolve(null); // TODO: Log a warning because it's suspicious..?
@@ -132,7 +132,7 @@ export function parseMeterEntry(requestObject: { [key: string]: string }): Meter
   return {
     modelType: 'MeterEntry',
     timestamp: bgTimestamp,
-    deviceName: 'dexcom',
+    source: 'dexcom',
     bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
   };
 }
