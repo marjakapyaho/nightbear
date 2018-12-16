@@ -1,14 +1,14 @@
 import { assert } from 'chai';
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Request } from 'core/models/api';
-import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'core/models/model';
+import { DeviceStatus, DexcomCalibration, MeterEntry, ParakeetSensorEntry } from 'core/models/model';
 import 'mocha';
 import {
   parseParakeetEntry,
   parseParakeetStatus,
   uploadParakeetEntry,
 } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
 
 describe('api/uploadParakeetEntry', () => {
   const context = createTestContext();
@@ -37,16 +37,17 @@ describe('api/uploadParakeetEntry', () => {
   };
 
   // Mock objects
+  const mockDexcomEntry: MeterEntry = {
+    modelType: 'MeterEntry',
+    timestamp: timestampNow - 2 * MIN_IN_MS,
+    deviceName: 'dexcom',
+    bloodGlucose: 8.0,
+  };
+
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
     timestamp: timestampNow - 2 * MIN_IN_MS,
-    meterEntries: [
-      {
-        modelType: 'MeterEntry',
-        timestamp: timestampNow - 2 * MIN_IN_MS,
-        bloodGlucose: 8.0,
-      },
-    ],
+    meterEntries: [],
     isInitialCalibration: false,
     slope: 828.3002146147081,
     intercept: 30000,
@@ -84,7 +85,7 @@ describe('api/uploadParakeetEntry', () => {
     it('uploads parakeet entry with correct response', () => {
       const context = createTestContext(createTestStorage());
       return Promise.resolve()
-        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() => saveAndAssociate(context, mockDexcomCalibration, mockDexcomEntry))
         .then(() => uploadParakeetEntry(mockRequest, context))
         .then(res => {
           assert.equal(res.responseBody, '!ACK  0!');
