@@ -211,34 +211,29 @@ describe('api/uploadDexcomEntry', () => {
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
         .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
     });
+
+    it("doesn't generate the same DexcomCalibration again", () => {
+      const context = createTestContext(createTestStorage());
+      return (
+        Promise.resolve()
+          // We need a MeterEntry in the DB, otherwise there's nothing to link the DexcomCalibration to:
+          .then(() => uploadDexcomEntry(mockRequestMeterEntry, context))
+          // Upload the calibration for the first time:
+          .then(() => uploadDexcomEntry(mockRequestCalibration, context))
+          .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+          .then(models => assert.equal(models.length, 1))
+          // Upload the calibration for the second time:
+          .then(() => uploadDexcomEntry(mockRequestCalibration, context))
+          .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
+          .then(models => assert.equal(models.length, 1)) // still just one!
+      );
+    });
   });
 
   it('produces correct DexcomSensorEntry', () => {
     assert.deepEqual(
       parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration),
       mockDexcomSensorEntry,
-    );
-  });
-
-  it('produces correct DexcomCalibration with new meter entry', () => {
-    assert.deepEqual(initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalibration), [
-      mockDexcomCalWithMeterEntry,
-      {
-        modelType: 'MeterEntry',
-        timestamp: timestampNow - 10 * MIN_IN_MS,
-        bloodGlucose: 8.5,
-      },
-    ]);
-  });
-
-  it('does not regenerate new calibration with same meter entry', () => {
-    assert.deepEqual(initCalibration(mockRequestMeterEntry.requestBody as any, mockDexcomCalWithMeterEntry), null);
-  });
-
-  it('adds calibration data to correct initalized calibration', () => {
-    assert.deepEqual(
-      amendOrInitCalibration(mockRequestCalibration.requestBody as any, mockDexcomCalWithMeterEntry),
-      mockDexcomCalWithMeterAndCalEntries,
     );
   });
 
