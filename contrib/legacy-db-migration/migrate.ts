@@ -49,7 +49,6 @@ function main() {
     .then(linkCalibrationsAndMeterEntries)
     .then(batchLinkedCalibrations)
     .then(runBatchedCalibrationUpdatesSerially)
-    .then(finalizeDb)
     .catch(err => console.warn('\nMigration failed:', err))
     .then(reportFinished);
 }
@@ -340,8 +339,4 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
       });
     });
   }
-}
-
-function finalizeDb() {
-  return targetStorage.loadLatestTimelineModels('Alarm').catch(() => null); // this will just trigger an index build; the result can be ignored
 }
