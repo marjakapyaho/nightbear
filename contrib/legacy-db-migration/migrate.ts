@@ -107,7 +107,7 @@ function outputModelTypes(ids: string[]): string[] {
 }
 
 function recordNestedModelIds(ids: string[]): string[] {
-  remainingNestedIds = ids.filter(id => !!id.match(/^meter-entries\b/));
+  remainingNestedIds = ids.filter(id => !!id.match(/^meter-entries\//));
   nestedIdTotal = remainingNestedIds.length;
   return ids;
 }
