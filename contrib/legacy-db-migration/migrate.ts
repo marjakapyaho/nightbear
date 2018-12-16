@@ -266,7 +266,20 @@ function toModernModel(x: any, nested = false): Promise<Model[] | null> {
           ...model,
           meterEntries: flatten(models.filter(isNotNull)).filter(is('MeterEntry')),
         },
-      ]);
+      ])
+      .then(models => {
+        models.forEach(model => {
+          const deltas = model.meterEntries
+            .map(e => ((e.timestamp - model.timestamp) / 1000).toFixed(1) + ' sec')
+            .join(', ');
+          console.log(
+            `"${x._id}" got ${
+              model.meterEntries.length
+            } nested MeterEntry's which are [ ${deltas} ] ahead of the parent ${model.modelType}`,
+          );
+        });
+        return models;
+      });
   } else if (x._id.match(/^treatments\//)) {
     const model1: Insulin = {
       modelType: 'Insulin',
