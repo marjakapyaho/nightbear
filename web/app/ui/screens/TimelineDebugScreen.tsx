@@ -3,6 +3,7 @@ import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
+import { isArray } from 'lodash';
 import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
@@ -81,7 +82,7 @@ function getOptions(models: TimelineModel[]): /* Highcharts.Options */ any {
       getSeries(models, 'Insulin'),
       getSeries(models, 'Carbs'),
       getSeries(models, 'Alarm'),
-    ],
+    ].filter(series => isArray(series.data) && series.data.length),
     time: {
       useUTC: false, // somewhat unintuitively, this needs to be false when model.timestamp is milliseconds since epoch in UTC :shrug:
     },
