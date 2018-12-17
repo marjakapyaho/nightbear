@@ -16,9 +16,22 @@ export type TimelineDataState = Readonly<
 
 export const timelineDataInitState: TimelineDataState = {
   filters: {
-    range: 4 * HOUR_IN_MS,
+    range: 12 * HOUR_IN_MS,
     rangeEnd: Date.now(),
-    modelTypes: ['ParakeetSensorEntry'],
+    modelTypes: [
+      'Sensor',
+      'DexcomSensorEntry',
+      'DexcomRawSensorEntry',
+      'ParakeetSensorEntry',
+      'DexcomCalibration',
+      'NightbearCalibration',
+      'DeviceStatus',
+      'Hba1c',
+      'MeterEntry',
+      'Insulin',
+      'Carbs',
+      'Alarm',
+    ],
   },
   status: 'FETCHING',
 };
