@@ -1,8 +1,9 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel } from 'core/models/model';
+import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { isNotNull } from 'server/utils/types';
+import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import { renderFromStore } from 'web/app/utils/react';
@@ -26,7 +27,7 @@ export default renderFromStore(
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
-function getOptions(models: TimelineModel[]): Highcharts.Options {
+function getOptions(models: TimelineModel[]): /* Highcharts.Options */ any {
   return {
     title: { text: null },
     xAxis: {
@@ -68,19 +69,58 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
       },
     },
     series: [
-      {
-        name: 'Parakeet',
-        data: models
-          .map(model => (model.modelType === 'ParakeetSensorEntry' ? model : null))
-          .filter(isNotNull)
-          .map(model =>
-            model.bloodGlucose ? ([model.timestamp, model.bloodGlucose] as [number, number]) : null,
-          )
-          .filter(isNotNull),
-      } as any,
+      getSeries(models, 'Sensor'),
+      getSeries(models, 'DexcomSensorEntry'),
+      getSeries(models, 'DexcomRawSensorEntry'),
+      getSeries(models, 'ParakeetSensorEntry'),
+      getSeries(models, 'DexcomCalibration'),
+      getSeries(models, 'NightbearCalibration'),
+      getSeries(models, 'DeviceStatus'),
+      getSeries(models, 'Hba1c'),
+      getSeries(models, 'MeterEntry'),
+      getSeries(models, 'Insulin'),
+      getSeries(models, 'Carbs'),
+      getSeries(models, 'Alarm'),
     ],
+    time: {
+      useUTC: false, // somewhat unintuitively, this needs to be false when model.timestamp is milliseconds since epoch in UTC :shrug:
+    },
     credits: {
       enabled: false,
     },
+  };
+}
+
+function getSeries(
+  models: TimelineModel[],
+  typeName: TimelineModel['modelType'],
+): Highcharts.IndividualSeriesOptions {
+  return {
+    name: typeName,
+    data: models
+      .filter(is(typeName))
+      .map(model => {
+        switch (model.modelType) {
+          case 'Sensor':
+          case 'DexcomCalibration':
+          case 'NightbearCalibration':
+          case 'DeviceStatus':
+          case 'Hba1c':
+          case 'Insulin':
+          case 'Carbs':
+          case 'Alarm':
+            return null; // not supported yet!
+          case 'DexcomSensorEntry':
+          case 'DexcomRawSensorEntry':
+          case 'ParakeetSensorEntry':
+          case 'MeterEntry':
+            return model.bloodGlucose
+              ? ([model.timestamp, model.bloodGlucose] as [number, number])
+              : null;
+          default:
+            assertExhausted(model);
+        }
+      })
+      .filter(isNotNull),
   };
 }
