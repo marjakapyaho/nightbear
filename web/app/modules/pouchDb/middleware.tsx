@@ -17,7 +17,7 @@ export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
 export const MODELS_FETCH_DEBOUNCE = 100;
 
-const LOCAL_REPLICATION_RANGE = 'week'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)
+const LOCAL_REPLICATION_RANGE = 'month'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)
 
 export const pouchDbMiddleware: ReduxMiddleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
@@ -80,6 +80,7 @@ function startReplication(remoteDbUrl: string, dispatch: ReduxDispatch) {
   };
   const replStartDate = DateTime.local()
     .startOf(LOCAL_REPLICATION_RANGE)
+    .minus({ days: 1 }) // ensure that even if you replicate for the first time at the start of LOCAL_REPLICATION_RANGE, you still have at least 1 days' worth of data locally
     .toFormat('yyyy-MM-dd');
   const upReplication = PouchDB.replicate(localDb, remoteDb, {
     ...replOptions,
