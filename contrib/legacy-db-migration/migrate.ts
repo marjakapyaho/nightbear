@@ -19,7 +19,6 @@ import { chunk, flatten } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { inspect } from 'util';
 
-const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
 const BATCH_RETRY_WAIT_SEC = 10;
@@ -27,9 +26,11 @@ const INCREMENTAL = true;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
-const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
+const remoteDb = new PouchDB(process.env.NIGHTBEAR_MIGRATE_REMOTE_DB_URL || 'https://example.com/remote_db');
 const sourceDb = new PouchDB(`migrate_temp`);
-const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_21`);
+const targetStorage = createCouchDbStorage(
+  process.env.NIGHTBEAR_MIGRATE_TARGET_DB_URL || 'https://example.com/target_db',
+);
 
 const warnings: Error[] = [];
 let incrementalIdsToMigrate: string[] = [];
