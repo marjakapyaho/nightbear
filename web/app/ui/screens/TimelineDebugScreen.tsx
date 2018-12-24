@@ -29,7 +29,7 @@ export default renderFromStore(
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
-function getOptions(models: TimelineModel[]): /* Highcharts.Options */ any {
+function getOptions(models: TimelineModel[]): Highcharts.Options {
   return {
     title: { text: null },
     xAxis: {
