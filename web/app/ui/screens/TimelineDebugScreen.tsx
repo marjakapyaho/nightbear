@@ -4,6 +4,7 @@ import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { isArray, matches } from 'lodash';
+import { DateTime } from 'luxon';
 import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
@@ -102,6 +103,19 @@ function getOptions(models: TimelineModel[]): Highcharts.Options {
     credits: {
       enabled: false,
     },
+    tooltip: {
+      useHTML: true,
+      formatter() {
+        const that: any = this; // this doesn't seem to be typed in @types/highcharts
+        const ts = DateTime.fromMillis(that.x).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
+        if (that.point.model) {
+          const json = JSON.stringify(that.point.model, null, 2);
+          return `<strong>${ts}</strong><br /><pre>${json}</pre>`;
+        } else {
+          return `<strong>${ts}</strong><br /><pre>(no model)</pre>`;
+        }
+      },
+    },
   };
 }
 
@@ -135,11 +149,9 @@ function getSeries(
           case 'DexcomRawSensorEntry':
           case 'ParakeetSensorEntry':
           case 'MeterEntry':
-            return model.bloodGlucose
-              ? ([model.timestamp, model.bloodGlucose] as [number, number])
-              : null;
+            return model.bloodGlucose ? { x: model.timestamp, y: model.bloodGlucose, model } : null;
           case 'DeviceStatus':
-            return [model.timestamp, model.batteryLevel] as [number, number];
+            return { x: model.timestamp, y: model.batteryLevel, model };
           default:
             assertExhausted(model);
         }
