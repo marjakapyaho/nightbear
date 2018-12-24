@@ -2,6 +2,7 @@ import { renderFromProps } from 'web/app/utils/react';
 
 const options = [
   ['1 hour', 1000 * 60 * 60 * 1],
+  ['4 hours', 1000 * 60 * 60 * 4],
   ['12 hours', 1000 * 60 * 60 * 12],
   ['day', 1000 * 60 * 60 * 24],
   ['week', 1000 * 60 * 60 * 24 * 7],
