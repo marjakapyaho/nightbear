@@ -19,6 +19,19 @@ export default renderFromStore(
     if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
     return (
       <div className="this">
+        <button
+          onClick={() =>
+            dispatch(
+              actions.TIMELINE_FILTERS_CHANGED(
+                state.timelineRange,
+                state.timelineRangeEnd - state.timelineRange,
+                state.selectedModelTypes,
+              ),
+            )
+          }
+        >
+          Prev
+        </button>
         <TimeRangeSelector
           value={state.timelineRange}
           onChange={range =>
@@ -31,6 +44,19 @@ export default renderFromStore(
             )
           }
         />
+        <button
+          onClick={() =>
+            dispatch(
+              actions.TIMELINE_FILTERS_CHANGED(
+                state.timelineRange,
+                state.timelineRangeEnd + state.timelineRange,
+                state.selectedModelTypes,
+              ),
+            )
+          }
+        >
+          Next
+        </button>
         <ModelTypeSelector
           multiple
           value={state.selectedModelTypes}
@@ -51,7 +77,11 @@ export default renderFromStore(
         {state.loadedModels.status === 'READY' && (
           <HighchartsReact
             highcharts={Highcharts}
-            options={getOptions(state.loadedModels.models)}
+            options={getOptions(
+              state.loadedModels.models,
+              state.timelineRange,
+              state.timelineRangeEnd,
+            )}
           />
         )}
       </div>
@@ -61,12 +91,19 @@ export default renderFromStore(
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
-function getOptions(models: TimelineModel[]): Highcharts.Options {
+function getOptions(
+  models: TimelineModel[],
+  timelineRange: number,
+  timelineRangeEnd: number,
+): Highcharts.Options {
   return {
     title: { text: null },
+    chart: { animation: false, zoomType: 'x' },
     xAxis: {
       type: 'datetime',
       minTickInterval: HOUR_IN_MS,
+      min: timelineRangeEnd - timelineRange,
+      max: timelineRangeEnd,
     },
     yAxis: [
       {
