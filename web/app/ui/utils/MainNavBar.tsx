@@ -9,8 +9,7 @@ export default renderFromStore(
     return (
       <div className="this">
         {renderTab('BgGraphScreen', 'Log')}
-        {renderTab('DailySummaryScreen', 'Summary')}
-        {renderTab('DebugScreen', 'Debug')}
+        {renderTab('TimelineDebugScreen', 'Debug')}
       </div>
     );
 
