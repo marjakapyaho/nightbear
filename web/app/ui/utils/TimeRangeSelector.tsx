@@ -27,6 +27,10 @@ export default renderFromProps<{
       value={props.value}
       onChange={event => props.onChange(parseInt(event.target.value, 10))}
     >
+      {typeof props.value !== 'undefined' &&
+        !options.find(([, value]) => value === props.value) && (
+          <option value={props.value}>custom</option>
+        )}
       {options.map(([title, value]) => (
         <option key={value} value={value}>
           {props.prefix} {title} {props.suffix}
