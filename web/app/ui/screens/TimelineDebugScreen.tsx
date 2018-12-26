@@ -59,6 +59,19 @@ export default renderFromStore(
         >
           Next
         </button>
+        <button
+          onClick={() =>
+            dispatch(
+              actions.TIMELINE_FILTERS_CHANGED(
+                state.timelineRange * 2,
+                state.timelineRangeEnd + state.timelineRange / 2,
+                state.selectedModelTypes,
+              ),
+            )
+          }
+        >
+          Zoom out
+        </button>
         <p>
           Showing from
           <strong>
