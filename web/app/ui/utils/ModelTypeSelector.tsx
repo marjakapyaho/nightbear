@@ -17,11 +17,13 @@ const options: TimelineModelType[] = [
 
 export default renderFromProps<{
   multiple?: boolean;
+  value?: TimelineModelType[];
   onChange: (newValues: TimelineModelType[]) => void;
-}>(__filename, (React, { multiple, onChange }) => (
+}>(__filename, (React, { multiple, value, onChange }) => (
   <div className="this">
     <select
       multiple={multiple}
+      value={value || []}
       onChange={event => {
         if (multiple) {
           onChange(

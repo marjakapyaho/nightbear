@@ -15,11 +15,14 @@ const options = [
   ['year', 1000 * 60 * 60 * 24 * 30 * 12],
 ];
 
-export default renderFromProps<{ onChange: (newRange: number) => void }>(
+export default renderFromProps<{ value?: number; onChange: (newRange: number) => void }>(
   __filename,
   (React, props) => (
     <div className="this">
-      <select onChange={event => props.onChange(parseInt(event.target.value, 10))}>
+      <select
+        value={props.value}
+        onChange={event => props.onChange(parseInt(event.target.value, 10))}
+      >
         {options.map(([title, value]) => (
           <option key={value} value={value}>
             Last {title}
