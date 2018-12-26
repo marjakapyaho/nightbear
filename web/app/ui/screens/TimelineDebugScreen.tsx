@@ -235,6 +235,7 @@ function getSeries(
   filter?: Partial<ModelOfType<typeof typeName>>,
 ): Highcharts.IndividualSeriesOptions {
   return {
+    animation: false,
     name:
       typeName +
       (filter
