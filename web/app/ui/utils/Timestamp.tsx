@@ -5,7 +5,7 @@ import { namespaceReactClass } from 'web/app/utils/react';
 const LIVE_FORMAT_AGE_LIMIT = HOUR_IN_MS;
 const FULL_FORMAT_AGE_LIMIT = DAY_IN_MS * 0.5;
 
-type Props = { ts: number };
+type Props = { ts: number; live?: boolean };
 
 export default namespaceReactClass(
   __filename,
@@ -19,6 +19,7 @@ export default namespaceReactClass(
       }
 
       _getLiveAge(): number | null {
+        if (!this.props.live) return null;
         const delta = Date.now() - this.props.ts;
         return delta <= LIVE_FORMAT_AGE_LIMIT ? delta : null; // return null if we shouldn't have a live age anymore
       }
