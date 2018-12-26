@@ -1,9 +1,9 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { ModelOfType, TimelineModel } from 'core/models/model';
+import { ModelOfType, TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { isArray, matches } from 'lodash';
+import { first, isArray, matches } from 'lodash';
 import { DateTime } from 'luxon';
 import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
@@ -11,6 +11,7 @@ import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import Timestamp from 'web/app/ui/utils/Timestamp';
 import { renderFromStore } from 'web/app/utils/react';
+import { ReduxDispatch } from 'web/app/utils/redux';
 import { objectKeys } from 'web/app/utils/types';
 
 export default renderFromStore(
@@ -90,8 +91,10 @@ export default renderFromStore(
             highcharts={Highcharts}
             options={getOptions(
               state.loadedModels.models,
+              state.selectedModelTypes,
               state.timelineRange,
               state.timelineRangeEnd,
+              dispatch,
             )}
           />
         )}
@@ -104,12 +107,27 @@ export default renderFromStore(
 // https://api.highcharts.com/highcharts/
 function getOptions(
   models: TimelineModel[],
+  selectedModelTypes: TimelineModelType[],
   timelineRange: number,
   timelineRangeEnd: number,
+  dispatch: ReduxDispatch,
 ): Highcharts.Options {
   return {
     title: { text: null },
-    chart: { animation: false, zoomType: 'x' },
+    chart: {
+      animation: false,
+      zoomType: 'x',
+      events: {
+        selection(event) {
+          event.preventDefault(); // we handle the zoom ourselves; no need for the default Highcharts one
+          const axis = first(event.xAxis);
+          if (!axis) return;
+          const { min, max } = axis;
+          if (!min || !max) return;
+          dispatch(actions.TIMELINE_FILTERS_CHANGED(max - min, max, selectedModelTypes));
+        },
+      },
+    },
     xAxis: {
       type: 'datetime',
       minTickInterval: HOUR_IN_MS,
