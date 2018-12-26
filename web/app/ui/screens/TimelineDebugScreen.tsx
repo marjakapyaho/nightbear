@@ -9,6 +9,7 @@ import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
+import Timestamp from 'web/app/ui/utils/Timestamp';
 import { renderFromStore } from 'web/app/utils/react';
 import { objectKeys } from 'web/app/utils/types';
 
@@ -57,6 +58,16 @@ export default renderFromStore(
         >
           Next
         </button>
+        <p>
+          Showing from
+          <strong>
+            <Timestamp ts={state.timelineRangeEnd - state.timelineRange} />
+          </strong>
+          to
+          <strong>
+            <Timestamp ts={state.timelineRangeEnd} />
+          </strong>
+        </p>
         <ModelTypeSelector
           multiple
           value={state.selectedModelTypes}
