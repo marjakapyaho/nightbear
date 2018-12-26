@@ -3,6 +3,7 @@ import { isNotNull } from 'server/utils/types';
 import { renderFromProps } from 'web/app/utils/react';
 
 const options: TimelineModelType[] = [
+  'Sensor',
   'DexcomSensorEntry',
   'DexcomRawSensorEntry',
   'ParakeetSensorEntry',
@@ -13,6 +14,7 @@ const options: TimelineModelType[] = [
   'MeterEntry',
   'Insulin',
   'Carbs',
+  'Alarm',
 ];
 
 export default renderFromProps<{
@@ -22,6 +24,7 @@ export default renderFromProps<{
 }>(__filename, (React, { multiple, value, onChange }) => (
   <div className="this">
     <select
+      style={{height: 200}}
       multiple={multiple}
       value={value || []}
       onChange={event => {
