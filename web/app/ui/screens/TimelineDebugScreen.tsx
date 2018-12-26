@@ -7,25 +7,56 @@ import { isArray, matches } from 'lodash';
 import { DateTime } from 'luxon';
 import { assertExhausted, isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
+import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import { renderFromStore } from 'web/app/utils/react';
 import { objectKeys } from 'web/app/utils/types';
 
 export default renderFromStore(
   __filename,
-  state => state.timelineData,
-  (React, state, dispatch) => (
-    <div className="this">
-      <TimeRangeSelector
-        onChange={range =>
-          dispatch(actions.TIMELINE_FILTERS_CHANGED(range, Date.now(), state.filters.modelTypes))
-        }
-      />
-      {state.status === 'READY' && (
-        <HighchartsReact highcharts={Highcharts} options={getOptions(state.models)} />
-      )}
-    </div>
-  ),
+  state => state.uiNavigation,
+  (React, state, dispatch) => {
+    if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
+    return (
+      <div className="this">
+        <TimeRangeSelector
+          value={state.timelineRange}
+          onChange={range =>
+            dispatch(
+              actions.TIMELINE_FILTERS_CHANGED(
+                range,
+                state.timelineRangeEnd,
+                state.selectedModelTypes,
+              ),
+            )
+          }
+        />
+        <ModelTypeSelector
+          multiple
+          value={state.selectedModelTypes}
+          onChange={newType =>
+            dispatch(
+              actions.TIMELINE_FILTERS_CHANGED(
+                state.timelineRange,
+                state.timelineRangeEnd,
+                newType,
+              ),
+            )
+          }
+        />
+        {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
+        {state.loadedModels.status === 'ERROR' && (
+          <pre>Error: ${state.loadedModels.errorMessage}</pre>
+        )}
+        {state.loadedModels.status === 'READY' && (
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={getOptions(state.loadedModels.models)}
+          />
+        )}
+      </div>
+    );
+  },
 );
 
 // https://www.highcharts.com/demo
