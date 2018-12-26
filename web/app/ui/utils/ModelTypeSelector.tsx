@@ -24,7 +24,7 @@ export default renderFromProps<{
 }>(__filename, (React, { multiple, value, onChange }) => (
   <div className="this">
     <select
-      style={{height: 200}}
+      style={{ height: 200 }}
       multiple={multiple}
       value={value || []}
       onChange={event => {
