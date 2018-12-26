@@ -19,22 +19,25 @@ import { chunk, flatten } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { inspect } from 'util';
 
-const DB_PASSWORD = '***';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
 const BATCH_RETRY_WAIT_SEC = 10;
-const INCREMENTAL = false;
+const INCREMENTAL = true;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
-const remoteDb = new PouchDB(`https://admin:${DB_PASSWORD}@db-prod.nightbear.fi/legacy`);
+const remoteDb = new PouchDB(process.env.NIGHTBEAR_MIGRATE_REMOTE_DB_URL || 'https://example.com/remote_db');
 const sourceDb = new PouchDB(`migrate_temp`);
-const targetStorage = createCouchDbStorage(`https://admin:${DB_PASSWORD}@db-stage.nightbear.fi/migrate_test_18`);
+const targetStorage = createCouchDbStorage(
+  process.env.NIGHTBEAR_MIGRATE_TARGET_DB_URL || 'https://example.com/target_db',
+);
 
 const warnings: Error[] = [];
 let incrementalIdsToMigrate: string[] = [];
 const maybeLinkedMeterEntries: MeterEntry[] = [];
 const maybeLinkedDexcomCalibrations: DexcomCalibration[] = [];
+const incrementalSkipped: string[] = [];
+const incrementalMigrated: string[] = [];
 
 main();
 
@@ -79,6 +82,7 @@ function migrateToLocalDb() {
 }
 
 function reportFinished() {
+  if (INCREMENTAL) console.log({ incrementalSkipped, incrementalMigrated });
   if (warnings.length) console.warn(`${warnings.length} warnings generated`);
   console.log('Warnings:\n' + inspect(warnings, { maxArrayLength: Infinity }));
   console.warn('Finished!');
@@ -158,7 +162,34 @@ function toModernModels(docs: object[]) {
       }
     }),
   )
-    .then(models => targetStorage.saveModels(flatten(models.filter(isNotNull)), true))
+    .then(maybeModels => {
+      const models = flatten(maybeModels.filter(isNotNull));
+      if (INCREMENTAL) {
+        // In incremental model: look for already-existing models with the same type and (roughly) the same timestamp
+        return Promise.all(
+          models.map(model => {
+            if ('timestamp' in model) {
+              return targetStorage.loadTimelineModels(model.modelType, MIN_IN_MS * 2, model.timestamp + MIN_IN_MS);
+            } else {
+              throw new Error(`Incremental migration mode not supported for: ${JSON.stringify(model)}`);
+            }
+          }),
+        )
+          .then(loadedModels =>
+            models.filter((model, i) => {
+              const alreadyExists = !!loadedModels[i];
+              (alreadyExists ? incrementalSkipped : incrementalMigrated).push(
+                `${model.modelType}@${(model as any).timestamp}`,
+              );
+              return !alreadyExists;
+            }),
+          )
+          .then(targetStorage.saveModels);
+      } else {
+        // This is easy: just save everything as new
+        return targetStorage.saveModels(models, true);
+      }
+    })
     .then(models => {
       maybeLinkedMeterEntries.push(...models.filter(is('MeterEntry')));
       maybeLinkedDexcomCalibrations.push(...models.filter(is('DexcomCalibration')));

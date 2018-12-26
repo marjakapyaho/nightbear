@@ -1,3 +1,4 @@
+import { TimelineModelType } from 'core/models/model';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
@@ -9,7 +10,6 @@ import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
 import { actions } from 'web/app/modules/actions';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
-import { ReduxState } from 'web/app/modules/state';
 import { createChangeObserver, ReduxDispatch, ReduxMiddleware } from 'web/app/utils/redux';
 
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
@@ -21,14 +21,21 @@ const LOCAL_REPLICATION_RANGE = 'month'; // one of [ 'year', 'month', 'day', 'ho
 
 export const pouchDbMiddleware: ReduxMiddleware = store => {
   let existingReplication: ReturnType<typeof startReplication> | null;
-  const debouncedTimelineFiltersChanged = debounce(timelineFiltersChanged, MODELS_FETCH_DEBOUNCE);
-
-  setTimeout(() => timelineFiltersChanged(store.getState().timelineData.filters), 0); // react to the initial filter values
 
   return next => {
     const observer = createChangeObserver(store, next);
     observer.add(state => state.configVars.remoteDbUrl, remoteDbUrlChanged);
-    observer.add(state => state.timelineData.filters, debouncedTimelineFiltersChanged);
+    observer.add(
+      state =>
+        state.uiNavigation.selectedScreen === 'TimelineDebugScreen'
+          ? ([
+              state.uiNavigation.selectedModelTypes,
+              state.uiNavigation.timelineRange,
+              state.uiNavigation.timelineRangeEnd,
+            ] as [TimelineModelType[], number, number])
+          : null,
+      timelineFiltersChanged,
+    );
     return observer.run;
   };
 
@@ -42,16 +49,17 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
     }
   }
 
-  function timelineFiltersChanged(filters: ReduxState['timelineData']['filters']) {
-    if (!existingReplication) return;
+  function timelineFiltersChanged(args: [TimelineModelType[], number, number] | null) {
+    if (!existingReplication || !args) return;
+    const [selectedModelTypes, timelineRange, timelineRangeEnd] = args;
     Promise.all(
-      filters.modelTypes.map(
+      selectedModelTypes.map(
         modelType =>
           existingReplication
             ? existingReplication.storage.loadTimelineModels(
                 modelType,
-                filters.range,
-                filters.rangeEnd,
+                timelineRange,
+                timelineRangeEnd,
               )
             : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
       ),
