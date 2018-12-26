@@ -233,7 +233,7 @@ function getSeries(
   models: TimelineModel[],
   typeName: TimelineModel['modelType'],
   filter?: Partial<ModelOfType<typeof typeName>>,
-): Highcharts.IndividualSeriesOptions {
+): Highcharts.IndividualSeriesOptions & Highcharts.LineChart {
   return {
     animation: false,
     name:
@@ -269,5 +269,6 @@ function getSeries(
       })
       .filter(isNotNull),
     yAxis: typeName === 'DeviceStatus' ? 1 : 0,
+    turboThreshold: 0, // Note: If we want to show REALLY large data sets at some point, it may make sense to re-enable this
   };
 }
