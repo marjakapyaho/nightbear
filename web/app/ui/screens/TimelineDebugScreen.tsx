@@ -62,7 +62,7 @@ export default renderFromStore(
             dispatch(
               actions.TIMELINE_FILTERS_CHANGED(
                 state.timelineRange * 2,
-                state.timelineRangeEnd + state.timelineRange / 2,
+                state.timelineRangeEnd + Math.round(state.timelineRange / 2),
                 state.selectedModelTypes,
               ),
             )
@@ -173,7 +173,13 @@ function getOptions(
           if (!axis) return;
           const { min, max } = axis;
           if (!min || !max) return;
-          dispatch(actions.TIMELINE_FILTERS_CHANGED(max - min, max, selectedModelTypes));
+          dispatch(
+            actions.TIMELINE_FILTERS_CHANGED(
+              Math.round(max - min),
+              Math.round(max),
+              selectedModelTypes,
+            ),
+          );
         },
       },
     },
