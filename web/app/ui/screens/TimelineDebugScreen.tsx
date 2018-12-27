@@ -146,7 +146,11 @@ const Y_BATTERY: Highcharts.AxisOptions = {
   max: 100,
 };
 
-const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_HBA1C];
+const Y_BATTERY_DEX: Highcharts.AxisOptions = {
+  visible: false,
+};
+
+const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_BATTERY_DEX, Y_HBA1C];
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
@@ -223,7 +227,7 @@ function getOptions(
       // Battery:
       getSeries(
         models,
-        Y_BATTERY,
+        Y_BATTERY_DEX,
         'DeviceStatus (Dexcom transmitter battery)',
         model =>
           model.modelType === 'DeviceStatus' &&
