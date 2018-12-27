@@ -105,7 +105,7 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
-    deviceName: 'dexcom',
+    deviceName: 'dexcom-uploader',
     timestamp: timestampNow,
     batteryLevel: 80,
     geolocation: null,

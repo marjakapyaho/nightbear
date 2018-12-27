@@ -62,7 +62,7 @@ export default renderFromStore(
             dispatch(
               actions.TIMELINE_FILTERS_CHANGED(
                 state.timelineRange * 2,
-                state.timelineRangeEnd + state.timelineRange / 2,
+                state.timelineRangeEnd + Math.round(state.timelineRange / 2),
                 state.selectedModelTypes,
               ),
             )
@@ -146,7 +146,11 @@ const Y_BATTERY: Highcharts.AxisOptions = {
   max: 100,
 };
 
-const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_HBA1C];
+const Y_BATTERY_DEX: Highcharts.AxisOptions = {
+  visible: false,
+};
+
+const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_BATTERY_DEX, Y_HBA1C];
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
@@ -169,7 +173,13 @@ function getOptions(
           if (!axis) return;
           const { min, max } = axis;
           if (!min || !max) return;
-          dispatch(actions.TIMELINE_FILTERS_CHANGED(max - min, max, selectedModelTypes));
+          dispatch(
+            actions.TIMELINE_FILTERS_CHANGED(
+              Math.round(max - min),
+              Math.round(max),
+              selectedModelTypes,
+            ),
+          );
         },
       },
     },
@@ -223,15 +233,7 @@ function getOptions(
       // Battery:
       getSeries(
         models,
-        Y_BATTERY,
-        'DeviceStatus (Dexcom battery)',
-        model =>
-          model.modelType === 'DeviceStatus' && model.deviceName === 'dexcom' && model.batteryLevel, // <- plotted value
-        { color: '#63767c' },
-      ),
-      getSeries(
-        models,
-        Y_BATTERY,
+        Y_BATTERY_DEX,
         'DeviceStatus (Dexcom transmitter battery)',
         model =>
           model.modelType === 'DeviceStatus' &&
@@ -359,7 +361,6 @@ function getSeries(
   const yAxis = Y_AXIS_OPTIONS.indexOf(yAxisAssociation);
   if (yAxis === -1)
     throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
-  console.log('getSeries()', name, models);
   return {
     stickyTracking: false,
     animation: false,

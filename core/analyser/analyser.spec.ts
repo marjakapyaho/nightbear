@@ -20,7 +20,7 @@ describe('utils/analyser', () => {
 
   const deviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
-    deviceName: 'dexcom',
+    deviceName: 'dexcom-uploader',
     timestamp: currentTimestamp,
     batteryLevel: 70,
     geolocation: null,
@@ -44,7 +44,7 @@ describe('utils/analyser', () => {
   it('detects battery', () => {
     const deviceStatusBattery: DeviceStatus = {
       modelType: 'DeviceStatus',
-      deviceName: 'dexcom',
+      deviceName: 'dexcom-uploader',
       timestamp: currentTimestamp,
       batteryLevel: 10,
       geolocation: null,

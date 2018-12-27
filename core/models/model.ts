@@ -126,7 +126,7 @@ export interface DeviceStatus {
   readonly modelType: 'DeviceStatus';
   readonly modelMeta?: ModelMeta;
   // DeviceStatus:
-  readonly deviceName: 'dexcom' | 'dexcom-uploader' | 'dexcom-transmitter' | 'parakeet';
+  readonly deviceName: 'dexcom-uploader' | 'dexcom-transmitter' | 'parakeet';
   readonly timestamp: number;
   readonly batteryLevel: number;
   readonly geolocation: string | null;
