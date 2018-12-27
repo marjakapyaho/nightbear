@@ -197,20 +197,9 @@ export interface Settings {
   readonly modelType: 'Settings';
   readonly modelMeta?: ModelMeta;
   // Settings:
-  readonly alarmsEnabled: boolean;
-  readonly activeProfile: Profile;
-}
-
-export interface Profile {
-  // Model:
-  readonly modelType: 'Profile';
-  readonly modelMeta?: ModelMeta;
-  // Profile:
+  readonly timestamp: number;
   readonly profileName: string;
-  readonly activatedAtUtc: {
-    readonly hours: number;
-    readonly minutes: number;
-  };
+  readonly alarmsEnabled: boolean;
   readonly analyserSettings: {
     readonly HIGH_LEVEL_REL: number;
     readonly TIME_SINCE_BG_LIMIT: number; // minutes
@@ -228,4 +217,18 @@ export interface Profile {
     }
   };
   readonly pushoverLevels: string[];
+}
+
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>; // https://stackoverflow.com/a/48216010
+
+export interface Profile {
+  // Model:
+  readonly modelType: 'Profile';
+  readonly modelMeta?: ModelMeta;
+  // Profile:
+  readonly activatedAtUtc?: {
+    readonly hours: number;
+    readonly minutes: number;
+  };
+  readonly activateSettings: Omit<Settings, 'modelType' | 'modelMeta' | 'timestamp'>; // some properties of Settings don't make sense here
 }
