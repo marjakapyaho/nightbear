@@ -162,7 +162,7 @@ export function parseDexcomStatus(requestObject: { [key: string]: string }, time
 
   return {
     modelType: 'DeviceStatus',
-    deviceName: 'dexcom',
+    deviceName: 'dexcom-uploader',
     timestamp,
     batteryLevel,
     geolocation: null,

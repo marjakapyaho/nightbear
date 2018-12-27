@@ -28,7 +28,7 @@ describe('server/main/check-runner', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
-    deviceName: 'dexcom',
+    deviceName: 'dexcom-uploader',
     timestamp: timestampNow - 10 * MIN_IN_MS,
     batteryLevel: 5,
     geolocation: null,

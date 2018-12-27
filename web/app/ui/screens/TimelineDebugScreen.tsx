@@ -224,14 +224,6 @@ function getOptions(
       getSeries(
         models,
         Y_BATTERY,
-        'DeviceStatus (Dexcom battery)',
-        model =>
-          model.modelType === 'DeviceStatus' && model.deviceName === 'dexcom' && model.batteryLevel, // <- plotted value
-        { color: '#63767c' },
-      ),
-      getSeries(
-        models,
-        Y_BATTERY,
         'DeviceStatus (Dexcom transmitter battery)',
         model =>
           model.modelType === 'DeviceStatus' &&
