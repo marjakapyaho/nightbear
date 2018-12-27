@@ -355,7 +355,6 @@ function getSeries(
   const yAxis = Y_AXIS_OPTIONS.indexOf(yAxisAssociation);
   if (yAxis === -1)
     throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
-  console.log('getSeries()', name, models);
   return {
     stickyTracking: false,
     animation: false,
