@@ -88,6 +88,9 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
       },
     )
+    .then((model: Model | null) =>
+      console.log(`uploadDexcomEntry: ${requestObject.type} => ${model ? model.modelType : 'null'}`),
+    )
     .then(() => Promise.resolve(createResponse(requestObject)));
 }
 
