@@ -53,12 +53,10 @@ export function parseParakeetEntry(
   };
 }
 
-// Unused parameters:
+// Unused known parameters:
 // rr (cache buster?)
 // zi (transmitter id)
 // pc (passcode for parakeet)
-// bm (?)
-// ct (?)
 export function parseParakeetStatus(params: { [key: string]: string }, timestamp: number): DeviceStatus[] {
   const batteryLevel = parseInt(params.bp, 10);
   const geolocation = params.gl;
@@ -77,7 +75,7 @@ export function parseParakeetStatus(params: { [key: string]: string }, timestamp
       deviceName: 'dexcom-transmitter',
       timestamp,
       batteryLevel: transmitterBattery,
-      geolocation,
+      geolocation: null,
     },
   ];
 }

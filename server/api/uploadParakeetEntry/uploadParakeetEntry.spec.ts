@@ -76,7 +76,7 @@ describe('api/uploadParakeetEntry', () => {
     deviceName: 'dexcom-transmitter',
     timestamp: timestampNow,
     batteryLevel: 216,
-    geolocation: '60.193707,24.949396',
+    geolocation: null,
   };
 
   it('produces correct ParakeetSensorEntry', () => {
