@@ -6,7 +6,6 @@ import { getHba1cHistory } from 'server/api/getHba1cHistory/getHba1cHistory';
 import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
-import { uploadEntries } from 'server/api/uploadEntries/uploadEntries';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { startExpressServer } from 'server/main/express';
 
@@ -21,7 +20,6 @@ startExpressServer(
   ['get', '/get-server-status', getServerStatus],
   ['get', '/get-watch-status', getWatchStatus],
   ['post', '/upload-dexcom-entry', uploadDexcomEntry],
-  ['post', '/upload-entries', uploadEntries],
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
   port => context.log.info(`Nightbear Server listening on ${port}`),
