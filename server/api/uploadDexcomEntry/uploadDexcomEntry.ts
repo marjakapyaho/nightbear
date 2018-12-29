@@ -26,6 +26,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const { requestBody } = request;
   const requestObject = requestBody as any; // we don't know what this object is yet
   const timestamp = context.timestamp();
+  const logCtx = `uploadDexcomEntry: "${requestObject.type}" at "${requestObject.date || ''}"`;
 
   return Promise.resolve()
     .then(
@@ -43,7 +44,11 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(() => context.storage.loadTimelineModels('MeterEntry', 0, timestamp)) // see if we can find a MeterEntry that already exists with this exact timestamp
             .then(entries => first(entries))
             .then(existingEntry => {
-              if (existingEntry) return Promise.resolve(null); // already exists in the DB -> no need to do anything!
+              if (existingEntry) {
+                // already exists in the DB -> no need to do anything!
+                console.log(`${logCtx}: Already exists in DB`);
+                return Promise.resolve(null);
+              }
               return context.storage.saveModel(parseMeterEntry(requestObject)); // we didn't find the entry yet -> create it
             });
         }
@@ -55,15 +60,26 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(() => context.storage.loadTimelineModels('DexcomCalibration', 0, timestamp)) // see if we can find a DexcomCalibration that already exists with this exact timestamp
             .then(cals => first(cals))
             .then(existingCal => {
-              if (existingCal) return Promise.resolve(null); // already exists in the DB -> no need to do anything!
+              if (existingCal) {
+                // already exists in the DB -> no need to do anything!
+                console.log(`${logCtx}: Already exists in DB`);
+                return Promise.resolve(null);
+              }
               const range = 3 * MIN_IN_MS;
               const rangeEnd = timestamp + range / 2;
               return Promise.resolve()
                 .then(() => context.storage.loadTimelineModels('MeterEntry', range, rangeEnd))
                 .then(entries => entries.filter(entry => entry.source === 'dexcom'))
                 .then(entries => {
-                  if (entries.length === 0) return Promise.resolve(null); // TODO: Retry until it's found..?
-                  if (entries.length > 1) return Promise.resolve(null); // TODO: Log a warning because it's suspicious..?
+                  if (entries.length === 0) {
+                    // TODO: Retry until it's found..?
+                    console.log(`${logCtx}: Didn't find a MeterEntry to link with -> ignoring`);
+                    return Promise.resolve(null);
+                  }
+                  if (entries.length > 1) {
+                    console.log(`${logCtx}: Found more than 1 MeterEntry to link with -> very suspicious -> ignoring`);
+                    return Promise.resolve(null);
+                  }
                   const newCal = {
                     ...parseDexcomCalibration(requestObject),
                     meterEntries: entries.map(getModelRef), // store a reference to the MeterEntry that was received at the same time from the Dexcom uploader
@@ -78,8 +94,14 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
           return Promise.resolve()
             .then(() => context.storage.loadLatestTimelineModel('DexcomCalibration'))
             .then(cal => {
-              if (!cal) return Promise.resolve(null); // TODO: Log a warning because it's suspicious..?
-              if (cal.slope === null) return Promise.resolve(null); // TODO: Log a warning because it's suspicious..?
+              if (!cal) {
+                console.log(`${logCtx}: Didn't find a DexcomCalibration -> ignoring`);
+                return Promise.resolve(null);
+              }
+              if (cal.slope === null) {
+                console.log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
+                return Promise.resolve(null);
+              }
               const newEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, cal);
               return context.storage.saveModel(newEntry);
             });
@@ -88,9 +110,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
       },
     )
-    .then((model: Model | null) =>
-      console.log(`uploadDexcomEntry: ${requestObject.type} => ${model ? model.modelType : 'null'}`),
-    )
+    .then((model: Model | null) => console.log(`${logCtx} => "${model ? model.modelType : 'null'}"`))
     .then(() => Promise.resolve(createResponse(requestObject)));
 }
 
