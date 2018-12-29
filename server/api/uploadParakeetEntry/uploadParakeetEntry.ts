@@ -53,10 +53,6 @@ export function parseParakeetEntry(
   };
 }
 
-// Unused known parameters:
-// rr (cache buster?)
-// zi (transmitter id)
-// pc (passcode for parakeet)
 export function parseParakeetStatus(params: { [key: string]: string }, timestamp: number): DeviceStatus[] {
   const batteryLevel = parseInt(params.bp, 10);
   const geolocation = params.gl;

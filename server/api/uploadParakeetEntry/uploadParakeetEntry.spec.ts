@@ -23,17 +23,17 @@ describe('api/uploadParakeetEntry', () => {
     requestHeaders: {},
     requestBody: {},
     requestParams: {
-      rr: '6577574',
-      zi: '6921800',
-      pc: '53478',
+      rr: '6577574', // (assumed) cache buster
+      zi: '6921800', // transmitter id
+      pc: '53478', // passcode for parakeet upload
       lv: '168416', // unfiltered
       lf: '165824', // filtered
-      db: '216',
+      db: '216', // battery level (transmitter)
       ts: '14934', // time since
-      bp: '80',
-      bm: '4047',
-      ct: '283',
-      gl: '60.193707,24.949396',
+      bp: '80', // battery level (parakeet)
+      bm: '4047', // ???
+      ct: '283', // ???
+      gl: '60.193707,24.949396', // geolocation
     },
   };
 
