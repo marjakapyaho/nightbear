@@ -1,5 +1,6 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { first } from 'lodash';
@@ -188,6 +189,13 @@ function getOptions(
       minTickInterval: HOUR_IN_MS,
       min: timelineRangeEnd - timelineRange,
       max: timelineRangeEnd,
+      plotLines: models.filter(is('ActiveProfile')).map(ap => ({
+        value: ap.timestamp,
+        dashStyle: 'Dash',
+        color: 'blue',
+        width: 3,
+        label: { text: ap.profileName },
+      })),
     },
     yAxis: Y_AXIS_OPTIONS,
     plotOptions: {
