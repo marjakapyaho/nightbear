@@ -1,12 +1,12 @@
 import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import {
+  ActiveProfile,
   Alarm,
   AnalyserEntry,
   DEFAULT_STATE,
   DeviceStatus,
   Insulin,
-  Profile,
   SensorEntry,
   Situation,
   State,
@@ -25,7 +25,7 @@ const slopeLimits = {
 
 export function runAnalysis(
   currentTimestamp: number,
-  activeProfile: Profile,
+  activeProfile: ActiveProfile,
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
   deviceStatus: DeviceStatus | undefined,
@@ -91,36 +91,36 @@ export function runAnalysis(
   return state;
 }
 
-function detectBattery(profile: Profile, deviceStatus: DeviceStatus) {
-  return deviceStatus.batteryLevel < profile.analyserSettings.BATTERY_LIMIT;
+function detectBattery(activeProfile: ActiveProfile, deviceStatus: DeviceStatus) {
+  return deviceStatus.batteryLevel < activeProfile.analyserSettings.BATTERY_LIMIT;
 }
 
-function detectOutdated(profile: Profile, latestEntry: AnalyserEntry, currentTimestamp: number) {
+function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, currentTimestamp: number) {
   if (latestEntry) {
-    return currentTimestamp - latestEntry.timestamp > profile.analyserSettings.TIME_SINCE_BG_LIMIT * MIN_IN_MS;
+    return currentTimestamp - latestEntry.timestamp > activeProfile.analyserSettings.TIME_SINCE_BG_LIMIT * MIN_IN_MS;
   } else {
     return true;
   }
 }
 
-function detectLow(profile: Profile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
+function detectLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
   const situationType: Situation = 'LOW';
   return (
     latestEntry.bloodGlucose <
-    profile.analyserSettings.LOW_LEVEL_ABS + (find(latestAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
+    activeProfile.analyserSettings.LOW_LEVEL_ABS + (find(latestAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
   );
 }
 
-function detectFalling(state: State, profile: Profile, entry: AnalyserEntry) {
+function detectFalling(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
     !state.LOW &&
-    entry.bloodGlucose < profile.analyserSettings.LOW_LEVEL_REL &&
+    entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_REL &&
     !!entry.slope &&
     entry.slope < -slopeLimits.MEDIUM
   );
 }
 
-function detectCompressionLow(activeProfile: Profile, entries: AnalyserEntry[], insulin: Insulin[]) {
+function detectCompressionLow(activeProfile: ActiveProfile, entries: AnalyserEntry[], insulin: Insulin[]) {
   const recentInsulin = insulin.length;
   const isDay = activeProfile.profileName === 'day';
   const lastFiveEntries = chain(entries)
@@ -135,23 +135,23 @@ function detectCompressionLow(activeProfile: Profile, entries: AnalyserEntry[], 
   return !!find(entries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
 }
 
-function detectHigh(profile: Profile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
+function detectHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
   const situationType: Situation = 'HIGH';
   const correctionIfAlreadyHigh = find(latestAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
-  return latestEntry.bloodGlucose > profile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh;
+  return latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh;
 }
 
-function detectRising(state: State, profile: Profile, entry: AnalyserEntry) {
+function detectRising(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
     !state.HIGH &&
-    entry.bloodGlucose > profile.analyserSettings.HIGH_LEVEL_REL &&
+    entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_REL &&
     !!entry.slope &&
     entry.slope > slopeLimits.MEDIUM
   );
 }
 
 function detectPersistentHigh(
-  profile: Profile,
+  activeProfile: ActiveProfile,
   latestEntry: AnalyserEntry,
   entries: AnalyserEntry[],
   currentTimestamp: number,
@@ -175,8 +175,8 @@ function detectPersistentHigh(
 
   // Reject the entire time period if even a single entry is above HIGH, below RELATIVE HIGH, or showing active change
   const hasCounterConditions = some(relevantTimeWindow, entry => {
-    const isAboveHigh = entry.bloodGlucose > profile.analyserSettings.HIGH_LEVEL_ABS;
-    const isBelowRelativeHigh = entry.bloodGlucose < profile.analyserSettings.HIGH_LEVEL_REL;
+    const isAboveHigh = entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS;
+    const isBelowRelativeHigh = entry.bloodGlucose < activeProfile.analyserSettings.HIGH_LEVEL_REL;
     let isFalling = false;
     let isRisingFast = false;
 

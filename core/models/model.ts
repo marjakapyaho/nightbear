@@ -10,8 +10,8 @@ export type Model =
   | Insulin
   | Carbs
   | Alarm
-  | Settings
-  | Profile;
+  | SavedProfile
+  | ActiveProfile;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
@@ -192,25 +192,9 @@ export interface Alarm {
   readonly pushoverReceipts: string[];
 }
 
-export interface Settings {
-  // Model:
-  readonly modelType: 'Settings';
-  readonly modelMeta?: ModelMeta;
-  // Settings:
-  readonly alarmsEnabled: boolean;
-  readonly activeProfile: Profile;
-}
-
-export interface Profile {
-  // Model:
-  readonly modelType: 'Profile';
-  readonly modelMeta?: ModelMeta;
-  // Profile:
+interface BaseProfile {
   readonly profileName: string;
-  readonly activatedAtUtc: {
-    readonly hours: number;
-    readonly minutes: number;
-  };
+  readonly alarmsEnabled: boolean;
   readonly analyserSettings: {
     readonly HIGH_LEVEL_REL: number;
     readonly TIME_SINCE_BG_LIMIT: number; // minutes
@@ -228,4 +212,23 @@ export interface Profile {
     }
   };
   readonly pushoverLevels: string[];
+}
+
+export interface ActiveProfile extends BaseProfile {
+  // Model:
+  readonly modelType: 'ActiveProfile';
+  readonly modelMeta?: ModelMeta;
+  // ActiveProfile:
+  readonly timestamp: number;
+}
+
+export interface SavedProfile extends BaseProfile {
+  // Model:
+  readonly modelType: 'SavedProfile';
+  readonly modelMeta?: ModelMeta;
+  // SavedProfile:
+  readonly activatedAtUtc?: {
+    readonly hours: number;
+    readonly minutes: number;
+  };
 }

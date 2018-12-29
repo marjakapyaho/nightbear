@@ -1,12 +1,12 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
-import { Alarm, Profile, Situation, State } from 'core/models/model';
+import { ActiveProfile, Alarm, Situation, State } from 'core/models/model';
 import { compact, filter, find, findIndex, map, sum, take } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 
 const INITIAL_ALARM_LEVEL = 1;
 
-export function runAlarmChecks(context: Context, state: State, activeProfile: Profile, activeAlarms: Alarm[]) {
+export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
 
   return Promise.all([
@@ -60,7 +60,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
 function handleAlarmsToKeep(
   alarms: Alarm[],
   currentTimestamp: number,
-  activeProfile: Profile,
+  activeProfile: ActiveProfile,
   context: Context,
 ): Promise<Array<Alarm | null>> {
   return Promise.all(

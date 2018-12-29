@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { NO_PUSHOVER } from 'core/alarms/pushover-client';
 import { Context, Request } from 'core/models/api';
-import { DexcomCalibration, MeterEntry, Model, Profile, Settings } from 'core/models/model';
+import { ActiveProfile, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { NO_STORAGE } from 'core/storage/storage';
@@ -87,22 +87,23 @@ export function assertEqualWithoutMeta(
   );
 }
 
-export function activeSettings(name: string): Settings {
+export function savedProfile(profileName: string): SavedProfile {
   return {
-    modelType: 'Settings',
-    alarmsEnabled: true,
-    activeProfile: activeProfile(name),
-  };
-}
-
-export function activeProfile(name: string): Profile {
-  return {
-    modelType: 'Profile',
-    profileName: name,
+    ...activeProfile(profileName, Date.now()), // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
+    modelType: 'SavedProfile',
     activatedAtUtc: {
       hours: 11,
       minutes: 0,
     },
+  };
+}
+
+export function activeProfile(profileName: string, timestamp: number): ActiveProfile {
+  return {
+    modelType: 'ActiveProfile',
+    timestamp,
+    profileName,
+    alarmsEnabled: true,
     analyserSettings: {
       HIGH_LEVEL_REL: 10,
       TIME_SINCE_BG_LIMIT: 20,

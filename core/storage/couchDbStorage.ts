@@ -261,10 +261,9 @@ export function getStorageKey(model: Model): string {
     case 'Insulin':
     case 'Carbs':
     case 'Hba1c':
+    case 'ActiveProfile':
       return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
-    case 'Settings':
-      return `${PREFIX_GLOBAL}/${model.modelType}`;
-    case 'Profile':
+    case 'SavedProfile':
       return `${PREFIX_GLOBAL}/${model.modelType}/${model.profileName}`;
     default:
       return assertExhausted(model);

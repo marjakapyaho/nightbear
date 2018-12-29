@@ -31,7 +31,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesNoSituation(currentTimestamp),
         insulin,
         deviceStatus,
@@ -53,7 +53,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesNoSituation(currentTimestamp),
         insulin,
         deviceStatusBattery,
@@ -70,7 +70,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesOutdated(currentTimestamp),
         insulin,
         deviceStatus,
@@ -87,7 +87,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesLow(currentTimestamp),
         insulin,
         deviceStatus,
@@ -104,7 +104,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesFalling(currentTimestamp),
         insulin,
         deviceStatus,
@@ -121,7 +121,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night'),
+        activeProfile('night', currentTimestamp),
         entriesCompressionLow(currentTimestamp),
         insulin,
         deviceStatus,
@@ -138,7 +138,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesHigh(currentTimestamp),
         insulin,
         deviceStatus,
@@ -155,7 +155,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day'),
+        activeProfile('day', currentTimestamp),
         entriesRising(currentTimestamp),
         insulin,
         deviceStatus,
@@ -172,7 +172,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night'),
+        activeProfile('night', currentTimestamp),
         entriesPersistentHigh(currentTimestamp),
         insulin,
         deviceStatus,

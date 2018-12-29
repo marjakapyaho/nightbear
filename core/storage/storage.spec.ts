@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, Settings } from 'core/models/model';
+import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
 import {
   generateUniqueId,
@@ -11,7 +11,7 @@ import {
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
-import { activeProfile, assertEqualWithoutMeta } from 'server/utils/test';
+import { assertEqualWithoutMeta, savedProfile } from 'server/utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -20,11 +20,7 @@ export const MODEL_1: Carbs = {
   carbsType: 'normal',
 };
 
-export const MODEL_2: Settings = {
-  modelType: 'Settings',
-  alarmsEnabled: false,
-  activeProfile: activeProfile('day'),
-};
+export const MODEL_2: SavedProfile = savedProfile('day');
 
 export function storageTestSuite(createTestStorage: () => Storage) {
   let storage: Storage;
@@ -56,14 +52,14 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           throw new Error('Expecting a failure');
         },
         err => {
-          assert.match(err.message, /Couldn't save model.*global.*Settings.*update conflict/);
+          assert.match(err.message, /Couldn't save model.*global.*Profile.*update conflict/);
           // Check that success is reported:
           assert.equal(err.saveSucceededForModels.length, 0);
           // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
           const [failedModel, reason] = first(err.saveFailedForModels);
-          if (is('Settings')(failedModel)) {
-            assert.equal(failedModel.activeProfile, MODEL_2.activeProfile);
+          if (is('SavedProfile')(failedModel)) {
+            assert.equal(failedModel.profileName, MODEL_2.profileName);
           } else {
             assert.fail('Did not get the expected Model back');
           }

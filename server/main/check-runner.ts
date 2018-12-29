@@ -23,18 +23,17 @@ export function checkRunnerTimer(context: Context) {
 
 export function runChecks(context: Context) {
   return Promise.all([
-    context.storage.loadLatestTimelineModels('Settings', 1),
+    context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels('Insulin', ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
-  ]).then(([settings, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
-    const activeSettings = first(settings);
+  ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
+    const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
-    if (!activeSettings) throw new Error(`Couldn't load active settings`);
+    if (!activeProfile) throw new Error(`Couldn't find an active profile`);
 
-    const activeProfile = activeSettings.activeProfile;
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
 
     return runAlarmChecks(context, state, activeProfile, alarms);

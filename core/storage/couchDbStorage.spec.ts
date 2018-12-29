@@ -11,7 +11,7 @@ describe('storage/couchDbStorage', () => {
     });
 
     it('works for global models', () => {
-      assert.equal(getStorageKey(MODEL_2), 'global/Settings');
+      assert.equal(getStorageKey(MODEL_2), 'global/SavedProfile/day');
     });
   });
 
