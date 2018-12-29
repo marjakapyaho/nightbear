@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Request } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, MeterEntry, ParakeetSensorEntry } from 'core/models/model';
+import { sortBy } from 'lodash';
 import 'mocha';
 import {
   parseParakeetEntry,
@@ -22,17 +23,17 @@ describe('api/uploadParakeetEntry', () => {
     requestHeaders: {},
     requestBody: {},
     requestParams: {
-      rr: '6577574',
-      zi: '6921800',
-      pc: '53478',
+      rr: '6577574', // (assumed) cache buster
+      zi: '6921800', // transmitter id
+      pc: '53478', // passcode for parakeet upload
       lv: '168416', // unfiltered
       lf: '165824', // filtered
-      db: '216',
+      db: '216', // battery level (transmitter)
       ts: '14934', // time since
-      bp: '80',
-      bm: '4047',
-      ct: '283',
-      gl: '60.193707,24.949396',
+      bp: '80', // battery level (parakeet)
+      bm: '4047', // ???
+      ct: '283', // ???
+      gl: '60.193707,24.949396', // geolocation
     },
   };
 
@@ -70,6 +71,14 @@ describe('api/uploadParakeetEntry', () => {
     geolocation: '60.193707,24.949396',
   };
 
+  const mockDeviceStatusTransmitter: DeviceStatus = {
+    modelType: 'DeviceStatus',
+    deviceName: 'dexcom-transmitter',
+    timestamp: timestampNow,
+    batteryLevel: 216,
+    geolocation: null,
+  };
+
   it('produces correct ParakeetSensorEntry', () => {
     assert.deepEqual(
       parseParakeetEntry(mockRequest.requestParams, mockDexcomCalibration, context.timestamp()),
@@ -78,7 +87,10 @@ describe('api/uploadParakeetEntry', () => {
   });
 
   it('produces correct DeviceStatus', () => {
-    assert.deepEqual(parseParakeetStatus(mockRequest.requestParams, context.timestamp()), mockDeviceStatus);
+    assert.deepEqual(parseParakeetStatus(mockRequest.requestParams, context.timestamp()), [
+      mockDeviceStatus,
+      mockDeviceStatusTransmitter,
+    ]);
   });
 
   withStorage(createTestStorage => {
@@ -93,7 +105,9 @@ describe('api/uploadParakeetEntry', () => {
         .then(() => context.storage.loadLatestTimelineModels('ParakeetSensorEntry', 100))
         .then(models => assertEqualWithoutMeta(models, [mockParakeetSensorEntry]))
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
-        .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
+        .then(models =>
+          assertEqualWithoutMeta(sortBy(models, 'deviceName'), [mockDeviceStatusTransmitter, mockDeviceStatus]),
+        );
     });
   });
 });

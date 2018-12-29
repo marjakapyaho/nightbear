@@ -25,10 +25,10 @@ export function uploadParakeetEntry(request: Request, context: Context): Respons
       );
 
       // Parse parakeet status
-      const parakeetStatus: DeviceStatus = parseParakeetStatus(requestParams, context.timestamp());
+      const parakeetStatuses: DeviceStatus[] = parseParakeetStatus(requestParams, context.timestamp());
 
       // Save entries to db
-      return context.storage.saveModels([parakeetEntry, parakeetStatus]);
+      return context.storage.saveModels([parakeetEntry, ...parakeetStatuses]);
     })
     .then(() => Promise.resolve(createResponse(PARAKEET_RESPONSE)));
 }
@@ -53,15 +53,25 @@ export function parseParakeetEntry(
   };
 }
 
-export function parseParakeetStatus(params: { [key: string]: string }, timestamp: number): DeviceStatus {
+export function parseParakeetStatus(params: { [key: string]: string }, timestamp: number): DeviceStatus[] {
   const batteryLevel = parseInt(params.bp, 10);
   const geolocation = params.gl;
+  const transmitterBattery = parseInt(params.db, 10);
 
-  return {
-    modelType: 'DeviceStatus',
-    deviceName: 'parakeet',
-    timestamp,
-    batteryLevel,
-    geolocation,
-  };
+  return [
+    {
+      modelType: 'DeviceStatus',
+      deviceName: 'parakeet',
+      timestamp,
+      batteryLevel,
+      geolocation,
+    },
+    {
+      modelType: 'DeviceStatus',
+      deviceName: 'dexcom-transmitter',
+      timestamp,
+      batteryLevel: transmitterBattery,
+      geolocation: null,
+    },
+  ];
 }
