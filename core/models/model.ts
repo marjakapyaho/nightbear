@@ -10,8 +10,8 @@ export type Model =
   | Insulin
   | Carbs
   | Alarm
-  | Settings
-  | Profile;
+  | SavedProfile
+  | ActiveProfile;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
@@ -192,12 +192,7 @@ export interface Alarm {
   readonly pushoverReceipts: string[];
 }
 
-export interface Settings {
-  // Model:
-  readonly modelType: 'Settings';
-  readonly modelMeta?: ModelMeta;
-  // Settings:
-  readonly timestamp: number;
+interface BaseProfile {
   readonly profileName: string;
   readonly alarmsEnabled: boolean;
   readonly analyserSettings: {
@@ -219,16 +214,21 @@ export interface Settings {
   readonly pushoverLevels: string[];
 }
 
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>; // https://stackoverflow.com/a/48216010
-
-export interface Profile {
+export interface ActiveProfile extends BaseProfile {
   // Model:
-  readonly modelType: 'Profile';
+  readonly modelType: 'ActiveProfile';
   readonly modelMeta?: ModelMeta;
-  // Profile:
+  // ActiveProfile:
+  readonly timestamp: number;
+}
+
+export interface SavedProfile extends BaseProfile {
+  // Model:
+  readonly modelType: 'SavedProfile';
+  readonly modelMeta?: ModelMeta;
+  // SavedProfile:
   readonly activatedAtUtc?: {
     readonly hours: number;
     readonly minutes: number;
   };
-  readonly activateSettings: Omit<Settings, 'modelType' | 'modelMeta' | 'timestamp'>; // some properties of Settings don't make sense here
 }
