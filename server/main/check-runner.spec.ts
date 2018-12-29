@@ -72,7 +72,7 @@ describe('server/main/check-runner', () => {
       let timestamp = timestampNow;
       const context = createTestContext(createTestStorage(), () => timestamp);
       return Promise.resolve()
-        .then(() => context.storage.saveModel(savedProfile('day')))
+        .then(() => context.storage.saveModel(activeProfile('day', timestamp)))
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => context.storage.saveModel(mockDexcomSensorEntry))
         .then(() => runChecks(context))

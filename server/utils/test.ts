@@ -89,7 +89,7 @@ export function assertEqualWithoutMeta(
 
 export function savedProfile(profileName: string): SavedProfile {
   return {
-    ...activeProfile(profileName),
+    ...activeProfile(profileName, Date.now()), // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
     modelType: 'SavedProfile',
     activatedAtUtc: {
       hours: 11,
@@ -98,10 +98,10 @@ export function savedProfile(profileName: string): SavedProfile {
   };
 }
 
-export function activeProfile(profileName: string): ActiveProfile {
+export function activeProfile(profileName: string, timestamp: number): ActiveProfile {
   return {
     modelType: 'ActiveProfile',
-    timestamp: Date.now(),
+    timestamp,
     profileName,
     alarmsEnabled: true,
     analyserSettings: {
