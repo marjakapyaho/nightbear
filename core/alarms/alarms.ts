@@ -1,17 +1,17 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
-import { Alarm, Settings, Situation, State } from 'core/models/model';
+import { ActiveProfile, Alarm, Situation, State } from 'core/models/model';
 import { compact, filter, find, findIndex, map, sum, take } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 
 const INITIAL_ALARM_LEVEL = 1;
 
-export function runAlarmChecks(context: Context, state: State, activeSettings: Settings, activeAlarms: Alarm[]) {
+export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
-    handleAlarmsToKeep(alarmsToKeep, context.timestamp(), activeSettings, context),
+    handleAlarmsToKeep(alarmsToKeep, context.timestamp(), activeProfile, context),
     handleAlarmsToCreate(alarmsToCreate, context),
   ]).then(modelArrays => {
     const alarmModels = modelArrays.reduce(
@@ -60,7 +60,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
 function handleAlarmsToKeep(
   alarms: Alarm[],
   currentTimestamp: number,
-  activeSettings: Settings,
+  activeProfile: ActiveProfile,
   context: Context,
 ): Promise<Array<Alarm | null>> {
   return Promise.all(
@@ -71,11 +71,11 @@ function handleAlarmsToKeep(
       }
 
       const hasBeenValidFor = (currentTimestamp - alarm.validAfterTimestamp) / MIN_IN_MS;
-      const levelUpTimes = activeSettings.alarmSettings[alarm.situationType].escalationAfterMinutes;
+      const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
         findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
-      const pushoverLevels = activeSettings.pushoverLevels;
+      const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : 'none';
 
       if (neededLevel !== alarm.alarmLevel) {

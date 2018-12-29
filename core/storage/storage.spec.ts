@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, Profile } from 'core/models/model';
+import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
 import {
   generateUniqueId,
@@ -11,7 +11,7 @@ import {
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
-import { activeSettings, assertEqualWithoutMeta } from 'server/utils/test';
+import { assertEqualWithoutMeta, savedProfile } from 'server/utils/test';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
@@ -20,10 +20,7 @@ export const MODEL_1: Carbs = {
   carbsType: 'normal',
 };
 
-export const MODEL_2: Profile = {
-  modelType: 'Profile',
-  activateSettings: activeSettings('day'),
-};
+export const MODEL_2: SavedProfile = savedProfile('day');
 
 export function storageTestSuite(createTestStorage: () => Storage) {
   let storage: Storage;
@@ -61,8 +58,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
           const [failedModel, reason] = first(err.saveFailedForModels);
-          if (is('Profile')(failedModel)) {
-            assert.equal(failedModel.activateSettings.profileName, MODEL_2.activateSettings.profileName);
+          if (is('SavedProfile')(failedModel)) {
+            assert.equal(failedModel.profileName, MODEL_2.profileName);
           } else {
             assert.fail('Did not get the expected Model back');
           }

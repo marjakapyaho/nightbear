@@ -2,7 +2,7 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
 import 'mocha';
 import { runChecks } from 'server/main/check-runner';
-import { activeSettings, assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import { activeProfile, assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;
@@ -72,7 +72,7 @@ describe('server/main/check-runner', () => {
       let timestamp = timestampNow;
       const context = createTestContext(createTestStorage(), () => timestamp);
       return Promise.resolve()
-        .then(() => context.storage.saveModel(activeSettings('day')))
+        .then(() => context.storage.saveModel(savedProfile('day')))
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => context.storage.saveModel(mockDexcomSensorEntry))
         .then(() => runChecks(context))
