@@ -22,6 +22,12 @@ const ENTRY_TYPES = {
   CALIBRATION: 'cal',
 };
 
+// When receiving a DexcomCalibration, we look for MeterEntry's to link using this time range
+const CAL_PAIRING = {
+  BEFORE: 15 * MIN_IN_MS,
+  AFTER: 3 * MIN_IN_MS,
+};
+
 export function uploadDexcomEntry(request: Request, context: Context): Response {
   const { requestBody } = request;
   const requestObject = requestBody as any; // we don't know what this object is yet
@@ -65,8 +71,8 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
                 console.log(`${logCtx}: DexcomCalibration already exists in DB`);
                 return Promise.resolve(null);
               }
-              const range = 3 * MIN_IN_MS;
-              const rangeEnd = timestamp + range / 2;
+              const range = CAL_PAIRING.BEFORE + CAL_PAIRING.AFTER;
+              const rangeEnd = timestamp + CAL_PAIRING.AFTER;
               return Promise.resolve()
                 .then(() => context.storage.loadTimelineModels('MeterEntry', range, rangeEnd))
                 .then(entries => entries.filter(entry => entry.source === 'dexcom'))
