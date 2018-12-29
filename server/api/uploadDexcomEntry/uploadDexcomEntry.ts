@@ -46,7 +46,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(existingEntry => {
               if (existingEntry) {
                 // already exists in the DB -> no need to do anything!
-                console.log(`${logCtx}: Already exists in DB`);
+                console.log(`${logCtx}: MeterEntry already exists in DB`);
                 return Promise.resolve(null);
               }
               return context.storage.saveModel(parseMeterEntry(requestObject)); // we didn't find the entry yet -> create it
@@ -62,7 +62,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(existingCal => {
               if (existingCal) {
                 // already exists in the DB -> no need to do anything!
-                console.log(`${logCtx}: Already exists in DB`);
+                console.log(`${logCtx}: DexcomCalibration already exists in DB`);
                 return Promise.resolve(null);
               }
               const range = 3 * MIN_IN_MS;
