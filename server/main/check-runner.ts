@@ -34,9 +34,8 @@ export function runChecks(context: Context) {
 
     if (!activeSettings) throw new Error(`Couldn't load active settings`);
 
-    const activeProfile = activeSettings.activeProfile;
-    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
+    const state = runAnalysis(context.timestamp(), activeSettings, sensorEntries, insulin, deviceStatus, alarms);
 
-    return runAlarmChecks(context, state, activeProfile, alarms);
+    return runAlarmChecks(context, state, activeSettings, alarms);
   });
 }

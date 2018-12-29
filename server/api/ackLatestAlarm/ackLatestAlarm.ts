@@ -15,8 +15,7 @@ export function ackLatestAlarm(_request: Request, context: Context): Response {
       return createResponse();
     }
 
-    const activeProfile = activeSettings.activeProfile;
-    const snoozeTime = activeProfile.alarmSettings[latestActiveAlarm.situationType].snoozeMinutes;
+    const snoozeTime = activeSettings.alarmSettings[latestActiveAlarm.situationType].snoozeMinutes;
     const updatedAlarm = extend(latestActiveAlarm, {
       validAfterTimestamp: context.timestamp() + snoozeTime * MIN_IN_MS,
       alarmLevel: 1,

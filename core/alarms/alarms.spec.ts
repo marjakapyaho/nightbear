@@ -3,7 +3,7 @@ import { detectAlarmActions, runAlarmChecks } from 'core/alarms/alarms';
 import { getMockActiveAlarms, getMockAlarm } from 'core/alarms/test-data/mock-active-alarms';
 import { getMockState } from 'core/alarms/test-data/mock-state';
 import 'mocha';
-import { activeProfile, createTestContext } from 'server/utils/test';
+import { activeSettings, createTestContext } from 'server/utils/test';
 
 const currentTimestamp = 1508672249758;
 
@@ -46,7 +46,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithFalling, activeProfile('day'), activeAlarms).then(alarms => {
+    runAlarmChecks(context, stateWithFalling, activeSettings('day'), activeAlarms).then(alarms => {
       assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]);
     });
   });
@@ -56,7 +56,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'FALLING');
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithFalling, activeProfile('day'), activeAlarms).then(alarms => {
+    runAlarmChecks(context, stateWithFalling, activeSettings('day'), activeAlarms).then(alarms => {
       assert.deepEqual(alarms, []);
     });
   });
@@ -66,7 +66,7 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
     const context = createTestContext();
 
-    runAlarmChecks(context, stateWithHigh, activeProfile('day'), activeAlarms).then(alarms => {
+    runAlarmChecks(context, stateWithHigh, activeSettings('day'), activeAlarms).then(alarms => {
       assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false)]);
     });
   });

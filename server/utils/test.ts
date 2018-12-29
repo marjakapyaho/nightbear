@@ -87,18 +87,10 @@ export function assertEqualWithoutMeta(
   );
 }
 
-export function activeSettings(name: string): Settings {
-  return {
-    modelType: 'Settings',
-    alarmsEnabled: true,
-    activeProfile: activeProfile(name),
-  };
-}
-
 export function activeProfile(name: string): Profile {
   return {
     modelType: 'Profile',
-    profileName: name,
+    activateSettings: activeSettings(name),
     activatedAtUtc: {
       hours: 11,
       minutes: 0,
