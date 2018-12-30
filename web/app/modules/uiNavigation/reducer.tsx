@@ -22,6 +22,7 @@ export function uiNavigationReducer(
             loadedModels: { status: 'FETCHING' },
             timelineRange: 12 * HOUR_IN_MS,
             timelineRangeEnd: Date.now(),
+            modelBeingEdited: null,
           };
         default:
           return assertExhausted(action.newScreen);
@@ -49,6 +50,9 @@ export function uiNavigationReducer(
         ...state,
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
+    case 'MODEL_SELECTED_FOR_EDITING':
+      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
+      return { ...state, modelBeingEdited: action.model };
     default:
       return state;
   }
