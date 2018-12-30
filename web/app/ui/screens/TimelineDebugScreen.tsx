@@ -6,6 +6,7 @@ import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
+import * as ReactModal from 'react-modal';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
@@ -18,10 +19,22 @@ import { objectKeys } from 'web/app/utils/types';
 export default renderFromStore(
   __filename,
   state => state.uiNavigation,
-  (React, state, dispatch) => {
+  (React, state, dispatch, cssNs) => {
     if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
     return (
       <div className="this">
+        {state.modelBeingEdited && (
+          <ReactModal
+            isOpen
+            ariaHideApp={false}
+            onRequestClose={() => dispatch(actions.MODEL_SELECTED_FOR_EDITING(null))}
+            portalClassName={cssNs('modalPortal')}
+            overlayClassName={cssNs('modalOverlay')}
+            className={cssNs('modalContent')}
+          >
+            TODO
+          </ReactModal>
+        )}
         <button
           onClick={() =>
             dispatch(
@@ -263,6 +276,7 @@ function getOptions(
               const point = (event as any).point;
               const model: TimelineModel | null = (point && point.model) || null;
               console.log('Click:', model);
+              if (model) dispatch(actions.MODEL_SELECTED_FOR_EDITING(model));
               return false;
             },
           },
