@@ -64,8 +64,15 @@ export function createChangeObserver(store: ReduxStore, next: ReduxDispatch) {
       const newValues = selectors.map(selector => selector(newState));
       handlers.forEach((handler, i) => {
         if (isEqual(newValues[i], oldValues[i])) return;
-        // prettier-ignore
-        console.log('createChangeObserver()', 'FROM', oldValues[i], 'TO', newValues[i], 'CALLING', handler.name);
+        console.log(
+          'createChangeObserver()',
+          'FROM',
+          oldValues[i],
+          'TO',
+          newValues[i],
+          'CALLING',
+          handler.name,
+        );
         handler(newValues[i], oldValues[i], newState, oldState);
       });
       return result;
