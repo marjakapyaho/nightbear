@@ -29,7 +29,7 @@ export function runAnalysis(
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
   deviceStatus: DeviceStatus | undefined,
-  latestAlarms: Alarm[],
+  existingActiveAlarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries)
@@ -60,7 +60,7 @@ export function runAnalysis(
 
   state = {
     ...state,
-    LOW: detectLow(activeProfile, latestEntry, latestAlarms),
+    LOW: detectLow(activeProfile, latestEntry, existingActiveAlarms),
   };
 
   state = {
@@ -75,7 +75,7 @@ export function runAnalysis(
 
   state = {
     ...state,
-    HIGH: detectHigh(activeProfile, latestEntry, latestAlarms),
+    HIGH: detectHigh(activeProfile, latestEntry, existingActiveAlarms),
   };
 
   state = {
@@ -103,11 +103,12 @@ function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry
   }
 }
 
-function detectLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
+function detectLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, existingActiveAlarms: Alarm[]) {
   const situationType: Situation = 'LOW';
   return (
     latestEntry.bloodGlucose <
-    activeProfile.analyserSettings.LOW_LEVEL_ABS + (find(latestAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
+    activeProfile.analyserSettings.LOW_LEVEL_ABS +
+      (find(existingActiveAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
   );
 }
 
@@ -135,9 +136,9 @@ function detectCompressionLow(activeProfile: ActiveProfile, entries: AnalyserEnt
   return !!find(entries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
 }
 
-function detectHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, latestAlarms: Alarm[]) {
+function detectHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, existingActiveAlarms: Alarm[]) {
   const situationType: Situation = 'HIGH';
-  const correctionIfAlreadyHigh = find(latestAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
+  const correctionIfAlreadyHigh = find(existingActiveAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
   return latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh;
 }
 

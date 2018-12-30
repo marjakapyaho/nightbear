@@ -6,6 +6,7 @@ import {
   PREFIX_TIMELINE,
 } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
+import { Storage } from 'core/storage/storage';
 import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
 import { actions } from 'web/app/modules/actions';
@@ -17,10 +18,12 @@ export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
 export const MODELS_FETCH_DEBOUNCE = 100;
 
+const LOCAL_REPLICATION_ENABLED = true;
 const LOCAL_REPLICATION_RANGE = 'month'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)
 
 export const pouchDbMiddleware: ReduxMiddleware = store => {
-  let existingReplication: ReturnType<typeof startReplication> | null;
+  let activeStorage: Storage | null;
+  let activeReplication: ReturnType<typeof startReplication> | null;
 
   return next => {
     const observer = createChangeObserver(store, next);
@@ -40,27 +43,28 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
   };
 
   function remoteDbUrlChanged(newUrl: string) {
-    if (existingReplication) {
-      existingReplication.dispose();
-      existingReplication = null;
+    if (activeReplication) {
+      activeReplication.dispose();
+      activeReplication = null;
     }
     if (newUrl) {
-      existingReplication = startReplication(newUrl, store.dispatch);
+      if (LOCAL_REPLICATION_ENABLED) {
+        activeReplication = startReplication(newUrl, store.dispatch);
+        activeStorage = activeReplication.storage;
+      } else {
+        activeStorage = createCouchDbStorage(newUrl);
+      }
     }
   }
 
   function timelineFiltersChanged(args: [TimelineModelType[], number, number] | null) {
-    if (!existingReplication || !args) return;
+    if (!activeStorage || !args) return;
     const [selectedModelTypes, timelineRange, timelineRangeEnd] = args;
     Promise.all(
       selectedModelTypes.map(
         modelType =>
-          existingReplication
-            ? existingReplication.storage.loadTimelineModels(
-                modelType,
-                timelineRange,
-                timelineRangeEnd,
-              )
+          activeStorage
+            ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
             : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
       ),
     ).then(

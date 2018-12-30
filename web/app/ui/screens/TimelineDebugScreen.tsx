@@ -1,8 +1,10 @@
-import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { runAnalysis } from 'core/analyser/analyser';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { first } from 'lodash';
+import { first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
@@ -11,6 +13,7 @@ import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import Timestamp from 'web/app/ui/utils/Timestamp';
 import { renderFromStore } from 'web/app/utils/react';
 import { ReduxDispatch } from 'web/app/utils/redux';
+import { objectKeys } from 'web/app/utils/types';
 
 export default renderFromStore(
   __filename,
@@ -161,6 +164,14 @@ function getOptions(
   timelineRangeEnd: number,
   dispatch: ReduxDispatch,
 ): Highcharts.Options {
+  const activeProfile = last(models.filter(is('ActiveProfile')));
+  let analysisRanges: Array<[number, number, number]> = [];
+  if (activeProfile) {
+    const bucket = 5 * MIN_IN_MS;
+    analysisRanges = range(timelineRangeEnd - timelineRange + bucket, timelineRangeEnd, bucket).map(
+      start => [start - 3 * HOUR_IN_MS, start - bucket, start] as [number, number, number],
+    );
+  }
   return {
     title: { text: null },
     chart: {
@@ -188,6 +199,52 @@ function getOptions(
       minTickInterval: HOUR_IN_MS,
       min: timelineRangeEnd - timelineRange,
       max: timelineRangeEnd,
+      plotLines: models.filter(is('ActiveProfile')).map(
+        (ap): Highcharts.PlotLines => ({
+          value: ap.timestamp,
+          dashStyle: 'Dash',
+          color: 'blue',
+          width: 3,
+          label: { text: ap.profileName, style: { color: 'blue', fontWeight: 'bold' } },
+          zIndex: 2,
+        }),
+      ),
+      plotBands: analysisRanges
+        .map(
+          ([base, from, to]): Highcharts.PlotBands | null => {
+            if (!activeProfile) return null;
+            const sensorEntries = models
+              .filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'))
+              .filter(m => m.timestamp > base && m.timestamp < to);
+            const state = runAnalysis(
+              to,
+              activeProfile,
+              sensorEntries,
+              models.filter(is('Insulin')).filter(m => m.timestamp > base && m.timestamp < to),
+              undefined, // TODO: Which DeviceStatus should go here..?
+              models
+                .filter(is('Alarm'))
+                .filter(m => m.timestamp > base && m.timestamp < to)
+                .filter(a => a.isActive),
+            );
+            const stateOn = objectKeys(state)
+              .map(key => (state[key] ? key : null))
+              .filter(isNotNull);
+            console.log(
+              `Analysis at ${new Date(to).toISOString()} with ${sensorEntries.length} entries:`,
+              stateOn.length ? stateOn : 'n/a',
+            );
+            if (!stateOn.length) return null;
+            return {
+              from,
+              to,
+              color: 'yellow',
+              label: { text: stateOn.join('+'), rotation: 90, style: { color: 'orange' } },
+              zIndex: 1,
+            };
+          },
+        )
+        .filter(isNotNull),
     },
     yAxis: Y_AXIS_OPTIONS,
     plotOptions: {

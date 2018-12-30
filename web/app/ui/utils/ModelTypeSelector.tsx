@@ -15,6 +15,7 @@ const options: TimelineModelType[] = [
   'Insulin',
   'Carbs',
   'Alarm',
+  'ActiveProfile',
 ];
 
 export default renderFromProps<{
