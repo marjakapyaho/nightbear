@@ -32,7 +32,13 @@ export default renderFromStore(
             overlayClassName={cssNs('modalOverlay')}
             className={cssNs('modalContent')}
           >
-            TODO
+            <textarea
+              className="model"
+              defaultValue={JSON.stringify(state.modelBeingEdited, null, 2)}
+            />
+            <button onClick={() => dispatch(actions.MODEL_SELECTED_FOR_EDITING(null))}>
+              Cancel
+            </button>
           </ReactModal>
         )}
         <button

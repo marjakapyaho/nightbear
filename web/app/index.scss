@@ -2,6 +2,7 @@
 @import 'ui/utils/DbStatusBar';
 @import 'ui/utils/MainNavBar';
 @import 'ui/utils/TimelineModelTable';
+@import 'ui/screens/TimelineDebugScreen';
 
 body,
 html,
@@ -16,4 +17,8 @@ html,
     width: 100%;
     height: 100%;
   }
+}
+
+* {
+  box-sizing: border-box;
 }
