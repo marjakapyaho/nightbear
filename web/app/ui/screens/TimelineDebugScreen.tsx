@@ -39,6 +39,19 @@ export default renderFromStore(
             <button onClick={() => dispatch(actions.MODEL_SELECTED_FOR_EDITING(null))}>
               Cancel
             </button>
+            <button
+              onClick={() => {
+                const txt: HTMLTextAreaElement | null = document.querySelector(
+                  '.' + cssNs('model'),
+                ); // TODO: Use React ref here instead
+                if (!txt) return;
+                if (!confirm('Are you sure you want to save these changes?')) return;
+                console.log('New model content:', txt.value);
+                dispatch(actions.MODEL_SELECTED_FOR_EDITING(null));
+              }}
+            >
+              Save
+            </button>
           </ReactModal>
         )}
         <button
