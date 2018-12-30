@@ -1,7 +1,7 @@
 import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { is, isTimelineModel } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { findIndex, first, last, range } from 'lodash';
@@ -47,7 +47,13 @@ export default renderFromStore(
                 if (!txt) return;
                 if (!confirm('Are you sure you want to save these changes?')) return;
                 console.log('New model content:', txt.value);
-                dispatch(actions.MODEL_SELECTED_FOR_EDITING(null));
+                const newModel = JSON.parse(txt.value);
+                if (isTimelineModel(newModel)) {
+                  dispatch(actions.MODEL_CHANGES_SAVED(newModel));
+                  dispatch(actions.MODEL_SELECTED_FOR_EDITING(null));
+                } else {
+                  throw new Error(`Couldn't parse content as a TimelineModel`);
+                }
               }}
             >
               Save

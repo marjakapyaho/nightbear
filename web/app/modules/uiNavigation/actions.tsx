@@ -7,4 +7,5 @@ export const uiNavigationActions = actionsWithType({
     newScreen,
   }),
   MODEL_SELECTED_FOR_EDITING: (model: TimelineModel | null) => ({ model }),
+  MODEL_CHANGES_SAVED: (model: TimelineModel) => ({ model }),
 });

@@ -9,7 +9,7 @@ import PouchDB from 'core/storage/PouchDb';
 import { Storage } from 'core/storage/storage';
 import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
-import { actions } from 'web/app/modules/actions';
+import { actions, ReduxAction } from 'web/app/modules/actions';
 import { ReplicationDirection } from 'web/app/modules/pouchDb/state';
 import { createChangeObserver, ReduxDispatch, ReduxMiddleware } from 'web/app/utils/redux';
 
@@ -39,7 +39,18 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
           : null,
       timelineFiltersChanged,
     );
-    return observer.run;
+    return (action: ReduxAction) => {
+      if (action.type === 'MODEL_CHANGES_SAVED') {
+        if (!activeStorage) throw new Error(`Can't save Model changes without an active Storage`);
+        activeStorage
+          .saveModel(action.model)
+          .then(
+            res => console.log('Save model result:', res),
+            err => console.log('Save model error:', err),
+          );
+      }
+      return observer.run(action); // run state change observers
+    };
   };
 
   function remoteDbUrlChanged(newUrl: string) {
