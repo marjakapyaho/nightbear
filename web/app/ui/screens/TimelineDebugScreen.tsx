@@ -4,7 +4,7 @@ import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { first, last, range } from 'lodash';
+import { findIndex, first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
 import * as ReactModal from 'react-modal';
 import { isNotNull } from 'server/utils/types';
@@ -448,7 +448,7 @@ function getSeries(
   selector: (model: TimelineModel) => number | null | false,
   extraOptions?: Partial<SeriesOptions>,
 ): SeriesOptions {
-  const yAxis = Y_AXIS_OPTIONS.indexOf(yAxisAssociation);
+  const yAxis = findIndex(Y_AXIS_OPTIONS, yAxisAssociation);
   if (yAxis === -1)
     throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
   return {
