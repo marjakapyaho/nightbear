@@ -16,7 +16,7 @@ export function checkRunnerTimer(context: Context) {
   }
 
   // And set next one
-  nextCheck = global.setTimeout(checkRunnerTimer, CHECK_RUN_INTERVAL);
+  nextCheck = global.setTimeout(checkRunnerTimer, CHECK_RUN_INTERVAL, context);
 
   return runChecks(context);
 }
