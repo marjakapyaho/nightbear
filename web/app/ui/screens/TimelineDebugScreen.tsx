@@ -142,7 +142,7 @@ export default renderFromStore(
           <HighchartsReact
             highcharts={Highcharts}
             options={getOptions(
-              state.loadedModels.models,
+              state.loadedModels.timelineModels,
               state.selectedModelTypes,
               state.timelineRange,
               state.timelineRangeEnd,

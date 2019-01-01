@@ -45,7 +45,7 @@ export function uiNavigationReducer(
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return {
         ...state,
-        loadedModels: { status: 'READY', models },
+        loadedModels: { status: 'READY', timelineModels: models },
       };
     case 'TIMELINE_DATA_FAILED':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
@@ -69,7 +69,7 @@ export function uiNavigationReducer(
           ...state,
           loadedModels: {
             ...state.loadedModels,
-            models: state.loadedModels.models.map(existingModel => {
+            timelineModels: state.loadedModels.timelineModels.map(existingModel => {
               const replacement = newModels.find(
                 newModel => getStorageKey(newModel) === getStorageKey(existingModel),
               );

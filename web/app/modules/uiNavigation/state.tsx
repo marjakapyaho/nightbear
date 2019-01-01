@@ -11,7 +11,7 @@ export type UiNavigationState = Readonly<
       selectedModelTypes: TimelineModelType[];
       loadedModels:
         | { status: 'FETCHING' }
-        | { status: 'READY'; models: TimelineModel[] }
+        | { status: 'READY'; timelineModels: TimelineModel[] }
         | { status: 'ERROR'; errorMessage: string };
       modelBeingEdited: TimelineModel | null;
       timelineCursorAt: number | null;
