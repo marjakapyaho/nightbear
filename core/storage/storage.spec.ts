@@ -198,11 +198,17 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     const alarm: Alarm = {
       modelType: 'Alarm',
       timestamp: 0,
-      validAfterTimestamp: 0,
-      alarmLevel: 0,
       situationType: 'HIGH',
       isActive: false,
-      pushoverReceipts: [],
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 0,
+          validAfterTimestamp: 0,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     };
 
     it("doesn't load anything if there's nothing to load", () => {

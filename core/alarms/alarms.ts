@@ -1,6 +1,7 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
-import { ActiveProfile, Alarm, Situation, State } from 'core/models/model';
+import { ActiveProfile, Alarm, AlarmState, Situation, State } from 'core/models/model';
+import { getAlarmState } from 'core/models/utils';
 import { compact, filter, find, findIndex, map, sum, take } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 
@@ -11,7 +12,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
-    handleAlarmsToKeep(alarmsToKeep, context.timestamp(), activeProfile, context),
+    handleAlarmsToKeep(alarmsToKeep, activeProfile, context),
     handleAlarmsToCreate(alarmsToCreate, context),
   ]).then(modelArrays => {
     const alarmModels = modelArrays.reduce(
@@ -44,14 +45,17 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   const modelsToSave: Alarm[] = [];
 
   alarms.forEach(alarm => {
-    const changedAlarm = Object.assign(alarm, {
-      isActive: false,
+    const alarmWithNewState = alarmWithUpdatedState(alarm, {
+      alarmLevel: getAlarmState(alarm).alarmLevel,
+      validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
+      ackedBy: null,
       pushoverReceipts: [],
     });
+    const changedAlarm = { ...alarmWithNewState, isActive: false, deactivationTimestamp: context.timestamp() };
     modelsToSave.push(changedAlarm);
 
     // We're not waiting for the results of pushover acks
-    context.pushover.ackAlarms(alarm.pushoverReceipts);
+    context.pushover.ackAlarms(getAlarmState(alarm).pushoverReceipts);
   });
 
   return Promise.resolve(modelsToSave);
@@ -59,18 +63,17 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
 
 function handleAlarmsToKeep(
   alarms: Alarm[],
-  currentTimestamp: number,
   activeProfile: ActiveProfile,
   context: Context,
 ): Promise<Array<Alarm | null>> {
   return Promise.all(
     alarms.map(alarm => {
       // Not yet valid
-      if (currentTimestamp <= alarm.validAfterTimestamp) {
+      if (context.timestamp() <= getAlarmState(alarm).validAfterTimestamp) {
         return Promise.resolve(null);
       }
 
-      const hasBeenValidFor = (currentTimestamp - alarm.validAfterTimestamp) / MIN_IN_MS;
+      const hasBeenValidFor = (context.timestamp() - getAlarmState(alarm).validAfterTimestamp) / MIN_IN_MS;
       const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
@@ -78,19 +81,30 @@ function handleAlarmsToKeep(
       const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : 'none';
 
-      if (neededLevel !== alarm.alarmLevel) {
-        const changedAlarm = { ...alarm, alarmLevel: neededLevel };
-
+      if (neededLevel !== getAlarmState(alarm).alarmLevel) {
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
-          return Promise.resolve(changedAlarm);
+          return Promise.resolve(
+            alarmWithUpdatedState(alarm, {
+              alarmLevel: neededLevel,
+              validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
+              ackedBy: null,
+              pushoverReceipts: getAlarmState(alarm).pushoverReceipts,
+            }),
+          );
         } else {
           return context.pushover
-            .sendAlarm(changedAlarm.situationType, pushoverRecipient)
+            .sendAlarm(alarm.situationType, pushoverRecipient)
             .then((receipt: string) => {
               // only persist the level upgrade IF the alarm got sent (so we get retries)
-              changedAlarm.pushoverReceipts.push(receipt);
-              return Promise.resolve(changedAlarm);
+              return Promise.resolve(
+                alarmWithUpdatedState(alarm, {
+                  alarmLevel: neededLevel,
+                  validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
+                  ackedBy: null,
+                  pushoverReceipts: [...getAlarmState(alarm).pushoverReceipts, receipt],
+                }),
+              );
             })
             .catch(() => Promise.resolve(null));
         }
@@ -115,10 +129,23 @@ export function createAlarm(situationType: Situation, alarmLevel: number, contex
   return {
     modelType: 'Alarm',
     timestamp: context.timestamp(),
-    validAfterTimestamp: context.timestamp(),
-    alarmLevel,
     situationType,
     isActive: true,
-    pushoverReceipts: [],
+    deactivationTimestamp: null,
+    alarmStates: [
+      {
+        alarmLevel,
+        validAfterTimestamp: context.timestamp(),
+        ackedBy: null,
+        pushoverReceipts: [],
+      },
+    ],
+  };
+}
+
+export function alarmWithUpdatedState(alarm: Alarm, state: AlarmState) {
+  return {
+    ...alarm,
+    alarmStates: [...alarm.alarmStates, state] as Alarm['alarmStates'],
   };
 }

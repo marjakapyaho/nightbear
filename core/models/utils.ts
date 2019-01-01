@@ -1,5 +1,6 @@
-import { Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
-import { isPlainObject } from 'lodash';
+import { Alarm, AlarmState, Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
+import { getStorageKey } from 'core/storage/couchDbStorage';
+import { isPlainObject, last as _last } from 'lodash';
 
 // @see https://github.com/Microsoft/TypeScript/issues/21732 for why "any" rather than "undefined" :/
 export function isModel(x: any): x is Model {
@@ -39,4 +40,10 @@ export function first<T extends Model>(_: T, index: number, _array: T[]) {
 // @example array.find(last)
 export function last<T extends Model>(_: T, index: number, array: T[]) {
   return index === array.length - 1;
+}
+
+export function getAlarmState(alarm: Alarm): AlarmState {
+  const latest = _last(alarm.alarmStates);
+  if (!latest) throw new Error(`Couldn't get latest AlarmState from Alarm "${getStorageKey(alarm)}"`);
+  return latest;
 }

@@ -37,33 +37,57 @@ describe('server/main/check-runner', () => {
   const alarmsArrayWithHigh: Alarm[] = [
     {
       modelType: 'Alarm',
-      alarmLevel: 1,
-      isActive: true,
-      pushoverReceipts: [],
-      situationType: 'HIGH',
       timestamp: timestampNow,
-      validAfterTimestamp: timestampNow,
+      situationType: 'HIGH',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     },
   ];
 
   const alarmsArrayWithHighAndBattery: Alarm[] = [
     {
       modelType: 'Alarm',
-      alarmLevel: 2,
-      isActive: true,
-      pushoverReceipts: [],
-      situationType: 'HIGH',
       timestamp: timestampNow,
-      validAfterTimestamp: timestampNow,
+      situationType: 'HIGH',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+        {
+          alarmLevel: 2,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     },
     {
       modelType: 'Alarm',
-      alarmLevel: 1,
-      isActive: true,
-      pushoverReceipts: [],
-      situationType: 'BATTERY',
       timestamp: timestampNow + 15 * MIN_IN_MS,
-      validAfterTimestamp: timestampNow + 15 * MIN_IN_MS,
+      situationType: 'BATTERY',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow + 15 * MIN_IN_MS,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     },
   ];
 
