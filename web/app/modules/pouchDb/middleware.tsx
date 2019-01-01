@@ -7,6 +7,7 @@ import {
 } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage } from 'core/storage/storage';
+import { reject } from 'core/utils/promise';
 import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
 import { actions, ReduxAction } from 'web/app/modules/actions';
@@ -41,9 +42,12 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
     );
     return (action: ReduxAction) => {
       if (action.type === 'MODEL_CHANGES_SAVED') {
-        if (!activeStorage) throw new Error(`Can't save Model changes without an active Storage`);
-        activeStorage
-          .saveModel(action.model)
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.saveModel(action.model)
+              : reject(`Can't save Model changes without an active Storage`),
+          )
           .then(
             res => console.log('Save model result:', res),
             err => console.log('Save model error:', err),
