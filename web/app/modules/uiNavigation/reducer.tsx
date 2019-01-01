@@ -1,4 +1,6 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { isTimelineModel } from 'core/models/utils';
+import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
 import { ReduxAction } from 'web/app/modules/actions';
 import { ReduxState } from 'web/app/modules/state';
@@ -53,6 +55,33 @@ export function uiNavigationReducer(
     case 'MODEL_SELECTED_FOR_EDITING':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return { ...state, modelBeingEdited: action.model };
+    case 'DB_EMITTED_CHANGES':
+      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
+      if (state.loadedModels.status !== 'READY') return state;
+      try {
+        const newModels = action.changes.map(change => reviveCouchDbRowIntoModel(change.doc));
+        console.log('Got new models', newModels);
+        return {
+          ...state,
+          loadedModels: {
+            ...state.loadedModels,
+            models: state.loadedModels.models.map(existingModel => {
+              const replacement = newModels.find(
+                newModel => getStorageKey(newModel) === getStorageKey(existingModel),
+              );
+              if (replacement && isTimelineModel(replacement)) {
+                console.log('Found replacement:', replacement);
+                return replacement;
+              } else {
+                return existingModel;
+              }
+            }),
+          },
+        };
+      } catch (err) {
+        console.log(`Couldn't revive changed docs into models`, action.changes);
+      }
+      return state;
     default:
       return state;
   }
