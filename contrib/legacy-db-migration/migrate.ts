@@ -16,6 +16,7 @@ import { is } from 'core/models/utils';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
+import { CAL_PAIRING } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { isNotNull } from 'server/utils/types';
 import { inspect } from 'util';
 
@@ -322,7 +323,10 @@ function linkCalibrationsAndMeterEntries() {
   );
   console.log({ maybeLinkedMeterEntries, maybeLinkedDexcomCalibrations });
   const updates = maybeLinkedDexcomCalibrations.map(cal => {
-    const entries = maybeLinkedMeterEntries.filter(entry => Math.abs(cal.timestamp - entry.timestamp) <= MIN_IN_MS * 3);
+    const entries = maybeLinkedMeterEntries.filter(
+      entry =>
+        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE || entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
+    );
     const deltas = entries.map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec').join(', ');
     console.log(
       `"${(cal as any).modelMeta._id}" got ${
