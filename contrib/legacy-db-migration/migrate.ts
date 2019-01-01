@@ -5,13 +5,13 @@ import {
   Carbs,
   DeviceStatus,
   DexcomCalibration,
+  DexcomRawSensorEntry,
   DexcomSensorEntry,
   Hba1c,
   Insulin,
   MeterEntry,
   Model,
   ParakeetSensorEntry,
-  DexcomRawSensorEntry,
 } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
@@ -203,27 +203,27 @@ function toModernModel(x: any): Promise<Model[] | null> {
   if (x._id.match(/^_/) || x._id.match(/^sensors\//)) {
     return Promise.resolve(null);
   } else if (x._id.match(/^sensor-entries\//) && x.type === 'sgv' && x.device === 'dexcom') {
+    const raw: DexcomRawSensorEntry = {
+      modelType: 'DexcomRawSensorEntry',
+      timestamp: x.date,
+      bloodGlucose: x.nb_raw_value,
+      signalStrength: x.rssi,
+      noiseLevel: x.noise,
+      rawFiltered: x.filtered,
+      rawUnfiltered: x.unfiltered,
+    };
     if (x.noise >= 4 || x.sgv < 40) {
-      // According to rules in the old backend, this is considered "raw"
-      const model: DexcomRawSensorEntry = {
-        modelType: 'DexcomRawSensorEntry',
+      // According to rules in the old backend, this is considered "raw" -> don't create a "proper" DexcomSensorEntry
+      return Promise.resolve([raw]);
+    } else {
+      const proper: DexcomSensorEntry = {
+        modelType: 'DexcomSensorEntry',
         timestamp: x.date,
         bloodGlucose: x.nb_glucose_value,
         signalStrength: x.rssi,
         noiseLevel: x.noise,
-        rawFiltered: x.filtered,
-        rawUnfiltered: x.unfiltered,
       };
-      return Promise.resolve([model]);
-    } else {
-      const model: DexcomSensorEntry = {
-        modelType: 'DexcomSensorEntry',
-        timestamp: x.date,
-        bloodGlucose: changeBloodGlucoseUnitToMmoll(x.sgv),
-        signalStrength: x.rssi,
-        noiseLevel: x.noise,
-      };
-      return Promise.resolve([model]);
+      return Promise.resolve([raw, proper]);
     }
   } else if (x._id.match(/^sensor-entries-raw\//) && x.type === 'raw' && x.device === 'parakeet') {
     const model: ParakeetSensorEntry = {
