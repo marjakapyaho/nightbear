@@ -1,4 +1,5 @@
 import { TimelineModelType } from 'core/models/model';
+import { is } from 'core/models/utils';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
@@ -82,10 +83,31 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
             ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
             : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
       ),
-    ).then(
-      models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(flatten(models))),
-      err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
-    );
+    )
+      .then(models => flatten(models))
+      .then(models => {
+        if (models.find(is('ActiveProfile'))) {
+          console.log(
+            `Results already contain at least one ActiveProfile -> no need to fetch more`,
+          );
+          return models;
+        } else {
+          console.log(`ActiveProfile not found in results -> need to fetch one`);
+          return Promise.resolve()
+            .then(() =>
+              activeStorage
+                ? activeStorage.loadLatestTimelineModel('ActiveProfile')
+                : reject(`Can't load latest ActiveProfile without an active Storage`),
+            )
+            .then(activeProfile =>
+              activeProfile
+                ? Promise.resolve([...models, activeProfile])
+                : reject(`No ActiveProfile's found from the entire DB`),
+            );
+        }
+      })
+      .then(models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)))
+      .catch(err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)));
   }
 };
 

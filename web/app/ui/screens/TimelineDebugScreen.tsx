@@ -136,7 +136,7 @@ export default renderFromStore(
         />
         {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
         {state.loadedModels.status === 'ERROR' && (
-          <pre>Error: ${state.loadedModels.errorMessage}</pre>
+          <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
         )}
         {state.loadedModels.status === 'READY' && (
           <HighchartsReact
