@@ -212,7 +212,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
       rawFiltered: x.filtered,
       rawUnfiltered: x.unfiltered,
     };
-    if (isDexcomEntryValid(x.noise, x.sgv)) {
+    if (!isDexcomEntryValid(x.noise, x.sgv)) {
       // According to rules in the old backend, this is considered "raw" -> don't create a "proper" DexcomSensorEntry
       return Promise.resolve([raw]);
     } else {
