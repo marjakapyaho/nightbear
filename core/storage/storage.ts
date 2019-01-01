@@ -1,4 +1,4 @@
-import { Model, ModelOfType, ModelRef, ModelType } from 'core/models/model';
+import { GlobalModel, Model, ModelOfType, ModelRef, ModelType } from 'core/models/model';
 
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
@@ -14,7 +14,7 @@ export interface Storage {
     mustMatch?: Partial<ModelOfType<T>>,
   ): Promise<Array<ModelOfType<T>>>;
   loadLatestTimelineModel<T extends ModelType>(modelType: T): Promise<ModelOfType<T> | undefined>;
-  loadGlobalModels(): Promise<Model[]>;
+  loadGlobalModels(): Promise<GlobalModel[]>;
   loadModelRef<T extends Model>(ref: ModelRef<T>): Promise<T | undefined>;
 }
 
