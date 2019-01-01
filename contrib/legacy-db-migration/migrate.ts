@@ -325,7 +325,7 @@ function linkCalibrationsAndMeterEntries() {
   const updates = maybeLinkedDexcomCalibrations.map(cal => {
     const entries = maybeLinkedMeterEntries.filter(
       entry =>
-        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE || entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
+        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE && entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
     );
     const deltas = entries.map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec').join(', ');
     console.log(
