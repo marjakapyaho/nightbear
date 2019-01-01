@@ -18,7 +18,7 @@ export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
 export const MODELS_FETCH_DEBOUNCE = 100;
 
-const LOCAL_REPLICATION_ENABLED = true;
+const LOCAL_REPLICATION_ENABLED = false;
 const LOCAL_REPLICATION_RANGE = 'month'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)
 
 export const pouchDbMiddleware: ReduxMiddleware = store => {
