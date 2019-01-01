@@ -1,12 +1,14 @@
 // Instead of importing PouchDB directly, you should always import it via this file.
 // This ensures that all the correct plugins are loaded before first use.
 
+// This file also supports loading via default imports and not.
 // @see https://github.com/pouchdb/pouchdb/issues/6692
-import PouchDbImported from 'pouchdb';
-// tslint:disable-next-line:no-var-requires
-const PouchDB = PouchDbImported || require('pouchdb');
+
+import * as _PouchDB from 'pouchdb';
+type typeOfPouchDB = typeof _PouchDB;
+const PouchDB: typeOfPouchDB = (_PouchDB as any).default || _PouchDB;
 
 import * as PouchDBFind from 'pouchdb-find';
-PouchDB.plugin(PouchDBFind); // @see https://www.npmjs.com/package/pouchdb-find
+PouchDB.plugin((PouchDBFind as any).default || PouchDBFind); // @see https://www.npmjs.com/package/pouchdb-find
 
 export default PouchDB;
