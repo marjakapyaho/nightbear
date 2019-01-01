@@ -41,11 +41,11 @@ export function uiNavigationReducer(
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
     case 'TIMELINE_DATA_RECEIVED':
-      const { models } = action;
+      const { timelineModels, globalModels } = action;
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return {
         ...state,
-        loadedModels: { status: 'READY', timelineModels: models },
+        loadedModels: { status: 'READY', timelineModels, globalModels },
       };
     case 'TIMELINE_DATA_FAILED':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;

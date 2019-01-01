@@ -1,4 +1,4 @@
-import { TimelineModelType } from 'core/models/model';
+import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import {
   createCouchDbStorage,
@@ -76,41 +76,48 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
   function timelineFiltersChanged(args: [TimelineModelType[], number, number] | null) {
     if (!activeStorage || !args) return;
     const [selectedModelTypes, timelineRange, timelineRangeEnd] = args;
-    Promise.all(
-      selectedModelTypes.map(
-        modelType =>
-          activeStorage
-            ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
-            : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
-      ),
-    )
-      .then(models => flatten(models))
-      .then(models => {
-        if (models.find(is('ActiveProfile'))) {
-          console.log(
-            `Results already contain at least one ActiveProfile -> no need to fetch more`,
-          );
-          return models;
-        } else {
-          console.log(`ActiveProfile not found in results -> need to fetch one`);
-          return Promise.resolve()
-            .then(() =>
-              activeStorage
-                ? activeStorage.loadLatestTimelineModel('ActiveProfile')
-                : reject(`Can't load latest ActiveProfile without an active Storage`),
-            )
-            .then(activeProfile => {
-              if (activeProfile) {
-                return Promise.resolve([...models, activeProfile]);
-              } else {
-                console.log(`Warning: No ActiveProfile's found from the entire DB`);
-                // For the time being at least, let's just finish the load; otherwise it's hard to ever create the INITIAL ActiveProfile
-                return Promise.resolve(models);
-              }
-            });
-        }
-      })
-      .then(models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)))
+    Promise.all([
+      activeStorage ? activeStorage.loadGlobalModels() : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
+      Promise.all(
+        selectedModelTypes.map(
+          modelType =>
+            activeStorage
+              ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
+              : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
+        ),
+      )
+        .then(models => flatten(models))
+        .then(
+          (models): Promise<TimelineModel[]> => {
+            if (models.find(is('ActiveProfile'))) {
+              console.log(
+                `Results already contain at least one ActiveProfile -> no need to fetch more`,
+              );
+              return Promise.resolve(models);
+            } else {
+              console.log(`ActiveProfile not found in results -> need to fetch one`);
+              return Promise.resolve()
+                .then(() =>
+                  activeStorage
+                    ? activeStorage.loadLatestTimelineModel('ActiveProfile')
+                    : reject(`Can't load latest ActiveProfile without an active Storage`),
+                )
+                .then(activeProfile => {
+                  if (activeProfile) {
+                    return Promise.resolve([...models, activeProfile]);
+                  } else {
+                    console.log(`Warning: No ActiveProfile's found from the entire DB`);
+                    // For the time being at least, let's just finish the load; otherwise it's hard to ever create the INITIAL ActiveProfile
+                    return Promise.resolve(models);
+                  }
+                });
+            }
+          },
+        ),
+    ])
+      .then(([globalModels, timelineModels]) =>
+        store.dispatch(actions.TIMELINE_DATA_RECEIVED(timelineModels, globalModels)),
+      )
       .catch(err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)));
   }
 };
