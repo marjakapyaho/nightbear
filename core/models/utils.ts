@@ -1,4 +1,4 @@
-import { Alarm, AlarmState, Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
+import { Alarm, AlarmState, GlobalModel, Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
 import { getStorageKey } from 'core/storage/couchDbStorage';
 import { isPlainObject, last as _last } from 'lodash';
 
@@ -9,6 +9,10 @@ export function isModel(x: any): x is Model {
 
 export function isTimelineModel(x: any): x is TimelineModel {
   return isModel(x) && 'timestamp' in x;
+}
+
+export function isGlobalModel(x: any): x is GlobalModel {
+  return isModel(x) && !('timestamp' in x);
 }
 
 // @example array.filter(is('Alarm'))
