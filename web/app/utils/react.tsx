@@ -1,4 +1,4 @@
-import { createCssNs } from 'css-ns';
+import { createCssNs, NsFunction } from 'css-ns';
 import * as React from 'react';
 import { ReactNode } from 'react';
 import { connect } from 'react-redux';
@@ -12,6 +12,7 @@ export type DispatchProp = { readonly _dispatch: ReduxDispatch };
 function namespaceReact(namespace: string) {
   const ns = createCssNs({ prefix: 'nb-', namespace, React, self: /this/ });
   return {
+    ns,
     displayName: ns('this'),
     NsReact: ns.React,
   };
@@ -19,13 +20,17 @@ function namespaceReact(namespace: string) {
 
 export function renderFromProps<Props>(
   filename: string,
-  renderFunc: (React: ReactApi, props: Readonly<Props>) => ReactNode,
+  renderFunc: (
+    React: ReactApi,
+    props: Readonly<Props>,
+    cssNs: NsFunction<typeof React>,
+  ) => ReactNode,
 ): ReactComponent<Props> {
-  const { displayName, NsReact } = namespaceReact(filename);
+  const { ns, displayName, NsReact } = namespaceReact(filename);
   return class extends React.Component<Props> {
     public static displayName = displayName;
     public render() {
-      return renderFunc(NsReact, this.props);
+      return renderFunc(NsReact, this.props, ns);
     }
   };
 }
@@ -39,13 +44,14 @@ export function renderFromStore<OwnProps, IntProps>(
     React: ReactApi,
     props: Readonly<IntProps & DispatchProp>,
     dispatch: ReduxDispatch,
+    cssNs: NsFunction<typeof React>,
   ) => ReactNode,
 ): ReactComponent<OwnProps> {
-  const { displayName, NsReact } = namespaceReact(filename);
+  const { ns, displayName, NsReact } = namespaceReact(filename);
   const Component = class extends React.Component<IntProps & DispatchProp> {
     public static displayName = displayName;
     public render() {
-      return renderFunc(NsReact, this.props, this.props._dispatch);
+      return renderFunc(NsReact, this.props, this.props._dispatch, ns);
     }
   };
   return connect(

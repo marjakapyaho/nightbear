@@ -1,9 +1,13 @@
-import { Model, ModelOfType, ModelType } from 'core/models/model';
+import { Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
 import { isPlainObject } from 'lodash';
 
 // @see https://github.com/Microsoft/TypeScript/issues/21732 for why "any" rather than "undefined" :/
 export function isModel(x: any): x is Model {
   return isPlainObject(x) && 'modelType' in x;
+}
+
+export function isTimelineModel(x: any): x is TimelineModel {
+  return isModel(x) && 'timestamp' in x;
 }
 
 // @example array.filter(is('Alarm'))

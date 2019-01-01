@@ -1,11 +1,12 @@
 import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { is, isTimelineModel } from 'core/models/utils';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { first, last, range } from 'lodash';
+import { findIndex, first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
+import * as ReactModal from 'react-modal';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
@@ -18,10 +19,47 @@ import { objectKeys } from 'web/app/utils/types';
 export default renderFromStore(
   __filename,
   state => state.uiNavigation,
-  (React, state, dispatch) => {
+  (React, state, dispatch, cssNs) => {
     if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
     return (
       <div className="this">
+        {state.modelBeingEdited && (
+          <ReactModal
+            isOpen
+            ariaHideApp={false}
+            onRequestClose={() => dispatch(actions.MODEL_SELECTED_FOR_EDITING(null))}
+            portalClassName={cssNs('modalPortal')}
+            overlayClassName={cssNs('modalOverlay')}
+            className={cssNs('modalContent')}
+          >
+            <textarea
+              className="model"
+              defaultValue={JSON.stringify(state.modelBeingEdited, null, 2)}
+            />
+            <button onClick={() => dispatch(actions.MODEL_SELECTED_FOR_EDITING(null))}>
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                const txt: HTMLTextAreaElement | null = document.querySelector(
+                  '.' + cssNs('model'),
+                ); // TODO: Use React ref here instead
+                if (!txt) return;
+                if (!confirm('Are you sure you want to save these changes?')) return;
+                console.log('New model content:', txt.value);
+                const newModel = JSON.parse(txt.value);
+                if (isTimelineModel(newModel)) {
+                  dispatch(actions.MODEL_CHANGES_SAVED(newModel));
+                  dispatch(actions.MODEL_SELECTED_FOR_EDITING(null));
+                } else {
+                  throw new Error(`Couldn't parse content as a TimelineModel`);
+                }
+              }}
+            >
+              Save
+            </button>
+          </ReactModal>
+        )}
         <button
           onClick={() =>
             dispatch(
@@ -255,6 +293,20 @@ function getOptions(
           radius: 3,
         },
       },
+      series: {
+        cursor: 'pointer',
+        point: {
+          events: {
+            click(event) {
+              const point = (event as any).point;
+              const model: TimelineModel | null = (point && point.model) || null;
+              console.log('Click:', model);
+              if (model) dispatch(actions.MODEL_SELECTED_FOR_EDITING(model));
+              return false;
+            },
+          },
+        },
+      },
     },
     series: [
       // Blood glucose:
@@ -415,7 +467,7 @@ function getSeries(
   selector: (model: TimelineModel) => number | null | false,
   extraOptions?: Partial<SeriesOptions>,
 ): SeriesOptions {
-  const yAxis = Y_AXIS_OPTIONS.indexOf(yAxisAssociation);
+  const yAxis = findIndex(Y_AXIS_OPTIONS, yAxisAssociation);
   if (yAxis === -1)
     throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
   return {
