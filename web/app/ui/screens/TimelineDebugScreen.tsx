@@ -151,6 +151,20 @@ export default renderFromStore(
             )}
           />
         )}
+        {state.timelineCursorAt && state.loadedModels.status === 'READY' && (
+          <div>
+            {state.loadedModels.globalModels.map(model => (
+              <button
+                key={model.profileName}
+                onClick={() =>
+                  dispatch(actions.PROFILE_ACTIVATED(model, state.timelineCursorAt || 0))
+                }
+              >
+                Activate profile: <strong>{model.profileName}</strong>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   },
