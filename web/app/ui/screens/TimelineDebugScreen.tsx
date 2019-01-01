@@ -329,9 +329,8 @@ function getOptions(
             click(event) {
               const point = (event as any).point;
               const model: TimelineModel | null = (point && point.model) || null;
-              console.log('Click:', model);
               if (model) dispatch(actions.MODEL_SELECTED_FOR_EDITING(model));
-              return false;
+              return true;
             },
           },
         },
