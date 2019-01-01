@@ -25,6 +25,7 @@ export function uiNavigationReducer(
             timelineRange: 12 * HOUR_IN_MS,
             timelineRangeEnd: Date.now(),
             modelBeingEdited: null,
+            timelineCursorAt: null,
           };
         default:
           return assertExhausted(action.newScreen);
@@ -55,6 +56,9 @@ export function uiNavigationReducer(
     case 'MODEL_SELECTED_FOR_EDITING':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return { ...state, modelBeingEdited: action.model };
+    case 'TIMELINE_CURSOR_UPDATED':
+      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
+      return { ...state, timelineCursorAt: action.timestamp };
     case 'DB_EMITTED_CHANGES':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       if (state.loadedModels.status !== 'READY') return state;

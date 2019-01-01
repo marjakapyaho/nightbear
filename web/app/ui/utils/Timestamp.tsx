@@ -41,12 +41,7 @@ export default namespaceReactClass(
         if (liveAge !== null) {
           return Duration.fromMillis(liveAge).toFormat("mm:ss 'ago'"); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
         }
-        const age = Date.now() - this.props.ts;
-        if (age < FULL_FORMAT_AGE_LIMIT) {
-          return DateTime.fromMillis(this.props.ts).toFormat('HH:mm:ss'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
-        } else {
-          return DateTime.fromMillis(this.props.ts).toLocaleString(DateTime.DATETIME_SHORT);
-        }
+        return getFormattedTimestamp(this.props.ts);
       }
 
       componentDidMount() {
@@ -77,3 +72,12 @@ export default namespaceReactClass(
       }
     },
 );
+
+export function getFormattedTimestamp(timestamp: number): string {
+  const age = Date.now() - timestamp;
+  if (age < FULL_FORMAT_AGE_LIMIT) {
+    return DateTime.fromMillis(timestamp).toFormat('HH:mm:ss'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+  } else {
+    return DateTime.fromMillis(timestamp).toLocaleString(DateTime.DATETIME_SHORT);
+  }
+}

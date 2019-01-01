@@ -14,6 +14,7 @@ export type UiNavigationState = Readonly<
         | { status: 'READY'; models: TimelineModel[] }
         | { status: 'ERROR'; errorMessage: string };
       modelBeingEdited: TimelineModel | null;
+      timelineCursorAt: number | null;
     }
 >;
 
