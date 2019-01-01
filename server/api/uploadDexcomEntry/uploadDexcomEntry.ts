@@ -23,7 +23,7 @@ const ENTRY_TYPES = {
 };
 
 // When receiving a DexcomCalibration, we look for MeterEntry's to link using this time range
-const CAL_PAIRING = {
+export const CAL_PAIRING = {
   BEFORE: 15 * MIN_IN_MS,
   AFTER: 3 * MIN_IN_MS,
 };
