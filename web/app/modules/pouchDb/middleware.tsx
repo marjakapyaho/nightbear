@@ -99,11 +99,15 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
                 ? activeStorage.loadLatestTimelineModel('ActiveProfile')
                 : reject(`Can't load latest ActiveProfile without an active Storage`),
             )
-            .then(activeProfile =>
-              activeProfile
-                ? Promise.resolve([...models, activeProfile])
-                : reject(`No ActiveProfile's found from the entire DB`),
-            );
+            .then(activeProfile => {
+              if (activeProfile) {
+                return Promise.resolve([...models, activeProfile]);
+              } else {
+                console.log(`Warning: No ActiveProfile's found from the entire DB`);
+                // For the time being at least, let's just finish the load; otherwise it's hard to ever create the INITIAL ActiveProfile
+                return Promise.resolve(models);
+              }
+            });
         }
       })
       .then(models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(models)))
