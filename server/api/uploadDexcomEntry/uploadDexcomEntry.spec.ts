@@ -1,7 +1,13 @@
 import { assert } from 'chai';
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Request } from 'core/models/api';
-import { DeviceStatus, DexcomCalibration, DexcomSensorEntry, MeterEntry } from 'core/models/model';
+import {
+  DeviceStatus,
+  DexcomCalibration,
+  DexcomRawSensorEntry,
+  DexcomSensorEntry,
+  MeterEntry,
+} from 'core/models/model';
 import { first } from 'lodash';
 import 'mocha';
 import { parseDexcomEntry, parseDexcomStatus, uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
@@ -81,6 +87,16 @@ describe('api/uploadDexcomEntry', () => {
     bloodGlucose: 7.5,
     signalStrength: 168,
     noiseLevel: 1,
+  };
+
+  const mockDexcomRawSensorEntry: DexcomRawSensorEntry = {
+    bloodGlucose: 8.6,
+    modelType: 'DexcomRawSensorEntry',
+    noiseLevel: 1,
+    rawFiltered: 156608,
+    rawUnfiltered: 158880,
+    signalStrength: 168,
+    timestamp: 1508672249758,
   };
 
   const mockDexcomCalibration: DexcomCalibration = {
@@ -194,10 +210,10 @@ describe('api/uploadDexcomEntry', () => {
   });
 
   it('produces correct DexcomSensorEntry', () => {
-    assert.deepEqual(
-      parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration),
+    assert.deepEqual(parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration), [
+      mockDexcomRawSensorEntry,
       mockDexcomSensorEntry,
-    );
+    ]);
   });
 
   it('produces correct DeviceStatus', () => {
