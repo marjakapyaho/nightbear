@@ -7,6 +7,7 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
+import { checkRunnerTimer } from 'server/main/check-runner';
 import { startExpressServer } from 'server/main/express';
 
 const context = createNodeContext();
@@ -22,6 +23,8 @@ startExpressServer(
   ['post', '/upload-dexcom-entry', uploadDexcomEntry],
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
-  port => context.log.info(`Nightbear Server listening on ${port}`),
-  err => context.log.error(`Nightbear Server Error: ${err.message}`, err),
+  port => context.log.info(`Nightbear server listening on ${port}`),
+  err => context.log.error(`Nightbear server error: ${err.message}`, err),
 );
+
+checkRunnerTimer(context).catch(err => context.log.error(`Nightbear check runner error: ${err.message}`, err));
