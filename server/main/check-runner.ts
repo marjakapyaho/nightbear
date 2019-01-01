@@ -35,7 +35,11 @@ export function runChecks(context: Context) {
     if (!activeProfile) throw new Error(`Couldn't find an active profile`);
 
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
+    context.log.info(`Run analysis returned state: ${state}`);
 
-    return runAlarmChecks(context, state, activeProfile, alarms);
+    return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
+      context.log.info(`Run checks returned alarms: ${alarms}`);
+      return alarms;
+    });
   });
 }
