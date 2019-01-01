@@ -1,10 +1,11 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll, MIN_IN_MS } from 'core/calculations/calculations';
+import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'core/calculations/calculations';
 import {
   Alarm,
   Carbs,
   DeviceStatus,
   DexcomCalibration,
+  DexcomRawSensorEntry,
   DexcomSensorEntry,
   Hba1c,
   Insulin,
@@ -202,14 +203,28 @@ function toModernModel(x: any): Promise<Model[] | null> {
   if (x._id.match(/^_/) || x._id.match(/^sensors\//)) {
     return Promise.resolve(null);
   } else if (x._id.match(/^sensor-entries\//) && x.type === 'sgv' && x.device === 'dexcom') {
-    const model: DexcomSensorEntry = {
-      modelType: 'DexcomSensorEntry',
+    const raw: DexcomRawSensorEntry = {
+      modelType: 'DexcomRawSensorEntry',
       timestamp: x.date,
-      bloodGlucose: changeBloodGlucoseUnitToMmoll(x.sgv),
+      bloodGlucose: x.nb_raw_value,
       signalStrength: x.rssi,
       noiseLevel: x.noise,
+      rawFiltered: x.filtered,
+      rawUnfiltered: x.unfiltered,
     };
-    return Promise.resolve([model]);
+    if (!isDexcomEntryValid(x.noise, x.sgv)) {
+      // According to rules in the old backend, this is considered "raw" -> don't create a "proper" DexcomSensorEntry
+      return Promise.resolve([raw]);
+    } else {
+      const proper: DexcomSensorEntry = {
+        modelType: 'DexcomSensorEntry',
+        timestamp: x.date,
+        bloodGlucose: x.nb_glucose_value,
+        signalStrength: x.rssi,
+        noiseLevel: x.noise,
+      };
+      return Promise.resolve([raw, proper]);
+    }
   } else if (x._id.match(/^sensor-entries-raw\//) && x.type === 'raw' && x.device === 'parakeet') {
     const model: ParakeetSensorEntry = {
       modelType: 'ParakeetSensorEntry',
@@ -325,7 +340,7 @@ function linkCalibrationsAndMeterEntries() {
   const updates = maybeLinkedDexcomCalibrations.map(cal => {
     const entries = maybeLinkedMeterEntries.filter(
       entry =>
-        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE || entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
+        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE && entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
     );
     const deltas = entries.map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec').join(', ');
     console.log(

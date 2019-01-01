@@ -13,6 +13,7 @@ import {
   MeterEntry,
   Model,
 } from 'core/models/model';
+import { isModel } from 'core/models/utils';
 import { getModelRef } from 'core/storage/couchDbStorage';
 import { first } from 'lodash';
 
@@ -36,7 +37,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
 
   return Promise.resolve()
     .then(
-      (): Promise<Model | null> => {
+      (): Promise<Model | Model[] | null> => {
         // Handle Dexcom Uploader DeviceStatus:
         if (requestObject.hasOwnProperty('uploaderBattery')) {
           const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
@@ -108,22 +109,26 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
                 console.log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
                 return Promise.resolve(null);
               }
-              const newEntry: DexcomSensorEntry | DexcomRawSensorEntry = parseDexcomEntry(requestObject, cal);
-              return context.storage.saveModel(newEntry);
+              const newEntries = parseDexcomEntry(requestObject, cal);
+              return context.storage.saveModels(newEntries);
             });
         }
 
         throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
       },
     )
-    .then((model: Model | null) => console.log(`${logCtx} => "${model ? model.modelType : 'null'}"`))
+    .then((model: Model | Model[] | null) => {
+      if (!model) console.log(`${logCtx} => null`);
+      else if (isModel(model)) console.log(`${logCtx} => "${model.modelType}"`);
+      else console.log(`${logCtx} => ${model.map(m => `"${m.modelType}"`).join(' & ')}`);
+    })
     .then(() => Promise.resolve(createResponse(requestObject)));
 }
 
 export function parseDexcomEntry(
   requestObject: { [key: string]: string },
   latestCalibration: DexcomCalibration,
-): DexcomSensorEntry | DexcomRawSensorEntry {
+): Array<DexcomSensorEntry | DexcomRawSensorEntry> {
   const { slope, intercept, scale } = latestCalibration;
 
   const dexBloodGlucose = parseInt(requestObject.sgv, 10);
@@ -133,24 +138,27 @@ export function parseDexcomEntry(
   const unfiltered = parseInt(requestObject.unfiltered, 10);
   const uploadTimestamp = parseInt(requestObject.date, 10);
 
+  const entryRaw: DexcomRawSensorEntry = {
+    modelType: 'DexcomRawSensorEntry',
+    timestamp: uploadTimestamp,
+    bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
+    signalStrength,
+    noiseLevel,
+    rawFiltered: filtered,
+    rawUnfiltered: unfiltered,
+  };
+
   if (isDexcomEntryValid(noiseLevel, dexBloodGlucose)) {
-    return {
+    const entry: DexcomSensorEntry = {
       modelType: 'DexcomSensorEntry',
       timestamp: uploadTimestamp,
       bloodGlucose: changeBloodGlucoseUnitToMmoll(dexBloodGlucose),
       signalStrength,
       noiseLevel,
     };
+    return [entryRaw, entry];
   } else {
-    return {
-      modelType: 'DexcomRawSensorEntry',
-      timestamp: uploadTimestamp,
-      bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
-      signalStrength,
-      noiseLevel,
-      rawFiltered: filtered,
-      rawUnfiltered: unfiltered,
-    };
+    return [entryRaw];
   }
 }
 
