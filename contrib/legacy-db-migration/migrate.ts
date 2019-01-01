@@ -1,5 +1,5 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll, MIN_IN_MS } from 'core/calculations/calculations';
+import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'core/calculations/calculations';
 import {
   Alarm,
   Carbs,
@@ -212,7 +212,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
       rawFiltered: x.filtered,
       rawUnfiltered: x.unfiltered,
     };
-    if (x.noise >= 4 || x.sgv < 40) {
+    if (isDexcomEntryValid(x.noise, x.sgv)) {
       // According to rules in the old backend, this is considered "raw" -> don't create a "proper" DexcomSensorEntry
       return Promise.resolve([raw]);
     } else {
