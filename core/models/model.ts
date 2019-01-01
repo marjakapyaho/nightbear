@@ -179,17 +179,23 @@ export type State = Readonly<typeof defaultState>;
 
 export type Situation = keyof State;
 
+export type AlarmState = {
+  readonly alarmLevel: number;
+  readonly validAfterTimestamp: number;
+  readonly ackedBy: string | null;
+  readonly pushoverReceipts: string[];
+};
+
 export interface Alarm {
   // Model:
   readonly modelType: 'Alarm';
   readonly modelMeta?: ModelMeta;
   // Alarm:
   readonly timestamp: number;
-  readonly validAfterTimestamp: number;
-  readonly alarmLevel: number;
   readonly situationType: Situation;
   readonly isActive: boolean;
-  readonly pushoverReceipts: string[];
+  readonly deactivationTimestamp: number | null;
+  readonly alarmStates: [AlarmState, ...AlarmState[]];
 }
 
 interface BaseProfile {

@@ -247,11 +247,17 @@ function toModernModel(x: any): Promise<Model[] | null> {
     const model: Alarm = {
       modelType: 'Alarm',
       timestamp: ts,
-      validAfterTimestamp: x.validAfter || ts,
-      alarmLevel: x.level,
       situationType: x.type,
       isActive: x.status !== 'inactive',
-      pushoverReceipts: x.pushoverReceipts || [],
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: x.level,
+          validAfterTimestamp: x.validAfter || ts,
+          ackedBy: null,
+          pushoverReceipts: x.pushoverReceipts || [],
+        },
+      ],
     };
     return Promise.resolve([model]);
   } else if (x._id.match(/^device-status\//)) {

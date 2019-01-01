@@ -9,11 +9,17 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
     {
       modelType: 'Alarm',
       timestamp: currentTimestamp,
-      validAfterTimestamp: currentTimestamp,
-      alarmLevel: 1,
       situationType: situation,
       isActive: true,
-      pushoverReceipts: [],
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: currentTimestamp,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     },
   ];
 }
@@ -22,10 +28,16 @@ export function getMockAlarm(currentTimestamp: number, situation: Situation, isA
   return {
     modelType: 'Alarm',
     timestamp: currentTimestamp,
-    validAfterTimestamp: currentTimestamp,
-    alarmLevel: 1,
     situationType: situation,
     isActive,
-    pushoverReceipts: [],
+    deactivationTimestamp: null,
+    alarmStates: [
+      {
+        alarmLevel: 1,
+        validAfterTimestamp: currentTimestamp,
+        ackedBy: null,
+        pushoverReceipts: [],
+      },
+    ],
   };
 }

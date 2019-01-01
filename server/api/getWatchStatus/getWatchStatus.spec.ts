@@ -13,11 +13,17 @@ describe('api/getWatchStatus', () => {
       {
         modelType: 'Alarm',
         timestamp: 324234324,
-        validAfterTimestamp: 234432423,
-        alarmLevel: 1,
         situationType: 'PERSISTENT_HIGH',
         isActive: true,
-        pushoverReceipts: [],
+        deactivationTimestamp: null,
+        alarmStates: [
+          {
+            alarmLevel: 1,
+            validAfterTimestamp: 234432423,
+            ackedBy: null,
+            pushoverReceipts: [],
+          },
+        ],
       },
     ],
     deviceStatus: {
