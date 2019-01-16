@@ -88,13 +88,14 @@ export function assertEqualWithoutMeta(
 }
 
 export function savedProfile(profileName: string): SavedProfile {
+  const { alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = activeProfile(profileName, Date.now()); // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
   return {
-    ...activeProfile(profileName, Date.now()), // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
     modelType: 'SavedProfile',
-    activatedAtUtc: {
-      hours: 11,
-      minutes: 0,
-    },
+    profileName,
+    alarmsEnabled,
+    analyserSettings,
+    alarmSettings,
+    pushoverLevels,
   };
 }
 
