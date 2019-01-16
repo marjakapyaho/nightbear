@@ -16,6 +16,7 @@ export type Model =
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
 export type TimelineModel = Extract<Model, { timestamp: number }>;
+export type GlobalModel = Exclude<Model, TimelineModel>;
 export type TimelineModelType = TimelineModel['modelType'];
 
 export type ModelMeta = object; // this is storage-type specific

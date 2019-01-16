@@ -12,6 +12,7 @@ import {
   MeterEntry,
   Model,
   ParakeetSensorEntry,
+  SavedProfile,
 } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
@@ -55,6 +56,7 @@ function main() {
     .then(linkCalibrationsAndMeterEntries)
     .then(batchLinkedCalibrations)
     .then(runBatchedCalibrationUpdatesSerially)
+    .then(seedProfiles)
     .catch(err => console.warn('\nMigration failed:', err))
     .then(reportFinished);
 }
@@ -402,4 +404,116 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
       });
     });
   }
+}
+
+function seedProfiles() {
+  const day: SavedProfile = {
+    modelType: 'SavedProfile',
+    profileName: 'day',
+    activatedAtUtc: {
+      hours: 11,
+      minutes: 0,
+    },
+    alarmsEnabled: true,
+    analyserSettings: {
+      HIGH_LEVEL_REL: 6.5,
+      TIME_SINCE_BG_LIMIT: 20,
+      BATTERY_LIMIT: 30,
+      LOW_LEVEL_ABS: 4.7,
+      ALARM_EXPIRE: 10800,
+      LOW_LEVEL_REL: 9,
+      HIGH_LEVEL_ABS: 8,
+      ALARM_RETRY: 30,
+    },
+    alarmSettings: {
+      OUTDATED: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 120,
+      },
+      HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
+      PERSISTENT_HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
+      LOW: {
+        escalationAfterMinutes: [10, 10, 10],
+        snoozeMinutes: 20,
+      },
+      FALLING: {
+        escalationAfterMinutes: [10, 10, 10],
+        snoozeMinutes: 15,
+      },
+      RISING: {
+        escalationAfterMinutes: [10, 15, 15],
+        snoozeMinutes: 20,
+      },
+      BATTERY: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
+      COMPRESSION_LOW: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
+    },
+    pushoverLevels: (process.env.NIGHTBEAR_MIGRATE_PUSHOVER_LEVELS_DAY || '').split(' '),
+  };
+  const night: SavedProfile = {
+    modelType: 'SavedProfile',
+    profileName: 'night',
+    activatedAtUtc: {
+      hours: 0,
+      minutes: 0,
+    },
+    alarmsEnabled: true,
+    analyserSettings: {
+      HIGH_LEVEL_REL: 7,
+      TIME_SINCE_BG_LIMIT: 20,
+      BATTERY_LIMIT: 10,
+      LOW_LEVEL_ABS: 4.3,
+      ALARM_EXPIRE: 10800,
+      LOW_LEVEL_REL: 6,
+      HIGH_LEVEL_ABS: 7.5,
+      ALARM_RETRY: 30,
+    },
+    alarmSettings: {
+      OUTDATED: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 120,
+      },
+      HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
+      PERSISTENT_HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
+      LOW: {
+        escalationAfterMinutes: [8, 10, 10],
+        snoozeMinutes: 10,
+      },
+      FALLING: {
+        escalationAfterMinutes: [10, 10, 10],
+        snoozeMinutes: 20,
+      },
+      RISING: {
+        escalationAfterMinutes: [20, 15, 15],
+        snoozeMinutes: 20,
+      },
+      BATTERY: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
+      COMPRESSION_LOW: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
+    },
+    pushoverLevels: (process.env.NIGHTBEAR_MIGRATE_PUSHOVER_LEVELS_NIGHT || '').split(' '),
+  };
+  return targetStorage.saveModels([day, night]);
 }

@@ -1,5 +1,5 @@
 import { Model, MODEL_VERSION, ModelOfType, ModelRef, ModelType } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { is, isGlobalModel } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { first } from 'lodash';
@@ -163,7 +163,12 @@ export function createCouchDbStorage(
           startkey: `${PREFIX_GLOBAL}/`,
           endkey: `${PREFIX_GLOBAL}/_`,
         })
-        .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
+        .then(res =>
+          res.rows
+            .map(row => row.doc)
+            .map(reviveCouchDbRowIntoModel)
+            .filter(isGlobalModel),
+        )
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load global models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });

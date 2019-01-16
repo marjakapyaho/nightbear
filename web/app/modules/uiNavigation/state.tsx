@@ -1,4 +1,4 @@
-import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
 
 export type UiNavigationState = Readonly<
   | {
@@ -11,9 +11,10 @@ export type UiNavigationState = Readonly<
       selectedModelTypes: TimelineModelType[];
       loadedModels:
         | { status: 'FETCHING' }
-        | { status: 'READY'; models: TimelineModel[] }
+        | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
         | { status: 'ERROR'; errorMessage: string };
       modelBeingEdited: TimelineModel | null;
+      timelineCursorAt: number | null;
     }
 >;
 

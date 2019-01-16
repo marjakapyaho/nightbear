@@ -2,6 +2,7 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is, isTimelineModel } from 'core/models/utils';
+import { NsFunction } from 'css-ns';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { findIndex, first, last, range } from 'lodash';
@@ -11,7 +12,7 @@ import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
-import Timestamp from 'web/app/ui/utils/Timestamp';
+import Timestamp, { getFormattedTimestamp } from 'web/app/ui/utils/Timestamp';
 import { renderFromStore } from 'web/app/utils/react';
 import { ReduxDispatch } from 'web/app/utils/redux';
 import { objectKeys } from 'web/app/utils/types';
@@ -22,7 +23,7 @@ export default renderFromStore(
   (React, state, dispatch, cssNs) => {
     if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
     return (
-      <div className="this">
+      <div className="this" onClick={() => dispatch(actions.TIMELINE_CURSOR_UPDATED(null))}>
         {state.modelBeingEdited && (
           <ReactModal
             isOpen
@@ -136,19 +137,35 @@ export default renderFromStore(
         />
         {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
         {state.loadedModels.status === 'ERROR' && (
-          <pre>Error: ${state.loadedModels.errorMessage}</pre>
+          <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
         )}
         {state.loadedModels.status === 'READY' && (
           <HighchartsReact
             highcharts={Highcharts}
             options={getOptions(
-              state.loadedModels.models,
+              state.loadedModels.timelineModels,
               state.selectedModelTypes,
               state.timelineRange,
               state.timelineRangeEnd,
+              state.timelineCursorAt,
               dispatch,
+              cssNs,
             )}
           />
+        )}
+        {state.timelineCursorAt && state.loadedModels.status === 'READY' && (
+          <div>
+            {state.loadedModels.globalModels.map(model => (
+              <button
+                key={model.profileName}
+                onClick={() =>
+                  dispatch(actions.PROFILE_ACTIVATED(model, state.timelineCursorAt || 0))
+                }
+              >
+                Activate profile: <strong>{model.profileName}</strong>
+              </button>
+            ))}
+          </div>
         )}
       </div>
     );
@@ -200,7 +217,9 @@ function getOptions(
   selectedModelTypes: TimelineModelType[],
   timelineRange: number,
   timelineRangeEnd: number,
+  timelineCursorAt: number | null,
   dispatch: ReduxDispatch,
+  cssNs: NsFunction<any>,
 ): Highcharts.Options {
   const activeProfile = last(models.filter(is('ActiveProfile')));
   let analysisRanges: Array<[number, number, number]> = [];
@@ -230,6 +249,14 @@ function getOptions(
             ),
           );
         },
+        click(event) {
+          const axis = first(event.xAxis);
+          if (!axis) return;
+          const { value } = axis;
+          if (!value) return;
+          event.stopPropagation(); // we don't want this to ALSO count as an outside-click
+          dispatch(actions.TIMELINE_CURSOR_UPDATED(Math.round(value)));
+        },
       },
     },
     xAxis: {
@@ -237,16 +264,46 @@ function getOptions(
       minTickInterval: HOUR_IN_MS,
       min: timelineRangeEnd - timelineRange,
       max: timelineRangeEnd,
-      plotLines: models.filter(is('ActiveProfile')).map(
-        (ap): Highcharts.PlotLines => ({
-          value: ap.timestamp,
-          dashStyle: 'Dash',
-          color: 'blue',
-          width: 3,
-          label: { text: ap.profileName, style: { color: 'blue', fontWeight: 'bold' } },
-          zIndex: 2,
-        }),
-      ),
+      plotLines: models
+        .filter(is('ActiveProfile'))
+        .map(
+          (ap): Highcharts.PlotLines => ({
+            value: ap.timestamp,
+            dashStyle: 'Dash',
+            className: cssNs('profileActivation'),
+            color: 'blue',
+            width: 3,
+            zIndex: 2,
+            label: {
+              text: ap.profileName,
+              style: { color: 'blue', fontWeight: 'bold' },
+            },
+            events: {
+              click(event) {
+                dispatch(actions.TIMELINE_CURSOR_UPDATED(null)); // clear existing cursor, if any
+                event.stopPropagation(); // we don't want this to set a NEW cursor position
+                dispatch(actions.MODEL_SELECTED_FOR_EDITING(ap));
+              },
+            },
+          }),
+        )
+        .concat(
+          timelineCursorAt
+            ? [
+                {
+                  value: timelineCursorAt,
+                  color: 'red',
+                  width: 3,
+                  zIndex: 3,
+                  label: {
+                    text: getFormattedTimestamp(timelineCursorAt),
+                    style: { color: 'red', fontWeight: 'bold' },
+                    rotation: 0,
+                  },
+                },
+              ]
+            : [],
+        ),
       plotBands: analysisRanges
         .map(
           ([base, from, to]): Highcharts.PlotBands | null => {
@@ -300,9 +357,8 @@ function getOptions(
             click(event) {
               const point = (event as any).point;
               const model: TimelineModel | null = (point && point.model) || null;
-              console.log('Click:', model);
               if (model) dispatch(actions.MODEL_SELECTED_FOR_EDITING(model));
-              return false;
+              return true;
             },
           },
         },

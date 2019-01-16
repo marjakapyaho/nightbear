@@ -1,4 +1,5 @@
-import { TimelineModelType } from 'core/models/model';
+import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { activateSavedProfile, is } from 'core/models/utils';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
@@ -7,6 +8,7 @@ import {
 } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage } from 'core/storage/storage';
+import { reject } from 'core/utils/promise';
 import { debounce, flatten } from 'lodash';
 import { DateTime } from 'luxon';
 import { actions, ReduxAction } from 'web/app/modules/actions';
@@ -41,12 +43,28 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
     );
     return (action: ReduxAction) => {
       if (action.type === 'MODEL_CHANGES_SAVED') {
-        if (!activeStorage) throw new Error(`Can't save Model changes without an active Storage`);
-        activeStorage
-          .saveModel(action.model)
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.saveModel(action.model)
+              : reject(`Can't save Model changes without an active Storage`),
+          )
           .then(
-            res => console.log('Save model result:', res),
-            err => console.log('Save model error:', err),
+            res => console.log('Save Model result:', res),
+            err => console.log('Save Model error:', err),
+          );
+      }
+      if (action.type === 'PROFILE_ACTIVATED') {
+        const activation = activateSavedProfile(action.profile, action.atTimestamp);
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.saveModel(activation)
+              : reject(`Can't save ActiveProfile without an active Storage`),
+          )
+          .then(
+            res => console.log('Save ActiveProfile result:', res),
+            err => console.log('Save ActiveProfile error:', err),
           );
       }
       return observer.run(action); // run state change observers
@@ -71,17 +89,49 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
   function timelineFiltersChanged(args: [TimelineModelType[], number, number] | null) {
     if (!activeStorage || !args) return;
     const [selectedModelTypes, timelineRange, timelineRangeEnd] = args;
-    Promise.all(
-      selectedModelTypes.map(
-        modelType =>
-          activeStorage
-            ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
-            : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
-      ),
-    ).then(
-      models => store.dispatch(actions.TIMELINE_DATA_RECEIVED(flatten(models))),
-      err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)),
-    );
+    Promise.all([
+      activeStorage ? activeStorage.loadGlobalModels() : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
+      Promise.all(
+        selectedModelTypes.map(
+          modelType =>
+            activeStorage
+              ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
+              : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
+        ),
+      )
+        .then(models => flatten(models))
+        .then(
+          (models): Promise<TimelineModel[]> => {
+            if (models.find(is('ActiveProfile'))) {
+              console.log(
+                `Results already contain at least one ActiveProfile -> no need to fetch more`,
+              );
+              return Promise.resolve(models);
+            } else {
+              console.log(`ActiveProfile not found in results -> need to fetch one`);
+              return Promise.resolve()
+                .then(() =>
+                  activeStorage
+                    ? activeStorage.loadLatestTimelineModel('ActiveProfile')
+                    : reject(`Can't load latest ActiveProfile without an active Storage`),
+                )
+                .then(activeProfile => {
+                  if (activeProfile) {
+                    return Promise.resolve([...models, activeProfile]);
+                  } else {
+                    console.log(`Warning: No ActiveProfile's found from the entire DB`);
+                    // For the time being at least, let's just finish the load; otherwise it's hard to ever create the INITIAL ActiveProfile
+                    return Promise.resolve(models);
+                  }
+                });
+            }
+          },
+        ),
+    ])
+      .then(([globalModels, timelineModels]) =>
+        store.dispatch(actions.TIMELINE_DATA_RECEIVED(timelineModels, globalModels)),
+      )
+      .catch(err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)));
   }
 };
 

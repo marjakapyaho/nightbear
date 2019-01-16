@@ -1,4 +1,14 @@
-import { Alarm, AlarmState, Model, ModelOfType, ModelType, TimelineModel } from 'core/models/model';
+import {
+  ActiveProfile,
+  Alarm,
+  AlarmState,
+  GlobalModel,
+  Model,
+  ModelOfType,
+  ModelType,
+  SavedProfile,
+  TimelineModel,
+} from 'core/models/model';
 import { getStorageKey } from 'core/storage/couchDbStorage';
 import { isPlainObject, last as _last } from 'lodash';
 
@@ -9,6 +19,10 @@ export function isModel(x: any): x is Model {
 
 export function isTimelineModel(x: any): x is TimelineModel {
   return isModel(x) && 'timestamp' in x;
+}
+
+export function isGlobalModel(x: any): x is GlobalModel {
+  return isModel(x) && !('timestamp' in x);
 }
 
 // @example array.filter(is('Alarm'))
@@ -46,4 +60,19 @@ export function getAlarmState(alarm: Alarm): AlarmState {
   const latest = _last(alarm.alarmStates);
   if (!latest) throw new Error(`Couldn't get latest AlarmState from Alarm "${getStorageKey(alarm)}"`);
   return latest;
+}
+
+// This helper converts between a SavedProfile and ActiveProfile.
+// Simply extending a SavedProfile into an ActiveProfile IS NOT SAFE, since excess property checks won't catch extra fields.
+export function activateSavedProfile(profile: SavedProfile, timestamp: number): ActiveProfile {
+  const { profileName, alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = profile;
+  return {
+    modelType: 'ActiveProfile',
+    timestamp,
+    profileName,
+    alarmsEnabled,
+    analyserSettings,
+    alarmSettings,
+    pushoverLevels,
+  };
 }

@@ -25,6 +25,7 @@ export function uiNavigationReducer(
             timelineRange: 12 * HOUR_IN_MS,
             timelineRangeEnd: Date.now(),
             modelBeingEdited: null,
+            timelineCursorAt: null,
           };
         default:
           return assertExhausted(action.newScreen);
@@ -40,11 +41,11 @@ export function uiNavigationReducer(
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
     case 'TIMELINE_DATA_RECEIVED':
-      const { models } = action;
+      const { timelineModels, globalModels } = action;
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return {
         ...state,
-        loadedModels: { status: 'READY', models },
+        loadedModels: { status: 'READY', timelineModels, globalModels },
       };
     case 'TIMELINE_DATA_FAILED':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
@@ -55,6 +56,9 @@ export function uiNavigationReducer(
     case 'MODEL_SELECTED_FOR_EDITING':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return { ...state, modelBeingEdited: action.model };
+    case 'TIMELINE_CURSOR_UPDATED':
+      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
+      return { ...state, timelineCursorAt: action.timestamp };
     case 'DB_EMITTED_CHANGES':
       if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       if (state.loadedModels.status !== 'READY') return state;
@@ -65,7 +69,7 @@ export function uiNavigationReducer(
           ...state,
           loadedModels: {
             ...state.loadedModels,
-            models: state.loadedModels.models.map(existingModel => {
+            timelineModels: state.loadedModels.timelineModels.map(existingModel => {
               const replacement = newModels.find(
                 newModel => getStorageKey(newModel) === getStorageKey(existingModel),
               );
