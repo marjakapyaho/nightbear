@@ -1,5 +1,5 @@
-import { ActiveProfile, TimelineModel, TimelineModelType } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { activateSavedProfile, is } from 'core/models/utils';
 import {
   createCouchDbStorage,
   HIGH_UNICODE_TERMINATOR,
@@ -55,12 +55,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
           );
       }
       if (action.type === 'PROFILE_ACTIVATED') {
-        const activation: ActiveProfile = {
-          ...action.profile, // TODO: Get rid of excess properties, e.g. activatedAtUtc..?
-          modelType: 'ActiveProfile',
-          modelMeta: undefined,
-          timestamp: action.atTimestamp,
-        };
+        const activation = activateSavedProfile(action.profile, action.atTimestamp);
         Promise.resolve()
           .then(() =>
             activeStorage
