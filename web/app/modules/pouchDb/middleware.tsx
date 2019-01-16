@@ -1,4 +1,4 @@
-import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { ActiveProfile, TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import {
   createCouchDbStorage,
@@ -50,8 +50,26 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
               : reject(`Can't save Model changes without an active Storage`),
           )
           .then(
-            res => console.log('Save model result:', res),
-            err => console.log('Save model error:', err),
+            res => console.log('Save Model result:', res),
+            err => console.log('Save Model error:', err),
+          );
+      }
+      if (action.type === 'PROFILE_ACTIVATED') {
+        const activation: ActiveProfile = {
+          ...action.profile, // TODO: Get rid of excess properties, e.g. activatedAtUtc..?
+          modelType: 'ActiveProfile',
+          modelMeta: undefined,
+          timestamp: action.atTimestamp,
+        };
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.saveModel(activation)
+              : reject(`Can't save ActiveProfile without an active Storage`),
+          )
+          .then(
+            res => console.log('Save ActiveProfile result:', res),
+            err => console.log('Save ActiveProfile error:', err),
           );
       }
       return observer.run(action); // run state change observers
