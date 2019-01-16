@@ -2,6 +2,7 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is, isTimelineModel } from 'core/models/utils';
+import { NsFunction } from 'css-ns';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { findIndex, first, last, range } from 'lodash';
@@ -148,6 +149,7 @@ export default renderFromStore(
               state.timelineRangeEnd,
               state.timelineCursorAt,
               dispatch,
+              cssNs,
             )}
           />
         )}
@@ -217,6 +219,7 @@ function getOptions(
   timelineRangeEnd: number,
   timelineCursorAt: number | null,
   dispatch: ReduxDispatch,
+  cssNs: NsFunction<any>,
 ): Highcharts.Options {
   const activeProfile = last(models.filter(is('ActiveProfile')));
   let analysisRanges: Array<[number, number, number]> = [];
@@ -267,10 +270,21 @@ function getOptions(
           (ap): Highcharts.PlotLines => ({
             value: ap.timestamp,
             dashStyle: 'Dash',
+            className: cssNs('profileActivation'),
             color: 'blue',
             width: 3,
             zIndex: 2,
-            label: { text: ap.profileName, style: { color: 'blue', fontWeight: 'bold' } },
+            label: {
+              text: ap.profileName,
+              style: { color: 'blue', fontWeight: 'bold' },
+            },
+            events: {
+              click(event) {
+                dispatch(actions.TIMELINE_CURSOR_UPDATED(null)); // clear existing cursor, if any
+                event.stopPropagation(); // we don't want this to set a NEW cursor position
+                dispatch(actions.MODEL_SELECTED_FOR_EDITING(ap));
+              },
+            },
           }),
         )
         .concat(
