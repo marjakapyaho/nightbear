@@ -9,7 +9,7 @@ provider "aws" {
 # "To use an ACM Certificate with CloudFront, you must request or import the certificate in the US East (N. Virginia) region."
 # https://www.terraform.io/docs/configuration/providers.html#multiple-provider-instances
 provider "aws" {
-  alias      = "acm_provider"
+  alias      = "us_east_1"
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
   region     = "us-east-1"

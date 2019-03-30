@@ -47,7 +47,7 @@ resource "aws_cloudfront_distribution" "this" {
 
 # https://www.terraform.io/docs/providers/aws/r/acm_certificate.html
 resource "aws_acm_certificate" "this" {
-  provider          = "aws.acm_provider"                          # because ACM needs to be used in the "us-east-1" region
+  provider          = "aws.us_east_1"                             # because ACM needs to be used in the "us-east-1" region
   domain_name       = "${var.cloudfront_static_site_domain_name}"
   validation_method = "DNS"
 }
@@ -61,7 +61,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "this" {
-  provider                = "aws.acm_provider"                             # because ACM needs to be used in the "us-east-1" region
+  provider                = "aws.us_east_1"                                # because ACM needs to be used in the "us-east-1" region
   certificate_arn         = "${aws_acm_certificate.this.arn}"
   validation_record_fqdns = ["${aws_route53_record.cert_validation.fqdn}"]
 }
