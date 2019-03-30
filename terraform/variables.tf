@@ -18,6 +18,10 @@ variable "db_admin_password" {
   description = "Default admin password to set on CouchDB"
 }
 
+variable "siren_ui_password" {
+  description = "HTTP Basic Auth password required to access the Siren UI"
+}
+
 variable "aws_region" {
   description = "AWS Region (AWS_DEFAULT_REGION)"
   default     = "eu-central-1"

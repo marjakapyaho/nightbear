@@ -81,5 +81,6 @@ module "hosting_prod" {
 }
 
 module "siren_ui" {
-  source = "./siren-ui"
+  source            = "./siren-ui"
+  siren_ui_password = "${var.siren_ui_password}"
 }

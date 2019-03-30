@@ -1,8 +1,15 @@
+variable "siren_ui_password" {
+  description = "HTTP Basic Auth password required to access the Siren UI"
+}
+
 module "aws_static_site" {
   # Check for updates at: https://github.com/futurice/terraform-utils/compare/v7.0...master
   source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_static_site?ref=v7.0"
 
   site_domain = "siren.nightbear.fi"
+
+  basic_auth_username = "nightbear"
+  basic_auth_password = "${var.siren_ui_password}"
 }
 
 resource "aws_s3_bucket_object" "index_html" {
