@@ -79,3 +79,7 @@ module "hosting_prod" {
   db_domain_zone    = "${aws_route53_zone.main.zone_id}"
   db_admin_password = "${var.db_admin_password}"
 }
+
+module "siren_ui" {
+  source = "./siren-ui"
+}
