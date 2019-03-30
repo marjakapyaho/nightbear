@@ -1,5 +1,5 @@
 window.addEventListener('load', () => {
-  const API_URL = 'https://router.nightbear.fi/get-legacy-entries';
+  const API_URL = 'https://router.nightbear.fi/legacy-api/entries';
   const AUDIO_URL = 'siren.mp3';
   const AUDIO_LENGTH = 30; // in sec
   const BG_LIMIT_LOW = 4;
