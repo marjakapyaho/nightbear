@@ -2,6 +2,7 @@ window.addEventListener('load', () => {
   const API_URL = 'https://router.nightbear.fi/legacy-api/entries';
   const AUDIO_URL = 'siren.mp3';
   const AUDIO_LENGTH = 30; // in sec
+  const DATA_REFRESH_INTERVAL = 60; // in sec
   const BG_LIMIT_LOW = 4;
   const BG_LIMIT_HIGH = 15;
   const STARTED_AT = Date.now();
@@ -26,7 +27,7 @@ window.addEventListener('load', () => {
     .then(audio => (audioBuffer = audio));
 
   refreshData(true);
-  setInterval(refreshData, 1000 * 60 * 5);
+  setInterval(refreshData, 1000 * DATA_REFRESH_INTERVAL);
   setInterval(refreshUi, 1000 * AUDIO_LENGTH);
 
   function playSound() {
