@@ -1,0 +1,50 @@
+/* Page setup */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: black;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  color: rgb(200,200,200);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* UI styles */
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body > div {
+  display: flex;
+  flex-direction: row;
+}
+
+body > div > div {
+  flex: 1;
+  padding: 5px;
+}
+
+body > div > div:first-child {
+  text-align: right;
+}
+
+body > div > div:last-child {
+  text-align: left;
+}
+
+#latest-bg {
+  font-size: 64px;
+  text-align: center;
+  display: block;
+  padding: 20px;
+}
