@@ -30,7 +30,7 @@ resource "aws_cloudfront_distribution" "this" {
 
     # TODO: https://github.com/terraform-providers/terraform-provider-aws/issues/1994
     min_ttl     = 0
-    default_ttl = 3600
+    default_ttl = 0
     max_ttl     = 86400
 
     forwarded_values {
