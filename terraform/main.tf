@@ -9,7 +9,7 @@ provider "aws" {
 # "To use an ACM Certificate with CloudFront, you must request or import the certificate in the US East (N. Virginia) region."
 # https://www.terraform.io/docs/configuration/providers.html#multiple-provider-instances
 provider "aws" {
-  alias      = "acm_provider"
+  alias      = "us_east_1"
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
   region     = "us-east-1"
@@ -78,4 +78,9 @@ module "hosting_prod" {
   db_domain_name    = "db-prod.nightbear.fi"
   db_domain_zone    = "${aws_route53_zone.main.zone_id}"
   db_admin_password = "${var.db_admin_password}"
+}
+
+module "siren_ui" {
+  source            = "./siren-ui"
+  siren_ui_password = "${var.siren_ui_password}"
 }
