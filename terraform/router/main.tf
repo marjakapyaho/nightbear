@@ -5,7 +5,7 @@ module "router" {
 
   api_domain             = "router.nightbear.fi"
   function_zipfile       = "${path.module}/lambda-multicast-proxy-v1.2.1.zip" # https://github.com/jareware/lambda-multicast-proxy
-  lambda_logging_enabled = true
+  lambda_logging_enabled = true                                               # note that this only includes messages from the runtime (e.g. start & stop); the JS code logs directly to Papertrail
   https_only             = false                                              # the router receives data from IoT devices incapable of HTTPS
 
   function_env_vars = {
