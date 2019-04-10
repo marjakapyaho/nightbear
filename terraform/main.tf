@@ -2,10 +2,13 @@ resource "aws_route53_zone" "main" {
   name = "nightbear.fi"
 }
 
-module "email" {
-  source            = "./email"
-  email_domain_name = "nightbear.fi"
-  email_domain_zone = "${aws_route53_zone.main.zone_id}"
+module "mailgun_domain" {
+  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_mailgun_domain#inputs
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_mailgun_domain?ref=v9.4"
+
+  mail_domain   = "nightbear.fi"
+  smtp_password = "${var.mailgun_smtp_password}"
 }
 
 module "metrics" {
