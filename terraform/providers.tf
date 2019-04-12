@@ -28,3 +28,11 @@ provider "mailgun" {
 provider "null" {
   version = "~> 2.1"
 }
+
+provider "archive" {
+  version = "~> 1.2"
+}
+
+provider "template" {
+  version = "~> 2.1"
+}
