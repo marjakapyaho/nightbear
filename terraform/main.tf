@@ -19,6 +19,32 @@ module "router" {
   source = "./router"
 }
 
+module "ui_stage" {
+  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_static_site#inputs
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_static_site?ref=v9.4"
+
+  site_domain = "stage.nightbear.fi"
+
+  tags = {
+    Nightbear_Component   = "ui"
+    Nightbear_Environment = "stage"
+  }
+}
+
+module "ui_prod" {
+  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_static_site#inputs
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_static_site?ref=v9.4"
+
+  site_domain = "nightbear.fi"
+
+  tags = {
+    Nightbear_Component   = "ui"
+    Nightbear_Environment = "prod"
+  }
+}
+
 module "hosting_stage" {
   source = "./hosting"
 
@@ -36,13 +62,6 @@ module "hosting_stage" {
   db_domain_name    = "db-stage.nightbear.fi"
   db_domain_zone    = "${aws_route53_zone.main.zone_id}"
   db_admin_password = "${var.db_admin_password}"
-}
-
-module "web_stage" {
-  source                             = "./utils/cloudfront_static_site"
-  cloudfront_static_site_domain_name = "stage.nightbear.fi"
-  cloudfront_static_site_domain_zone = "${aws_route53_zone.main.zone_id}"
-  cloudfront_static_site_cache_ttl   = 10
 }
 
 module "hosting_prod" {
