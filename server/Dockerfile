@@ -7,6 +7,7 @@ WORKDIR /app
 
 # Install npm deps (takes long)
 COPY package.json /app/
+COPY npm-shrinkwrap.json /app/
 RUN npm install
 
 # Install our own sources (doesn't take long)
