@@ -35,3 +35,9 @@ variable "aws_ami" {
 variable "mailgun_api_key" {}
 
 variable "mailgun_smtp_password" {}
+
+variable "pushover_user" {}
+
+variable "pushover_token" {}
+
+variable "papertrail_host_legacy" {}

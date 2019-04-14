@@ -87,3 +87,11 @@ module "siren_ui" {
   source            = "./siren-ui"
   siren_ui_password = "${var.siren_ui_password}"
 }
+
+module "hosting" {
+  source                 = "./shared-hosting"
+  couchdb_admin_password = "${var.db_admin_password}"
+  pushover_user          = "${var.pushover_user}"
+  pushover_token         = "${var.pushover_token}"
+  papertrail_host_legacy = "${var.papertrail_host_legacy}"
+}
