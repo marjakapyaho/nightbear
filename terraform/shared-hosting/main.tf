@@ -19,4 +19,5 @@ module "hosting_blue" {
   pushover_user          = "${var.pushover_user}"
   pushover_token         = "${var.pushover_token}"
   papertrail_host_legacy = "${var.papertrail_host_legacy}"
+  backup_config          = "${local.backup_config}"
 }

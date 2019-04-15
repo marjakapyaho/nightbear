@@ -121,6 +121,22 @@ services:
       - PUSHOVER_LEVEL_1=marjan_iphone
       - PUSHOVER_LEVEL_2=jrwNexus5
       - PUSHOVER_LEVEL_3=bear-phone
+
+  backup:
+    image: futurice/docker-volume-backup:2.0.1
+    restart: always
+    hostname: ${module.docker_host.hostname}
+    environment:
+      BACKUP_SOURCES: /data
+      BACKUP_CRON_EXPRESSION: "00 00,06,12,18 * * *" # at 00:00, 06:00, 12:00 & 18:00
+      BACKUP_FILENAME: latest.tar.gz # because the bucket is versioned, we can always use the same file name
+      AWS_S3_BUCKET_NAME: ${var.backup_config["AWS_S3_BUCKET_NAME"]}
+      AWS_ACCESS_KEY_ID: ${var.backup_config["AWS_ACCESS_KEY_ID"]}
+      AWS_SECRET_ACCESS_KEY: ${var.backup_config["AWS_SECRET_ACCESS_KEY"]}
+      AWS_DEFAULT_REGION: ${var.backup_config["AWS_DEFAULT_REGION"]}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # allow Docker commands from within the container
+      - /data:/data:ro # expose the data volume, which we want to back up
 EOF
 }
 
