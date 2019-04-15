@@ -121,7 +121,6 @@ services:
       - PUSHOVER_LEVEL_1=marjan_iphone
       - PUSHOVER_LEVEL_2=jrwNexus5
       - PUSHOVER_LEVEL_3=bear-phone
-      - QUERY_THROTTLE_MS=1000
 EOF
 }
 
