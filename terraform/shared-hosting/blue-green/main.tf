@@ -112,7 +112,7 @@ services:
       - "${var.port_map["legacy"]}:3001"
     environment:
       - NODE_ENV=production
-      - DB_URL=https://admin:${var.couchdb_admin_password}@db-prod.nightbear.fi/legacy
+      - DB_URL=https://admin:${var.couchdb_admin_password}@db-prod-blue.nightbear.fi/legacy
       - PAPERTRAIL_URL=${var.papertrail_host_legacy}
       - PAPERTRAIL_LEVEL=info
       - PUSHOVER_USER=${var.pushover_user}
