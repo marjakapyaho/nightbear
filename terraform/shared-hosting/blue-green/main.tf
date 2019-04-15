@@ -26,6 +26,40 @@ module "docker_host" {
   }
 }
 
+locals {
+  unattended_upgrades_enabled = true
+  unattended_upgrades_file    = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
+}
+
+resource "null_resource" "unattended_upgrades" {
+  depends_on = ["module.docker_host"]                         # wait until other provisioners within the module have finished
+  count      = "${local.unattended_upgrades_enabled ? 1 : 0}" # somewhat unintuitively, "destroy" time provisioners only run on "count = 0", not when this resource is destroyed
+
+  connection {
+    host        = "${module.docker_host.public_ip}"
+    user        = "${module.docker_host.ssh_username}"
+    private_key = "${module.docker_host.ssh_private_key}"
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [<<EOF
+echo '
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "13:00";
+' | sudo tee ${local.unattended_upgrades_file}
+EOF
+    ]
+  }
+
+  provisioner "remote-exec" {
+    when   = "destroy"
+    inline = ["sudo rm -fv ${local.unattended_upgrades_file}"]
+  }
+}
+
 resource "aws_security_group_rule" "this" {
   security_group_id = "${module.docker_host.security_group_id}"
   type              = "ingress"
