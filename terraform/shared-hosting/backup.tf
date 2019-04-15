@@ -26,6 +26,11 @@ resource "aws_s3_bucket" "backup" {
       days = 365
     }
   }
+
+  tags = {
+    Nightbear_Component   = "hosting"
+    Nightbear_Environment = "mixed"
+  }
 }
 
 resource "aws_iam_user" "backup" {
