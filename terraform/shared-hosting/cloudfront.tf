@@ -39,7 +39,10 @@ module "hosting_legacy" {
   site_domain        = "legacy.nightbear.fi"
   origin_url         = "http://${aws_route53_record.this.name}/"
   origin_custom_port = "${local.port_map["legacy"]}"
-  viewer_https_only  = false                                     # for legacy integrations
+
+  viewer_https_only    = false # for legacy integrations that won't/can't do HTTPS
+  cache_ttl_override   = 0     # our old server may sometimes omit sensible cache-control headers
+  add_response_headers = {}    # skip adding HSTS by default
 
   tags = {
     Nightbear_Component   = "legacy"
