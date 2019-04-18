@@ -70,3 +70,23 @@ locals {
     AWS_DEFAULT_REGION    = "${data.aws_region.backup.name}"
   }
 }
+
+resource "aws_s3_bucket" "backup_manual" {
+  bucket = "nightbear-fi---manual-backup"
+  acl    = "private"
+
+  lifecycle_rule {
+    enabled = true
+
+    # When the backup is older than a day, move it to Glacier
+    noncurrent_version_transition {
+      days          = 1
+      storage_class = "GLACIER"
+    }
+  }
+
+  tags = {
+    Nightbear_Component   = "hosting"
+    Nightbear_Environment = "mixed"
+  }
+}
