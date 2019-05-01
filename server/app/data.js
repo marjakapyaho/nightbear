@@ -194,13 +194,14 @@ export default app => {
     }
 
     function getActiveAlarms(includeInvalids = false) {
+        const range = 3 * 24 * helpers.HOUR_IN_MS; // by default, consider only alarms from the past 3 days; technically we should consider all alarms since the beginning of time, but in practice this doesn't matter, and improves performance significantly
         return app.pouchDB.allDocs({
                 include_docs: true,
-                startkey: 'alarms/',
+                startkey: 'alarms/' + helpers.isoTimestamp(app.currentTime() - range),
                 endkey: 'alarms/' + END
             })
             .then(res => res.rows.map(row => row.doc))
-            .then(docs => docs.filter(doc => ( // TODO: Move this filtering into a db.find(), this is wildly inefficient on larger datasets!
+            .then(docs => docs.filter(doc => (
                 doc.status === 'active'
                 &&
                 (includeInvalids || !includeInvalids && app.currentTime() >= doc.validAfter)
