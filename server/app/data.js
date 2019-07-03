@@ -96,7 +96,7 @@ export default app => {
                         function() {
                             log(`Received entry from parakeet: (${convertedData.sensorEntriesRaw.nb_glucose_value})`);
                             log(`Received device status from parakeet with battery (${convertedData.deviceStatusParakeet.parakeetBattery})`);
-                            return "!ACK  2!"; // status to awake parakeet from deep sleep "!ACK  2!"
+                            return "!ACK  0!"; // status to awake parakeet from deep sleep "!ACK  2!"
                         },
                         function(err) {
                             log.error('Failed to save parakeet data entry', err);
