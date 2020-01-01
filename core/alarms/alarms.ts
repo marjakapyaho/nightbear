@@ -45,13 +45,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   const modelsToSave: Alarm[] = [];
 
   alarms.forEach(alarm => {
-    const alarmWithNewState = alarmWithUpdatedState(alarm, {
-      alarmLevel: getAlarmState(alarm).alarmLevel,
-      validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
-      ackedBy: null,
-      pushoverReceipts: [],
-    });
-    const changedAlarm = { ...alarmWithNewState, isActive: false, deactivationTimestamp: context.timestamp() };
+    const changedAlarm = { ...alarm, isActive: false, deactivationTimestamp: context.timestamp() };
     modelsToSave.push(changedAlarm);
 
     // We're not waiting for the results of pushover acks

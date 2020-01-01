@@ -24,13 +24,18 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
   ];
 }
 
-export function getMockAlarm(currentTimestamp: number, situation: Situation, isActive: boolean = true): Alarm {
+export function getMockAlarm(
+  currentTimestamp: number,
+  situation: Situation,
+  isActive: boolean = true,
+  deactivationTimestamp: number | null = null,
+): Alarm {
   return {
     modelType: 'Alarm',
     timestamp: currentTimestamp,
     situationType: situation,
     isActive,
-    deactivationTimestamp: null,
+    deactivationTimestamp,
     alarmStates: [
       {
         alarmLevel: 1,
