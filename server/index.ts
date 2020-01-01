@@ -1,5 +1,5 @@
 import { createNodeContext } from 'core/models/api';
-import { ackLatestAlarm } from 'server/api/ackLatestAlarm/ackLatestAlarm';
+import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
 import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
 import { getEntries } from 'server/api/getEntries/getEntries';
 import { getHba1cHistory } from 'server/api/getHba1cHistory/getHba1cHistory';
@@ -14,7 +14,7 @@ const context = createNodeContext();
 
 startExpressServer(
   context,
-  ['post', '/ack-latest-alarm', ackLatestAlarm],
+  ['post', '/ack-latest-alarm', ackActiveAlarms],
   ['get', '/calculate-hba1c', calculateHba1cForDate],
   ['get', '/get-entries', getEntries],
   ['get', '/get-hba1c-history', getHba1cHistory],

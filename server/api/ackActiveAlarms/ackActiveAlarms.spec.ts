@@ -1,8 +1,8 @@
 import 'mocha';
 
-describe('api/ackLatestAlarm', () => {
+describe('api/ackActiveAlarms', () => {
   // Assertations
-  it('ack latest alarm', () => {
+  it('ack active alarms', () => {
     console.log('TODO: test acking alarms'); // tslint:disable-line:no-console
   });
 });
