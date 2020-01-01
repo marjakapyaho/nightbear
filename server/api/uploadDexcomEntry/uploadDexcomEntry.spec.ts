@@ -127,7 +127,7 @@ describe('api/uploadDexcomEntry', () => {
     geolocation: null,
   };
 
-  // Assertations
+  // Assertions
   withStorage(createTestStorage => {
     it('uploads Dexcom sensor entry with correct response', () => {
       const context = createTestContext(createTestStorage());

@@ -79,7 +79,7 @@ describe('utils/analyser-utils', () => {
     },
   ];
 
-  // Assertations
+  // Assertions
   it('parses correct slopes for analyser entries', () => {
     assert.deepEqual(parseAnalyserEntries(entriesBefore), entriesAfter);
   });

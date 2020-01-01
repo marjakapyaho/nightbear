@@ -15,6 +15,7 @@ Create a local dev DB:
 1. Run `npm test` to see that everything works
 
 ## Starting docker process if it has stopped
+
 `docker start nightbear-dev-couchdb`
 
 ## Backups
