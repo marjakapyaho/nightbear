@@ -1,4 +1,6 @@
+import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
+import { TIMELINE_MODEL_TYPES } from 'web/app/ui/utils/ModelTypeSelector';
 
 export type UiNavigationState = Readonly<
   | {
@@ -19,5 +21,11 @@ export type UiNavigationState = Readonly<
 >;
 
 export const uiNavigationInitState: UiNavigationState = {
-  selectedScreen: 'BgGraphScreen',
+  selectedScreen: 'TimelineDebugScreen',
+  selectedModelTypes: TIMELINE_MODEL_TYPES,
+  loadedModels: { status: 'FETCHING' },
+  timelineRange: 4 * HOUR_IN_MS,
+  timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
+  modelBeingEdited: null,
+  timelineCursorAt: null,
 };

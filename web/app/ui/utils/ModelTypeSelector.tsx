@@ -2,7 +2,7 @@ import { TimelineModelType } from 'core/models/model';
 import { isNotNull } from 'server/utils/types';
 import { renderFromProps } from 'web/app/utils/react';
 
-const options: TimelineModelType[] = [
+export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
   'Sensor',
   'DexcomSensorEntry',
   'DexcomRawSensorEntry',
@@ -40,7 +40,7 @@ export default renderFromProps<{
         }
       }}
     >
-      {options.map(value => (
+      {TIMELINE_MODEL_TYPES.map(value => (
         <option key={value} value={value}>
           {value}
         </option>
