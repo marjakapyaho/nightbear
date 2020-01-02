@@ -4,7 +4,7 @@ import { createChangeObserver, ReduxMiddleware } from 'web/app/utils/redux';
 const CONFIG_DB_URL = 'nightbear:configVars:dbUrl';
 
 export const configVarsMiddleware: ReduxMiddleware = store => {
-  setTimeout(read, 0);
+  setTimeout(read, 0); // it's not safe to dispatch during middleware setup -> defer it to next tick
 
   return next => {
     const observer = createChangeObserver(store, next);
