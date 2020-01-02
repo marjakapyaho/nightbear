@@ -13,7 +13,8 @@ export const configVarsMiddleware: ReduxMiddleware = store => {
   };
 
   function read() {
-    store.dispatch(actions.DB_URL_SET(localStorage.getItem(CONFIG_DB_URL) || ''));
+    const url = localStorage.getItem(CONFIG_DB_URL) || prompt('Enter DB URL:') || '';
+    store.dispatch(actions.DB_URL_SET(url));
   }
 
   function write(newDbUrl: string) {
