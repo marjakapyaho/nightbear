@@ -232,6 +232,7 @@ function getOptions(
   return {
     title: { text: null },
     chart: {
+      height: 500,
       animation: false,
       zoomType: 'x',
       events: {
