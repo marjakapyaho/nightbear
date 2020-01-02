@@ -24,3 +24,9 @@ Useful utils for backing up/moving the DB's around:
 
 1. https://www.npmjs.com/package/@cloudant/couchbackup
 1. https://www.npmjs.com/package/couchreplicate
+
+## Removing old logs
+
+...from an Ubuntu Docker host:
+
+`sudo journalctl --vacuum-size=50M` (leave only the last 50 MB's worth of logs)
