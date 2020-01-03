@@ -25,7 +25,7 @@ import { inspect } from 'util';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
 const BATCH_RETRY_WAIT_SEC = 10;
-const INCREMENTAL = true;
+const INCREMENTAL = !!process.env.NIGHTBEAR_MIGRATE_INCREMENTAL_MODE;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
