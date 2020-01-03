@@ -27,7 +27,7 @@
     "==================== WEB ====================": "",
     "web-start": "webpack-dev-server --config web/webpack.config.js --mode development --hot --progress --color --port 3000",
     "web-build": "webpack --config web/webpack.config.js -p --progress --colors",
-    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive web/dist s3://stage-nightbear-fi/"
+    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive web/dist s3://aws-static-site---stage-nightbear-fi/"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [
