@@ -29,4 +29,8 @@
   &-profileActivation {
     cursor: pointer;
   }
+
+  > .nb-TimeRangeSelector {
+    display: inline-block;
+  }
 }
