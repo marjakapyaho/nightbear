@@ -20,6 +20,7 @@ export default renderFromProps<{ models: TimelineModel[] }>(__filename, (React, 
             ))}
           </tbody>
         </table>
+        <p>{props.models.length} models shown</p>
       </div>
     );
   }
