@@ -11,6 +11,7 @@ import * as ReactModal from 'react-modal';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import ModelTypeSelector from 'web/app/ui/utils/ModelTypeSelector';
+import TimelineModelTable from 'web/app/ui/utils/TimelineModelTable';
 import TimeRangeSelector from 'web/app/ui/utils/TimeRangeSelector';
 import Timestamp, { getFormattedTimestamp } from 'web/app/ui/utils/Timestamp';
 import { renderFromStore } from 'web/app/utils/react';
@@ -165,6 +166,9 @@ export default renderFromStore(
               cssNs,
             )}
           />
+        )}
+        {state.loadedModels.status === 'READY' && (
+          <TimelineModelTable models={state.loadedModels.timelineModels} />
         )}
         {state.timelineCursorAt && state.loadedModels.status === 'READY' && (
           <div>
