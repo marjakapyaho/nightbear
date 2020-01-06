@@ -31,7 +31,7 @@ export type UiNavigationState = Readonly<
 >;
 
 export const uiNavigationInitState: UiNavigationState = {
-  selectedScreen: 'TimelineDebugScreen',
+  selectedScreen: 'BgGraphScreen',
   selectedModelTypes: TIMELINE_MODEL_TYPES,
   loadedModels: { status: 'FETCHING' },
   timelineRange: 4 * HOUR_IN_MS,
