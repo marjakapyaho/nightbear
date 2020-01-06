@@ -1,5 +1,6 @@
 import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { mergeEntriesFeed } from 'core/entries/entries';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
@@ -264,6 +265,18 @@ function getOptions(
         'MeterEntry',
         model => model.modelType === 'MeterEntry' && model.bloodGlucose, // <- plotted value
         { color: '#5bc0de' },
+      ),
+      getSeries(
+        mergeEntriesFeed([
+          models.filter(is('DexcomSensorEntry')),
+          models.filter(is('DexcomRawSensorEntry')),
+          models.filter(is('ParakeetSensorEntry')),
+          models.filter(is('MeterEntry')),
+        ]),
+        Y_BG,
+        'Merged',
+        model => 'bloodGlucose' in model && model.bloodGlucose, // <- plotted value
+        { color: '#0025ff' },
       ),
 
       // Battery:
