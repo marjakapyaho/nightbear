@@ -5,6 +5,16 @@ import { TIMELINE_MODEL_TYPES } from 'web/app/ui/utils/ModelTypeSelector';
 export type UiNavigationState = Readonly<
   | {
       selectedScreen: 'BgGraphScreen';
+      // TODO: TEMP
+      timelineRange: number;
+      timelineRangeEnd: number;
+      selectedModelTypes: TimelineModelType[];
+      loadedModels:
+        | { status: 'FETCHING' }
+        | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
+        | { status: 'ERROR'; errorMessage: string };
+      modelBeingEdited: TimelineModel | null;
+      timelineCursorAt: number | null;
     }
   | {
       selectedScreen: 'TimelineDebugScreen';

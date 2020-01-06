@@ -31,7 +31,6 @@ export function uiNavigationReducer(
           return assertExhausted(action.newScreen);
       }
     case 'TIMELINE_FILTERS_CHANGED':
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       const { range, rangeEnd, modelTypes } = action;
       return {
         ...state,
@@ -42,25 +41,20 @@ export function uiNavigationReducer(
       };
     case 'TIMELINE_DATA_RECEIVED':
       const { timelineModels, globalModels } = action;
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return {
         ...state,
         loadedModels: { status: 'READY', timelineModels, globalModels },
       };
     case 'TIMELINE_DATA_FAILED':
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return {
         ...state,
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
     case 'MODEL_SELECTED_FOR_EDITING':
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return { ...state, modelBeingEdited: action.model };
     case 'TIMELINE_CURSOR_UPDATED':
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       return { ...state, timelineCursorAt: action.timestamp };
     case 'DB_EMITTED_CHANGES':
-      if (state.selectedScreen !== 'TimelineDebugScreen') return state;
       if (state.loadedModels.status !== 'READY') return state;
       try {
         const newModels = action.changes.map(change => reviveCouchDbRowIntoModel(change.doc));
