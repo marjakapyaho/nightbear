@@ -1,3 +1,6 @@
+import { mergeEntriesFeed } from 'core/entries/entries';
+import { TimelineModel } from 'core/models/model';
+import { is } from 'core/models/utils';
 import BgGraph from 'web/app/ui/utils/BgGraph';
 import { renderFromStore } from 'web/app/utils/react';
 
@@ -14,7 +17,7 @@ export default renderFromStore(
         )}
         {state.loadedModels.status === 'READY' && (
           <BgGraph
-            timelineModels={state.loadedModels.timelineModels}
+            timelineModels={merge(state.loadedModels.timelineModels)}
             selectedModelTypes={state.selectedModelTypes}
             timelineRange={state.timelineRange}
             timelineRangeEnd={state.timelineRangeEnd}
@@ -26,3 +29,12 @@ export default renderFromStore(
     );
   },
 );
+
+function merge(timelineModels: TimelineModel[]) {
+  return mergeEntriesFeed([
+    timelineModels.filter(is('DexcomSensorEntry')),
+    timelineModels.filter(is('DexcomRawSensorEntry')),
+    timelineModels.filter(is('ParakeetSensorEntry')),
+    timelineModels.filter(is('MeterEntry')),
+  ]);
+}
