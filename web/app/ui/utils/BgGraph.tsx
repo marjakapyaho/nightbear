@@ -5,7 +5,6 @@ import { NsFunction } from 'css-ns';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
 import { findIndex, first } from 'lodash';
-import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import { getFormattedTimestamp } from 'web/app/ui/utils/Timestamp';
@@ -40,10 +39,6 @@ export default renderFromProps<Props>(__filename, (React, props, cssNs) => {
   );
 });
 
-const Y_STATIC: Highcharts.AxisOptions = {
-  visible: false,
-};
-
 const Y_INSULIN: Highcharts.AxisOptions = {
   visible: false,
   min: 0,
@@ -61,23 +56,10 @@ const Y_BG: Highcharts.AxisOptions = {
   opposite: true,
   min: 2,
   max: 18,
+  title: null,
 };
 
-const Y_HBA1C: Highcharts.AxisOptions = {
-  visible: false,
-};
-
-const Y_BATTERY: Highcharts.AxisOptions = {
-  visible: false,
-  min: 0,
-  max: 100,
-};
-
-const Y_BATTERY_DEX: Highcharts.AxisOptions = {
-  visible: false,
-};
-
-const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_BATTERY_DEX, Y_HBA1C];
+const Y_AXIS_OPTIONS = [Y_INSULIN, Y_CARBS, Y_BG];
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
@@ -224,40 +206,6 @@ function getOptions(
         model => model.modelType === 'MeterEntry' && model.bloodGlucose, // <- plotted value
         { color: '#5bc0de' },
       ),
-
-      // Battery:
-      getSeries(
-        models,
-        Y_BATTERY_DEX,
-        'DeviceStatus (Dexcom transmitter battery)',
-        model =>
-          model.modelType === 'DeviceStatus' &&
-          model.deviceName === 'dexcom-transmitter' &&
-          model.batteryLevel, // <- plotted value
-        { color: '#63767c' },
-      ),
-      getSeries(
-        models,
-        Y_BATTERY,
-        'DeviceStatus (Dexcom uploader battery)',
-        model =>
-          model.modelType === 'DeviceStatus' &&
-          model.deviceName === 'dexcom-uploader' &&
-          model.batteryLevel, // <- plotted value
-        { color: '#63767c' },
-      ),
-      getSeries(
-        models,
-        Y_BATTERY,
-        'DeviceStatus (Parakeet battery)',
-        model =>
-          model.modelType === 'DeviceStatus' &&
-          model.deviceName === 'parakeet' &&
-          model.batteryLevel, // <- plotted value
-        { color: '#63767c' },
-      ),
-
-      // Miscellaneous:
       getSeries(
         models,
         Y_INSULIN,
@@ -275,52 +223,6 @@ function getOptions(
           color: '#59df59',
         },
       ),
-      getSeries(
-        models,
-        Y_HBA1C,
-        'HbA1c',
-        model => model.modelType === 'Hba1c' && model.hba1cValue, // <- plotted value
-        { color: '#00607c' },
-      ),
-
-      // Static:
-      getSeries(
-        models,
-        Y_STATIC,
-        'Sensor',
-        model => model.modelType === 'Sensor' && 1, // <- plotted value
-        {
-          color: '#7c005d',
-        },
-      ),
-      getSeries(
-        models,
-        Y_STATIC,
-        'DexcomCalibration',
-        model => model.modelType === 'DexcomCalibration' && 2, // <- plotted value
-        {
-          color: '#7c005d',
-        },
-      ),
-      getSeries(
-        models,
-        Y_STATIC,
-        'NightbearCalibration',
-        model => model.modelType === 'NightbearCalibration' && 3, // <- plotted value
-        {
-          color: '#7c005d',
-        },
-      ),
-      getSeries(
-        models,
-        Y_STATIC,
-        'Alarm',
-        model => model.modelType === 'Alarm' && 4, // <- plotted value
-        {
-          type: 'scatter',
-          color: '#ffa600',
-        },
-      ),
     ],
     time: {
       useUTC: false, // somewhat unintuitively, this needs to be false when model.timestamp is milliseconds since epoch in UTC :shrug:
@@ -329,17 +231,10 @@ function getOptions(
       enabled: false,
     },
     tooltip: {
-      useHTML: true,
-      formatter() {
-        const that: any = this; // this doesn't seem to be typed in @types/highcharts
-        const ts = DateTime.fromMillis(that.x).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
-        if (that.point.model) {
-          const json = JSON.stringify(that.point.model, null, 2);
-          return `<strong>${ts}</strong><br /><pre>${json}</pre>`;
-        } else {
-          return `<strong>${ts}</strong><br /><pre>(no model)</pre>`;
-        }
-      },
+      enabled: false,
+    },
+    legend: {
+      enabled: false,
     },
   };
 }
