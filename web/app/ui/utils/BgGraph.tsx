@@ -103,7 +103,7 @@ function getOptions(
         },
       },
       scrollablePlotArea: {
-        minWidth: 800,
+        minWidth: 2500,
         scrollPositionX: 1, // i.e. start at the rightmost-edge
       },
     },
