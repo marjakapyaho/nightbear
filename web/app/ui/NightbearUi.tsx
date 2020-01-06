@@ -1,4 +1,5 @@
 import { assertExhausted } from 'server/utils/types';
+import BgGraphScreen from 'web/app/ui/screens/BgGraphScreen';
 import TimelineDebugScreen from 'web/app/ui/screens/TimelineDebugScreen';
 import MainNavBar from 'web/app/ui/utils/MainNavBar';
 import { renderFromStore } from 'web/app/utils/react';
@@ -19,7 +20,7 @@ export default renderFromStore(
         case 'TimelineDebugScreen':
           return <TimelineDebugScreen />;
         case 'BgGraphScreen':
-          return 'TODO';
+          return <BgGraphScreen />;
         default:
           return assertExhausted(selectedScreen);
       }
