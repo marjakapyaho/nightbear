@@ -57,7 +57,8 @@ const Y_CARBS: Highcharts.AxisOptions = {
 };
 
 const Y_BG: Highcharts.AxisOptions = {
-  visible: false,
+  visible: true,
+  opposite: true,
   min: 2,
   max: 18,
 };
@@ -118,6 +119,10 @@ function getOptions(
           event.stopPropagation(); // we don't want this to ALSO count as an outside-click
           dispatch(actions.TIMELINE_CURSOR_UPDATED(Math.round(value)));
         },
+      },
+      scrollablePlotArea: {
+        minWidth: 800,
+        scrollPositionX: 1, // i.e. start at the rightmost-edge
       },
     },
     xAxis: {
