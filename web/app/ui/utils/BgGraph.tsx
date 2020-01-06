@@ -1,18 +1,16 @@
-import { runAnalysis } from 'core/analyser/analyser';
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { findIndex, first, last, range } from 'lodash';
+import { findIndex, first } from 'lodash';
 import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
 import { actions } from 'web/app/modules/actions';
 import { getFormattedTimestamp } from 'web/app/ui/utils/Timestamp';
 import { renderFromProps } from 'web/app/utils/react';
 import { ReduxDispatch } from 'web/app/utils/redux';
-import { objectKeys } from 'web/app/utils/types';
 
 type Props = {
   timelineRange: number;
@@ -91,14 +89,6 @@ function getOptions(
   dispatch: ReduxDispatch,
   cssNs: NsFunction<any>,
 ): Highcharts.Options {
-  const activeProfile = last(models.filter(is('ActiveProfile')));
-  let analysisRanges: Array<[number, number, number]> = [];
-  if (activeProfile) {
-    const bucket = 5 * MIN_IN_MS;
-    analysisRanges = range(timelineRangeEnd - timelineRange + bucket, timelineRangeEnd, bucket).map(
-      start => [start - 3 * HOUR_IN_MS, start - bucket, start] as [number, number, number],
-    );
-  }
   return {
     title: { text: null },
     chart: {
@@ -175,42 +165,6 @@ function getOptions(
               ]
             : [],
         ),
-      plotBands: analysisRanges
-        .map(
-          ([base, from, to]): Highcharts.PlotBands | null => {
-            if (!activeProfile) return null;
-            const sensorEntries = models
-              .filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'))
-              .filter(m => m.timestamp > base && m.timestamp < to);
-            const state = runAnalysis(
-              to,
-              activeProfile,
-              sensorEntries,
-              models.filter(is('Insulin')).filter(m => m.timestamp > base && m.timestamp < to),
-              undefined, // TODO: Which DeviceStatus should go here..?
-              models
-                .filter(is('Alarm'))
-                .filter(m => m.timestamp > base && m.timestamp < to)
-                .filter(a => a.isActive),
-            );
-            const stateOn = objectKeys(state)
-              .map(key => (state[key] ? key : null))
-              .filter(isNotNull);
-            console.log(
-              `Analysis at ${new Date(to).toISOString()} with ${sensorEntries.length} entries:`,
-              stateOn.length ? stateOn : 'n/a',
-            );
-            if (!stateOn.length) return null;
-            return {
-              from,
-              to,
-              color: 'yellow',
-              label: { text: stateOn.join('+'), rotation: 90, style: { color: 'orange' } },
-              zIndex: 1,
-            };
-          },
-        )
-        .filter(isNotNull),
     },
     yAxis: Y_AXIS_OPTIONS,
     plotOptions: {
