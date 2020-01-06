@@ -116,6 +116,18 @@ export default renderFromStore(
         >
           Now
         </button>
+        {state.timelineCursorAt &&
+          state.loadedModels.status === 'READY' &&
+          state.loadedModels.globalModels.map(model => (
+            <button
+              key={model.profileName}
+              onClick={() =>
+                dispatch(actions.PROFILE_ACTIVATED(model, state.timelineCursorAt || 0))
+              }
+            >
+              Activate profile: <strong>{model.profileName}</strong>
+            </button>
+          ))}
         <p>
           Showing from
           <strong>
@@ -155,20 +167,6 @@ export default renderFromStore(
         )}
         {state.loadedModels.status === 'READY' && (
           <TimelineModelTable models={state.loadedModels.timelineModels} />
-        )}
-        {state.timelineCursorAt && state.loadedModels.status === 'READY' && (
-          <div>
-            {state.loadedModels.globalModels.map(model => (
-              <button
-                key={model.profileName}
-                onClick={() =>
-                  dispatch(actions.PROFILE_ACTIVATED(model, state.timelineCursorAt || 0))
-                }
-              >
-                Activate profile: <strong>{model.profileName}</strong>
-              </button>
-            ))}
-          </div>
         )}
       </div>
     );
