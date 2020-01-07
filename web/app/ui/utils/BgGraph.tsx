@@ -56,8 +56,12 @@ const Y_BG: Highcharts.AxisOptions = {
   visible: true,
   opposite: true,
   min: 2,
-  max: 18,
-  title: null,
+  max: 20,
+  allowDecimals: false,
+  tickInterval: 1,
+  endOnTick: false,
+  startOnTick: false,
+  title: { text: null },
 };
 
 const Y_AXIS_OPTIONS = [Y_INSULIN, Y_CARBS, Y_BG];
