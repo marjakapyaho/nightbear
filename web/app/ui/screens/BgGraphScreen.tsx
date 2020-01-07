@@ -17,7 +17,7 @@ export default renderFromStore(
         )}
         {state.loadedModels.status === 'READY' && (
           <BgGraph
-            timelineModels={merge(state.loadedModels.timelineModels)}
+            timelineModels={getTimelineModels(state.loadedModels.timelineModels)}
             timelineRange={state.timelineRange}
             timelineRangeEnd={state.timelineRangeEnd}
           />
@@ -27,11 +27,13 @@ export default renderFromStore(
   },
 );
 
-function merge(timelineModels: TimelineModel[]) {
-  return mergeEntriesFeed([
+function getTimelineModels(timelineModels: TimelineModel[]): TimelineModel[] {
+  const bgEntries: TimelineModel[] = mergeEntriesFeed([
     timelineModels.filter(is('DexcomSensorEntry')),
     timelineModels.filter(is('DexcomRawSensorEntry')),
     timelineModels.filter(is('ParakeetSensorEntry')),
     timelineModels.filter(is('MeterEntry')),
   ]);
+  const insulinEntries: TimelineModel[] = timelineModels.filter(is('Insulin'));
+  return bgEntries.concat(insulinEntries);
 }
