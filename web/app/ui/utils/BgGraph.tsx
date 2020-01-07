@@ -1,40 +1,25 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { mergeEntriesFeed } from 'core/entries/entries';
-import { TimelineModel, TimelineModelType } from 'core/models/model';
+import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { NsFunction } from 'css-ns';
 import * as Highcharts from 'highcharts';
 import * as HighchartsReact from 'highcharts-react-official';
-import { findIndex, first } from 'lodash';
+import { findIndex } from 'lodash';
 import { isNotNull } from 'server/utils/types';
-import { actions } from 'web/app/modules/actions';
-import { getFormattedTimestamp } from 'web/app/ui/utils/Timestamp';
 import { renderFromProps } from 'web/app/utils/react';
-import { ReduxDispatch } from 'web/app/utils/redux';
 
 type Props = {
   timelineRange: number;
   timelineRangeEnd: number;
-  selectedModelTypes: TimelineModelType[];
   timelineModels: TimelineModel[];
-  timelineCursorAt: number | null;
-  dispatch: ReduxDispatch;
 };
 
-export default renderFromProps<Props>(__filename, (React, props, cssNs) => {
+export default renderFromProps<Props>(__filename, (React, props) => {
   return (
     <div className="this">
       <HighchartsReact
         highcharts={Highcharts}
-        options={getOptions(
-          props.timelineModels,
-          props.selectedModelTypes,
-          props.timelineRange,
-          props.timelineRangeEnd,
-          props.timelineCursorAt,
-          props.dispatch,
-          cssNs,
-        )}
+        options={getOptions(props.timelineModels, props.timelineRange, props.timelineRangeEnd)}
       />
     </div>
   );
@@ -70,43 +55,14 @@ const Y_AXIS_OPTIONS = [Y_INSULIN, Y_CARBS, Y_BG];
 // https://api.highcharts.com/highcharts/
 function getOptions(
   models: TimelineModel[],
-  selectedModelTypes: TimelineModelType[],
   timelineRange: number,
   timelineRangeEnd: number,
-  timelineCursorAt: number | null,
-  dispatch: ReduxDispatch,
-  cssNs: NsFunction<any>,
 ): Highcharts.Options {
   return {
     title: { text: null },
     chart: {
       height: 500,
       animation: false,
-      zoomType: 'x',
-      events: {
-        selection(event) {
-          event.preventDefault(); // we handle the zoom ourselves; no need for the default Highcharts one
-          const axis = first(event.xAxis);
-          if (!axis) return;
-          const { min, max } = axis;
-          if (!min || !max) return;
-          dispatch(
-            actions.TIMELINE_FILTERS_CHANGED(
-              Math.round(max - min),
-              Math.round(max),
-              selectedModelTypes,
-            ),
-          );
-        },
-        click(event) {
-          const axis = first(event.xAxis);
-          if (!axis) return;
-          const { value } = axis;
-          if (!value) return;
-          event.stopPropagation(); // we don't want this to ALSO count as an outside-click
-          dispatch(actions.TIMELINE_CURSOR_UPDATED(Math.round(value)));
-        },
-      },
       scrollablePlotArea: {
         minWidth: 2500,
         scrollPositionX: 1, // i.e. start at the rightmost-edge
@@ -117,46 +73,6 @@ function getOptions(
       minTickInterval: HOUR_IN_MS,
       min: timelineRangeEnd - timelineRange,
       max: timelineRangeEnd,
-      plotLines: models
-        .filter(is('ActiveProfile'))
-        .map(
-          (ap): Highcharts.PlotLines => ({
-            value: ap.timestamp,
-            dashStyle: 'Dash',
-            className: cssNs('profileActivation'),
-            color: 'blue',
-            width: 3,
-            zIndex: 2,
-            label: {
-              text: ap.profileName,
-              style: { color: 'blue', fontWeight: 'bold' },
-            },
-            events: {
-              click(event) {
-                dispatch(actions.TIMELINE_CURSOR_UPDATED(null)); // clear existing cursor, if any
-                event.stopPropagation(); // we don't want this to set a NEW cursor position
-                dispatch(actions.MODEL_SELECTED_FOR_EDITING(ap));
-              },
-            },
-          }),
-        )
-        .concat(
-          timelineCursorAt
-            ? [
-                {
-                  value: timelineCursorAt,
-                  color: 'red',
-                  width: 3,
-                  zIndex: 3,
-                  label: {
-                    text: getFormattedTimestamp(timelineCursorAt),
-                    style: { color: 'red', fontWeight: 'bold' },
-                    rotation: 0,
-                  },
-                },
-              ]
-            : [],
-        ),
     },
     yAxis: Y_AXIS_OPTIONS,
     plotOptions: {
@@ -169,16 +85,6 @@ function getOptions(
       },
       series: {
         cursor: 'pointer',
-        point: {
-          events: {
-            click(event) {
-              const point = (event as any).point;
-              const model: TimelineModel | null = (point && point.model) || null;
-              if (model) dispatch(actions.MODEL_SELECTED_FOR_EDITING(model));
-              return true;
-            },
-          },
-        },
       },
     },
     series: [
