@@ -1,4 +1,5 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { mergeEntriesFeed } from 'core/entries/entries';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
@@ -179,33 +180,18 @@ function getOptions(
     series: [
       // Blood glucose:
       getSeries(
-        models,
+        mergeEntriesFeed([
+          models.filter(is('DexcomSensorEntry')),
+          models.filter(is('DexcomRawSensorEntry')),
+          models.filter(is('ParakeetSensorEntry')),
+          models.filter(is('MeterEntry')),
+        ]),
         Y_BG,
-        'DexcomSensorEntry',
-        model => model.modelType === 'DexcomSensorEntry' && model.bloodGlucose, // <- plotted value
+        'Blood glucose',
+        model => 'bloodGlucose' in model && model.bloodGlucose, // <- plotted value
         { color: '#5bc0de' },
       ),
-      getSeries(
-        models,
-        Y_BG,
-        'DexcomRawSensorEntry',
-        model => model.modelType === 'DexcomRawSensorEntry' && model.bloodGlucose, // <- plotted value
-        { color: '#5bc0de' },
-      ),
-      getSeries(
-        models,
-        Y_BG,
-        'ParakeetSensorEntry',
-        model => model.modelType === 'ParakeetSensorEntry' && model.bloodGlucose, // <- plotted value
-        { color: '#5bc0de' },
-      ),
-      getSeries(
-        models,
-        Y_BG,
-        'MeterEntry',
-        model => model.modelType === 'MeterEntry' && model.bloodGlucose, // <- plotted value
-        { color: '#5bc0de' },
-      ),
+
       getSeries(
         models,
         Y_INSULIN,
