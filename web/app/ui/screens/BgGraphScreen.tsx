@@ -2,6 +2,7 @@ import { mergeEntriesFeed } from 'core/entries/entries';
 import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import BgGraph from 'web/app/ui/utils/BgGraph';
+import ScrollNumberSelector from 'web/app/ui/utils/ScrollNumberSelector';
 import { renderFromStore } from 'web/app/utils/react';
 
 export default renderFromStore(
@@ -11,17 +12,24 @@ export default renderFromStore(
     if (state.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
     return (
       <div className="this">
-        {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
-        {state.loadedModels.status === 'ERROR' && (
-          <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
-        )}
-        {state.loadedModels.status === 'READY' && (
-          <BgGraph
-            timelineModels={getTimelineModels(state.loadedModels.timelineModels)}
-            timelineRange={state.timelineRange}
-            timelineRangeEnd={state.timelineRangeEnd}
-          />
-        )}
+        <div className="top">
+          {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
+          {state.loadedModels.status === 'ERROR' && (
+            <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
+          )}
+          {state.loadedModels.status === 'READY' && (
+            <BgGraph
+              timelineModels={getTimelineModels(state.loadedModels.timelineModels)}
+              timelineRange={state.timelineRange}
+              timelineRangeEnd={state.timelineRangeEnd}
+            />
+          )}
+        </div>
+        <div className="bottom">
+          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
+          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
+          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
+        </div>
       </div>
     );
   },
