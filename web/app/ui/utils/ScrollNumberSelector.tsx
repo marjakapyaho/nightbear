@@ -1,5 +1,5 @@
-import { renderFromProps } from 'web/app/utils/react';
 import { range } from 'lodash';
+import { renderFromProps } from 'web/app/utils/react';
 
 export default renderFromProps<{
   value?: number;
