@@ -7,10 +7,13 @@ export default renderFromProps<{
   min: number;
   max: number;
   step: number;
-}>(__filename, (React, props) => (
-  <div className="this">
-    {range(props.min, props.max + props.step, props.step).map((val, i) => (
-      <div key={i}>{val}</div>
-    ))}
-  </div>
-));
+  centerOn?: number;
+}>(__filename, (React, props) => {
+  return (
+    <div className="this">
+      {range(props.min, props.max + props.step, props.step).map((val, i) => (
+        <div key={i}>{val}</div>
+      ))}
+    </div>
+  );
+});

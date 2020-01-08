@@ -31,18 +31,21 @@ export default renderFromStore(
             min={1}
             max={20}
             step={1}
+            centerOn={5}
           />
           <ScrollNumberSelector
             onChange={newValue => console.log('New BG value:', newValue)}
             min={1}
             max={20}
             step={0.5}
+            centerOn={8}
           />
           <ScrollNumberSelector
             onChange={newValue => console.log('New carbs value:', newValue)}
             min={5}
             max={100}
             step={5}
+            centerOn={40}
           />
         </div>
       </div>
