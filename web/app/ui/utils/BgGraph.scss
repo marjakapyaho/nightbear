@@ -1,7 +1,0 @@
-.nb-BgGraph {
-  // Normally Highcharts will take up exactly the vertical space given to it.
-  // When it renders a scroll bar, though, that goes outside the chart area.
-  // We choose to not display it, on browsers (e.g. desktop) where it would be visible.
-  // The chart is still scrollable, though you need to use a touchpad or the horizontal scroll of a mouse wheel.
-  overflow: hidden;
-}
