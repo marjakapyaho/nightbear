@@ -26,9 +26,24 @@ export default renderFromStore(
           )}
         </div>
         <div className="bottom">
-          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
-          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
-          <ScrollNumberSelector onChange={newValue => console.log('New value:', newValue)} />
+          <ScrollNumberSelector
+            onChange={newValue => console.log('New insulin value:', newValue)}
+            min={1}
+            max={20}
+            step={1}
+          />
+          <ScrollNumberSelector
+            onChange={newValue => console.log('New BG value:', newValue)}
+            min={1}
+            max={20}
+            step={0.5}
+          />
+          <ScrollNumberSelector
+            onChange={newValue => console.log('New carbs value:', newValue)}
+            min={5}
+            max={100}
+            step={5}
+          />
         </div>
       </div>
     );

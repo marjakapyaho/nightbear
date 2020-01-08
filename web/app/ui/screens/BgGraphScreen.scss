@@ -15,6 +15,7 @@
     flex: 1;
     display: flex;
     flex-direction: row;
+    height: 0; // the bottom panel needs a height so its children can overflow-scroll normally
 
     > .nb-ScrollNumberSelector {
       flex: 1;

@@ -9,7 +9,6 @@
 
   &-screen {
     flex: 1;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden; // screens should take care of their own overflow behaviour, if any
   }
 }
