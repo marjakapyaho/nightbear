@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.scss';
+import 'web/src/App.scss';
 
 const App: React.FC = () => {
   return <div>TODO</div>;
