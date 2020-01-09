@@ -1,5 +1,9 @@
 import { isEqual } from 'lodash';
+import { applyMiddleware, createStore as reduxCreateStore } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import { ReduxAction } from 'web/src/modules/actions';
+import { middleware } from 'web/src/modules/middleware';
+import { rootReducer } from 'web/src/modules/reducer';
 import { ReduxState } from 'web/src/modules/state';
 
 export type ReduxStore = Readonly<{ getState: () => ReduxState; dispatch: ReduxDispatch }>;
@@ -7,6 +11,7 @@ export type ReduxDispatch = (action: ReduxAction) => ReduxAction;
 export type ReduxReducer = (state: ReduxState | undefined, action: ReduxAction) => ReduxState;
 export type ReduxMiddleware = (store: ReduxStore) => (next: ReduxDispatch) => (action: ReduxAction) => ReduxAction;
 
+type valueof<T> = T[keyof T];
 type ActionCreatorMap = { [key: string]: (...args: any[]) => object };
 type ActionCreatorMapWithType<T extends { [key: string]: (...args: any) => any }> = {
   [K in keyof T]: ActionCreatorWithType<T[K], K>
@@ -17,6 +22,11 @@ type ActionCreatorWithType<A, T> = A extends (...args: any) => infer R
 
 // The union of all possible return types from the given action creator map
 export type ActionUnionFrom<T extends ActionCreatorMap> = valueof<{ [P in keyof T]: ReturnType<T[P]> }>; // returns the union of all possible return types from the given action creator map
+
+// Simple wrapper around Redux's standard createStore(), which standardizes middleware & enhancer setup
+export function createStore(initialState?: ReduxState): ReduxStore {
+  return reduxCreateStore(rootReducer, initialState, composeWithDevTools(applyMiddleware(...middleware)));
+}
 
 // Updates the given map of action creators so that their return value (i.e. the action object)
 // contains a "type" key with the type of each action, as determined by their key in the given map.
