@@ -9,13 +9,16 @@
     "@types/highcharts": "^5.0.36",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
+    "@types/react-redux": "^7.1.5",
     "css-ns": "^1.2.1",
     "highcharts": "^6.1.1",
     "highcharts-react-official": "^1.3.1",
     "node-sass": "^4.13.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0"
+    "react-redux": "^7.1.3",
+    "react-scripts": "3.3.0",
+    "redux": "^4.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
