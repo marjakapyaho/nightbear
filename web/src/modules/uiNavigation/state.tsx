@@ -1,6 +1,6 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
-import { TIMELINE_MODEL_TYPES } from 'web/src/app/ui/utils/ModelTypeSelector';
+import { TIMELINE_MODEL_TYPES } from 'web/src/ui/utils/ModelTypeSelector';
 
 export type UiNavigationState = Readonly<
   | {
