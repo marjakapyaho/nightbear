@@ -5,8 +5,8 @@
 // @see https://github.com/pouchdb/pouchdb/issues/6692
 
 import * as _PouchDB from 'pouchdb';
-type typeOfPouchDB = typeof _PouchDB;
-const PouchDB: typeOfPouchDB = (_PouchDB as any).default || _PouchDB;
+import __PouchDB from 'pouchdb';
+const PouchDB: typeof __PouchDB = (_PouchDB as any).default || _PouchDB;
 
 import * as PouchDBFind from 'pouchdb-find';
 PouchDB.plugin((PouchDBFind as any).default || PouchDBFind); // @see https://www.npmjs.com/package/pouchdb-find
