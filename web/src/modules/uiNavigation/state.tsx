@@ -1,6 +1,21 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
-import { TIMELINE_MODEL_TYPES } from 'web/src/ui/utils/ModelTypeSelector';
+
+export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
+  'Sensor',
+  'DexcomSensorEntry',
+  'DexcomRawSensorEntry',
+  'ParakeetSensorEntry',
+  'DexcomCalibration',
+  'NightbearCalibration',
+  'DeviceStatus',
+  'Hba1c',
+  'MeterEntry',
+  'Insulin',
+  'Carbs',
+  'Alarm',
+  'ActiveProfile',
+];
 
 export type UiNavigationState = Readonly<
   | {
