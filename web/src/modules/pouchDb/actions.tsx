@@ -19,7 +19,7 @@ export const pouchDbActions = actionsWithType({
   // something (anything) happened within the context of this replication
   REPLICATION_EMITTED_CHANGE: (direction: ReplicationDirection, info: PouchDB.Replication.ReplicationResult<{}>) => ({
     direction,
-    info,
+    info: info as typeof info & { pending?: number }, // this is missing from the official types
   }),
 
   // replication paused (e.g. replication up to date, user went offline)
