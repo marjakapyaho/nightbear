@@ -1,4 +1,5 @@
 import { TimelineModelType } from 'core/models/model';
+import { first } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { TIMELINE_MODEL_TYPES } from 'web/modules/uiNavigation/state';
 import { useCssNs } from 'web/utils/react';
@@ -17,7 +18,7 @@ export default (({ multiple, value, onChange }) => {
       <select
         style={{ height: 200 }}
         multiple={multiple}
-        value={value || []}
+        value={multiple ? value || [] : first(value)}
         onChange={event => {
           if (multiple) {
             onChange(
