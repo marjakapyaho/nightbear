@@ -7,7 +7,8 @@ import { ReduxState } from 'web/modules/state';
 
 // Hook-compatible way to invoke css-ns in a React.FunctionComponent
 export function useCssNs(componentName: string) {
-  return createCssNs({ prefix: 'nb-', namespace: componentName, React, self: /this/ });
+  const ns = createCssNs({ prefix: 'nb-', namespace: componentName, React, self: /this/ });
+  return { ns, React: ns.React };
 }
 
 // This is the recommended way of not having to repeat the type of our Store shape all over the place.
