@@ -4,8 +4,8 @@ import { mergeEntriesFeed } from 'core/entries/entries';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
-import * as Highcharts from 'highcharts';
-import * as HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import { findIndex, first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
@@ -92,7 +92,7 @@ function getOptions(
   timelineRangeEnd: number,
   timelineCursorAt: number | null,
   actions: ReduxActions,
-  cssNs: NsFunction<any>,
+  cssNs: NsFunction<unknown>,
 ): Highcharts.Options {
   const activeProfile = last(models.filter(is('ActiveProfile')));
   let analysisRanges: Array<[number, number, number]> = [];
@@ -103,13 +103,13 @@ function getOptions(
     );
   }
   return {
-    title: { text: null },
+    title: { text: undefined },
     chart: {
       height: 500,
       animation: false,
       zoomType: 'x',
       events: {
-        selection(event) {
+        selection(event): undefined {
           event.preventDefault(); // we handle the zoom ourselves; no need for the default Highcharts one
           const axis = first(event.xAxis);
           if (!axis) return;
@@ -117,8 +117,9 @@ function getOptions(
           if (!min || !max) return;
           actions.TIMELINE_FILTERS_CHANGED(Math.round(max - min), Math.round(max), selectedModelTypes);
         },
-        click(event) {
-          const axis = first(event.xAxis);
+        click(event: any) {
+          // official Highcharts types are missing the PointerAxisCoordinatesObject part from this type :shrug:
+          const axis = first((event as Highcharts.PointerAxisCoordinatesObject).xAxis);
           if (!axis) return;
           const { value } = axis;
           if (!value) return;
@@ -135,7 +136,7 @@ function getOptions(
       plotLines: models
         .filter(is('ActiveProfile'))
         .map(
-          (ap): Highcharts.PlotLines => ({
+          (ap): Highcharts.XAxisPlotLinesOptions => ({
             value: ap.timestamp,
             dashStyle: 'Dash',
             className: cssNs('profileActivation'),
@@ -148,6 +149,7 @@ function getOptions(
             },
             events: {
               click(event) {
+                if (!event) return;
                 actions.TIMELINE_CURSOR_UPDATED(null); // clear existing cursor, if any
                 event.stopPropagation(); // we don't want this to set a NEW cursor position
                 actions.MODEL_SELECTED_FOR_EDITING(ap);
@@ -173,7 +175,7 @@ function getOptions(
             : [],
         ),
       plotBands: analysisRanges
-        .map(([base, from, to]): Highcharts.PlotBands | null => {
+        .map(([base, from, to]): Highcharts.XAxisPlotBandsOptions | null => {
           if (!activeProfile) return null;
           const sensorEntries = models
             .filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'))
@@ -221,8 +223,7 @@ function getOptions(
         point: {
           events: {
             click(event) {
-              const point = (event as any).point;
-              const model: TimelineModel | null = (point && point.model) || null;
+              const model = getModelAtPoint(event.point);
               if (model) actions.MODEL_SELECTED_FOR_EDITING(model);
               return true;
             },
@@ -370,10 +371,10 @@ function getOptions(
     tooltip: {
       useHTML: true,
       formatter() {
-        const that: any = this; // this doesn't seem to be typed in @types/highcharts
-        const ts = DateTime.fromMillis(that.x).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
-        if (that.point.model) {
-          const json = JSON.stringify(that.point.model, null, 2);
+        const ts = DateTime.fromMillis(this.x).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
+        const model = getModelAtPoint(this.point);
+        if (model) {
+          const json = JSON.stringify(model, null, 2);
           return `<strong>${ts}</strong><br /><pre>${json}</pre>`;
         } else {
           return `<strong>${ts}</strong><br /><pre>(no model)</pre>`;
@@ -383,18 +384,17 @@ function getOptions(
   };
 }
 
-type SeriesOptions = Highcharts.IndividualSeriesOptions & Highcharts.LineChart;
-
 function getSeries(
   models: TimelineModel[],
   yAxisAssociation: Highcharts.AxisOptions,
   name: string,
   selector: (model: TimelineModel) => number | null | false,
-  extraOptions?: Partial<SeriesOptions>,
-): SeriesOptions {
+  extraOptions?: Partial<Highcharts.SeriesOptionsType>,
+): Highcharts.SeriesOptionsType {
   const yAxis = findIndex(Y_AXIS_OPTIONS, yAxisAssociation);
   if (yAxis === -1) throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
   return {
+    type: 'line',
     stickyTracking: false,
     animation: false,
     name,
@@ -404,9 +404,22 @@ function getSeries(
       .map(model => {
         const y = selector(model);
         if (!y) return null;
-        return { x: model.timestamp, y, model };
+        return setModelAtPoint({ x: model.timestamp, y }, model);
       })
       .filter(isNotNull),
-    ...extraOptions,
+    ...(extraOptions as any), // Note: This is cheating a bit, but this code should be temporary :trademark:
   };
+}
+
+// Highcharts allows attaching arbitrary metadata to Points as they're created,
+// but this isn't (understandably) visible on the type. This helper allows doing it
+// more-or-less safely. For performance reasons, we mutate the given Point options.
+function setModelAtPoint(point: Highcharts.PointOptionsObject, model: TimelineModel): Highcharts.PointOptionsObject {
+  (point as any)._modelAtPoint = model;
+  return point;
+}
+
+// Reverse of setModelAtPoint()
+function getModelAtPoint(point: Highcharts.Point): TimelineModel | null {
+  return (point as any)._modelAtPoint || null;
 }
