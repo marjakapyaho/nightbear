@@ -1,0 +1,26 @@
+.nb-MainNavBar {
+  display: flex;
+  flex-direction: row;
+
+  &-button {
+    flex: 1;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background: #f3f3f3;
+    border-bottom: 1px solid #f3f3f3;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: #777;
+
+    &:not(:last-of-type) {
+      border-right: 1px solid white;
+    }
+
+    &-selected {
+      color: white;
+      background: #7a7a7a;
+      border-color: #7a7a7a;
+    }
+  }
+}
