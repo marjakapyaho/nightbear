@@ -2,7 +2,7 @@ import { createCssNs } from 'css-ns';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions } from 'web/modules/actions';
+import { actions, ReduxActions } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
 
 // Hook-compatible way to invoke css-ns in a React.FunctionComponent
@@ -20,6 +20,6 @@ export function useReduxState<Selection>(
 }
 
 // Simple wrapper around Redux's default hook, adding more accurate types
-export function useReduxDispatch(): typeof actions {
+export function useReduxDispatch(): ReduxActions {
   return bindActionCreators(actions, useDispatch());
 }
