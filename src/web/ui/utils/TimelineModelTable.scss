@@ -1,0 +1,15 @@
+.nb-TimelineModelTable {
+  > table {
+    border-collapse: collapse;
+    > tbody,
+    > thead {
+      > tr {
+        > th,
+        > td {
+          border: 1px solid gray;
+          padding: 3px 6px;
+        }
+      }
+    }
+  }
+}
