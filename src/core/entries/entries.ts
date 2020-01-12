@@ -27,7 +27,7 @@ export function mergeEntriesFeed([dexcomSensorEntries, dexcomRawSensorEntries, p
   DexcomSensorEntry[],
   DexcomRawSensorEntry[],
   ParakeetSensorEntry[],
-  MeterEntry[]
+  MeterEntry[],
 ]) {
   return sortBy(
     unionBy(

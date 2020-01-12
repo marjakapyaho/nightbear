@@ -8,7 +8,7 @@ export type PouchDbState = Readonly<
       status: PouchDbStatus;
       details: string | [number, number];
       lastChangedAt: number;
-    }
+    };
   }
 >;
 

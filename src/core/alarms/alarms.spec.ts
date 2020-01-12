@@ -46,9 +46,12 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]),
-    );
+    return runAlarmChecks(
+      context,
+      stateWithFalling,
+      activeProfile('day', currentTimestamp),
+      activeAlarms,
+    ).then(alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]));
   });
 
   it('run alarm checks with one alarm to keep', () => {
@@ -56,9 +59,12 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'FALLING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms => assert.deepEqual(alarms, []),
-    );
+    return runAlarmChecks(
+      context,
+      stateWithFalling,
+      activeProfile('day', currentTimestamp),
+      activeAlarms,
+    ).then(alarms => assert.deepEqual(alarms, []));
   });
 
   it('run alarm checks with one alarm to remove', () => {
@@ -66,8 +72,11 @@ describe('core/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithNoSituation, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]),
-    );
+    return runAlarmChecks(
+      context,
+      stateWithNoSituation,
+      activeProfile('day', currentTimestamp),
+      activeAlarms,
+    ).then(alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]));
   });
 });

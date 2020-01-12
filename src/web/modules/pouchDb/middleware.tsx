@@ -51,7 +51,10 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
               ? activeStorage.saveModel(action.model)
               : reject(`Can't save Model changes without an active Storage`),
           )
-          .then(res => console.log('Save Model result:', res), err => console.log('Save Model error:', err));
+          .then(
+            res => console.log('Save Model result:', res),
+            err => console.log('Save Model error:', err),
+          );
       }
       if (action.type === 'PROFILE_ACTIVATED') {
         const activation = activateSavedProfile(action.profile, action.atTimestamp);

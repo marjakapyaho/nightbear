@@ -216,7 +216,7 @@ interface BaseProfile {
     readonly [S in Situation]: {
       readonly escalationAfterMinutes: number[];
       readonly snoozeMinutes: number;
-    }
+    };
   };
   readonly pushoverLevels: string[];
 }

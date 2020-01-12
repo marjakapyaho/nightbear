@@ -14,7 +14,7 @@ export type ReduxMiddleware = (store: ReduxStore) => (next: ReduxDispatch) => (a
 type valueof<T> = T[keyof T];
 type ActionCreatorMap = { [key: string]: (...args: any[]) => object };
 type ActionCreatorMapWithType<T extends { [key: string]: (...args: any) => any }> = {
-  [K in keyof T]: ActionCreatorWithType<T[K], K>
+  [K in keyof T]: ActionCreatorWithType<T[K], K>;
 };
 type ActionCreatorWithType<A, T> = A extends (...args: any) => infer R
   ? (...args: Parameters<A>) => Readonly<R & { type: T }>
@@ -42,9 +42,12 @@ export function actionsWithType<T extends ActionCreatorMap>(map: T): ActionCreat
 // The main use case being triggering actions/side-effects in response to Store state changing.
 export function createChangeObserver(store: ReduxStore, next: ReduxDispatch) {
   const selectors: Array<(state: ReduxState) => any> = [];
-  const handlers: Array<
-    (newSelection: any, oldSelection: any, newState: ReduxState, oldState: ReduxState) => void
-  > = [];
+  const handlers: Array<(
+    newSelection: any,
+    oldSelection: any,
+    newState: ReduxState,
+    oldState: ReduxState,
+  ) => void> = [];
   return {
     add<T>(
       selector: (state: ReduxState) => T,

@@ -304,7 +304,10 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     it("complains when modelMeta isn't set", () => {
       return Promise.resolve()
         .then(() => ({ ...cal, meterEntries: [getModelRef(entry)] }))
-        .then(() => assert.fail(), err => assert.match(err.message, /MeterEntry.*modelMeta/));
+        .then(
+          () => assert.fail(),
+          err => assert.match(err.message, /MeterEntry.*modelMeta/),
+        );
     });
 
     it('saves models with references', () => {
