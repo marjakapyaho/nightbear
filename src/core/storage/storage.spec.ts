@@ -57,7 +57,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assert.equal(err.saveSucceededForModels.length, 0);
           // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
-          const [failedModel, reason] = first(err.saveFailedForModels);
+          const [failedModel, reason] = first(err.saveFailedForModels) || [];
           if (is('SavedProfile')(failedModel)) {
             assert.equal(failedModel.profileName, MODEL_2.profileName);
           } else {
@@ -100,7 +100,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         }
         // Check that failure is reported:
         assert.equal(err.saveFailedForModels.length, 1);
-        const [failedModel, reason] = first(err.saveFailedForModels);
+        const [failedModel, reason] = first(err.saveFailedForModels) || [];
         if (is('Carbs')(failedModel)) {
           assert.equal(failedModel.timestamp, model.timestamp);
         } else {
