@@ -3,7 +3,6 @@ import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context, createResponse, Request, Response } from 'core/models/api';
 import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
-import * as _ from 'lodash';
 import { chain, union } from 'lodash';
 
 export function getEntries(request: Request, context: Context): Response {
