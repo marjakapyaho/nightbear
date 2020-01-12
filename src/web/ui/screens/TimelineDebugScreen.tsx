@@ -11,7 +11,7 @@ import TimelineModelTable from 'web/ui/utils/TimelineModelTable';
 type Props = {};
 
 export default () => {
-  const { React, ns: cssNs } = useCssNs(module.id);
+  const { React, ns: cssNs } = useCssNs('TimelineDebugScreen');
   const state = useReduxState(s => s.uiNavigation);
   const actions = useReduxDispatch();
 

@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('ScrollNumberSelector');
 
   return (
     <div className="this">

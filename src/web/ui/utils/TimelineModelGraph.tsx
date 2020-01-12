@@ -24,7 +24,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React, ns: cssNs } = useCssNs(module.id);
+  const { React, ns: cssNs } = useCssNs('TimelineModelGraph');
   const actions = useReduxDispatch();
 
   return (

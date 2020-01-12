@@ -9,7 +9,7 @@ const FULL_FORMAT_AGE_LIMIT = DAY_IN_MS * 0.5;
 type Props = { ts: number; live?: boolean };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('Timestamp');
   const [formattedTs, setFormattedTs] = useState(getFormattedTs(props.ts));
 
   const fullFormattedTs = DateTime.fromMillis(props.ts).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);

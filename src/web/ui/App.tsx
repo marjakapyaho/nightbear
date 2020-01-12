@@ -9,7 +9,7 @@ import { useCssNs, useReduxState } from 'web/utils/react';
 type Props = {};
 
 export default (() => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('App');
   const state = useReduxState(s => s.uiNavigation);
 
   return (

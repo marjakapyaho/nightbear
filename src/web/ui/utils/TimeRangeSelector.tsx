@@ -24,7 +24,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('TimeRangeSelector');
 
   return (
     <div className="this">

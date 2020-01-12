@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('ModelTypeSelector');
 
   return (
     <div className="this">

@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('BgGraph');
 
   return (
     <div className="this">

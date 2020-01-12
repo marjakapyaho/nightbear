@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs(module.id);
+  const { React } = useCssNs('TimelineModelTable');
 
   if (props.models.length === 0) {
     return <div className="this">(no data to show)</div>;
