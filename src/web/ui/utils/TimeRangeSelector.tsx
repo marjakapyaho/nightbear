@@ -23,16 +23,18 @@ type Props = {
   suffix?: string;
 };
 
-export default (({ value, onChange, prefix, suffix }) => {
+export default (props => {
   const { React } = useCssNs(module.id);
 
   return (
     <div className="this">
-      <select value={value} onChange={event => onChange(parseInt(event.target.value, 10))}>
-        {typeof value !== 'undefined' && !options.find(([, v]) => v === value) && <option value={value}>custom</option>}
+      <select value={props.value} onChange={event => props.onChange(parseInt(event.target.value, 10))}>
+        {typeof props.value !== 'undefined' && !options.find(([, v]) => v === props.value) && (
+          <option value={props.value}>custom</option>
+        )}
         {options.map(([title, value]) => (
           <option key={value} value={value}>
-            {prefix} {title} {suffix}
+            {props.prefix} {title} {props.suffix}
           </option>
         ))}
       </select>

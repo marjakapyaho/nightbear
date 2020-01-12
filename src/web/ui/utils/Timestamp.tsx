@@ -8,17 +8,17 @@ const FULL_FORMAT_AGE_LIMIT = DAY_IN_MS * 0.5;
 
 type Props = { ts: number; live?: boolean };
 
-export default (({ ts, live }) => {
+export default (props => {
   const { React } = useCssNs(module.id);
-  const [formattedTs, setFormattedTs] = useState(getFormattedTs(ts));
+  const [formattedTs, setFormattedTs] = useState(getFormattedTs(props.ts));
 
-  const fullFormattedTs = DateTime.fromMillis(ts).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);
+  const fullFormattedTs = DateTime.fromMillis(props.ts).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);
 
   useEffect(() => {
-    if (!live) return;
-    const interval = setInterval(() => setFormattedTs(getFormattedTs(ts, live)), 1000);
+    if (!props.live) return;
+    const interval = setInterval(() => setFormattedTs(getFormattedTs(props.ts, props.live)), 1000);
     return () => clearInterval(interval);
-  }, [ts, live]);
+  }, [props.ts, props.live]);
 
   return (
     <span className="this" title={fullFormattedTs}>

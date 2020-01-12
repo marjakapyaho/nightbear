@@ -10,24 +10,24 @@ type Props = {
   onChange: (newValues: TimelineModelType[]) => void;
 };
 
-export default (({ multiple, value, onChange }) => {
+export default (props => {
   const { React } = useCssNs(module.id);
 
   return (
     <div className="this">
       <select
         style={{ height: 200 }}
-        multiple={multiple}
-        value={multiple ? value || [] : first(value)}
+        multiple={props.multiple}
+        value={props.multiple ? props.value || [] : first(props.value)}
         onChange={event => {
-          if (multiple) {
-            onChange(
+          if (props.multiple) {
+            props.onChange(
               (Array.prototype.slice.call(event.target.options) as HTMLOptionElement[])
                 .map(option => (option.selected ? (option.value as TimelineModelType) : null))
                 .filter(isNotNull),
             );
           } else {
-            onChange([event.target.value as TimelineModelType]);
+            props.onChange([event.target.value as TimelineModelType]);
           }
         }}
       >
