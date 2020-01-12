@@ -3,6 +3,8 @@ node_modules/
 npm-debug.log
 /hours.txt
 .env
+.envrc
 .DS_Store
 /.history
 .vscode
+/build
