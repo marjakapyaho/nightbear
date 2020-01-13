@@ -1,35 +1,26 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src",
     "target": "es5",
-    "jsx": "react",
-    "module": "commonjs",
-    "allowJs": false,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    /*
-    "paths": {
-      "nightbear/*": ["./*"]
-    },
-    */
-    "types": [
-      "node"
-    ],
     "lib": [
-      "es2017",
-      "dom" // see https://github.com/Microsoft/TypeScript/issues/14897
-    ]
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
+    "src"
   ]
 }
