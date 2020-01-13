@@ -26,7 +26,7 @@ describe('utils/analyser', () => {
     geolocation: null,
   };
 
-  // Assertations
+  // Assertions
   it('detects no situation', () => {
     assert.deepEqual(
       runAnalysis(

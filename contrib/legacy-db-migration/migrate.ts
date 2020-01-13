@@ -14,7 +14,7 @@ import {
   ParakeetSensorEntry,
   SavedProfile,
 } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { first, is } from 'core/models/utils';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
@@ -25,7 +25,7 @@ import { inspect } from 'util';
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min
 const BATCH_RETRY_LIMIT = 10;
 const BATCH_RETRY_WAIT_SEC = 10;
-const INCREMENTAL = true;
+const INCREMENTAL = !!process.env.NIGHTBEAR_MIGRATE_INCREMENTAL_MODE;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
@@ -169,7 +169,7 @@ function toModernModels(docs: object[]) {
     .then(maybeModels => {
       const models = flatten(maybeModels.filter(isNotNull));
       if (INCREMENTAL) {
-        // In incremental model: look for already-existing models with the same type and (roughly) the same timestamp
+        // In incremental mode: look for already-existing models with the same type and (roughly) the same timestamp
         return Promise.all(
           models.map(model => {
             if ('timestamp' in model) {
@@ -179,15 +179,15 @@ function toModernModels(docs: object[]) {
             }
           }),
         )
-          .then(loadedModels =>
-            models.filter((model, i) => {
-              const alreadyExists = !!loadedModels[i];
-              (alreadyExists ? incrementalSkipped : incrementalMigrated).push(
+          .then(loadedModels => {
+            return models.filter((model, i) => {
+              const alreadyExistingModel = loadedModels[i].find(first);
+              (!!alreadyExistingModel ? incrementalSkipped : incrementalMigrated).push(
                 `${model.modelType}@${(model as any).timestamp}`,
               );
-              return !alreadyExists;
-            }),
-          )
+              return !alreadyExistingModel;
+            });
+          })
           .then(targetStorage.saveModels);
       } else {
         // This is easy: just save everything as new
@@ -300,7 +300,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
     const model: DexcomCalibration = {
       modelType: 'DexcomCalibration',
       timestamp: x.date,
-      meterEntries: [], // will be filled in later
+      meterEntries: [], // will be filled in later in this script
       isInitialCalibration: false,
       slope: x.slope,
       intercept: x.intercept,
@@ -515,5 +515,5 @@ function seedProfiles() {
     },
     pushoverLevels: (process.env.NIGHTBEAR_MIGRATE_PUSHOVER_LEVELS_NIGHT || '').split(' '),
   };
-  return targetStorage.saveModels([day, night]);
+  return targetStorage.saveModels([day, night], true);
 }

@@ -35,7 +35,7 @@ describe('api/getWatchStatus', () => {
     },
   };
 
-  // Assertations
+  // Assertions
   xit('get watch status', () => {
     return getWatchStatus(request, context).then(res => {
       assert.deepEqual(res.responseBody, mockResponseJson);

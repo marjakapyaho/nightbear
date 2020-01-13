@@ -27,7 +27,7 @@
     "==================== WEB ====================": "",
     "web-start": "webpack-dev-server --config web/webpack.config.js --mode development --hot --progress --color --port 3000",
     "web-build": "webpack --config web/webpack.config.js -p --progress --colors",
-    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive web/dist s3://stage-nightbear-fi/"
+    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive web/dist s3://aws-static-site---stage-nightbear-fi/"
   },
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [
@@ -47,8 +47,8 @@
     "@types/node": "^8.0.34",
     "@types/pouchdb": "^6.3.2",
     "@types/pouchdb-find": "^6.3.2",
-    "@types/react": "16.0.40",
-    "@types/react-dom": "16.0.4",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
     "@types/react-modal": "^3.6.0",
     "@types/react-redux": "^6.0.1",
     "@types/webpack": "3.8.8",
@@ -83,8 +83,8 @@
     "prettier": "^1.15.3",
     "prettier-check": "^2.0.0",
     "pushover-notifications": "^1.2.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "react-hot-loader": "^4.0.0",
     "react-modal": "^3.8.1",
     "react-redux": "^5.0.7",
