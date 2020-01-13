@@ -20,7 +20,7 @@ export function getEntries(request: Request, context: Context): Response {
       union(sensorEntries as TimelineModel[], insulin as TimelineModel[], carbs as TimelineModel[]),
     )
       .groupBy((entry: TimelineModel) => entry.timestamp)
-      .map((group: TimelineModel[], timestamp: number) => {
+      .map((group: TimelineModel[], timestamp: string) => {
         const carbs = group.find(is('Carbs'));
         const insulin = group.find(is('Insulin'));
         const dexcomSensorEntry = group.find(is('DexcomSensorEntry'));
@@ -29,7 +29,7 @@ export function getEntries(request: Request, context: Context): Response {
         const sensorEntry = dexcomSensorEntry || dexcomRawSensorEntry || parakeetSensorEntry;
         const isRaw = !!dexcomRawSensorEntry || !!parakeetSensorEntry;
         return {
-          time: timestamp,
+          time: parseInt(timestamp, 10), // note: timestamp has become string as it was used as an object key in the result of the groupBy()
           carbs: carbs ? carbs.amount : undefined,
           insulin: insulin ? insulin.amount : undefined,
           sugar: sensorEntry ? sensorEntry.bloodGlucose && sensorEntry.bloodGlucose.toFixed(1) + '' : undefined,
