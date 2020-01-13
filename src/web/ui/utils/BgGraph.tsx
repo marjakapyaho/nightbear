@@ -4,10 +4,13 @@ import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import HighchartsAnnotations from 'highcharts/modules/annotations';
 import { findIndex } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
 import { useCssNs } from 'web/utils/react';
+
+HighchartsAnnotations(Highcharts);
 
 type Props = {
   timelineRange: number;
@@ -98,6 +101,7 @@ function getOptions(models: TimelineModel[], timelineRange: number, timelineRang
         'Blood glucose',
         model => 'bloodGlucose' in model && model.bloodGlucose, // <- plotted value
         { color: '#5bc0de' },
+        true,
       ),
 
       getSeries(
@@ -117,6 +121,16 @@ function getOptions(models: TimelineModel[], timelineRange: number, timelineRang
           color: '#59df59',
         },
       ),
+    ],
+    annotations: [
+      {
+        labels: [
+          {
+            point: 'last',
+            text: '{point.y}',
+          },
+        ],
+      },
     ],
     time: {
       useUTC: false, // somewhat unintuitively, this needs to be false when model.timestamp is milliseconds since epoch in UTC :shrug:
@@ -139,6 +153,7 @@ function getSeries(
   name: string,
   selector: (model: TimelineModel) => number | null | false,
   extraOptions?: Partial<Highcharts.SeriesOptionsType>,
+  addLastId = false,
 ): Highcharts.SeriesOptionsType {
   const yAxis = findIndex(Y_AXIS_OPTIONS, yAxisAssociation);
   if (yAxis === -1) throw new Error(`Could not determine Y axis association for series from "${yAxis}"`);
@@ -150,10 +165,11 @@ function getSeries(
     yAxis,
     turboThreshold: 0, // Note: If we want to show REALLY large data sets at some point, it may make sense to re-enable this
     data: models
-      .map(model => {
+      .map((model, i) => {
         const y = selector(model);
         if (!y) return null;
-        return { x: model.timestamp, y };
+        const point = { x: model.timestamp, y, id: addLastId && i === models.length - 1 ? 'last' : undefined };
+        return point;
       })
       .filter(isNotNull),
     ...(extraOptions as any), // Note: This is cheating a bit, but this code should be temporary :trademark:
