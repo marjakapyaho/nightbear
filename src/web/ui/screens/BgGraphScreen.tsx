@@ -1,16 +1,19 @@
 import { mergeEntriesFeed } from 'core/entries/entries';
-import 'web/ui/screens/BgGraphScreen.scss';
 import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
+import 'web/ui/screens/BgGraphScreen.scss';
 import BgGraph from 'web/ui/utils/BgGraph';
 import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
-import { useCssNs, useReduxState } from 'web/utils/react';
+import { useCssNs, useReduxDispatch, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const state = useReduxState(s => s.uiNavigation);
+  const { MODEL_SELECTED_FOR_EDITING, TIMELINE_CURSOR_UPDATED } = useReduxDispatch();
+
+  const { modelBeingEdited } = state;
 
   return (
     <div className="this">
@@ -30,14 +33,16 @@ export default (() => {
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
             timelineRange={state.timelineRange}
             timelineRangeEnd={state.timelineRangeEnd}
-            timelineCursorAt={state.timelineCursorAt}
-            onBgModelSelected={model => console.log('Selected BG model:', model)}
-            onInsulinModelSelected={model => console.log('Selected Insulin model:', model)}
+            cursorAt={state.timelineCursorAt}
+            onCursorUpdated={TIMELINE_CURSOR_UPDATED}
+            onBgModelSelected={MODEL_SELECTED_FOR_EDITING}
+            onInsulinModelSelected={MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
       <div className="bottom">
         <ScrollNumberSelector
+          value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={newValue => console.log('New insulin value:', newValue)}
           min={1}
           max={20}
@@ -45,6 +50,7 @@ export default (() => {
           centerOn={5}
         />
         <ScrollNumberSelector
+          value={is('ParakeetSensorEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
           onChange={newValue => console.log('New BG value:', newValue)}
           min={1}
           max={20}
@@ -62,14 +68,3 @@ export default (() => {
     </div>
   );
 }) as React.FC<Props>;
-
-function getTimelineModels(timelineModels: TimelineModel[]): TimelineModel[] {
-  const bgEntries: TimelineModel[] = mergeEntriesFeed([
-    timelineModels.filter(is('DexcomSensorEntry')),
-    timelineModels.filter(is('DexcomRawSensorEntry')),
-    timelineModels.filter(is('ParakeetSensorEntry')),
-    timelineModels.filter(is('MeterEntry')),
-  ]);
-  const insulinEntries: TimelineModel[] = timelineModels.filter(is('Insulin'));
-  return bgEntries.concat(insulinEntries);
-}
