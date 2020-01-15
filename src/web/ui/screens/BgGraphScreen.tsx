@@ -27,10 +27,12 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('ParakeetSensorEntry')),
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
+            insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
             timelineRange={state.timelineRange}
             timelineRangeEnd={state.timelineRangeEnd}
             timelineCursorAt={state.timelineCursorAt}
             onBgModelSelected={model => console.log('Selected BG model:', model)}
+            onInsulinModelSelected={model => console.log('Selected Insulin model:', model)}
           />
         )}
       </div>

@@ -1,20 +1,27 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { MeterEntry, SensorEntry, TimelineModel } from 'core/models/model';
+import { MeterEntry, SensorEntry, TimelineModel, Insulin } from 'core/models/model';
 import { NsFunction } from 'css-ns';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import HighchartsAnnotations from 'highcharts/modules/annotations';
+import HighchartsMore from 'highcharts/highcharts-more'; // for e.g. chart type "bubble"
 import { findIndex } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
-import 'web/ui/utils/TimelineModelGraph.scss';
 import { useCssNs } from 'web/utils/react';
+import { is } from 'core/models/utils';
+
+HighchartsAnnotations(Highcharts);
+HighchartsMore(Highcharts);
 
 type Props = {
   timelineRange: number;
   timelineRangeEnd: number;
   bgModels: (SensorEntry | MeterEntry)[];
+  insulinModels: Insulin[];
   timelineCursorAt: number | null;
   onBgModelSelected?: (model: SensorEntry | MeterEntry) => void;
+  onInsulinModelSelected?: (model: Insulin) => void;
 };
 
 export default (props => {
@@ -32,9 +39,11 @@ const Y_STATIC: Highcharts.AxisOptions = {
 };
 
 const Y_INSULIN: Highcharts.AxisOptions = {
+  id: 'insulin',
   visible: false,
-  min: 0,
-  max: 15,
+  min: 0, // note: this axis is positional only (that is, it doesn't reflect the amount of insulin)
+  max: 1,
+  height: 50, // this is the amount of pixels reserved for showing the insulin values at the top of the graph
 };
 
 const Y_CARBS: Highcharts.AxisOptions = {
@@ -123,6 +132,46 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
             const model = getModelAtPoint(event.point);
             if (!model || !('bloodGlucose' in model)) return;
             props.onBgModelSelected(model);
+          },
+        },
+      },
+      {
+        type: 'bubble',
+        stickyTracking: false,
+        animation: false,
+        name: 'Insulin',
+        yAxis: Y_INSULIN.id,
+        turboThreshold: 0, // Note: If we want to show REALLY large data sets at some point, it may make sense to re-enable this
+        dataLabels: {
+          enabled: true,
+          format: '{point.name}',
+        },
+        marker: {
+          enabled: true,
+          fillColor: 'hotpink',
+        },
+        minSize: 15, // these values effectively set the size of the bubbles
+        maxSize: 50,
+        data: props.insulinModels
+          .map(model => {
+            if (!model.amount) return null;
+            return setModelAtPoint(
+              {
+                x: model.timestamp,
+                y: 0.5, // this is only for vertical positioning!
+                z: model.amount,
+                name: model.amount,
+              },
+              model,
+            );
+          })
+          .filter(isNotNull),
+        events: {
+          click(event) {
+            if (!props.onInsulinModelSelected) return;
+            const model = getModelAtPoint(event.point);
+            if (!is('Insulin')(model)) return;
+            props.onInsulinModelSelected(model);
           },
         },
       },
