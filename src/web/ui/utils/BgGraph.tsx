@@ -1,15 +1,14 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { MeterEntry, SensorEntry, TimelineModel, Insulin } from 'core/models/model';
+import { Insulin, MeterEntry, SensorEntry, TimelineModel } from 'core/models/model';
+import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import HighchartsAnnotations from 'highcharts/modules/annotations';
 import HighchartsMore from 'highcharts/highcharts-more'; // for e.g. chart type "bubble"
-import { findIndex } from 'lodash';
+import HighchartsAnnotations from 'highcharts/modules/annotations';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
 import { useCssNs } from 'web/utils/react';
-import { is } from 'core/models/utils';
 
 HighchartsAnnotations(Highcharts);
 HighchartsMore(Highcharts);
@@ -43,7 +42,7 @@ const Y_INSULIN: Highcharts.AxisOptions = {
   visible: false,
   min: 0, // note: this axis is positional only (that is, it doesn't reflect the amount of insulin)
   max: 1,
-  height: 50, // this is the amount of pixels reserved for showing the insulin values at the top of the graph
+  height: 80, // this is the amount of pixels reserved for showing the insulin values at the top of the graph
 };
 
 const Y_CARBS: Highcharts.AxisOptions = {
@@ -98,6 +97,18 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
       minTickInterval: HOUR_IN_MS,
       min: props.timelineRangeEnd - props.timelineRange,
       max: props.timelineRangeEnd,
+      plotLines: ([] as Highcharts.XAxisPlotLinesOptions[]).concat(
+        props.insulinModels.map(model => ({
+          value: model.timestamp,
+          color: 'hotpink',
+          label: {
+            text: `${((Date.now() - model.timestamp) / HOUR_IN_MS).toFixed(1)} h ago`,
+            style: { color: 'hotpink', fontWeight: 'bold' },
+            rotation: 0,
+            align: 'center',
+          },
+        })),
+      ),
     },
     yAxis: Y_AXIS_OPTIONS,
     series: [
