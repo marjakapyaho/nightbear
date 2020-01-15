@@ -6,6 +6,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsMore from 'highcharts/highcharts-more'; // for e.g. chart type "bubble"
 import HighchartsAnnotations from 'highcharts/modules/annotations';
+import { first } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
 import { useCssNs } from 'web/utils/react';
@@ -18,9 +19,10 @@ type Props = {
   timelineRangeEnd: number;
   bgModels: (SensorEntry | MeterEntry)[];
   insulinModels: Insulin[];
-  timelineCursorAt: number | null;
+  cursorAt: number | null;
   onBgModelSelected?: (model: SensorEntry | MeterEntry) => void;
   onInsulinModelSelected?: (model: Insulin) => void;
+  onCursorUpdated?: (timestamp: number | null) => void;
 };
 
 export default (props => {
@@ -91,24 +93,55 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
         minWidth: 2500,
         scrollPositionX: 1, // i.e. start at the rightmost-edge
       },
+      events: {
+        click(
+          event: any /* official Highcharts types are missing the PointerAxisCoordinatesObject part from this type :shrug: */,
+        ) {
+          if (!props.onCursorUpdated) return;
+          const axis = first((event as Highcharts.PointerAxisCoordinatesObject).xAxis);
+          if (!axis) return;
+          const { value } = axis;
+          if (!value) return;
+          event.stopPropagation(); // we don't want this to ALSO count as an outside-click
+          props.onCursorUpdated(Math.round(value));
+        },
+      },
     },
     xAxis: {
       type: 'datetime',
       minTickInterval: HOUR_IN_MS,
       min: props.timelineRangeEnd - props.timelineRange,
       max: props.timelineRangeEnd,
-      plotLines: ([] as Highcharts.XAxisPlotLinesOptions[]).concat(
-        props.insulinModels.map(model => ({
-          value: model.timestamp,
-          color: 'hotpink',
-          label: {
-            text: `${((Date.now() - model.timestamp) / HOUR_IN_MS).toFixed(1)} h ago`,
-            style: { color: 'hotpink', fontWeight: 'bold' },
-            rotation: 0,
-            align: 'center',
-          },
-        })),
-      ),
+      plotLines: ([] as Highcharts.XAxisPlotLinesOptions[])
+        .concat(
+          props.insulinModels.map(model => ({
+            value: model.timestamp,
+            color: 'hotpink',
+            label: {
+              text: `${((Date.now() - model.timestamp) / HOUR_IN_MS).toFixed(1)} h ago`,
+              style: { color: 'hotpink', fontWeight: 'bold' },
+              rotation: 0,
+              align: 'center',
+            },
+          })),
+        )
+        .concat(
+          props.cursorAt
+            ? {
+                value: props.cursorAt,
+                color: 'red',
+                width: 3,
+                events: {
+                  click(event) {
+                    if (!props.onCursorUpdated) return;
+                    if (!event) return;
+                    props.onCursorUpdated(null); // clear existing cursor, if any
+                    event.stopPropagation(); // we don't want this to set a NEW cursor position
+                  },
+                },
+              }
+            : [],
+        ),
     },
     yAxis: Y_AXIS_OPTIONS,
     series: [
