@@ -21,9 +21,16 @@ export default (() => {
         )}
         {state.loadedModels.status === 'READY' && (
           <BgGraph
-            timelineModels={getTimelineModels(state.loadedModels.timelineModels)}
+            bgModels={mergeEntriesFeed([
+              state.loadedModels.timelineModels.filter(is('DexcomSensorEntry')),
+              state.loadedModels.timelineModels.filter(is('DexcomRawSensorEntry')),
+              state.loadedModels.timelineModels.filter(is('ParakeetSensorEntry')),
+              state.loadedModels.timelineModels.filter(is('MeterEntry')),
+            ])}
             timelineRange={state.timelineRange}
             timelineRangeEnd={state.timelineRangeEnd}
+            timelineCursorAt={state.timelineCursorAt}
+            onBgModelSelected={model => console.log('Selected BG model:', model)}
           />
         )}
       </div>
