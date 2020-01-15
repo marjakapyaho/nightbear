@@ -20,7 +20,7 @@ export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
 export type UiNavigationState = Readonly<
   | {
       selectedScreen: 'BgGraphScreen';
-      // TODO: TEMP
+      // TODO: BEGIN COPY-PASTA
       timelineRange: number;
       timelineRangeEnd: number;
       selectedModelTypes: TimelineModelType[];
@@ -30,6 +30,7 @@ export type UiNavigationState = Readonly<
         | { status: 'ERROR'; errorMessage: string };
       modelBeingEdited: TimelineModel | null;
       timelineCursorAt: number | null;
+      // TODO: END COPY-PASTA
     }
   | {
       selectedScreen: 'TimelineDebugScreen';
