@@ -100,18 +100,6 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
       max: props.timelineRangeEnd,
     },
     yAxis: Y_AXIS_OPTIONS,
-    plotOptions: {
-      line: {
-        marker: {
-          enabled: true,
-          symbol: 'circle',
-          radius: 3,
-        },
-      },
-      series: {
-        cursor: 'pointer',
-      },
-    },
     series: [
       {
         type: 'line',
@@ -120,6 +108,12 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
         name: 'Blood glucose',
         yAxis: Y_BG.id,
         turboThreshold: 0, // Note: If we want to show REALLY large data sets at some point, it may make sense to re-enable this
+        marker: {
+          enabled: true,
+          symbol: 'circle',
+          radius: 3,
+        },
+        cursor: 'pointer',
         data: props.bgModels
           .map(model => {
             if (!model.bloodGlucose) return null;
