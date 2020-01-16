@@ -4,12 +4,11 @@ import { mergeEntriesFeed } from 'core/entries/entries';
 import { TimelineModel, TimelineModelType } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 import { findIndex, first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
 import { ReduxActions } from 'web/modules/actions';
+import Highcharts from 'web/ui/utils/Highcharts';
 import 'web/ui/utils/TimelineModelGraph.scss';
 import { getFormattedTimestamp } from 'web/ui/utils/Timestamp';
 import { useCssNs, useReduxDispatch } from 'web/utils/react';
@@ -29,8 +28,7 @@ export default (props => {
 
   return (
     <div className="this">
-      <HighchartsReact
-        highcharts={Highcharts}
+      <Highcharts
         options={getOptions(
           props.timelineModels,
           props.selectedModelTypes,

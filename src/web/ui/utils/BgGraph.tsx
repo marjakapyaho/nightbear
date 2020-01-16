@@ -2,17 +2,11 @@ import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Insulin, MeterEntry, SensorEntry, TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import HighchartsMore from 'highcharts/highcharts-more'; // for e.g. chart type "bubble"
-import HighchartsAnnotations from 'highcharts/modules/annotations';
 import { first } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
+import Highcharts from 'web/ui/utils/Highcharts';
 import { useCssNs } from 'web/utils/react';
-
-HighchartsAnnotations(Highcharts);
-HighchartsMore(Highcharts);
 
 type Props = {
   timelineRange: number;
@@ -30,7 +24,7 @@ export default (props => {
 
   return (
     <div className="this">
-      <HighchartsReact highcharts={Highcharts} options={getHighchartsOptions(props, cssNs)} />
+      <Highcharts options={getHighchartsOptions(props, cssNs)} />
     </div>
   );
 }) as React.FC<Props>;

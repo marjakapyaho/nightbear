@@ -1,5 +1,4 @@
 import { mergeEntriesFeed } from 'core/entries/entries';
-import { TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import 'web/ui/screens/BgGraphScreen.scss';
 import BgGraph from 'web/ui/utils/BgGraph';
