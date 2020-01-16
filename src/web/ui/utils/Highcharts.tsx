@@ -31,5 +31,28 @@ export default (props => {
   function manageChartUpdates() {
     if (!chartRef.current) return;
     chartRef.current.update(props.options);
+    issue8862Workaround(chartRef.current);
   }
 }) as React.FC<Props>;
+
+// https://github.com/highcharts/highcharts/issues/8862
+function issue8862Workaround(chart: any) {
+  if (!chart.options.chart.scrollablePlotArea) return; // https://github.com/highcharts/highcharts/issues/8862#issuecomment-575093026
+  var H = Highcharts,
+    fixedRenderer = chart.fixedRenderer;
+  [
+    chart.inverted ? '.highcharts-xaxis' : '.highcharts-yaxis',
+    chart.inverted ? '.highcharts-xaxis-labels' : '.highcharts-yaxis-labels',
+    '.highcharts-contextbutton',
+    '.highcharts-credits',
+    '.highcharts-legend',
+    '.highcharts-subtitle',
+    '.highcharts-title',
+    '.highcharts-legend-checkbox',
+  ].forEach(function(className) {
+    H.each(chart.container.querySelectorAll(className), function(elem: any) {
+      (elem.namespaceURI === fixedRenderer.SVG_NS ? fixedRenderer.box : fixedRenderer.box.parentNode).appendChild(elem);
+      elem.style.pointerEvents = 'auto';
+    });
+  });
+}
