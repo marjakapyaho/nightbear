@@ -6,6 +6,7 @@ import 'index.scss';
 import * as serviceWorker from 'serviceWorker';
 import App from 'web/ui/App';
 import { createStore } from 'web/utils/redux';
+import 'web/utils/polyfills';
 
 const store = createStore();
 

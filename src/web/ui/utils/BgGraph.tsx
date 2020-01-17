@@ -1,4 +1,5 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { PIXELS_PER_HOUR } from 'core/config/const';
 import { Insulin, MeterEntry, SensorEntry, TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
@@ -22,9 +23,14 @@ type Props = {
 export default (props => {
   const { React, ns: cssNs } = useCssNs('BgGraph');
 
+  const chartWidth = Math.round(PIXELS_PER_HOUR * (props.timelineRange / HOUR_IN_MS));
+
   return (
     <div className="this">
-      <Highcharts options={getHighchartsOptions(props, cssNs)} />
+      <div className="scroller" style={{ width: chartWidth }}>
+        {/* TODO: This scroller element shouldn't be needed once https://github.com/highcharts/highcharts/issues/8862 is fixed */}
+        <Highcharts options={getHighchartsOptions(props, chartWidth, cssNs)} />
+      </div>
     </div>
   );
 }) as React.FC<Props>;
@@ -78,15 +84,19 @@ const Y_AXIS_OPTIONS = [Y_STATIC, Y_INSULIN, Y_CARBS, Y_BG, Y_BATTERY, Y_BATTERY
 
 // https://www.highcharts.com/demo
 // https://api.highcharts.com/highcharts/
-function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcharts.Options {
+function getHighchartsOptions(props: Props, chartWidth: number, cssNs: NsFunction<unknown>): Highcharts.Options {
   return {
     title: { text: undefined },
     chart: {
+      width: chartWidth,
       animation: false,
+      /*
+      // TODO: Use this (instead of the "scroller" element) when https://github.com/highcharts/highcharts/issues/8862 gets a fix
       scrollablePlotArea: {
         minWidth: 2500,
         scrollPositionX: 1, // i.e. start at the rightmost-edge
       },
+      */
       events: {
         click(
           event: any /* official Highcharts types are missing the PointerAxisCoordinatesObject part from this type :shrug: */,
@@ -96,8 +106,14 @@ function getHighchartsOptions(props: Props, cssNs: NsFunction<unknown>): Highcha
           if (!axis) return;
           const { value } = axis;
           if (!value) return;
+          // See the following issues for why this is needed:
+          // https://github.com/highcharts/highcharts/issues/8862
+          // https://github.com/highcharts/highcharts/issues/12682#issuecomment-575077172
+          // I thus also have exactly 0 interest in figuring out why the magic number is needed (probably some padding somewhere, whatever)...
+          const scrollParent = this.container.closest('.nb-BgGraph');
+          const correction = scrollParent ? ((scrollParent.scrollLeft * 1.019) / PIXELS_PER_HOUR) * HOUR_IN_MS : 0;
           event.stopPropagation(); // we don't want this to ALSO count as an outside-click
-          props.onCursorUpdated(Math.round(value));
+          props.onCursorUpdated(Math.round(value + correction));
         },
       },
     },
