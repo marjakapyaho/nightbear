@@ -117,6 +117,14 @@ function getHighchartsOptions(props: Props, chartWidth: number, cssNs: NsFunctio
         },
       },
     },
+    plotOptions: {
+      series: {
+        states: {
+          hover: { enabled: false }, // on touch devices, hovers are triggered along with taps, but they tend to get stuck until the next such tap/hover; we don't want that
+          inactive: { opacity: 1 }, // similarly, during the hover, other series would fade out; don't want that, either
+        },
+      },
+    },
     xAxis: {
       type: 'datetime',
       minTickInterval: HOUR_IN_MS,
@@ -231,6 +239,9 @@ function getHighchartsOptions(props: Props, chartWidth: number, cssNs: NsFunctio
       enabled: false,
     },
     legend: {
+      enabled: false,
+    },
+    tooltip: {
       enabled: false,
     },
   };

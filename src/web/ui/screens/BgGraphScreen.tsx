@@ -10,7 +10,7 @@ type Props = {};
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const state = useReduxState(s => s.uiNavigation);
-  const { MODEL_SELECTED_FOR_EDITING, TIMELINE_CURSOR_UPDATED } = useReduxDispatch();
+  const { MODEL_SELECTED_FOR_EDITING, MODEL_CHANGES_SAVED, TIMELINE_CURSOR_UPDATED } = useReduxDispatch();
 
   const { modelBeingEdited } = state;
 
@@ -42,7 +42,16 @@ export default (() => {
       <div className="bottom">
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
-          onChange={newValue => console.log('New insulin value:', newValue)}
+          onChange={newValue => {
+            if (state.timelineCursorAt && !modelBeingEdited) {
+              MODEL_CHANGES_SAVED({
+                modelType: 'Insulin',
+                timestamp: state.timelineCursorAt,
+                amount: newValue,
+                insulinType: '',
+              });
+            }
+          }}
           min={1}
           max={20}
           step={1}

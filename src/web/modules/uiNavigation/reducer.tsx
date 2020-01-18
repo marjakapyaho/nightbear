@@ -1,4 +1,5 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { Model } from 'core/models/model';
 import { isTimelineModel } from 'core/models/utils';
 import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
@@ -40,7 +41,14 @@ export function uiNavigationReducer(
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
     case 'TIMELINE_DATA_RECEIVED':
-      const { timelineModels, globalModels } = action;
+      const timelineModels = mergeIncomingModels(
+        state.loadedModels.status === 'READY' ? state.loadedModels.timelineModels : [],
+        action.timelineModels,
+      );
+      const globalModels = mergeIncomingModels(
+        state.loadedModels.status === 'READY' ? state.loadedModels.globalModels : [],
+        action.globalModels,
+      );
       return {
         ...state,
         loadedModels: { status: 'READY', timelineModels, globalModels },
@@ -81,4 +89,16 @@ export function uiNavigationReducer(
     default:
       return state;
   }
+}
+
+// Updates an array of existing Models, so that incoming Models either replace existing ones with the same storageKey, or are simply appended if they're new
+function mergeIncomingModels<T extends Model>(existingModels: T[], incomingModels: T[]): T[] {
+  const map = new Map<string, T>();
+  ([] as T[])
+    .concat(existingModels)
+    .concat(incomingModels)
+    .forEach(m => {
+      map.set(getStorageKey(m), m);
+    });
+  return [...map.values()];
 }

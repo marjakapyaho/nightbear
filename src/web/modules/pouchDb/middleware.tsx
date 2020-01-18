@@ -52,7 +52,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
               : reject(`Can't save Model changes without an active Storage`),
           )
           .then(
-            res => console.log('Save Model result:', res),
+            (res: typeof action.model) => store.dispatch(actions.TIMELINE_DATA_RECEIVED([res], [])),
             err => console.log('Save Model error:', err),
           );
       }
