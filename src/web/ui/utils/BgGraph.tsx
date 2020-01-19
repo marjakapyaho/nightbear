@@ -4,6 +4,7 @@ import { Insulin, MeterEntry, SensorEntry, TimelineModel } from 'core/models/mod
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
 import { first } from 'lodash';
+import { useEffect, useRef } from 'react';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/BgGraph.scss';
 import Highcharts from 'web/ui/utils/Highcharts';
@@ -22,17 +23,24 @@ type Props = {
 
 export default (props => {
   const { React, ns: cssNs } = useCssNs('BgGraph');
+  const thisRef = useRef<HTMLDivElement | null>(null);
+  useEffect(scrollRightOnMount, []);
 
   const chartWidth = Math.round(PIXELS_PER_HOUR * (props.timelineRange / HOUR_IN_MS));
 
   return (
-    <div className="this">
-      <div className="scroller" style={{ width: chartWidth }}>
-        {/* TODO: This scroller element shouldn't be needed once https://github.com/highcharts/highcharts/issues/8862 is fixed */}
+    <div className="this" ref={thisRef}>
+      {/* TODO: The following scroller element shouldn't be needed once https://github.com/highcharts/highcharts/issues/8862 is fixed */}
+      <div style={{ width: chartWidth }}>
         <Highcharts options={getHighchartsOptions(props, chartWidth, cssNs)} />
       </div>
     </div>
   );
+
+  function scrollRightOnMount() {
+    if (!thisRef.current) return;
+    thisRef.current.scrollLeft = thisRef.current.scrollWidth;
+  }
 }) as React.FC<Props>;
 
 const Y_STATIC: Highcharts.AxisOptions = {
