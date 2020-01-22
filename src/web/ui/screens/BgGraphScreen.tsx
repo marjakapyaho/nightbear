@@ -4,6 +4,7 @@ import 'web/ui/screens/BgGraphScreen.scss';
 import BgGraph from 'web/ui/utils/BgGraph';
 import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
 import { useCssNs, useReduxDispatch, useReduxState } from 'web/utils/react';
+import Timeline from 'web/ui/utils/timeline/Timeline';
 
 type Props = {};
 
@@ -17,12 +18,10 @@ export default (() => {
   return (
     <div className="this">
       <div className="top">
-        {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
-        {state.loadedModels.status === 'ERROR' && (
-          <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
-        )}
         {state.loadedModels.status === 'READY' && (
-          <BgGraph
+          <Timeline
+            timelineRange={state.timelineRange}
+            timelineRangeEnd={state.timelineRangeEnd}
             bgModels={mergeEntriesFeed([
               state.loadedModels.timelineModels.filter(is('DexcomSensorEntry')),
               state.loadedModels.timelineModels.filter(is('DexcomRawSensorEntry')),
@@ -30,12 +29,6 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
-            timelineRange={state.timelineRange}
-            timelineRangeEnd={state.timelineRangeEnd}
-            cursorAt={state.timelineCursorAt}
-            onCursorUpdated={TIMELINE_CURSOR_UPDATED}
-            onBgModelSelected={MODEL_SELECTED_FOR_EDITING}
-            onInsulinModelSelected={MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
