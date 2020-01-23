@@ -1,16 +1,13 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Insulin, MeterEntry, SensorEntry } from 'core/models/model';
-import { range } from 'lodash';
-import { DateTime } from 'luxon';
 import React, { useEffect, useRef } from 'react';
-import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/timeline/Timeline.scss';
-import { useCssNs } from 'web/utils/react';
-import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
-import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
 import TimelineGraphBg from 'web/ui/utils/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/utils/timeline/TimelineMarkerBg';
 import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
+import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
+import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
+import { useCssNs } from 'web/utils/react';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing

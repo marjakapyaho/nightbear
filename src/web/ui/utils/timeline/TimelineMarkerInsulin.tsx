@@ -1,13 +1,8 @@
-import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { Insulin, MeterEntry, SensorEntry } from 'core/models/model';
-import { range } from 'lodash';
-import { DateTime } from 'luxon';
-import React, { useEffect, useRef } from 'react';
-import { isNotNull } from 'server/utils/types';
+import { Insulin } from 'core/models/model';
+import React from 'react';
+import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/Timeline';
 import 'web/ui/utils/timeline/TimelineMarkerBg.scss';
 import { useCssNs } from 'web/utils/react';
-import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
-import { ExtendedTimelineConfig, tsToLeft, bgToTop } from 'web/ui/utils/timeline/Timeline';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -15,7 +10,7 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs('TimelineMarkerBg');
+  const { React } = useCssNs('TimelineMarkerInsulin');
 
   const c = props.timelineConfig;
 
