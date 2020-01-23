@@ -15,40 +15,53 @@ import { DateTime } from 'luxon';
 export type TimelineConfig = {
   timelineRange: number;
   timelineRangeEnd: number;
+  paddingTop: number;
+  paddingBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
+  outerHeight: number;
+  bgMin: number;
+  bgMax: number;
+  bgStep: number;
 };
 
 type Props = {
+  timelineConfig: TimelineConfig;
   bgModels: (SensorEntry | MeterEntry)[];
   insulinModels: Insulin[];
-} & TimelineConfig;
+};
 
 export default (props => {
   const { React } = useCssNs('Timeline');
   const thisRef = useRef<HTMLDivElement | null>(null);
   useEffect(scrollRightOnMount, []);
 
-  const timelinePaddingTop = 10;
-  const timelinePaddingBottom = 40;
-  const timelinePaddingLeft = 0;
-  const timelinePaddingRight = 20;
-  const timelineWidth = Math.round(PIXELS_PER_MS * props.timelineRange) + timelinePaddingLeft + timelinePaddingRight;
-  const timelineHeight = 400;
-  const yScaleMin = 2;
-  const yScaleMax = 18;
-  const yScaleStep = 1;
-  const startFullHour = Math.floor((props.timelineRangeEnd - props.timelineRange) / HOUR_IN_MS) * HOUR_IN_MS;
+  const {
+    timelineRange,
+    timelineRangeEnd,
+    paddingTop,
+    paddingBottom,
+    paddingLeft,
+    paddingRight,
+    outerHeight,
+    bgMin,
+    bgMax,
+    bgStep,
+  } = props.timelineConfig;
+  const flooredHourStart = Math.floor((timelineRangeEnd - timelineRange) / HOUR_IN_MS) * HOUR_IN_MS;
+  const innerWidth = Math.round(PIXELS_PER_MS * timelineRange) + paddingLeft + paddingRight;
 
   return (
     <div className="this">
       <div className="staticLayer">
-        {range(yScaleMin, yScaleMax + yScaleStep, yScaleStep).map(bg => (
+        {range(bgMin, bgMax + bgStep, bgStep).map(bg => (
           <div
             key={bg}
             style={{
               position: 'absolute',
-              left: timelinePaddingLeft,
+              left: paddingLeft,
               top: bgToY(bg),
-              right: timelinePaddingRight,
+              right: paddingRight,
               height: 1,
               background: 'green',
             }}
@@ -60,13 +73,13 @@ export default (props => {
             position: 'absolute',
             top: 0,
             right: 0,
-            bottom: timelinePaddingBottom,
-            width: timelinePaddingRight,
+            bottom: paddingBottom,
+            width: paddingRight,
             background: 'white',
             zIndex: 10,
           }}
         >
-          {range(yScaleMin, yScaleMax + yScaleStep, yScaleStep).map(bg => (
+          {range(bgMin, bgMax + bgStep, bgStep).map(bg => (
             <div
               key={bg}
               style={{
@@ -87,16 +100,16 @@ export default (props => {
         <div
           style={{
             border: '1px solid green',
-            width: timelineWidth,
-            height: timelineHeight,
+            width: innerWidth,
+            height: outerHeight,
             overflow: 'hidden',
             position: 'relative',
           }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox={[0, 0, timelineWidth, timelineHeight].join(' ')}
-            style={{ width: timelineWidth, height: timelineHeight, zIndex: 9 }}
+            viewBox={[0, 0, innerWidth, outerHeight].join(' ')}
+            style={{ width: innerWidth, height: outerHeight, zIndex: 9 }}
           >
             <polyline
               points={props.bgModels
@@ -120,7 +133,7 @@ export default (props => {
               ) : null,
             )}
           </svg>
-          {range(startFullHour, props.timelineRangeEnd, HOUR_IN_MS).map(ts => (
+          {range(flooredHourStart, timelineRangeEnd, HOUR_IN_MS).map(ts => (
             <div
               key={ts}
               style={{
@@ -166,11 +179,11 @@ export default (props => {
   }
 
   function tsToX(ts: number) {
-    return (timelinePaddingLeft + (ts - (props.timelineRangeEnd - props.timelineRange)) * PIXELS_PER_MS).toFixed(1);
+    return (paddingLeft + (ts - (timelineRangeEnd - timelineRange)) * PIXELS_PER_MS).toFixed(1);
   }
 
   function bgToY(bg: number) {
-    const kek = timelineHeight - timelinePaddingTop - timelinePaddingBottom;
-    return kek - ((bg - yScaleMin) / (yScaleMax - yScaleMin)) * kek + timelinePaddingTop;
+    const kek = outerHeight - paddingTop - paddingBottom;
+    return kek - ((bg - bgMin) / (bgMax - bgMin)) * kek + paddingTop;
   }
 }) as React.FC<Props>;
