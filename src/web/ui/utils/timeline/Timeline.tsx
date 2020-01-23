@@ -6,6 +6,11 @@ import React, { useEffect, useRef } from 'react';
 import { isNotNull } from 'server/utils/types';
 import 'web/ui/utils/timeline/Timeline.scss';
 import { useCssNs } from 'web/utils/react';
+import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
+import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
+import TimelineGraphBg from 'web/ui/utils/timeline/TimelineGraphBg';
+import TimelineMarkerBg from 'web/ui/utils/timeline/TimelineMarkerBg';
+import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing
@@ -44,52 +49,13 @@ export default (props => {
   return (
     <div className="this">
       <div className="staticLayer">
-        {range(c.bgMin, c.bgMax + c.bgStep, c.bgStep).map(bg => (
-          <div
-            key={bg}
-            style={{
-              position: 'absolute',
-              left: c.paddingLeft,
-              top: bgToTop(c, bg),
-              right: c.paddingRight,
-              height: 1,
-              background: 'green',
-            }}
-          ></div>
-        ))}
-        <div
-          className="bgScale"
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: c.paddingBottom,
-            width: c.paddingRight,
-            background: 'white',
-            zIndex: 10,
-          }}
-        >
-          {range(c.bgMin, c.bgMax + c.bgStep, c.bgStep).map(bg => (
-            <div
-              key={bg}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: bgToTop(c, bg),
-                right: 0,
-                fontSize: 10,
-                textAlign: 'left',
-              }}
-            >
-              {bg}
-            </div>
-          ))}
-        </div>
+        <TimelineScaleBg timelineConfig={c} />
       </div>
       <div className="scrollingLayer" ref={thisRef}>
         <div
+          className="scrollingLayerCutoff"
           style={{
-            border: '1px solid green',
+            border: '1px dotted blue',
             width: c.innerWidth,
             height: c.outerHeight,
             overflow: 'hidden',
@@ -101,64 +67,14 @@ export default (props => {
             viewBox={[0, 0, c.innerWidth, c.outerHeight].join(' ')}
             style={{ width: c.innerWidth, height: c.outerHeight, zIndex: 9 }}
           >
-            <polyline
-              points={props.bgModels
-                .map(model =>
-                  isNotNull(model.bloodGlucose)
-                    ? [tsToLeft(c, model.timestamp), bgToTop(c, model.bloodGlucose)].join()
-                    : '',
-                )
-                .join(' ')}
-              stroke="orange"
-              strokeWidth="3"
-              fill="none"
-            />
-            {props.bgModels.map((model, i) =>
-              isNotNull(model.bloodGlucose) ? (
-                <circle
-                  key={i}
-                  className="point-bg"
-                  cx={tsToLeft(c, model.timestamp)}
-                  cy={bgToTop(c, model.bloodGlucose)}
-                  onClick={() => alert(`${new Date(model.timestamp)}\n\nbg = ${model.bloodGlucose}`)}
-                ></circle>
-              ) : null,
-            )}
+            <TimelineGraphBg timelineConfig={c} bgModels={props.bgModels} />
+            {props.bgModels.map((model, i) => (
+              <TimelineMarkerBg key={i} timelineConfig={c} model={model} />
+            ))}
           </svg>
-          {range(c.flooredHourStart, c.timelineRangeEnd, HOUR_IN_MS).map(ts => (
-            <div
-              key={ts}
-              style={{
-                position: 'absolute',
-                left: tsToLeft(c, ts),
-                bottom: 0,
-                width: HOUR_IN_MS * c.pixelsPerMs,
-                borderLeft: '1px dotted gray',
-                top: 0,
-                display: 'flex',
-                alignItems: 'flex-end', // i.e. bottom-align the text
-                pointerEvents: 'none',
-              }}
-              title={new Date(ts) + ''}
-            >
-              {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
-              }
-            </div>
-          ))}
+          <TimelineScaleTs timelineConfig={c} />
           {props.insulinModels.map((model, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: tsToLeft(c, model.timestamp),
-                bottom: 0,
-                width: 3,
-                background: 'hotpink',
-              }}
-            >
-              {model.amount}
-            </div>
+            <TimelineMarkerInsulin key={i} timelineConfig={c} model={model} />
           ))}
         </div>
       </div>
