@@ -1,5 +1,4 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { PIXELS_PER_HOUR } from 'core/config/const';
 import { Insulin, MeterEntry, SensorEntry, TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
 import { NsFunction } from 'css-ns';
@@ -20,6 +19,8 @@ type Props = {
   onInsulinModelSelected?: (model: Insulin) => void;
   onCursorUpdated?: (timestamp: number | null) => void;
 };
+
+const PIXELS_PER_HOUR = 100;
 
 export default (props => {
   const { React, ns: cssNs } = useCssNs('BgGraph');

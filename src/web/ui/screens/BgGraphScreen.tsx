@@ -16,16 +16,17 @@ export default (() => {
   const { modelBeingEdited, timelineRange, timelineRangeEnd } = state;
 
   const timelineConfig = {
-    timelineRange, // how many ms worth of timeline data are we showing
-    timelineRangeEnd, // what's the most recent bit of timeline data we are showing (e.g. Date.now())
-    paddingTop: 10, // extra space above the BG scale lines
-    paddingBottom: 40, // extra space below the BG scale lines
-    paddingLeft: 0, // extra space to the left of the BG scale lines (does not move with the timeline)
-    paddingRight: 20, // extra space to the right of the BG scale lines (does not move with the timeline)
-    outerHeight: 400, // how much height from the layout should the whole timeline take (width is automatic)
-    bgMin: 2, // lowest BG to show on the scale lines
-    bgMax: 18, // highest BG to show on the scale lines
-    bgStep: 1, // how often to draw a BG line
+    timelineRange,
+    timelineRangeEnd,
+    paddingTop: 10,
+    paddingBottom: 40,
+    paddingLeft: 0,
+    paddingRight: 20,
+    outerHeight: 400,
+    bgMin: 2,
+    bgMax: 18,
+    bgStep: 1,
+    pixelsPerHour: 100,
   };
 
   return (
