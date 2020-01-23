@@ -65,6 +65,7 @@
     "concurrently": "^3.5.1",
     "cors": "^2.8.4",
     "css-ns": "^1.2.2",
+    "emotion": "^10.0.27",
     "express": "^4.16.2",
     "highcharts": "^8.0.0",
     "highcharts-react-official": "^2.2.2",

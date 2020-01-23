@@ -1,13 +1,12 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Insulin, MeterEntry, SensorEntry } from 'core/models/model';
+import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
-import 'web/ui/utils/timeline/Timeline.scss';
 import TimelineGraphBg from 'web/ui/utils/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/utils/timeline/TimelineMarkerBg';
 import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
-import { useCssNs } from 'web/utils/react';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing
@@ -36,33 +35,54 @@ type Props = {
   insulinModels: Insulin[];
 };
 
+const rootCss = css({
+  position: 'relative', // a lot of children are positioned according to this root element
+  overflow: 'hidden', // if anything pokes out, hide it; scrolling is implemented using a separate element
+});
+const baseLayerCss = css({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+});
+const scrollingLayerCss = cx(
+  baseLayerCss,
+  css({
+    overflowX: 'scroll',
+    overflowY: 'hidden',
+    // IMPORTANT: Even though this doesn't seem to be needed for momentum scrolling anymore (tested on iOS 13.3),
+    // at least SVG elements within a scroll container may randomly skip repaints without it. ¯\_(ツ)_/¯
+    WebkitOverflowScrolling: 'touch',
+  }),
+);
+const scrollingCutoffCss = css({
+  overflow: 'hidden',
+  position: 'relative',
+});
+const svgCss = css({
+  display: 'block',
+  zIndex: 9,
+});
+
 export default (props => {
-  const { React } = useCssNs('Timeline');
   const thisRef = useRef<HTMLDivElement | null>(null);
   useEffect(scrollRightOnMount, []);
 
   const c = getExtendedTimelineConfig(props.timelineConfig);
 
   return (
-    <div className="this">
-      <div className="staticLayer">
+    <div className={rootCss}>
+      <div className={baseLayerCss}>
         <TimelineScaleBg timelineConfig={c} />
       </div>
-      <div className="scrollingLayer" ref={thisRef}>
-        <div
-          className="scrollingLayerCutoff"
-          style={{
-            border: '1px dotted blue',
-            width: c.innerWidth,
-            height: c.outerHeight,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
+      <div className={scrollingLayerCss} ref={thisRef}>
+        <div className={scrollingCutoffCss} style={{ width: c.innerWidth, height: c.outerHeight }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox={[0, 0, c.innerWidth, c.outerHeight].join(' ')}
-            style={{ width: c.innerWidth, height: c.outerHeight, zIndex: 9 }}
+            className={svgCss}
+            style={{ width: c.innerWidth, height: c.outerHeight }}
           >
             <TimelineGraphBg timelineConfig={c} bgModels={props.bgModels} />
             {props.bgModels.map((model, i) => (

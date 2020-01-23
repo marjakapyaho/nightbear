@@ -1,55 +1,61 @@
+import { css } from 'emotion';
 import { range } from 'lodash';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig } from 'web/ui/utils/timeline/Timeline';
-import 'web/ui/utils/timeline/Timeline.scss';
-import { useCssNs } from 'web/utils/react';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
 };
 
 export default (props => {
-  const { React } = useCssNs('TimelineScaleBg');
-
-  const c = props.timelineConfig;
+  const bgLines = range(
+    props.timelineConfig.bgMin,
+    props.timelineConfig.bgMax + props.timelineConfig.bgStep,
+    props.timelineConfig.bgStep,
+  );
 
   return (
     <div className="this">
-      {range(c.bgMin, c.bgMax + c.bgStep, c.bgStep).map(bg => (
+      {bgLines.map(bg => (
         <div
           key={bg}
-          style={{
+          className={css({
             position: 'absolute',
-            left: c.paddingLeft,
-            top: bgToTop(c, bg),
-            right: c.paddingRight,
             height: 1,
             background: 'green',
+          })}
+          style={{
+            left: props.timelineConfig.paddingLeft,
+            top: bgToTop(props.timelineConfig, bg),
+            right: props.timelineConfig.paddingRight,
           }}
         ></div>
       ))}
       <div
-        className="bgScale"
-        style={{
+        className={css({
           position: 'absolute',
           top: 0,
           right: 0,
-          bottom: c.paddingBottom,
-          width: c.paddingRight,
           background: 'white',
           zIndex: 10,
+        })}
+        style={{
+          bottom: props.timelineConfig.paddingBottom,
+          width: props.timelineConfig.paddingRight,
         }}
       >
-        {range(c.bgMin, c.bgMax + c.bgStep, c.bgStep).map(bg => (
+        {bgLines.map(bg => (
           <div
             key={bg}
-            style={{
+            className={css({
               position: 'absolute',
               left: 0,
-              top: bgToTop(c, bg),
               right: 0,
               fontSize: 10,
               textAlign: 'left',
+            })}
+            style={{
+              top: bgToTop(props.timelineConfig, bg),
             }}
           >
             {bg}
