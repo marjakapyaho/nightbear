@@ -7,11 +7,14 @@ import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
 import { getExtendedTimelineConfig, TimelineConfig } from 'web/ui/utils/timeline/utils';
+import { isSameModel } from 'core/models/utils';
 
 type Props = {
   timelineConfig: TimelineConfig;
   bgModels: (SensorEntry | MeterEntry)[];
   insulinModels: Insulin[];
+  selectedInsulinModel?: Insulin;
+  onInsulinModelSelect: (model: Insulin) => void;
 };
 
 const rootCss = css({
@@ -70,7 +73,13 @@ export default (props => {
           </svg>
           <TimelineScaleTs timelineConfig={c} />
           {props.insulinModels.map((model, i) => (
-            <TimelineMarkerInsulin key={i} timelineConfig={c} model={model} />
+            <TimelineMarkerInsulin
+              key={i}
+              timelineConfig={c}
+              model={model}
+              isSelected={isSameModel(props.selectedInsulinModel, model)}
+              onSelect={props.onInsulinModelSelect}
+            />
           ))}
         </div>
       </div>

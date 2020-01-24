@@ -1,13 +1,13 @@
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
 import 'web/ui/utils/MainNavBar.scss';
-import { useCssNs, useReduxDispatch, useReduxState } from 'web/utils/react';
+import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
 export default (() => {
   const { React } = useCssNs('MainNavBar');
   const selectedScreen = useReduxState(s => s.uiNavigation.selectedScreen);
-  const { UI_NAVIGATED } = useReduxDispatch();
+  const { UI_NAVIGATED } = useReduxActions();
 
   return (
     <div className="this">

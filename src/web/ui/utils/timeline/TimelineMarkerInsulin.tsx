@@ -6,6 +6,8 @@ import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/utils';
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
   model: Insulin;
+  isSelected: boolean;
+  onSelect: (model: Insulin) => void;
 };
 
 export default (props => {
@@ -20,7 +22,9 @@ export default (props => {
       })}
       style={{
         left: tsToLeft(props.timelineConfig, props.model.timestamp),
+        width: props.isSelected ? 10 : undefined,
       }}
+      onClick={() => props.onSelect(props.model)}
     >
       {props.model.amount}
     </div>

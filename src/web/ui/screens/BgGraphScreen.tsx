@@ -1,17 +1,16 @@
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { is } from 'core/models/utils';
 import 'web/ui/screens/BgGraphScreen.scss';
-import BgGraph from 'web/ui/utils/BgGraph';
 import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
-import { useCssNs, useReduxDispatch, useReduxState } from 'web/utils/react';
 import Timeline from 'web/ui/utils/timeline/Timeline';
+import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const state = useReduxState(s => s.uiNavigation);
-  const { MODEL_SELECTED_FOR_EDITING, MODEL_CHANGES_SAVED, TIMELINE_CURSOR_UPDATED } = useReduxDispatch();
+  const actions = useReduxActions();
 
   const { modelBeingEdited, timelineRange, timelineRangeEnd } = state;
 
@@ -42,6 +41,8 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
+            selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
@@ -50,7 +51,7 @@ export default (() => {
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={newValue => {
             if (state.timelineCursorAt && !modelBeingEdited) {
-              MODEL_CHANGES_SAVED({
+              actions.MODEL_CHANGES_SAVED({
                 modelType: 'Insulin',
                 timestamp: state.timelineCursorAt,
                 amount: newValue,

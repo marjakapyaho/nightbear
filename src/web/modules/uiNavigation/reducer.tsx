@@ -1,6 +1,6 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Model } from 'core/models/model';
-import { isTimelineModel } from 'core/models/utils';
+import { isTimelineModel, isSameModel } from 'core/models/utils';
 import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
 import { ReduxAction } from 'web/modules/actions';
@@ -72,7 +72,7 @@ export function uiNavigationReducer(
           loadedModels: {
             ...state.loadedModels,
             timelineModels: state.loadedModels.timelineModels.map(existingModel => {
-              const replacement = newModels.find(newModel => getStorageKey(newModel) === getStorageKey(existingModel));
+              const replacement = newModels.find(isSameModel.bind(null, existingModel));
               if (replacement && isTimelineModel(replacement)) {
                 console.log('Found replacement:', replacement);
                 return replacement;
