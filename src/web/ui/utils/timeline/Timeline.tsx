@@ -1,16 +1,19 @@
 import { Insulin, MeterEntry, SensorEntry } from 'core/models/model';
+import { isSameModel } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
 import TimelineGraphBg from 'web/ui/utils/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/utils/timeline/TimelineMarkerBg';
+import TimelineMarkerCursor from 'web/ui/utils/timeline/TimelineMarkerCursor';
 import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
-import { getExtendedTimelineConfig, TimelineConfig } from 'web/ui/utils/timeline/utils';
-import { isSameModel } from 'core/models/utils';
+import { getExtendedTimelineConfig, TimelineConfig, tsToLeft, leftToTs } from 'web/ui/utils/timeline/utils';
 
 type Props = {
   timelineConfig: TimelineConfig;
+  cursorTimestamp?: number | null;
+  onCursorTimestampUpdate: (ts: number | null) => void;
   bgModels: (SensorEntry | MeterEntry)[];
   insulinModels: Insulin[];
   selectedInsulinModel?: Insulin;
@@ -48,7 +51,8 @@ const svgCss = css({
 });
 
 export default (props => {
-  const thisRef = useRef<HTMLDivElement | null>(null);
+  const scrollingRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
   useEffect(scrollRightOnMount, []);
 
   const c = getExtendedTimelineConfig(props.timelineConfig);
@@ -58,13 +62,22 @@ export default (props => {
       <div className={baseLayerCss}>
         <TimelineScaleBg timelineConfig={c} />
       </div>
-      <div className={scrollingLayerCss} ref={thisRef}>
+      <div
+        className={scrollingLayerCss}
+        ref={scrollingRef}
+        onClick={event => {
+          if (!scrollingRef.current) return;
+          if (event.target !== svgRef.current) return;
+          props.onCursorTimestampUpdate(leftToTs(c, scrollingRef.current.scrollLeft + event.clientX));
+        }}
+      >
         <div className={scrollingCutoffCss} style={{ width: c.innerWidth, height: c.outerHeight }}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox={[0, 0, c.innerWidth, c.outerHeight].join(' ')}
             className={svgCss}
             style={{ width: c.innerWidth, height: c.outerHeight }}
+            ref={svgRef}
           >
             <TimelineGraphBg timelineConfig={c} bgModels={props.bgModels} />
             {props.bgModels.map((model, i) => (
@@ -81,13 +94,20 @@ export default (props => {
               onSelect={props.onInsulinModelSelect}
             />
           ))}
+          {props.cursorTimestamp ? (
+            <TimelineMarkerCursor
+              timelineConfig={c}
+              timestamp={props.cursorTimestamp}
+              onClick={() => props.onCursorTimestampUpdate(null)}
+            />
+          ) : null}
         </div>
       </div>
     </div>
   );
 
   function scrollRightOnMount() {
-    if (!thisRef.current) return;
-    thisRef.current.scrollLeft = thisRef.current.scrollWidth;
+    if (!scrollingRef.current) return;
+    scrollingRef.current.scrollLeft = scrollingRef.current.scrollWidth;
   }
 }) as React.FC<Props>;

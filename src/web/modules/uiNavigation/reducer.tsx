@@ -59,9 +59,17 @@ export function uiNavigationReducer(
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
     case 'MODEL_SELECTED_FOR_EDITING':
-      return { ...state, modelBeingEdited: action.model };
+      return {
+        ...state,
+        modelBeingEdited: isSameModel(state.modelBeingEdited, action.model) ? null : action.model, // if selecting the same model again, de-select instead
+        timelineCursorAt: null, // clear a possible previous cursor when starting edit
+      };
     case 'TIMELINE_CURSOR_UPDATED':
-      return { ...state, timelineCursorAt: action.timestamp };
+      return {
+        ...state,
+        modelBeingEdited: null, // clear a possible previous edit when placing cursor
+        timelineCursorAt: state.modelBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
+      };
     case 'DB_EMITTED_CHANGES':
       if (state.loadedModels.status !== 'READY') return state;
       try {

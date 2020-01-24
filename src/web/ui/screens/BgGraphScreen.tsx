@@ -34,6 +34,8 @@ export default (() => {
         {state.loadedModels.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
+            cursorTimestamp={state.timelineCursorAt}
+            onCursorTimestampUpdate={actions.TIMELINE_CURSOR_UPDATED}
             bgModels={mergeEntriesFeed([
               state.loadedModels.timelineModels.filter(is('DexcomSensorEntry')),
               state.loadedModels.timelineModels.filter(is('DexcomRawSensorEntry')),
