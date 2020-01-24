@@ -1,7 +1,7 @@
 import { MeterEntry, SensorEntry } from 'core/models/model';
 import { css } from 'emotion';
 import React from 'react';
-import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/Timeline';
+import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;

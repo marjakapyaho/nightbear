@@ -1,7 +1,7 @@
 import { css } from 'emotion';
 import { range } from 'lodash';
 import React from 'react';
-import { bgToTop, ExtendedTimelineConfig } from 'web/ui/utils/timeline/Timeline';
+import { bgToTop, ExtendedTimelineConfig } from 'web/ui/utils/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;

@@ -1,7 +1,7 @@
 import { Insulin } from 'core/models/model';
 import { css } from 'emotion';
 import React from 'react';
-import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/Timeline';
+import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
