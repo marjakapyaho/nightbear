@@ -1,4 +1,4 @@
-import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS, roundTo1Decimals } from 'core/calculations/calculations';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing
@@ -35,15 +35,15 @@ export function getExtendedTimelineConfig(c: TimelineConfig): ExtendedTimelineCo
 
 // The CSS left value for rendering the given timestamp
 export function tsToLeft(c: ExtendedTimelineConfig, ts: number) {
-  return Math.round((c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs) * 10) / 10; // round to 1 decimal; anything more is a nuisance when debugging
+  return roundTo1Decimals(c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs);
 }
 
 // Inverse of tsToLeft()
 export function leftToTs(c: ExtendedTimelineConfig, left: number) {
-  return (left - c.paddingLeft) / c.pixelsPerMs + (c.timelineRangeEnd - c.timelineRange);
+  return roundTo1Decimals((left - c.paddingLeft) / c.pixelsPerMs + (c.timelineRangeEnd - c.timelineRange));
 }
 
 // The CSS top value for rendering the given BG
 export function bgToTop(c: ExtendedTimelineConfig, bg: number) {
-  return c.innerHeight - ((bg - c.bgMin) / (c.bgMax - c.bgMin)) * c.innerHeight + c.paddingTop;
+  return roundTo1Decimals(c.innerHeight - ((bg - c.bgMin) / (c.bgMax - c.bgMin)) * c.innerHeight + c.paddingTop);
 }

@@ -35,6 +35,11 @@ export function isDexcomEntryValid(noise: number, sgv: number): boolean {
   return noise < NOISE_LEVEL_LIMIT && sgv > 40;
 }
 
+// Rounds a number to 1 decimal; for contexts where more precision is a nuisance when debugging
+export function roundTo1Decimals(num: number) {
+  return Math.round(num * 10) / 10;
+}
+
 export function roundTo2Decimals(num: number) {
   return Math.round(num * 100) / 100;
 }
