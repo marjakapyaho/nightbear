@@ -1,8 +1,0 @@
-.nb-BgGraph {
-  overflow-x: scroll;
-  overflow-y: hidden;
-
-  // IMPORTANT: Even though this doesn't seem to be needed for momentum scrolling anymore (tested on iOS 13.3),
-  // at least SVG elements within a scroll container will skip repaints without it. ¯\_(ツ)_/¯
-  -webkit-overflow-scrolling: touch;
-}
