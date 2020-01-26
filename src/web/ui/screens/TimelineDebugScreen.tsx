@@ -1,5 +1,5 @@
 import 'web/ui/screens/TimelineDebugScreen.scss';
-import { useCssNs, useReduxState, useReduxDispatch } from 'web/utils/react';
+import { useCssNs, useReduxState, useReduxActions } from 'web/utils/react';
 import ReactModal from 'react-modal';
 import { isTimelineModel } from 'core/models/utils';
 import TimeRangeSelector from 'web/ui/utils/TimeRangeSelector';
@@ -13,7 +13,7 @@ type Props = {};
 export default () => {
   const { React, ns: cssNs } = useCssNs('TimelineDebugScreen');
   const state = useReduxState(s => s.uiNavigation);
-  const actions = useReduxDispatch();
+  const actions = useReduxActions();
 
   if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
   return (
@@ -37,7 +37,7 @@ export default () => {
               console.log('New model content:', txt.value);
               const newModel = JSON.parse(txt.value);
               if (isTimelineModel(newModel)) {
-                actions.MODEL_CHANGES_SAVED(newModel);
+                actions.MODEL_UPDATED_BY_USER(newModel);
                 actions.MODEL_SELECTED_FOR_EDITING(null);
               } else {
                 throw new Error(`Couldn't parse content as a TimelineModel`);

@@ -1,28 +1,41 @@
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { is } from 'core/models/utils';
 import 'web/ui/screens/BgGraphScreen.scss';
-import BgGraph from 'web/ui/utils/BgGraph';
 import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
-import { useCssNs, useReduxDispatch, useReduxState } from 'web/utils/react';
+import Timeline from 'web/ui/utils/timeline/Timeline';
+import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const state = useReduxState(s => s.uiNavigation);
-  const { MODEL_SELECTED_FOR_EDITING, MODEL_CHANGES_SAVED, TIMELINE_CURSOR_UPDATED } = useReduxDispatch();
+  const actions = useReduxActions();
 
-  const { modelBeingEdited } = state;
+  const { modelBeingEdited, timelineRange, timelineRangeEnd } = state;
+
+  const timelineConfig = {
+    timelineRange,
+    timelineRangeEnd,
+    paddingTop: 10,
+    paddingBottom: 40,
+    paddingLeft: 0,
+    paddingRight: 20,
+    outerHeight: 400,
+    bgMin: 2,
+    bgMax: 18,
+    bgStep: 1,
+    pixelsPerHour: 100,
+  };
 
   return (
     <div className="this">
       <div className="top">
-        {state.loadedModels.status === 'FETCHING' && <pre>Fetching...</pre>}
-        {state.loadedModels.status === 'ERROR' && (
-          <pre>Error while loading timeline models: {state.loadedModels.errorMessage}</pre>
-        )}
         {state.loadedModels.status === 'READY' && (
-          <BgGraph
+          <Timeline
+            timelineConfig={timelineConfig}
+            cursorTimestamp={state.timelineCursorAt}
+            onCursorTimestampUpdate={actions.TIMELINE_CURSOR_UPDATED}
             bgModels={mergeEntriesFeed([
               state.loadedModels.timelineModels.filter(is('DexcomSensorEntry')),
               state.loadedModels.timelineModels.filter(is('DexcomRawSensorEntry')),
@@ -30,12 +43,8 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
-            timelineRange={state.timelineRange}
-            timelineRangeEnd={state.timelineRangeEnd}
-            cursorAt={state.timelineCursorAt}
-            onCursorUpdated={TIMELINE_CURSOR_UPDATED}
-            onBgModelSelected={MODEL_SELECTED_FOR_EDITING}
-            onInsulinModelSelected={MODEL_SELECTED_FOR_EDITING}
+            selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
@@ -44,13 +53,21 @@ export default (() => {
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={newValue => {
             if (state.timelineCursorAt && !modelBeingEdited) {
-              MODEL_CHANGES_SAVED({
+              // Create new
+              actions.MODEL_UPDATED_BY_USER({
                 modelType: 'Insulin',
                 timestamp: state.timelineCursorAt,
                 amount: newValue,
                 insulinType: '',
               });
+            } else if (is('Insulin')(modelBeingEdited)) {
+              // Update existing
+              actions.MODEL_UPDATED_BY_USER({
+                ...modelBeingEdited,
+                amount: newValue,
+              });
             }
+            // TODO: Deleting when modelBeingEdited.amount === newValue
           }}
           min={1}
           max={20}

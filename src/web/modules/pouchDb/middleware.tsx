@@ -44,7 +44,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
       timelineFiltersChanged,
     );
     return (action: ReduxAction) => {
-      if (action.type === 'MODEL_CHANGES_SAVED') {
+      if (action.type === 'MODEL_UPDATED_BY_USER') {
         Promise.resolve()
           .then(() =>
             activeStorage

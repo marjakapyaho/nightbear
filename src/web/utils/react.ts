@@ -21,6 +21,6 @@ export function useReduxState<Selection>(
 }
 
 // Simple wrapper around Redux's default hook, adding more accurate types
-export function useReduxDispatch(): ReduxActions {
+export function useReduxActions(): ReduxActions {
   return bindActionCreators(actions, useDispatch());
 }

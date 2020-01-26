@@ -11,7 +11,7 @@ import { ReduxActions } from 'web/modules/actions';
 import Highcharts from 'web/ui/utils/Highcharts';
 import 'web/ui/utils/TimelineModelGraph.scss';
 import { getFormattedTimestamp } from 'web/ui/utils/Timestamp';
-import { useCssNs, useReduxDispatch } from 'web/utils/react';
+import { useCssNs, useReduxActions } from 'web/utils/react';
 import { objectKeys } from 'web/utils/types';
 
 type Props = {
@@ -24,7 +24,7 @@ type Props = {
 
 export default (props => {
   const { React, ns: cssNs } = useCssNs('TimelineModelGraph');
-  const actions = useReduxDispatch();
+  const actions = useReduxActions();
 
   return (
     <div className="this">

@@ -1,6 +1,6 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Model } from 'core/models/model';
-import { isTimelineModel } from 'core/models/utils';
+import { isTimelineModel, isSameModel } from 'core/models/utils';
 import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
 import { ReduxAction } from 'web/modules/actions';
@@ -59,9 +59,23 @@ export function uiNavigationReducer(
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
     case 'MODEL_SELECTED_FOR_EDITING':
-      return { ...state, modelBeingEdited: action.model };
+      return {
+        ...state,
+        modelBeingEdited: isSameModel(state.modelBeingEdited, action.model) ? null : action.model, // if selecting the same model again, de-select instead
+        timelineCursorAt: null, // clear a possible previous cursor when starting edit
+      };
     case 'TIMELINE_CURSOR_UPDATED':
-      return { ...state, timelineCursorAt: action.timestamp };
+      return {
+        ...state,
+        modelBeingEdited: null, // clear a possible previous edit when placing cursor
+        timelineCursorAt: state.modelBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
+      };
+    case 'MODEL_UPDATED_BY_USER':
+      return {
+        ...state,
+        modelBeingEdited: null, // after updating a model, de-select it
+        timelineCursorAt: null, // ^ ditto for the cursor, if it existed (as it does before creating a new model)
+      };
     case 'DB_EMITTED_CHANGES':
       if (state.loadedModels.status !== 'READY') return state;
       try {
@@ -72,7 +86,7 @@ export function uiNavigationReducer(
           loadedModels: {
             ...state.loadedModels,
             timelineModels: state.loadedModels.timelineModels.map(existingModel => {
-              const replacement = newModels.find(newModel => getStorageKey(newModel) === getStorageKey(existingModel));
+              const replacement = newModels.find(isSameModel.bind(null, existingModel));
               if (replacement && isTimelineModel(replacement)) {
                 console.log('Found replacement:', replacement);
                 return replacement;

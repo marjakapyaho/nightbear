@@ -25,6 +25,13 @@ export function isGlobalModel(x: any): x is GlobalModel {
   return isModel(x) && !('timestamp' in x);
 }
 
+// Tells you whether the two Models have the same unique identity.
+// This does NOT mean their properties are exactly equal, though!
+export function isSameModel(a: any, b: any): boolean {
+  if (!isModel(a) || !isModel(b)) return false;
+  return getStorageKey(a) === getStorageKey(b);
+}
+
 // @example array.filter(is('Alarm'))
 // prettier-ignore
 export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType>(mt1: T1): (model: unknown, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1>;
