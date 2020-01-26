@@ -8,7 +8,7 @@ import TimelineMarkerCursor from 'web/ui/utils/timeline/TimelineMarkerCursor';
 import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
-import { getExtendedTimelineConfig, TimelineConfig, tsToLeft, leftToTs } from 'web/ui/utils/timeline/utils';
+import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/utils/timeline/utils';
 
 type Props = {
   timelineConfig: TimelineConfig;
