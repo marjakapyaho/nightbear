@@ -53,7 +53,8 @@ export default (() => {
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={newValue => {
             if (state.timelineCursorAt && !modelBeingEdited) {
-              actions.MODEL_CHANGES_SAVED({
+              // Create new
+              actions.MODEL_UPDATED_BY_USER({
                 modelType: 'Insulin',
                 timestamp: state.timelineCursorAt,
                 amount: newValue,

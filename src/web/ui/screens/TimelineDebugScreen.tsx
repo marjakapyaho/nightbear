@@ -37,7 +37,7 @@ export default () => {
               console.log('New model content:', txt.value);
               const newModel = JSON.parse(txt.value);
               if (isTimelineModel(newModel)) {
-                actions.MODEL_CHANGES_SAVED(newModel);
+                actions.MODEL_UPDATED_BY_USER(newModel);
                 actions.MODEL_SELECTED_FOR_EDITING(null);
               } else {
                 throw new Error(`Couldn't parse content as a TimelineModel`);
