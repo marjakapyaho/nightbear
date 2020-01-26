@@ -60,7 +60,14 @@ export default (() => {
                 amount: newValue,
                 insulinType: '',
               });
+            } else if (is('Insulin')(modelBeingEdited)) {
+              // Update existing
+              actions.MODEL_UPDATED_BY_USER({
+                ...modelBeingEdited,
+                amount: newValue,
+              });
             }
+            // TODO: Deleting when modelBeingEdited.amount === newValue
           }}
           min={1}
           max={20}

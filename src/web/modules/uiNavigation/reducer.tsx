@@ -70,6 +70,12 @@ export function uiNavigationReducer(
         modelBeingEdited: null, // clear a possible previous edit when placing cursor
         timelineCursorAt: state.modelBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
+    case 'MODEL_UPDATED_BY_USER':
+      return {
+        ...state,
+        modelBeingEdited: null, // after updating a model, de-select it
+        timelineCursorAt: null, // ^ ditto for the cursor, if it existed (as it does before creating a new model)
+      };
     case 'DB_EMITTED_CHANGES':
       if (state.loadedModels.status !== 'READY') return state;
       try {
