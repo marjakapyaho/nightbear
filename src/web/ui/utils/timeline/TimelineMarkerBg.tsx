@@ -28,6 +28,6 @@ export default (props => {
       cx={tsToLeft(props.timelineConfig, props.model.timestamp)}
       cy={bgToTop(props.timelineConfig, props.model.bloodGlucose)}
       onClick={() => alert(`${new Date(props.model.timestamp)}\n\nbg = ${props.model.bloodGlucose}`)}
-    ></circle>
+    />
   );
 }) as React.FC<Props>;
