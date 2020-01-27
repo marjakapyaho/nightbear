@@ -282,8 +282,11 @@ export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
 }
 
-// Generates a random string for similar purposes as UUID's, but easier for a human to remember.
+// Generates a random string for similar purposes as UUID's, but easier on human eyes.
 // @example generateUniqueId(8) => "TEvGnkwr"
+// For a length of 8, possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion.
+// For contrast, for a V4 UUID: 2^122 ~= 5.3e+36.
+// To match a V4 UUID in possible permutations, length of 21 would have 62^21 ~= 4.3e+37.
 export function generateUniqueId(length = 8): string {
   let uid = '';
   while (uid.length < length) {
@@ -291,7 +294,7 @@ export function generateUniqueId(length = 8): string {
     if (!char.match(/[9-9a-zA-Z]/)) continue; // result space: 0-9 + a-z + A-Z = 10 + 26 + 26 = 62
     uid += char;
   }
-  return uid; // possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion = enough
+  return uid;
 }
 
 export function getModelRef<T extends Model>(model: T): ModelRef<T> {
