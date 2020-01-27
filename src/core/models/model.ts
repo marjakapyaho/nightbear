@@ -25,7 +25,7 @@ export type ModelRef<T extends Model> = {
   readonly modelRef: string; // this is storage-type specific
 };
 
-export interface Sensor {
+export type Sensor = {
   // Model:
   readonly modelType: 'Sensor';
   readonly modelMeta?: ModelMeta;
@@ -33,11 +33,11 @@ export interface Sensor {
   readonly timestamp: number;
   readonly endTimestamp: number;
   readonly placementNote: string;
-}
+};
 
 export type SensorEntry = DexcomSensorEntry | DexcomRawSensorEntry | ParakeetSensorEntry;
 
-export interface DexcomSensorEntry {
+export type DexcomSensorEntry = {
   // Model:
   readonly modelType: 'DexcomSensorEntry';
   readonly modelMeta?: ModelMeta;
@@ -47,9 +47,9 @@ export interface DexcomSensorEntry {
   // DexcomSensorEntry:
   readonly signalStrength: number; // i.e. "rssi"
   readonly noiseLevel: number;
-}
+};
 
-export interface DexcomRawSensorEntry {
+export type DexcomRawSensorEntry = {
   // Model:
   readonly modelType: 'DexcomRawSensorEntry';
   readonly modelMeta?: ModelMeta;
@@ -61,9 +61,9 @@ export interface DexcomRawSensorEntry {
   readonly noiseLevel: number;
   readonly rawFiltered: number;
   readonly rawUnfiltered: number;
-}
+};
 
-export interface ParakeetSensorEntry {
+export type ParakeetSensorEntry = {
   // Model:
   readonly modelType: 'ParakeetSensorEntry';
   readonly modelMeta?: ModelMeta;
@@ -73,26 +73,26 @@ export interface ParakeetSensorEntry {
   // ParakeetSensorEntry:
   readonly rawFiltered: number;
   readonly rawUnfiltered: number;
-}
+};
 
-export interface AnalyserEntry {
+export type AnalyserEntry = {
   readonly timestamp: number;
   readonly bloodGlucose: number;
   readonly slope: number | null;
   readonly rawSlope: number | null;
-}
+};
 
 export type Calibration = DexcomCalibration | NightbearCalibration;
 
-export interface MeterEntry {
+export type MeterEntry = {
   readonly modelType: 'MeterEntry';
   readonly modelMeta?: ModelMeta;
   readonly timestamp: number;
   readonly source: 'dexcom' | 'ui';
   readonly bloodGlucose: number;
-}
+};
 
-export interface DexcomCalibration {
+export type DexcomCalibration = {
   // Model:
   readonly modelType: 'DexcomCalibration';
   readonly modelMeta?: ModelMeta;
@@ -104,9 +104,9 @@ export interface DexcomCalibration {
   readonly intercept: number | null;
   // DexcomCalibration:
   readonly scale: number | null;
-}
+};
 
-export interface NightbearCalibration {
+export type NightbearCalibration = {
   // Model:
   readonly modelType: 'NightbearCalibration';
   readonly modelMeta?: ModelMeta;
@@ -120,9 +120,9 @@ export interface NightbearCalibration {
   readonly sensorId: string; // UUID
   readonly rawValueId: string; // UUID
   readonly slopeConfidence: number;
-}
+};
 
-export interface DeviceStatus {
+export type DeviceStatus = {
   // Model:
   readonly modelType: 'DeviceStatus';
   readonly modelMeta?: ModelMeta;
@@ -131,9 +131,9 @@ export interface DeviceStatus {
   readonly timestamp: number;
   readonly batteryLevel: number;
   readonly geolocation: string | null;
-}
+};
 
-export interface Hba1c {
+export type Hba1c = {
   // Model:
   readonly modelType: 'Hba1c';
   readonly modelMeta?: ModelMeta;
@@ -141,9 +141,9 @@ export interface Hba1c {
   readonly source: 'calculated' | 'measured';
   readonly timestamp: number;
   readonly hba1cValue: number;
-}
+};
 
-export interface Insulin {
+export type Insulin = {
   // Model:
   readonly modelType: 'Insulin';
   readonly modelMeta?: ModelMeta;
@@ -151,9 +151,9 @@ export interface Insulin {
   readonly timestamp: number;
   readonly amount: number;
   readonly insulinType: string;
-}
+};
 
-export interface Carbs {
+export type Carbs = {
   // Model:
   readonly modelType: 'Carbs';
   readonly modelMeta?: ModelMeta;
@@ -161,7 +161,7 @@ export interface Carbs {
   readonly timestamp: number;
   readonly amount: number;
   readonly carbsType: 'fast' | 'normal' | 'slow';
-}
+};
 
 const defaultState = {
   BATTERY: false,
@@ -187,7 +187,7 @@ export type AlarmState = {
   readonly pushoverReceipts: string[];
 };
 
-export interface Alarm {
+export type Alarm = {
   // Model:
   readonly modelType: 'Alarm';
   readonly modelMeta?: ModelMeta;
@@ -197,9 +197,9 @@ export interface Alarm {
   readonly isActive: boolean;
   readonly deactivationTimestamp: number | null;
   readonly alarmStates: [AlarmState, ...AlarmState[]];
-}
+};
 
-interface BaseProfile {
+type BaseProfile = {
   readonly profileName: string;
   readonly alarmsEnabled: boolean;
   readonly analyserSettings: {
@@ -219,17 +219,17 @@ interface BaseProfile {
     };
   };
   readonly pushoverLevels: string[];
-}
+};
 
-export interface ActiveProfile extends BaseProfile {
+export type ActiveProfile = BaseProfile & {
   // Model:
   readonly modelType: 'ActiveProfile';
   readonly modelMeta?: ModelMeta;
   // ActiveProfile:
   readonly timestamp: number;
-}
+};
 
-export interface SavedProfile extends BaseProfile {
+export type SavedProfile = BaseProfile & {
   // Model:
   readonly modelType: 'SavedProfile';
   readonly modelMeta?: ModelMeta;
@@ -238,4 +238,4 @@ export interface SavedProfile extends BaseProfile {
     readonly hours: number;
     readonly minutes: number;
   };
-}
+};
