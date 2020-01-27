@@ -8,7 +8,7 @@ import { NO_STORAGE } from 'core/storage/storage';
 import { Storage } from 'core/storage/storage';
 import 'mocha';
 import { NO_LOGGING } from 'server/utils/logging';
-import { getUuid } from 'server/utils/uuid';
+import { generateUuid } from 'core/utils/id';
 
 export type TestSuite = (storage: () => Storage) => void;
 
@@ -22,7 +22,7 @@ export function withStorage(suite: TestSuite) {
 function withInMemoryStorage(suite: TestSuite) {
   describe('with in-memory storage', () => {
     suite(() => {
-      const dbUrl = TEMP_DB_PREFIX + getUuid();
+      const dbUrl = TEMP_DB_PREFIX + generateUuid();
       return createCouchDbStorage(dbUrl, { adapter: 'memory' });
     });
   });
@@ -33,7 +33,7 @@ function withCouchDbStorage(suite: TestSuite) {
   (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('with CouchDB storage', () => {
     let createdDbs: string[] = [];
     suite(() => {
-      const dbUrl = NIGHTBEAR_TEST_DB_URL + TEMP_DB_PREFIX + getUuid();
+      const dbUrl = NIGHTBEAR_TEST_DB_URL + TEMP_DB_PREFIX + generateUuid();
       createdDbs.push(dbUrl);
       return createCouchDbStorage(dbUrl);
     });

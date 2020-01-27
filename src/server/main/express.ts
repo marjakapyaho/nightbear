@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import { Request as ExpressRequest } from 'express';
 import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
-import { getUuid } from 'server/utils/uuid';
+import { generateUuid } from 'core/utils/id';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
@@ -16,7 +16,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
     app.use(bodyParser.json());
     handlers.forEach(([method, path, handler]) => {
       app[method](path, (req, res) => {
-        const requestId = req.get('X-Request-ID') || getUuid(); // use Heroku-style req-ID where available, but fall back to our own
+        const requestId = req.get('X-Request-ID') || generateUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
           .then(request => {
             const log = bindLoggingContext(context.log, getContextName('request', requestId));

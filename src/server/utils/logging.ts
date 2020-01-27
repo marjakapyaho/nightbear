@@ -1,7 +1,7 @@
 import { RequestHandler } from 'core/models/api';
 import { noop } from 'lodash';
 import { mapObject } from 'server/utils/data';
-import { getUuid } from 'server/utils/uuid';
+import { generateUuid } from 'core/utils/id';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LoggerMethod = (message: string, meta?: any) => void;
@@ -34,7 +34,7 @@ export function createConsoleLogger(): Logger {
 // @example getContextName() => "default-32846a768f5f"
 // @example getContextName('request', req.get('X-Request-ID')) => "request-32846a768f5f"
 export function getContextName(label = 'default', uuid?: string) {
-  const [id] = (uuid || getUuid()).split('-');
+  const [id] = (uuid || generateUuid()).split('-');
   return `${label}-${id}`;
 }
 
