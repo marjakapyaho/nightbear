@@ -27,6 +27,7 @@ export type Model =
 
 type _Model<T> = Readonly<{
   modelType: T;
+  modelUuid: string;
   modelMeta?: ModelMeta;
 }>;
 
