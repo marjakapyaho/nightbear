@@ -4,6 +4,7 @@ import { Carbs, DexcomSensorEntry, Insulin } from 'core/models/model';
 import 'mocha';
 import { getEntries } from 'server/api/getEntries/getEntries';
 import { createTestContext, createTestRequest, withStorage } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('api/getEntries', () => {
   const timestampNow = 1508672249758;
@@ -11,6 +12,7 @@ describe('api/getEntries', () => {
 
   const mockDexcomSensorEntry1: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 6 * MIN_IN_MS,
     bloodGlucose: 6.9,
     signalStrength: 168,
@@ -19,6 +21,7 @@ describe('api/getEntries', () => {
 
   const mockDexcomSensorEntry2: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - MIN_IN_MS,
     bloodGlucose: 7.5,
     signalStrength: 168,
@@ -27,6 +30,7 @@ describe('api/getEntries', () => {
 
   const mockInsulinEntry: Insulin = {
     modelType: 'Insulin',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - MIN_IN_MS,
     amount: 5,
     insulinType: 'fiasp',
@@ -34,6 +38,7 @@ describe('api/getEntries', () => {
 
   const mockCarbEntry: Carbs = {
     modelType: 'Carbs',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 3 * MIN_IN_MS,
     amount: 40,
     carbsType: 'slow',

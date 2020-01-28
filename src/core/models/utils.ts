@@ -11,6 +11,7 @@ import {
 } from 'core/models/model';
 import { getStorageKey } from 'core/storage/couchDbStorage';
 import { isPlainObject, last as _last } from 'lodash';
+import { generateUuid } from 'core/utils/id';
 
 // @see https://github.com/Microsoft/TypeScript/issues/21732 for why "any" rather than "undefined" :/
 export function isModel(x: any): x is Model {
@@ -75,6 +76,7 @@ export function activateSavedProfile(profile: SavedProfile, timestamp: number): 
   const { profileName, alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = profile;
   return {
     modelType: 'ActiveProfile',
+    modelUuid: generateUuid(),
     timestamp,
     profileName,
     alarmsEnabled,

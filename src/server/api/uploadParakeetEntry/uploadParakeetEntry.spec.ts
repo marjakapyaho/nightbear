@@ -10,6 +10,7 @@ import {
   uploadParakeetEntry,
 } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('api/uploadParakeetEntry', () => {
   const context = createTestContext();
@@ -40,6 +41,7 @@ describe('api/uploadParakeetEntry', () => {
   // Mock objects
   const mockDexcomEntry: MeterEntry = {
     modelType: 'MeterEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 2 * MIN_IN_MS,
     source: 'dexcom',
     bloodGlucose: 8.0,
@@ -47,6 +49,7 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 2 * MIN_IN_MS,
     meterEntries: [],
     isInitialCalibration: false,
@@ -57,6 +60,7 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockParakeetSensorEntry: ParakeetSensorEntry = {
     modelType: 'ParakeetSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 14934, // requestParam ts (time since)
     bloodGlucose: 9.3, // was 8.7 with the old server
     rawFiltered: 165824,
@@ -65,6 +69,7 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'parakeet',
     timestamp: timestampNow,
     batteryLevel: 80,
@@ -73,6 +78,7 @@ describe('api/uploadParakeetEntry', () => {
 
   const mockDeviceStatusTransmitter: DeviceStatus = {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'dexcom-transmitter',
     timestamp: timestampNow,
     batteryLevel: 216,

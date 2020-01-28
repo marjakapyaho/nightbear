@@ -11,18 +11,21 @@ import {
   saveAndAssociate,
   withStorage,
 } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('api/calculateHba1c', () => {
   const request = createTestRequest();
 
   const mockDexcomMeterEntry: MeterEntry = {
     modelType: 'MeterEntry',
+    modelUuid: generateUuid(),
     timestamp: 1508672249758 - 3 * 14934,
     source: 'dexcom',
     bloodGlucose: 8.0,
   };
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: 1508672249758 - 3 * 14934,
     meterEntries: [],
     isInitialCalibration: false,
@@ -57,6 +60,7 @@ describe('api/calculateHba1c', () => {
 
       const mockHba1c: Hba1c = {
         modelType: 'Hba1c',
+        modelUuid: generateUuid(),
         source: 'calculated',
         timestamp: 1508672249758,
         hba1cValue: 6.218815331010453,

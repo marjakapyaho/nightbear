@@ -5,6 +5,7 @@ import 'mocha';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('core/entries', () => {
   const timestamp = 1508672249758;
@@ -102,6 +103,7 @@ describe('core/entries', () => {
             context,
             {
               modelType: 'DexcomCalibration',
+              modelUuid: generateUuid(),
               timestamp: timestamp - 30 * MIN_IN_MS,
               meterEntries: [],
               isInitialCalibration: false,
@@ -111,6 +113,7 @@ describe('core/entries', () => {
             },
             {
               modelType: 'MeterEntry',
+              modelUuid: generateUuid(),
               timestamp: timestamp - 30 * MIN_IN_MS,
               source: 'dexcom',
               bloodGlucose: 8.0,
@@ -127,6 +130,7 @@ describe('core/entries', () => {
           assertEqualWithoutMeta(entries, [
             {
               modelType: 'MeterEntry',
+              modelUuid: generateUuid(),
               timestamp: timestamp - 30 * MIN_IN_MS,
               source: 'dexcom',
               bloodGlucose: 8.0,
@@ -134,6 +138,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 7.5,
               modelType: 'DexcomSensorEntry',
+              modelUuid: generateUuid(),
               noiseLevel: 1,
               signalStrength: 168,
               timestamp: timestamp - 20 * MIN_IN_MS,
@@ -141,6 +146,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 8.6,
               modelType: 'DexcomRawSensorEntry',
+              modelUuid: generateUuid(),
               noiseLevel: 4,
               rawFiltered: 156608,
               rawUnfiltered: 158880,
@@ -150,6 +156,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 9.3,
               modelType: 'ParakeetSensorEntry',
+              modelUuid: generateUuid(),
               rawFiltered: 165824,
               rawUnfiltered: 168416,
               timestamp: timestamp - 5 * MIN_IN_MS + 100,

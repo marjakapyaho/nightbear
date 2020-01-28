@@ -1,4 +1,5 @@
 import { Alarm, Situation } from 'core/models/model';
+import { generateUuid } from 'core/utils/id';
 
 export function getMockActiveAlarms(currentTimestamp: number, situation?: Situation): Alarm[] {
   if (!situation) {
@@ -8,6 +9,7 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
   return [
     {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp,
       situationType: situation,
       isActive: true,
@@ -32,6 +34,7 @@ export function getMockAlarm(
 ): Alarm {
   return {
     modelType: 'Alarm',
+    modelUuid: generateUuid(),
     timestamp: currentTimestamp,
     situationType: situation,
     isActive,

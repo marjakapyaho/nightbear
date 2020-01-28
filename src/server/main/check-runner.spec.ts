@@ -3,6 +3,7 @@ import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/
 import 'mocha';
 import { runChecks } from 'server/main/check-runner';
 import { activeProfile, assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;
@@ -10,6 +11,7 @@ describe('server/main/check-runner', () => {
   // Mock models
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 20 * MIN_IN_MS,
     meterEntries: [],
     isInitialCalibration: false,
@@ -20,6 +22,7 @@ describe('server/main/check-runner', () => {
 
   const mockDexcomSensorEntry: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 3 * MIN_IN_MS,
     bloodGlucose: 16,
     signalStrength: 168,
@@ -28,6 +31,7 @@ describe('server/main/check-runner', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'dexcom-uploader',
     timestamp: timestampNow - 10 * MIN_IN_MS,
     batteryLevel: 5,
@@ -37,6 +41,7 @@ describe('server/main/check-runner', () => {
   const alarmsArrayWithHigh: Alarm[] = [
     {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: timestampNow,
       situationType: 'HIGH',
       isActive: true,
@@ -55,6 +60,7 @@ describe('server/main/check-runner', () => {
   const alarmsArrayWithHighAndBattery: Alarm[] = [
     {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: timestampNow,
       situationType: 'HIGH',
       isActive: true,
@@ -76,6 +82,7 @@ describe('server/main/check-runner', () => {
     },
     {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: timestampNow + 15 * MIN_IN_MS,
       situationType: 'BATTERY',
       isActive: true,

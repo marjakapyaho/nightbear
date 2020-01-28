@@ -3,6 +3,7 @@ import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { AnalyserEntry, SensorEntry } from 'core/models/model';
 import 'mocha';
+import { generateUuid } from 'core/utils/id';
 
 describe('utils/analyser-utils', () => {
   // Mock objects
@@ -11,6 +12,7 @@ describe('utils/analyser-utils', () => {
   const entriesBefore: SensorEntry[] = [
     {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp - 25 * MIN_IN_MS,
       bloodGlucose: 6,
       signalStrength: 1,
@@ -18,6 +20,7 @@ describe('utils/analyser-utils', () => {
     },
     {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp - 20 * MIN_IN_MS,
       bloodGlucose: 8.5,
       signalStrength: 1,
@@ -25,6 +28,7 @@ describe('utils/analyser-utils', () => {
     },
     {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp - 15 * MIN_IN_MS,
       bloodGlucose: 7,
       signalStrength: 1,
@@ -32,6 +36,7 @@ describe('utils/analyser-utils', () => {
     },
     {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp - 10 * MIN_IN_MS,
       bloodGlucose: 7,
       signalStrength: 1,
@@ -39,6 +44,7 @@ describe('utils/analyser-utils', () => {
     },
     {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: currentTimestamp - 5 * MIN_IN_MS,
       bloodGlucose: 8,
       signalStrength: 1,

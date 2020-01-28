@@ -91,6 +91,7 @@ export function savedProfile(profileName: string): SavedProfile {
   const { alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = activeProfile(profileName, Date.now()); // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
   return {
     modelType: 'SavedProfile',
+    modelUuid: generateUuid(),
     profileName,
     alarmsEnabled,
     analyserSettings,
@@ -102,6 +103,7 @@ export function savedProfile(profileName: string): SavedProfile {
 export function activeProfile(profileName: string, timestamp: number): ActiveProfile {
   return {
     modelType: 'ActiveProfile',
+    modelUuid: generateUuid(),
     timestamp,
     profileName,
     alarmsEnabled: true,

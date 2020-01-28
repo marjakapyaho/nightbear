@@ -12,6 +12,7 @@ import { first } from 'lodash';
 import 'mocha';
 import { parseDexcomEntry, parseDexcomStatus, uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('api/uploadDexcomEntry', () => {
   const timestampNow = 1508672249758;
@@ -83,6 +84,7 @@ describe('api/uploadDexcomEntry', () => {
   // Mock objects
   const mockDexcomSensorEntry: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestampNow,
     bloodGlucose: 7.5,
     signalStrength: 168,
@@ -92,6 +94,7 @@ describe('api/uploadDexcomEntry', () => {
   const mockDexcomRawSensorEntry: DexcomRawSensorEntry = {
     bloodGlucose: 8.6,
     modelType: 'DexcomRawSensorEntry',
+    modelUuid: generateUuid(),
     noiseLevel: 1,
     rawFiltered: 156608,
     rawUnfiltered: 158880,
@@ -101,6 +104,7 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 3 * MIN_IN_MS,
     meterEntries: [],
     isInitialCalibration: false,
@@ -111,6 +115,7 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDexcomCalWithMeterAndCalEntries: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: timestampNow - 9 * MIN_IN_MS,
     meterEntries: [],
     isInitialCalibration: false,
@@ -121,6 +126,7 @@ describe('api/uploadDexcomEntry', () => {
 
   const mockDeviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'dexcom-uploader',
     timestamp: timestampNow,
     batteryLevel: 80,
@@ -135,6 +141,7 @@ describe('api/uploadDexcomEntry', () => {
         .then(() =>
           saveAndAssociate(context, mockDexcomCalibration, {
             modelType: 'MeterEntry',
+            modelUuid: generateUuid(),
             timestamp: timestampNow - 3 * MIN_IN_MS,
             source: 'dexcom',
             bloodGlucose: 8.0,
@@ -157,6 +164,7 @@ describe('api/uploadDexcomEntry', () => {
         .then(model =>
           assertEqualWithoutMeta(model, {
             modelType: 'MeterEntry',
+            modelUuid: generateUuid(),
             timestamp: timestampNow - 10 * MIN_IN_MS,
             source: 'dexcom',
             bloodGlucose: 8.5,

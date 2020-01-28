@@ -16,6 +16,7 @@ import {
 import { isModel } from 'core/models/utils';
 import { getModelRef } from 'core/storage/couchDbStorage';
 import { first } from 'lodash';
+import { generateUuid } from 'core/utils/id';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',
@@ -140,6 +141,7 @@ export function parseDexcomEntry(
 
   const entryRaw: DexcomRawSensorEntry = {
     modelType: 'DexcomRawSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: uploadTimestamp,
     bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number), // TODO
     signalStrength,
@@ -151,6 +153,7 @@ export function parseDexcomEntry(
   if (isDexcomEntryValid(noiseLevel, dexBloodGlucose)) {
     const entry: DexcomSensorEntry = {
       modelType: 'DexcomSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: uploadTimestamp,
       bloodGlucose: changeBloodGlucoseUnitToMmoll(dexBloodGlucose),
       signalStrength,
@@ -168,6 +171,7 @@ export function parseMeterEntry(requestObject: { [key: string]: string }): Meter
 
   return {
     modelType: 'MeterEntry',
+    modelUuid: generateUuid(),
     timestamp: bgTimestamp,
     source: 'dexcom',
     bloodGlucose: changeBloodGlucoseUnitToMmoll(bloodGlucose),
@@ -182,6 +186,7 @@ export function parseDexcomCalibration(requestObject: { [key: string]: string })
 
   return {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp,
     meterEntries: [],
     isInitialCalibration: false,
@@ -196,6 +201,7 @@ export function parseDexcomStatus(requestObject: { [key: string]: string }, time
 
   return {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'dexcom-uploader',
     timestamp,
     batteryLevel,

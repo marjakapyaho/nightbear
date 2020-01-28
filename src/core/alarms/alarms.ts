@@ -5,6 +5,7 @@ import { getAlarmState } from 'core/models/utils';
 import { filter, find, findIndex, map, sum, take } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
+import { generateUuid } from 'core/utils/id';
 
 const INITIAL_ALARM_LEVEL = 1;
 
@@ -123,6 +124,7 @@ function handleAlarmsToCreate(situationTypes: Situation[], context: Context): Pr
 export function createAlarm(situationType: Situation, alarmLevel: number, context: Context): Alarm {
   return {
     modelType: 'Alarm',
+    modelUuid: generateUuid(),
     timestamp: context.timestamp(),
     situationType,
     isActive: true,

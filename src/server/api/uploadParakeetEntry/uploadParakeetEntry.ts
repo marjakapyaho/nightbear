@@ -2,6 +2,7 @@ import { calculateRaw } from 'core/calculations/calculations';
 import { Context, createResponse, Request, Response } from 'core/models/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'core/models/model';
 import { find } from 'lodash';
+import { generateUuid } from 'core/utils/id';
 
 // parakeet needs this response to work
 const PARAKEET_RESPONSE = '!ACK  0!';
@@ -46,6 +47,7 @@ export function parseParakeetEntry(
 
   return {
     modelType: 'ParakeetSensorEntry',
+    modelUuid: generateUuid(),
     timestamp: timestamp - millisecondsSinceMeasured,
     bloodGlucose: calculateRaw(unfiltered, slope as number, intercept as number, scale as number),
     rawFiltered: filtered,
@@ -61,6 +63,7 @@ export function parseParakeetStatus(params: { [key: string]: string }, timestamp
   return [
     {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'parakeet',
       timestamp,
       batteryLevel,
@@ -68,6 +71,7 @@ export function parseParakeetStatus(params: { [key: string]: string }, timestamp
     },
     {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'dexcom-transmitter',
       timestamp,
       batteryLevel: transmitterBattery,

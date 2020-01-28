@@ -6,9 +6,11 @@ import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
 import { assertEqualWithoutMeta, savedProfile } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
+  modelUuid: generateUuid(),
   timestamp: 1508092667717, // i.e. Sun Oct 15 2017 21:37:47 GMT+0300 (EEST)
   amount: 10,
   carbsType: 'normal',
@@ -191,6 +193,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   describe('loading active alarms', () => {
     const alarm: Alarm = {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: 0,
       situationType: 'HIGH',
       isActive: false,
@@ -261,6 +264,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   describe('model references', () => {
     const entry: MeterEntry = {
       modelType: 'MeterEntry',
+      modelUuid: generateUuid(),
       timestamp: 1544372705829 - 1000,
       source: 'dexcom',
       bloodGlucose: 8,
@@ -268,6 +272,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
     const cal: DexcomCalibration = {
       modelType: 'DexcomCalibration',
+      modelUuid: generateUuid(),
       timestamp: 1544372705829,
       meterEntries: [],
       isInitialCalibration: true,
