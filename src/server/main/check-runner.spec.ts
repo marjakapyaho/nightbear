@@ -2,7 +2,13 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
 import 'mocha';
 import { runChecks } from 'server/main/check-runner';
-import { activeProfile, assertEqualWithoutMeta, createTestContext, withStorage } from 'server/utils/test';
+import {
+  activeProfile,
+  assertEqualWithoutMeta,
+  createTestContext,
+  withStorage,
+  eraseModelUuid,
+} from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 
 describe('server/main/check-runner', () => {
@@ -107,11 +113,13 @@ describe('server/main/check-runner', () => {
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => context.storage.saveModel(mockDexcomSensorEntry))
         .then(() => runChecks(context))
-        .then(alarms => assertEqualWithoutMeta(alarms, alarmsArrayWithHigh))
+        .then(alarms => assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHigh.map(eraseModelUuid)))
         .then(() => context.storage.saveModel(mockDeviceStatus))
         .then(() => (timestamp += 15 * MIN_IN_MS))
         .then(() => runChecks(context))
-        .then(alarms => assertEqualWithoutMeta(alarms, alarmsArrayWithHighAndBattery));
+        .then(alarms =>
+          assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHighAndBattery.map(eraseModelUuid)),
+        );
     });
   });
 });

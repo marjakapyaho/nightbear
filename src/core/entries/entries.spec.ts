@@ -4,7 +4,14 @@ import { Request } from 'core/models/api';
 import 'mocha';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import {
+  assertEqualWithoutMeta,
+  createTestContext,
+  saveAndAssociate,
+  withStorage,
+  eraseModelUuid,
+  ERASED_UUID,
+} from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 
 describe('core/entries', () => {
@@ -127,10 +134,10 @@ describe('core/entries', () => {
         .then(() => uploadParakeetEntry(mockRequestParakeetEntry, context))
         .then(() => getMergedEntriesFeed(context, 24 * HOUR_IN_MS, timestamp))
         .then(entries => {
-          assertEqualWithoutMeta(entries, [
+          assertEqualWithoutMeta(entries.map(eraseModelUuid), [
             {
               modelType: 'MeterEntry',
-              modelUuid: generateUuid(),
+              modelUuid: ERASED_UUID,
               timestamp: timestamp - 30 * MIN_IN_MS,
               source: 'dexcom',
               bloodGlucose: 8.0,
@@ -138,7 +145,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 7.5,
               modelType: 'DexcomSensorEntry',
-              modelUuid: generateUuid(),
+              modelUuid: ERASED_UUID,
               noiseLevel: 1,
               signalStrength: 168,
               timestamp: timestamp - 20 * MIN_IN_MS,
@@ -146,7 +153,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 8.6,
               modelType: 'DexcomRawSensorEntry',
-              modelUuid: generateUuid(),
+              modelUuid: ERASED_UUID,
               noiseLevel: 4,
               rawFiltered: 156608,
               rawUnfiltered: 158880,
@@ -156,7 +163,7 @@ describe('core/entries', () => {
             {
               bloodGlucose: 9.3,
               modelType: 'ParakeetSensorEntry',
-              modelUuid: generateUuid(),
+              modelUuid: ERASED_UUID,
               rawFiltered: 165824,
               rawUnfiltered: 168416,
               timestamp: timestamp - 5 * MIN_IN_MS + 100,

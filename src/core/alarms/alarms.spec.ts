@@ -3,11 +3,19 @@ import { detectAlarmActions, runAlarmChecks } from 'core/alarms/alarms';
 import { getMockActiveAlarms, getMockAlarm } from 'core/alarms/test-data/mock-active-alarms';
 import { getMockState } from 'core/alarms/test-data/mock-state';
 import 'mocha';
-import { activeProfile, createTestContext } from 'server/utils/test';
+import { activeProfile, createTestContext, eraseModelUuid } from 'server/utils/test';
 
 const currentTimestamp = 1508672249758;
 
 describe('core/alarms', () => {
+  function eraseUuids(x: ReturnType<typeof detectAlarmActions>): ReturnType<typeof detectAlarmActions> {
+    return {
+      alarmsToRemove: x.alarmsToRemove.map(eraseModelUuid),
+      alarmsToKeep: x.alarmsToKeep.map(eraseModelUuid),
+      alarmsToCreate: x.alarmsToCreate,
+    };
+  }
+
   it('alarm actions to create', () => {
     const stateWithLow = getMockState('LOW');
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
@@ -23,22 +31,28 @@ describe('core/alarms', () => {
     const stateWithHigh = getMockState('HIGH');
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'HIGH');
 
-    assert.deepEqual(detectAlarmActions(stateWithHigh, activeAlarms), {
-      alarmsToRemove: [],
-      alarmsToKeep: [getMockAlarm(currentTimestamp, 'HIGH')],
-      alarmsToCreate: [],
-    });
+    assert.deepEqual(
+      eraseUuids(detectAlarmActions(stateWithHigh, activeAlarms)),
+      eraseUuids({
+        alarmsToRemove: [],
+        alarmsToKeep: [getMockAlarm(currentTimestamp, 'HIGH')],
+        alarmsToCreate: [],
+      }),
+    );
   });
 
   it('alarm actions to remove', () => {
     const stateWithNoSituation = getMockState();
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
 
-    assert.deepEqual(detectAlarmActions(stateWithNoSituation, activeAlarms), {
-      alarmsToRemove: [getMockAlarm(currentTimestamp, 'RISING')],
-      alarmsToKeep: [],
-      alarmsToCreate: [],
-    });
+    assert.deepEqual(
+      eraseUuids(detectAlarmActions(stateWithNoSituation, activeAlarms)),
+      eraseUuids({
+        alarmsToRemove: [getMockAlarm(currentTimestamp, 'RISING')],
+        alarmsToKeep: [],
+        alarmsToCreate: [],
+      }),
+    );
   });
 
   it('run alarm checks with one alarm to create', () => {
@@ -51,7 +65,9 @@ describe('core/alarms', () => {
       stateWithFalling,
       activeProfile('day', currentTimestamp),
       activeAlarms,
-    ).then(alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]));
+    ).then(alarms =>
+      assert.deepEqual(alarms.map(eraseModelUuid), [eraseModelUuid(getMockAlarm(currentTimestamp, 'FALLING'))]),
+    );
   });
 
   it('run alarm checks with one alarm to keep', () => {
@@ -77,6 +93,10 @@ describe('core/alarms', () => {
       stateWithNoSituation,
       activeProfile('day', currentTimestamp),
       activeAlarms,
-    ).then(alarms => assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]));
+    ).then(alarms =>
+      assert.deepEqual(alarms.map(eraseModelUuid), [
+        eraseModelUuid(getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)),
+      ]),
+    );
   });
 });

@@ -10,6 +10,8 @@ import {
   createTestRequest,
   saveAndAssociate,
   withStorage,
+  ERASED_UUID,
+  eraseModelUuid,
 } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 
@@ -60,7 +62,7 @@ describe('api/calculateHba1c', () => {
 
       const mockHba1c: Hba1c = {
         modelType: 'Hba1c',
-        modelUuid: generateUuid(),
+        modelUuid: ERASED_UUID,
         source: 'calculated',
         timestamp: 1508672249758,
         hba1cValue: 6.218815331010453,
@@ -73,7 +75,7 @@ describe('api/calculateHba1c', () => {
         .then(() => uploadDexcomEntry(mockRequestBgEntry, context))
         .then(() => calculateHba1cForDate(request, context))
         .then(() => getHba1cHistory(request, context))
-        .then(res => assertEqualWithoutMeta(res.responseBody as any, mockResponseJson));
+        .then(res => assertEqualWithoutMeta((res.responseBody as any).map(eraseModelUuid), mockResponseJson));
     });
   });
 });

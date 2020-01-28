@@ -87,6 +87,13 @@ export function assertEqualWithoutMeta(
   );
 }
 
+export const ERASED_UUID = '<uuid-erased-in-test-code>';
+
+// Erasing the ID's of Model(s) makes it simpler to compare them, when the ID's aren't important
+export function eraseModelUuid<T extends Model>(model: T): T {
+  return { ...model, modelUuid: ERASED_UUID };
+}
+
 export function savedProfile(profileName: string): SavedProfile {
   const { alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = activeProfile(profileName, Date.now()); // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
   return {

@@ -9,7 +9,13 @@ import {
   parseParakeetStatus,
   uploadParakeetEntry,
 } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import {
+  assertEqualWithoutMeta,
+  createTestContext,
+  saveAndAssociate,
+  withStorage,
+  eraseModelUuid,
+} from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 
 describe('api/uploadParakeetEntry', () => {
@@ -87,16 +93,16 @@ describe('api/uploadParakeetEntry', () => {
 
   it('produces correct ParakeetSensorEntry', () => {
     assert.deepEqual(
-      parseParakeetEntry(mockRequest.requestParams, mockDexcomCalibration, context.timestamp()),
-      mockParakeetSensorEntry,
+      eraseModelUuid(parseParakeetEntry(mockRequest.requestParams, mockDexcomCalibration, context.timestamp())),
+      eraseModelUuid(mockParakeetSensorEntry),
     );
   });
 
   it('produces correct DeviceStatus', () => {
-    assert.deepEqual(parseParakeetStatus(mockRequest.requestParams, context.timestamp()), [
-      mockDeviceStatus,
-      mockDeviceStatusTransmitter,
-    ]);
+    assert.deepEqual(
+      parseParakeetStatus(mockRequest.requestParams, context.timestamp()).map(eraseModelUuid),
+      [mockDeviceStatus, mockDeviceStatusTransmitter].map(eraseModelUuid),
+    );
   });
 
   withStorage(createTestStorage => {
@@ -109,10 +115,13 @@ describe('api/uploadParakeetEntry', () => {
           assert.equal(res.responseBody, '!ACK  0!');
         })
         .then(() => context.storage.loadLatestTimelineModels('ParakeetSensorEntry', 100))
-        .then(models => assertEqualWithoutMeta(models, [mockParakeetSensorEntry]))
+        .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockParakeetSensorEntry)]))
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
         .then(models =>
-          assertEqualWithoutMeta(sortBy(models, 'deviceName'), [mockDeviceStatusTransmitter, mockDeviceStatus]),
+          assertEqualWithoutMeta(
+            sortBy(models, 'deviceName').map(eraseModelUuid),
+            [mockDeviceStatusTransmitter, mockDeviceStatus].map(eraseModelUuid),
+          ),
         );
     });
   });

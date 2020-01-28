@@ -11,7 +11,14 @@ import {
 import { first } from 'lodash';
 import 'mocha';
 import { parseDexcomEntry, parseDexcomStatus, uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
-import { assertEqualWithoutMeta, createTestContext, saveAndAssociate, withStorage } from 'server/utils/test';
+import {
+  assertEqualWithoutMeta,
+  createTestContext,
+  saveAndAssociate,
+  withStorage,
+  eraseModelUuid,
+  ERASED_UUID,
+} from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 
 describe('api/uploadDexcomEntry', () => {
@@ -150,7 +157,7 @@ describe('api/uploadDexcomEntry', () => {
         .then(() => uploadDexcomEntry(mockRequestBgEntry, context))
         .then(res => assert.equal(res.responseBody, mockRequestBgEntry.requestBody))
         .then(() => context.storage.loadLatestTimelineModels('DexcomSensorEntry', 100))
-        .then(models => assertEqualWithoutMeta(models, [mockDexcomSensorEntry]));
+        .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockDexcomSensorEntry)]));
     });
 
     it('uploads Dexcom meter entry and calibration with correct responses', () => {
@@ -162,9 +169,9 @@ describe('api/uploadDexcomEntry', () => {
         .then(() => context.storage.loadLatestTimelineModels('MeterEntry', 100))
         .then(models => (savedEntry = first(models)))
         .then(model =>
-          assertEqualWithoutMeta(model, {
+          assertEqualWithoutMeta(model && eraseModelUuid(model), {
             modelType: 'MeterEntry',
-            modelUuid: generateUuid(),
+            modelUuid: ERASED_UUID,
             timestamp: timestampNow - 10 * MIN_IN_MS,
             source: 'dexcom',
             bloodGlucose: 8.5,
@@ -174,9 +181,9 @@ describe('api/uploadDexcomEntry', () => {
         .then(res => assert.equal(res.responseBody, mockRequestCalibration.requestBody))
         .then(() => context.storage.loadLatestTimelineModels('DexcomCalibration', 100))
         .then(models =>
-          assertEqualWithoutMeta(models, [
+          assertEqualWithoutMeta(models.map(eraseModelUuid), [
             {
-              ...mockDexcomCalWithMeterAndCalEntries,
+              ...eraseModelUuid(mockDexcomCalWithMeterAndCalEntries),
               meterEntries: [
                 {
                   modelType: 'MeterEntry',
@@ -196,7 +203,7 @@ describe('api/uploadDexcomEntry', () => {
           assert.equal(res.responseBody, mockRequestDeviceStatus.requestBody);
         })
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
-        .then(models => assertEqualWithoutMeta(models, [mockDeviceStatus]));
+        .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockDeviceStatus)]));
     });
 
     it("doesn't generate the same DexcomCalibration again", () => {
@@ -218,17 +225,17 @@ describe('api/uploadDexcomEntry', () => {
   });
 
   it('produces correct DexcomSensorEntry', () => {
-    assert.deepEqual(parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration), [
-      mockDexcomRawSensorEntry,
-      mockDexcomSensorEntry,
-    ]);
+    assert.deepEqual(
+      parseDexcomEntry(mockRequestBgEntry.requestBody as any, mockDexcomCalibration).map(eraseModelUuid),
+      [mockDexcomRawSensorEntry, mockDexcomSensorEntry].map(eraseModelUuid),
+    );
   });
 
   it('produces correct DeviceStatus', () => {
     const context = createTestContext();
     assert.deepEqual(
-      parseDexcomStatus(mockRequestDeviceStatus.requestBody as any, context.timestamp()),
-      mockDeviceStatus,
+      eraseModelUuid(parseDexcomStatus(mockRequestDeviceStatus.requestBody as any, context.timestamp())),
+      eraseModelUuid(mockDeviceStatus),
     );
   });
 });
