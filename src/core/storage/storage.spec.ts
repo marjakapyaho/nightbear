@@ -1,13 +1,7 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
-import {
-  generateUniqueId,
-  getModelRef,
-  getStorageKey,
-  REV_CONFLICT_SAVE_ERROR,
-  timestampToString,
-} from 'core/storage/couchDbStorage';
+import { getModelRef, getStorageKey, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -255,25 +249,6 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assertEqualWithoutMeta(first(models), a3);
           assertEqualWithoutMeta(last(models), a1);
         });
-    });
-  });
-
-  describe('generateUniqueId()', () => {
-    const TEST_ITERATIONS = 1000;
-
-    it('generates ' + TEST_ITERATIONS + " successive ID's that look right", () => {
-      for (let i = 0; i < TEST_ITERATIONS; i++) {
-        assert.match(generateUniqueId(), /^[0-9a-zA-Z]{8}$/);
-      }
-    });
-
-    it('generates ' + TEST_ITERATIONS + " successive, unique ID's", () => {
-      const ids: { [uuid: string]: string } = {};
-      for (let i = 0; i < TEST_ITERATIONS; i++) {
-        const id = generateUniqueId();
-        if (ids[id]) throw new Error('Duplicate ID generated');
-        ids[id] = id;
-      }
     });
   });
 

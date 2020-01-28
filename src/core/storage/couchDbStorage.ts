@@ -1,7 +1,8 @@
-import { Model, MODEL_VERSION, ModelOfType, ModelRef, ModelType } from 'core/models/model';
+import { Model, ModelOfType, ModelRef, ModelType, MODEL_VERSION } from 'core/models/model';
 import { is, isGlobalModel } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
+import { generateShortId } from 'core/utils/id';
 import { first } from 'lodash';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
 
@@ -267,7 +268,7 @@ export function getStorageKey(model: Model): string {
     case 'Carbs':
     case 'Hba1c':
     case 'ActiveProfile':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
+      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateShortId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
     case 'SavedProfile':
       return `${PREFIX_GLOBAL}/${model.modelType}/${model.profileName}`;
     default:
@@ -280,21 +281,6 @@ export function getStorageKey(model: Model): string {
 // Importantly, because our queries use this for ordering, it should include milliseconds.
 export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
-}
-
-// Generates a random string for similar purposes as UUID's, but easier on human eyes.
-// @example generateUniqueId(8) => "TEvGnkwr"
-// For a length of 8, possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion.
-// For contrast, for a V4 UUID: 2^122 ~= 5.3e+36.
-// To match a V4 UUID in possible permutations, length of 21 would have 62^21 ~= 4.3e+37.
-export function generateUniqueId(length = 8): string {
-  let uid = '';
-  while (uid.length < length) {
-    const char = String.fromCharCode(Math.round(Math.random() * 255));
-    if (!char.match(/[9-9a-zA-Z]/)) continue; // result space: 0-9 + a-z + A-Z = 10 + 26 + 26 = 62
-    uid += char;
-  }
-  return uid;
 }
 
 export function getModelRef<T extends Model>(model: T): ModelRef<T> {
