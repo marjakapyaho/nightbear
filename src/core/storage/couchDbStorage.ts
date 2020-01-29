@@ -50,7 +50,7 @@ export function createCouchDbStorage(
         const doc: PouchDB.Core.PutDocument<Model> = {
           _id,
           _rev: _rev || undefined,
-          ...{ modelType: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
+          ...{ modelType: null, modelUuid: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
           ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
         };
