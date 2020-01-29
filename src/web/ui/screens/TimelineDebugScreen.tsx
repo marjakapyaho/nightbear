@@ -18,7 +18,7 @@ export default () => {
   if (state.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
   return (
     <div className="this" onClick={() => actions.TIMELINE_CURSOR_UPDATED(null)}>
-      {state.modelBeingEdited && (
+      {state.modelUuidBeingEdited && (
         <ReactModal
           isOpen
           ariaHideApp={false}
@@ -27,7 +27,10 @@ export default () => {
           overlayClassName={cssNs('modalOverlay')}
           className={cssNs('modalContent')}
         >
-          <textarea className="model" defaultValue={JSON.stringify(state.modelBeingEdited, null, 2)} />
+          <textarea
+            className="model"
+            defaultValue="TODO: Model editing not implemented after the Timeline refactoring, until actually needed"
+          />
           <button onClick={() => actions.MODEL_SELECTED_FOR_EDITING(null)}>Cancel</button>
           <button
             onClick={() => {

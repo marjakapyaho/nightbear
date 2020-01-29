@@ -5,6 +5,7 @@ import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
 import Timeline from 'web/ui/utils/timeline/Timeline';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import { generateUuid } from 'core/utils/id';
+import { getModelByUuid } from 'web/modules/uiNavigation/getters';
 
 type Props = {};
 
@@ -13,7 +14,8 @@ export default (() => {
   const state = useReduxState(s => s.uiNavigation);
   const actions = useReduxActions();
 
-  const { modelBeingEdited, timelineRange, timelineRangeEnd } = state;
+  const { timelineRange, timelineRangeEnd } = state;
+  const modelBeingEdited = getModelByUuid(state, state.modelUuidBeingEdited);
 
   const timelineConfig = {
     timelineRange,

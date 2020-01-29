@@ -28,7 +28,7 @@ export type UiNavigationState = Readonly<
         | { status: 'FETCHING' }
         | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
         | { status: 'ERROR'; errorMessage: string };
-      modelBeingEdited: TimelineModel | null;
+      modelUuidBeingEdited: string | null;
       timelineCursorAt: number | null;
       // TODO: END COPY-PASTA
     }
@@ -41,7 +41,7 @@ export type UiNavigationState = Readonly<
         | { status: 'FETCHING' }
         | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
         | { status: 'ERROR'; errorMessage: string };
-      modelBeingEdited: TimelineModel | null;
+      modelUuidBeingEdited: string | null;
       timelineCursorAt: number | null;
     }
 >;
@@ -52,6 +52,6 @@ export const uiNavigationInitState: UiNavigationState = {
   loadedModels: { status: 'FETCHING' },
   timelineRange: 24 * HOUR_IN_MS,
   timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
-  modelBeingEdited: null,
+  modelUuidBeingEdited: null,
   timelineCursorAt: null,
 };
