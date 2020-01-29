@@ -2,7 +2,6 @@ import { Model, ModelOfType, ModelRef, ModelType, MODEL_VERSION } from 'core/mod
 import { is, isGlobalModel } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
-import { generateShortId } from 'core/utils/id';
 import { first } from 'lodash';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
 

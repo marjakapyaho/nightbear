@@ -9,7 +9,6 @@ import {
   SavedProfile,
   TimelineModel,
 } from 'core/models/model';
-import { getStorageKey } from 'core/storage/couchDbStorage';
 import { isPlainObject, last as _last } from 'lodash';
 import { generateUuid } from 'core/utils/id';
 
@@ -30,7 +29,7 @@ export function isGlobalModel(x: any): x is GlobalModel {
 // This does NOT mean their properties are exactly equal, though!
 export function isSameModel(a: any, b: any): boolean {
   if (!isModel(a) || !isModel(b)) return false;
-  return getStorageKey(a) === getStorageKey(b);
+  return a.modelUuid === b.modelUuid;
 }
 
 // @example array.filter(is('Alarm'))
@@ -66,7 +65,7 @@ export function last<T extends Model>(_: T, index: number, array: T[]) {
 
 export function getAlarmState(alarm: Alarm): AlarmState {
   const latest = _last(alarm.alarmStates);
-  if (!latest) throw new Error(`Couldn't get latest AlarmState from Alarm "${getStorageKey(alarm)}"`);
+  if (!latest) throw new Error(`Couldn't get latest AlarmState from Alarm "${alarm.modelUuid}"`);
   return latest;
 }
 

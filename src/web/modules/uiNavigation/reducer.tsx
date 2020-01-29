@@ -1,7 +1,7 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Model } from 'core/models/model';
-import { isTimelineModel, isSameModel } from 'core/models/utils';
-import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
+import { isSameModel, isTimelineModel } from 'core/models/utils';
+import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
 import { ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
@@ -112,7 +112,7 @@ function mergeIncomingModels<T extends Model>(existingModels: T[], incomingModel
     .concat(existingModels)
     .concat(incomingModels)
     .forEach(m => {
-      map.set(getStorageKey(m), m);
+      map.set(m.modelUuid, m);
     });
   return [...map.values()];
 }
