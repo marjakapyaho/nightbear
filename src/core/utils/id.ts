@@ -8,6 +8,9 @@ export function generateUuid() {
   });
 }
 
+// For testing whether a string looks like a UUID
+export const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
 // Generates a random string for similar purposes as UUID's, but easier on human eyes.
 // @example generateShortId(8) => "TEvGnkwr"
 // For a length of 8, possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion.

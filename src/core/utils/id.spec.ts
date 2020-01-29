@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import 'mocha';
-import { generateUuid, generateShortId } from 'core/utils/id';
+import { generateUuid, generateShortId, UUID_REGEX } from 'core/utils/id';
 
 const TEST_ITERATIONS = 1000;
 
@@ -8,7 +8,7 @@ describe('core/utils/id', () => {
   describe('generateUuid()', () => {
     it('generates ' + TEST_ITERATIONS + " successive ID's that look right", () => {
       for (let i = 0; i < TEST_ITERATIONS; i++) {
-        assert.match(generateUuid(), /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+        assert.match(generateUuid(), UUID_REGEX);
       }
     });
 
