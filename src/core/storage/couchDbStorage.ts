@@ -250,9 +250,13 @@ function createModelMeta(model: Model): CouchDbModelMeta {
   };
 }
 
+// Generates a unique string which can be used as a primary key for storing the given Model in the DB
+// @example "timeline/2018-12-09T16:25:04.829Z/8b71dc77-42ee-4edd-8679-04fc2a3b29a5"
 export function getStorageKey(model: Model): string {
   if (isModelMeta(model.modelMeta) && model.modelMeta._id) {
     return model.modelMeta._id; // the Model already has an assigned storage key -> use it
+  } else if (!model.modelUuid) {
+    throw new Error(`Can't generate storage key for given ${model.modelType}: it doesn't have a UUID set`);
   }
   switch (model.modelType) {
     case 'Alarm':
@@ -268,9 +272,13 @@ export function getStorageKey(model: Model): string {
     case 'Carbs':
     case 'Hba1c':
     case 'ActiveProfile':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateShortId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
+      if (typeof model.timestamp === 'number') {
+        return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelUuid}`;
+      } else {
+        throw new Error(`Can't generate storage key for given ${model.modelType}: it doesn't have a timestamp set`);
+      }
     case 'SavedProfile':
-      return `${PREFIX_GLOBAL}/${model.modelType}/${model.profileName}`;
+      return `${PREFIX_GLOBAL}/${model.modelType}/${model.modelUuid}`;
     default:
       return assertExhausted(model);
   }
