@@ -292,6 +292,9 @@ export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
 }
 
+// Creates a ModelRef-object (which is used to point to another Model in the DB).
+// The created ref points to the given Model.
+// Because ModelRef's are DB-specific, we can use the CouchDB _id here, to make subsequent lookups via the ref faster.
 export function getModelRef<T extends Model>(model: T): ModelRef<T> {
   const { modelMeta } = model;
   if (isModelMeta(modelMeta) && modelMeta._id) {
