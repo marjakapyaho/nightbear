@@ -217,6 +217,8 @@ export function reviveCouchDbRowIntoModel(doc: any): Model {
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
   assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
   assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
+  assert(typeof doc.modelUuid === 'string', 'Expected string "modelUuid" property when reviving', doc);
+  assert(doc.modelUuid !== '', 'Expected non-empty "modelUuid" property when reviving', doc);
   assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
   assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
 
