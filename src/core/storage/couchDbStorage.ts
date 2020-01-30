@@ -1,4 +1,4 @@
-import { Model, MODEL_VERSION, ModelOfType, ModelRef, ModelType } from 'core/models/model';
+import { Model, ModelOfType, ModelRef, ModelType, MODEL_VERSION } from 'core/models/model';
 import { is, isGlobalModel } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
@@ -49,7 +49,7 @@ export function createCouchDbStorage(
         const doc: PouchDB.Core.PutDocument<Model> = {
           _id,
           _rev: _rev || undefined,
-          ...{ modelType: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
+          ...{ modelType: null, modelUuid: null, modelMeta: null }, // ensure pleasant property order, for vanity (these fields get overwritten below)
           ...(model as Model), // see https://github.com/Microsoft/TypeScript/pull/13288 for why we need to cast here
           modelMeta: { modelVersion } as any, // we cheat a bit here, to allow not saving _id & _rev twice
         };
@@ -217,6 +217,8 @@ export function reviveCouchDbRowIntoModel(doc: any): Model {
   assert(typeof doc === 'object', 'Expected object when reviving model', doc);
   assert(typeof doc.modelType === 'string', 'Expected string "modelType" property when reviving', doc);
   assert(doc.modelType !== '', 'Expected non-empty "modelType" property when reviving', doc);
+  assert(typeof doc.modelUuid === 'string', 'Expected string "modelUuid" property when reviving', doc);
+  assert(doc.modelUuid !== '', 'Expected non-empty "modelUuid" property when reviving', doc);
   assert(typeof doc.modelMeta === 'object', 'Expected modelMeta object when reviving model', doc);
   assert(typeof doc.modelMeta.modelVersion === 'number', 'Expected a "modelVersion" property when reviving', doc);
 
@@ -249,9 +251,13 @@ function createModelMeta(model: Model): CouchDbModelMeta {
   };
 }
 
+// Generates a unique string which can be used as a primary key for storing the given Model in the DB
+// @example "timeline/2018-12-09T16:25:04.829Z/8b71dc77-42ee-4edd-8679-04fc2a3b29a5"
 export function getStorageKey(model: Model): string {
   if (isModelMeta(model.modelMeta) && model.modelMeta._id) {
     return model.modelMeta._id; // the Model already has an assigned storage key -> use it
+  } else if (!model.modelUuid) {
+    throw new Error(`Can't generate storage key for given ${model.modelType}: it doesn't have a UUID set`);
   }
   switch (model.modelType) {
     case 'Alarm':
@@ -267,9 +273,13 @@ export function getStorageKey(model: Model): string {
     case 'Carbs':
     case 'Hba1c':
     case 'ActiveProfile':
-      return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${generateUniqueId()}`; // include a random component at the end; otherwise we wouldn't be able to persist 2 models with the exact same timestamp
+      if (typeof model.timestamp === 'number') {
+        return `${PREFIX_TIMELINE}/${timestampToString(model.timestamp)}/${model.modelUuid}`;
+      } else {
+        throw new Error(`Can't generate storage key for given ${model.modelType}: it doesn't have a timestamp set`);
+      }
     case 'SavedProfile':
-      return `${PREFIX_GLOBAL}/${model.modelType}/${model.profileName}`;
+      return `${PREFIX_GLOBAL}/${model.modelType}/${model.modelUuid}`;
     default:
       return assertExhausted(model);
   }
@@ -282,21 +292,9 @@ export function timestampToString(timestamp: number): string {
   return new Date(timestamp).toISOString();
 }
 
-// Generates a random string for similar purposes as UUID's, but easier on human eyes.
-// @example generateUniqueId(8) => "TEvGnkwr"
-// For a length of 8, possible permutations: 62^8 ~= 2.18e+14 ~= 218 trillion.
-// For contrast, for a V4 UUID: 2^122 ~= 5.3e+36.
-// To match a V4 UUID in possible permutations, length of 21 would have 62^21 ~= 4.3e+37.
-export function generateUniqueId(length = 8): string {
-  let uid = '';
-  while (uid.length < length) {
-    const char = String.fromCharCode(Math.round(Math.random() * 255));
-    if (!char.match(/[9-9a-zA-Z]/)) continue; // result space: 0-9 + a-z + A-Z = 10 + 26 + 26 = 62
-    uid += char;
-  }
-  return uid;
-}
-
+// Creates a ModelRef-object (which is used to point to another Model in the DB).
+// The created ref points to the given Model.
+// Because ModelRef's are DB-specific, we can use the CouchDB _id here, to make subsequent lookups via the ref faster.
 export function getModelRef<T extends Model>(model: T): ModelRef<T> {
   const { modelMeta } = model;
   if (isModelMeta(modelMeta) && modelMeta._id) {

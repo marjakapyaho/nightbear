@@ -32,7 +32,9 @@
     "\n==================== WEB ====================": "",
     "web-start": "npm run lint-node && BROWSER=none react-scripts start",
     "web-build": "npm run lint-node && react-scripts build",
-    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/"
+    "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/",
+    "\n==================== UTILS ====================": "",
+    "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",

@@ -36,6 +36,6 @@ Useful utils for backing up/moving the DB's around:
 1. Log onto the hosting server (i.e. your Docker host)
 1. Pick a destination DB name that doesn't yet exist, and based on that, add correct values for `NIGHTBEAR_MIGRATE_REMOTE_DB_URL` and `NIGHTBEAR_MIGRATE_TARGET_DB_URL` to your `.env` file
 1. Prepare a git working copy, with `git clone https://github.com/marjakapyaho/nightbear.git legacy-migration`
-1. Run the initial migration, with `docker run --rm -it -v $(pwd)/legacy-migration:/app -w /app --env-file .env node:8.10 bash -c 'npm install && NODE_PATH=. ./node_modules/.bin/ts-node contrib/legacy-db-migration/migrate.ts > migrate.log'`
-1. Set up a container for the continuous migration, with `docker run -d --name legacy-migration -v $(pwd)/legacy-migration:/app -w /app --env-file .env --env NIGHTBEAR_MIGRATE_INCREMENTAL_MODE=1 node:8.10 bash -c 'NODE_PATH=. ./node_modules/.bin/ts-node contrib/legacy-db-migration/migrate.ts >> migrate.log'`
+1. Run the initial migration, with `docker run --rm -it -v $(pwd)/legacy-migration:/app -w /app --env-file .env node:8.10 bash -c 'npm install && npm run ts-node contrib/legacy-db-migration/migrate.ts > migrate.log'`
+1. Set up a container for the continuous migration, with `docker run -d --name legacy-migration -v $(pwd)/legacy-migration:/app -w /app --env-file .env --env NIGHTBEAR_MIGRATE_INCREMENTAL_MODE=1 node:8.10 bash -c 'npm run ts-node contrib/legacy-db-migration/migrate.ts >> migrate.log'`
 1. Set up a scheduled run for the container, with `crontab -e` and put in `*/5 * * * * docker start legacy-migration`

@@ -1,20 +1,16 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
-import {
-  generateUniqueId,
-  getModelRef,
-  getStorageKey,
-  REV_CONFLICT_SAVE_ERROR,
-  timestampToString,
-} from 'core/storage/couchDbStorage';
+import { getModelRef, getStorageKey, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
 import { assertEqualWithoutMeta, savedProfile } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 export const MODEL_1: Carbs = {
   modelType: 'Carbs',
+  modelUuid: generateUuid(),
   timestamp: 1508092667717, // i.e. Sun Oct 15 2017 21:37:47 GMT+0300 (EEST)
   amount: 10,
   carbsType: 'normal',
@@ -197,6 +193,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   describe('loading active alarms', () => {
     const alarm: Alarm = {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: 0,
       situationType: 'HIGH',
       isActive: false,
@@ -258,25 +255,6 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     });
   });
 
-  describe('generateUniqueId()', () => {
-    const TEST_ITERATIONS = 1000;
-
-    it('generates ' + TEST_ITERATIONS + " successive ID's that look right", () => {
-      for (let i = 0; i < TEST_ITERATIONS; i++) {
-        assert.match(generateUniqueId(), /^[0-9a-zA-Z]{8}$/);
-      }
-    });
-
-    it('generates ' + TEST_ITERATIONS + " successive, unique ID's", () => {
-      const ids: { [uuid: string]: string } = {};
-      for (let i = 0; i < TEST_ITERATIONS; i++) {
-        const id = generateUniqueId();
-        if (ids[id]) throw new Error('Duplicate ID generated');
-        ids[id] = id;
-      }
-    });
-  });
-
   describe('timestampToString()', () => {
     it('generates timestamp strings of the expected type', () => {
       assert.equal(timestampToString(1544367587513), '2018-12-09T14:59:47.513Z');
@@ -286,6 +264,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   describe('model references', () => {
     const entry: MeterEntry = {
       modelType: 'MeterEntry',
+      modelUuid: generateUuid(),
       timestamp: 1544372705829 - 1000,
       source: 'dexcom',
       bloodGlucose: 8,
@@ -293,6 +272,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
     const cal: DexcomCalibration = {
       modelType: 'DexcomCalibration',
+      modelUuid: generateUuid(),
       timestamp: 1544372705829,
       meterEntries: [],
       isInitialCalibration: true,

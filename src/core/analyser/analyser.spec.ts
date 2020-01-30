@@ -11,6 +11,7 @@ import { entriesRising } from 'core/analyser/test-data/rising';
 import { Alarm, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
 import 'mocha';
 import { activeProfile } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -20,6 +21,7 @@ describe('utils/analyser', () => {
 
   const deviceStatus: DeviceStatus = {
     modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
     deviceName: 'dexcom-uploader',
     timestamp: currentTimestamp,
     batteryLevel: 70,
@@ -44,6 +46,7 @@ describe('utils/analyser', () => {
   it('detects battery', () => {
     const deviceStatusBattery: DeviceStatus = {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'dexcom-uploader',
       timestamp: currentTimestamp,
       batteryLevel: 10,

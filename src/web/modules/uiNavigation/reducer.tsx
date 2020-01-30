@@ -1,10 +1,11 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { Model } from 'core/models/model';
-import { isTimelineModel, isSameModel } from 'core/models/utils';
-import { getStorageKey, reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
+import { isSameModel, isTimelineModel } from 'core/models/utils';
+import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
 import { ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
+import { getModelByUuid } from 'web/modules/uiNavigation/getters';
 import { uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
 
 export function uiNavigationReducer(
@@ -25,7 +26,7 @@ export function uiNavigationReducer(
             loadedModels: { status: 'FETCHING' },
             timelineRange: 12 * HOUR_IN_MS,
             timelineRangeEnd: Date.now(),
-            modelBeingEdited: null,
+            modelUuidBeingEdited: null,
             timelineCursorAt: null,
           };
         default:
@@ -59,21 +60,25 @@ export function uiNavigationReducer(
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
     case 'MODEL_SELECTED_FOR_EDITING':
+      let modelUuidBeingEdited = null;
+      if (action.model && !isSameModel(getModelByUuid(state, state.modelUuidBeingEdited), action.model)) {
+        modelUuidBeingEdited = action.model.modelUuid;
+      }
       return {
         ...state,
-        modelBeingEdited: isSameModel(state.modelBeingEdited, action.model) ? null : action.model, // if selecting the same model again, de-select instead
+        modelUuidBeingEdited,
         timelineCursorAt: null, // clear a possible previous cursor when starting edit
       };
     case 'TIMELINE_CURSOR_UPDATED':
       return {
         ...state,
-        modelBeingEdited: null, // clear a possible previous edit when placing cursor
-        timelineCursorAt: state.modelBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
+        modelUuidBeingEdited: null, // clear a possible previous edit when placing cursor
+        timelineCursorAt: state.modelUuidBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
     case 'MODEL_UPDATED_BY_USER':
       return {
         ...state,
-        modelBeingEdited: null, // after updating a model, de-select it
+        modelUuidBeingEdited: null, // after updating a model, de-select it
         timelineCursorAt: null, // ^ ditto for the cursor, if it existed (as it does before creating a new model)
       };
     case 'DB_EMITTED_CHANGES':
@@ -112,7 +117,7 @@ function mergeIncomingModels<T extends Model>(existingModels: T[], incomingModel
     .concat(existingModels)
     .concat(incomingModels)
     .forEach(m => {
-      map.set(getStorageKey(m), m);
+      map.set(m.modelUuid, m);
     });
   return [...map.values()];
 }

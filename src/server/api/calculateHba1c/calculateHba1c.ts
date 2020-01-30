@@ -1,6 +1,7 @@
 import { calculateHba1c, DAY_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context, createResponse, Request, Response } from 'core/models/api';
+import { generateUuid } from 'core/utils/id';
 
 const HBA1C_WEEKS = 4;
 
@@ -15,6 +16,7 @@ export function calculateHba1cForDate(request: Request, context: Context): Respo
     .then(hba1cValue =>
       context.storage.saveModel({
         modelType: 'Hba1c',
+        modelUuid: generateUuid(),
         source: 'calculated',
         timestamp: dateAsMs,
         hba1cValue,

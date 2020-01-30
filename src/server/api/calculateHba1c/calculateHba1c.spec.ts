@@ -10,19 +10,24 @@ import {
   createTestRequest,
   saveAndAssociate,
   withStorage,
+  ERASED_UUID,
+  eraseModelUuid,
 } from 'server/utils/test';
+import { generateUuid } from 'core/utils/id';
 
 describe('api/calculateHba1c', () => {
   const request = createTestRequest();
 
   const mockDexcomMeterEntry: MeterEntry = {
     modelType: 'MeterEntry',
+    modelUuid: generateUuid(),
     timestamp: 1508672249758 - 3 * 14934,
     source: 'dexcom',
     bloodGlucose: 8.0,
   };
   const mockDexcomCalibration: DexcomCalibration = {
     modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
     timestamp: 1508672249758 - 3 * 14934,
     meterEntries: [],
     isInitialCalibration: false,
@@ -57,6 +62,7 @@ describe('api/calculateHba1c', () => {
 
       const mockHba1c: Hba1c = {
         modelType: 'Hba1c',
+        modelUuid: ERASED_UUID,
         source: 'calculated',
         timestamp: 1508672249758,
         hba1cValue: 6.218815331010453,
@@ -69,7 +75,7 @@ describe('api/calculateHba1c', () => {
         .then(() => uploadDexcomEntry(mockRequestBgEntry, context))
         .then(() => calculateHba1cForDate(request, context))
         .then(() => getHba1cHistory(request, context))
-        .then(res => assertEqualWithoutMeta(res.responseBody as any, mockResponseJson));
+        .then(res => assertEqualWithoutMeta((res.responseBody as any).map(eraseModelUuid), mockResponseJson));
     });
   });
 });

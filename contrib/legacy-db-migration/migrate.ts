@@ -16,6 +16,7 @@ import {
 } from 'core/models/model';
 import { first, is } from 'core/models/utils';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
+import { generateUuid } from 'core/utils/id';
 import PouchDB from 'core/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
 import { CAL_PAIRING } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
@@ -207,6 +208,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^sensor-entries\//) && x.type === 'sgv' && x.device === 'dexcom') {
     const raw: DexcomRawSensorEntry = {
       modelType: 'DexcomRawSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       bloodGlucose: x.nb_raw_value,
       signalStrength: x.rssi,
@@ -220,6 +222,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
     } else {
       const proper: DexcomSensorEntry = {
         modelType: 'DexcomSensorEntry',
+        modelUuid: generateUuid(),
         timestamp: x.date,
         bloodGlucose: x.nb_glucose_value,
         signalStrength: x.rssi,
@@ -230,6 +233,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^sensor-entries-raw\//) && x.type === 'raw' && x.device === 'parakeet') {
     const model: ParakeetSensorEntry = {
       modelType: 'ParakeetSensorEntry',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       bloodGlucose: x.nb_glucose_value,
       rawFiltered: x.filtered,
@@ -239,6 +243,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^meter-entries\//) && x.type === 'mbg' && x.device === 'dexcom') {
     const model: MeterEntry = {
       modelType: 'MeterEntry',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       source: 'dexcom',
       bloodGlucose: changeBloodGlucoseUnitToMmoll(x.mbg),
@@ -248,6 +253,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
     const ts = new Date(x._id.replace(/.*\//, '')).getTime();
     const model: Alarm = {
       modelType: 'Alarm',
+      modelUuid: generateUuid(),
       timestamp: ts,
       situationType: x.type,
       isActive: x.status !== 'inactive',
@@ -266,6 +272,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
     const ts = new Date(x._id.replace(/.*\//, '')).getTime();
     const model: DeviceStatus = {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'dexcom-uploader',
       timestamp: ts,
       batteryLevel: x.uploaderBattery,
@@ -275,6 +282,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^device-status-parakeet\//)) {
     const model1: DeviceStatus = {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'parakeet',
       timestamp: x.date,
       batteryLevel: parseFloat(x.parakeetBattery),
@@ -282,6 +290,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
     };
     const model2: DeviceStatus = {
       modelType: 'DeviceStatus',
+      modelUuid: generateUuid(),
       deviceName: 'dexcom-transmitter',
       timestamp: x.date,
       batteryLevel: parseFloat(x.transmitterBattery),
@@ -291,6 +300,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^hba1c-history\//)) {
     const model: Hba1c = {
       modelType: 'Hba1c',
+      modelUuid: generateUuid(),
       source: 'calculated',
       timestamp: x.calculationTimestamp,
       hba1cValue: x.hba1c,
@@ -299,6 +309,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^calibrations\//) && x.type === 'cal' && x.device === 'dexcom') {
     const model: DexcomCalibration = {
       modelType: 'DexcomCalibration',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       meterEntries: [], // will be filled in later in this script
       isInitialCalibration: false,
@@ -310,18 +321,21 @@ function toModernModel(x: any): Promise<Model[] | null> {
   } else if (x._id.match(/^treatments\//)) {
     const model1: Insulin = {
       modelType: 'Insulin',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       insulinType: 'unknown',
       amount: parseFloat(x.insulin),
     };
     const model2: Carbs = {
       modelType: 'Carbs',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       amount: parseFloat(x.carbs),
       carbsType: 'normal',
     };
     const model3: MeterEntry = {
       modelType: 'MeterEntry',
+      modelUuid: generateUuid(),
       timestamp: x.date,
       source: 'ui',
       bloodGlucose: parseFloat(x.sugar),
@@ -340,9 +354,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
 
 function linkCalibrationsAndMeterEntries() {
   console.warn(
-    `Attempting to link ${maybeLinkedMeterEntries.length} MeterEntry's with ${
-      maybeLinkedDexcomCalibrations.length
-    } DexcomCalibration's`,
+    `Attempting to link ${maybeLinkedMeterEntries.length} MeterEntry's with ${maybeLinkedDexcomCalibrations.length} DexcomCalibration's`,
   );
   console.log({ maybeLinkedMeterEntries, maybeLinkedDexcomCalibrations });
   const updates = maybeLinkedDexcomCalibrations.map(cal => {
@@ -409,6 +421,7 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
 function seedProfiles() {
   const day: SavedProfile = {
     modelType: 'SavedProfile',
+    modelUuid: generateUuid(),
     profileName: 'day',
     activatedAtUtc: {
       hours: 11,
@@ -463,6 +476,7 @@ function seedProfiles() {
   };
   const night: SavedProfile = {
     modelType: 'SavedProfile',
+    modelUuid: generateUuid(),
     profileName: 'night',
     activatedAtUtc: {
       hours: 0,

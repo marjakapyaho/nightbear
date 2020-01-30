@@ -8,7 +8,7 @@ import { NO_STORAGE } from 'core/storage/storage';
 import { Storage } from 'core/storage/storage';
 import 'mocha';
 import { NO_LOGGING } from 'server/utils/logging';
-import { getUuid } from 'server/utils/uuid';
+import { generateUuid } from 'core/utils/id';
 
 export type TestSuite = (storage: () => Storage) => void;
 
@@ -22,7 +22,7 @@ export function withStorage(suite: TestSuite) {
 function withInMemoryStorage(suite: TestSuite) {
   describe('with in-memory storage', () => {
     suite(() => {
-      const dbUrl = TEMP_DB_PREFIX + getUuid();
+      const dbUrl = TEMP_DB_PREFIX + generateUuid();
       return createCouchDbStorage(dbUrl, { adapter: 'memory' });
     });
   });
@@ -33,7 +33,7 @@ function withCouchDbStorage(suite: TestSuite) {
   (NIGHTBEAR_TEST_DB_URL ? describe : xdescribe)('with CouchDB storage', () => {
     let createdDbs: string[] = [];
     suite(() => {
-      const dbUrl = NIGHTBEAR_TEST_DB_URL + TEMP_DB_PREFIX + getUuid();
+      const dbUrl = NIGHTBEAR_TEST_DB_URL + TEMP_DB_PREFIX + generateUuid();
       createdDbs.push(dbUrl);
       return createCouchDbStorage(dbUrl);
     });
@@ -87,10 +87,18 @@ export function assertEqualWithoutMeta(
   );
 }
 
+export const ERASED_UUID = '<uuid-erased-in-test-code>';
+
+// Erasing the ID's of Model(s) makes it simpler to compare them, when the ID's aren't important
+export function eraseModelUuid<T extends Model>(model: T): T {
+  return { ...model, modelUuid: ERASED_UUID };
+}
+
 export function savedProfile(profileName: string): SavedProfile {
   const { alarmsEnabled, analyserSettings, alarmSettings, pushoverLevels } = activeProfile(profileName, Date.now()); // note: the timestamp value given here should be irrelevant, since it's not actually visible on the SavedProfile interface
   return {
     modelType: 'SavedProfile',
+    modelUuid: generateUuid(),
     profileName,
     alarmsEnabled,
     analyserSettings,
@@ -102,6 +110,7 @@ export function savedProfile(profileName: string): SavedProfile {
 export function activeProfile(profileName: string, timestamp: number): ActiveProfile {
   return {
     modelType: 'ActiveProfile',
+    modelUuid: generateUuid(),
     timestamp,
     profileName,
     alarmsEnabled: true,
