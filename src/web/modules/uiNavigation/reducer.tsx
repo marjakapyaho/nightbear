@@ -76,10 +76,16 @@ export function uiNavigationReducer(
         timelineCursorAt: state.modelUuidBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
     case 'MODEL_UPDATED_BY_USER':
+      if (state.loadedModels.status !== 'READY') return state; // updates while there's no data loaded should be ignored
       return {
         ...state,
         modelUuidBeingEdited: action.model.modelUuid, // keep whatever we just edited selected for further edits
         timelineCursorAt: null, // ^ clear the cursor if it existed (as it does before creating a new model)
+        loadedModels: {
+          // also to get a realistic re-render quicker, let's immediately merge the new Model in, even if the DB would soon emit it anyway
+          ...state.loadedModels,
+          timelineModels: mergeIncomingModels(state.loadedModels.timelineModels, [action.model]),
+        },
       };
     case 'DB_EMITTED_CHANGES':
       if (state.loadedModels.status !== 'READY') return state;
