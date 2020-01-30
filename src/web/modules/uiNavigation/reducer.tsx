@@ -78,8 +78,8 @@ export function uiNavigationReducer(
     case 'MODEL_UPDATED_BY_USER':
       return {
         ...state,
-        modelUuidBeingEdited: null, // after updating a model, de-select it
-        timelineCursorAt: null, // ^ ditto for the cursor, if it existed (as it does before creating a new model)
+        modelUuidBeingEdited: action.model.modelUuid, // keep whatever we just edited selected for further edits
+        timelineCursorAt: null, // ^ clear the cursor if it existed (as it does before creating a new model)
       };
     case 'DB_EMITTED_CHANGES':
       if (state.loadedModels.status !== 'READY') return state;
