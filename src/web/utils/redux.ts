@@ -17,7 +17,7 @@ type ActionCreatorMapWithType<T extends { [key: string]: (...args: any) => any }
   [K in keyof T]: ActionCreatorWithType<T[K], K>;
 };
 type ActionCreatorWithType<A, T> = A extends (...args: any) => infer R
-  ? (...args: Parameters<A>) => Readonly<R & { type: T }>
+  ? ((...args: Parameters<A>) => Readonly<R & { type: T }>) & { name: T }
   : never;
 
 // The union of all possible return types from the given action creator map
@@ -30,11 +30,17 @@ export function createStore(initialState?: ReduxState): ReduxStore {
 
 // Updates the given map of action creators so that their return value (i.e. the action object)
 // contains a "type" key with the type of each action, as determined by their key in the given map.
+// For convenience, we also set up their Function.name so that:
+// a) it's typed as the correct string literal, instead of just "string"
+// b) it survives minification (as done by Webpack for example)
+// Setting this up correctly requires a few internal cheats with "any", but we know what we're doing. :tm:
 export function actionsWithType<T extends ActionCreatorMap>(map: T): ActionCreatorMapWithType<T> {
   return Object.keys(map)
-    .map(type => ({
-      [type]: (...args: any[]) => ({ type, ...map[type].apply(null, args) }),
-    }))
+    .map(type => {
+      const funcWithType = (...args: any[]) => ({ type, ...map[type].apply(null, args) }); // update the return value so it includes the action name as the "type" property
+      const funcWithName = Object.defineProperty(funcWithType, 'name', { value: type }); // https://2ality.com/2015/09/function-names-es6.html#changing-the-names-of-functions
+      return { [type]: funcWithName };
+    })
     .reduce((memo, next) => ({ ...memo, ...next }), {} as any);
 }
 
