@@ -3,7 +3,7 @@ import { Model } from 'core/models/model';
 import { isSameModel, isTimelineModel } from 'core/models/utils';
 import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { assertExhausted } from 'server/utils/types';
-import { ReduxAction } from 'web/modules/actions';
+import { ReduxAction, actions } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
 import { getModelByUuid } from 'web/modules/uiNavigation/getters';
 import { uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
@@ -14,7 +14,7 @@ export function uiNavigationReducer(
   _rootState: ReduxState,
 ): UiNavigationState {
   switch (action.type) {
-    case 'UI_NAVIGATED':
+    case actions.UI_NAVIGATED.type:
       switch (action.newScreen) {
         case 'BgGraphScreen':
           return { ...state, selectedScreen: 'BgGraphScreen' };
@@ -32,7 +32,7 @@ export function uiNavigationReducer(
         default:
           return assertExhausted(action.newScreen);
       }
-    case 'TIMELINE_FILTERS_CHANGED':
+    case actions.TIMELINE_FILTERS_CHANGED.type:
       const { range, rangeEnd, modelTypes } = action;
       return {
         ...state,
@@ -41,7 +41,7 @@ export function uiNavigationReducer(
         timelineRangeEnd: rangeEnd,
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
-    case 'TIMELINE_DATA_RECEIVED':
+    case actions.TIMELINE_DATA_RECEIVED.type:
       const timelineModels = mergeIncomingModels(
         state.loadedModels.status === 'READY' ? state.loadedModels.timelineModels : [],
         action.timelineModels,
@@ -54,12 +54,12 @@ export function uiNavigationReducer(
         ...state,
         loadedModels: { status: 'READY', timelineModels, globalModels },
       };
-    case 'TIMELINE_DATA_FAILED':
+    case actions.TIMELINE_DATA_FAILED.type:
       return {
         ...state,
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
-    case 'MODEL_SELECTED_FOR_EDITING':
+    case actions.MODEL_SELECTED_FOR_EDITING.type:
       let modelUuidBeingEdited = null;
       if (action.model && !isSameModel(getModelByUuid(state, state.modelUuidBeingEdited), action.model)) {
         modelUuidBeingEdited = action.model.modelUuid;
@@ -69,13 +69,13 @@ export function uiNavigationReducer(
         modelUuidBeingEdited,
         timelineCursorAt: null, // clear a possible previous cursor when starting edit
       };
-    case 'TIMELINE_CURSOR_UPDATED':
+    case actions.TIMELINE_CURSOR_UPDATED.type:
       return {
         ...state,
         modelUuidBeingEdited: null, // clear a possible previous edit when placing cursor
         timelineCursorAt: state.modelUuidBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
-    case 'MODEL_UPDATED_BY_USER':
+    case actions.MODEL_UPDATED_BY_USER.type:
       if (state.loadedModels.status !== 'READY') return state; // updates while there's no data loaded should be ignored
       return {
         ...state,
@@ -87,7 +87,7 @@ export function uiNavigationReducer(
           timelineModels: mergeIncomingModels(state.loadedModels.timelineModels, [action.model]),
         },
       };
-    case 'DB_EMITTED_CHANGES':
+    case actions.DB_EMITTED_CHANGES.type:
       if (state.loadedModels.status !== 'READY') return state;
       try {
         const newModels = action.changes.map(change => reviveCouchDbRowIntoModel(change.doc));

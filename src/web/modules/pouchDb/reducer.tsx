@@ -1,5 +1,5 @@
 import { isArray, last } from 'lodash';
-import { ReduxAction } from 'web/modules/actions';
+import { ReduxAction, actions } from 'web/modules/actions';
 import { DB_REPLICATION_BATCH_SIZE } from 'web/modules/pouchDb/middleware';
 import { pouchDbInitState, PouchDbState, PouchDbStatePart, PouchDbStatus } from 'web/modules/pouchDb/state';
 import { ReduxState } from 'web/modules/state';
@@ -11,15 +11,15 @@ export function pouchDbReducer(
   _rootState: ReduxState,
 ): PouchDbState {
   switch (action.type) {
-    case 'DB_EMITTED_CHANGES_BUFFERING':
+    case actions.DB_EMITTED_CHANGES_BUFFERING.type:
       return updateDbStatus(state, 'LOCAL', 'ACTIVE');
-    case 'DB_EMITTED_CHANGES':
+    case actions.DB_EMITTED_CHANGES.type:
       return updateDbStatus(state, 'LOCAL', 'ONLINE');
-    case 'DB_EMITTED_COMPLETE':
+    case actions.DB_EMITTED_COMPLETE.type:
       return updateDbStatus(state, 'LOCAL', 'DISABLED');
-    case 'DB_EMITTED_ERROR':
+    case actions.DB_EMITTED_ERROR.type:
       return updateDbStatus(state, 'LOCAL', 'ERROR', action.err.message);
-    case 'REPLICATION_EMITTED_CHANGE':
+    case actions.REPLICATION_EMITTED_CHANGE.type:
       if (action.info.pending) {
         // We know how much replication work is left!
         const { details } = state[action.direction];
@@ -31,15 +31,15 @@ export function pouchDbReducer(
         // We only know the replication is active, but not how much is left
         return updateDbStatus(state, action.direction, 'ACTIVE');
       }
-    case 'REPLICATION_EMITTED_PAUSED':
+    case actions.REPLICATION_EMITTED_PAUSED.type:
       return updateDbStatus(state, action.direction, action.err ? 'OFFLINE' : 'ONLINE');
-    case 'REPLICATION_EMITTED_ACTIVE':
+    case actions.REPLICATION_EMITTED_ACTIVE.type:
       return updateDbStatus(state, action.direction, 'ACTIVE');
-    case 'REPLICATION_EMITTED_DENIED':
+    case actions.REPLICATION_EMITTED_DENIED.type:
       return updateDbStatus(state, action.direction, 'ERROR', action.err.message);
-    case 'REPLICATION_EMITTED_COMPLETE':
+    case actions.REPLICATION_EMITTED_COMPLETE.type:
       return updateDbStatus(state, action.direction, 'DISABLED');
-    case 'REPLICATION_EMITTED_ERROR':
+    case actions.REPLICATION_EMITTED_ERROR.type:
       return updateDbStatus(state, action.direction, 'ERROR', action.err.message);
     default:
       return state;
