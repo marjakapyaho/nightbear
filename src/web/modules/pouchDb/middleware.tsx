@@ -44,7 +44,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
       timelineFiltersChanged,
     );
     return (action: ReduxAction) => {
-      if (action.type === 'MODEL_UPDATED_BY_USER') {
+      if (action.type === actions.MODEL_UPDATED_BY_USER.name) {
         Promise.resolve()
           .then(() =>
             activeStorage
@@ -56,7 +56,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
             err => console.log('Save Model error:', err),
           );
       }
-      if (action.type === 'PROFILE_ACTIVATED') {
+      if (action.type === actions.PROFILE_ACTIVATED.name) {
         const activation = activateSavedProfile(action.profile, action.atTimestamp);
         Promise.resolve()
           .then(() =>
