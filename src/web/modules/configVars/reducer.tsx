@@ -8,7 +8,7 @@ export function configVarsReducer(
   _rootState: ReduxState,
 ): ConfigVarsState {
   switch (action.type) {
-    case actions.DB_URL_SET.name:
+    case actions.DB_URL_SET.type:
       return { ...state, remoteDbUrl: action.newDbUrl };
     default:
       return state;

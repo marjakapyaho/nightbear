@@ -11,15 +11,15 @@ export function pouchDbReducer(
   _rootState: ReduxState,
 ): PouchDbState {
   switch (action.type) {
-    case actions.DB_EMITTED_CHANGES_BUFFERING.name:
+    case actions.DB_EMITTED_CHANGES_BUFFERING.type:
       return updateDbStatus(state, 'LOCAL', 'ACTIVE');
-    case actions.DB_EMITTED_CHANGES.name:
+    case actions.DB_EMITTED_CHANGES.type:
       return updateDbStatus(state, 'LOCAL', 'ONLINE');
-    case actions.DB_EMITTED_COMPLETE.name:
+    case actions.DB_EMITTED_COMPLETE.type:
       return updateDbStatus(state, 'LOCAL', 'DISABLED');
-    case actions.DB_EMITTED_ERROR.name:
+    case actions.DB_EMITTED_ERROR.type:
       return updateDbStatus(state, 'LOCAL', 'ERROR', action.err.message);
-    case actions.REPLICATION_EMITTED_CHANGE.name:
+    case actions.REPLICATION_EMITTED_CHANGE.type:
       if (action.info.pending) {
         // We know how much replication work is left!
         const { details } = state[action.direction];
@@ -31,15 +31,15 @@ export function pouchDbReducer(
         // We only know the replication is active, but not how much is left
         return updateDbStatus(state, action.direction, 'ACTIVE');
       }
-    case actions.REPLICATION_EMITTED_PAUSED.name:
+    case actions.REPLICATION_EMITTED_PAUSED.type:
       return updateDbStatus(state, action.direction, action.err ? 'OFFLINE' : 'ONLINE');
-    case actions.REPLICATION_EMITTED_ACTIVE.name:
+    case actions.REPLICATION_EMITTED_ACTIVE.type:
       return updateDbStatus(state, action.direction, 'ACTIVE');
-    case actions.REPLICATION_EMITTED_DENIED.name:
+    case actions.REPLICATION_EMITTED_DENIED.type:
       return updateDbStatus(state, action.direction, 'ERROR', action.err.message);
-    case actions.REPLICATION_EMITTED_COMPLETE.name:
+    case actions.REPLICATION_EMITTED_COMPLETE.type:
       return updateDbStatus(state, action.direction, 'DISABLED');
-    case actions.REPLICATION_EMITTED_ERROR.name:
+    case actions.REPLICATION_EMITTED_ERROR.type:
       return updateDbStatus(state, action.direction, 'ERROR', action.err.message);
     default:
       return state;
