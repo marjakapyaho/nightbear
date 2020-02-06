@@ -64,6 +64,9 @@ export default (() => {
                 amount: newValue,
                 insulinType: '',
               });
+            } else if (is('Insulin')(modelBeingEdited) && modelBeingEdited.amount === newValue) {
+              // Same value selected again -> clear value -> delete model
+              actions.MODEL_DELETED_BY_USER(modelBeingEdited);
             } else if (is('Insulin')(modelBeingEdited)) {
               // Update existing
               actions.MODEL_UPDATED_BY_USER({
@@ -71,7 +74,6 @@ export default (() => {
                 amount: newValue,
               });
             }
-            // TODO: Deleting when modelBeingEdited.amount === newValue
           }}
           min={1}
           max={20}
