@@ -41,7 +41,7 @@ export function uiNavigationReducer(
         timelineRangeEnd: rangeEnd,
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
-    case actions.TIMELINE_DATA_RECEIVED.type:
+    case actions.TIMELINE_DATA_UPDATED.type:
       const timelineModels = mergeIncomingModels(
         state.loadedModels.status === 'READY' ? state.loadedModels.timelineModels : [],
         action.timelineModels,

@@ -7,7 +7,7 @@ export const timelineDataActions = actionsWithType({
     rangeEnd,
     modelTypes,
   }),
-  TIMELINE_DATA_RECEIVED: (timelineModels: TimelineModel[], globalModels: GlobalModel[]) => ({
+  TIMELINE_DATA_UPDATED: (timelineModels: TimelineModel[], globalModels: GlobalModel[]) => ({
     timelineModels,
     globalModels,
   }),
