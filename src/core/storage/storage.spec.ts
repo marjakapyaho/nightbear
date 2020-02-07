@@ -74,8 +74,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
   it('reports save errors in bulk', () => {
     const models = [
-      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } },
-      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } }, // make sure we conflict, as we have the exact same _id
+      model,
+      { ...model, modelMeta: { _id: getStorageKey(model) } }, // make sure we conflict, as we have the exact same _id
     ];
     return storage.saveModels(models).then(
       () => {
@@ -84,7 +84,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       (err: StorageError) => {
         assert.match(
           err.message,
-          /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/,
+          /Couldn't save some models:\n.*"timeline\/.* => OK\n.*"timeline\/.* => .*update conflict/,
         );
         // Check that success is reported:
         assert.equal(err?.saveSucceededForModels?.length, 1);
@@ -338,12 +338,12 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         .then(() =>
           storage.loadModelRef({
             modelType: 'MeterEntry',
-            modelRef: 'timeline/2018-12-09T16:25:04.829Z/MeterEntry/Tos9mfFf',
+            modelRef: getStorageKey(model),
           }),
         )
         .then(
           assert.fail, // expecting a failure
-          err => assert.match(err.message, /modelRef.*MeterEntry.*Tos9mfFf/),
+          err => assert.match(err.message, /Couldn't load modelRef "timeline\/.*"/),
         );
     });
   });
