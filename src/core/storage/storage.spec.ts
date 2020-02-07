@@ -1,7 +1,13 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { getModelRef, getStorageKey, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
+import {
+  getModelRef,
+  getStorageKey,
+  REV_CONFLICT_SAVE_ERROR,
+  timestampToString,
+  REV_CONFLICT_DELETE_ERROR,
+} from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -74,8 +80,8 @@ export function storageTestSuite(createTestStorage: () => Storage) {
 
   it('reports save errors in bulk', () => {
     const models = [
-      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } },
-      { ...model, modelMeta: { _id: 'timeline/2018-12-09T15:42:52.561Z/Carbs/foo' } }, // make sure we conflict, as we have the exact same _id
+      model,
+      { ...model, modelMeta: { _id: getStorageKey(model) } }, // make sure we conflict, as we have the exact same _id
     ];
     return storage.saveModels(models).then(
       () => {
@@ -84,10 +90,10 @@ export function storageTestSuite(createTestStorage: () => Storage) {
       (err: StorageError) => {
         assert.match(
           err.message,
-          /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/,
+          /Couldn't save some models:\n.*"timeline\/.* => OK\n.*"timeline\/.* => .*update conflict/,
         );
         // Check that success is reported:
-        assert.equal(err.saveSucceededForModels.length, 1);
+        assert.equal(err?.saveSucceededForModels?.length, 1);
         const succeededModel = first(err.saveSucceededForModels);
         if (is('Carbs')(succeededModel)) {
           assert.equal(succeededModel.timestamp, model.timestamp);
@@ -95,7 +101,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assert.fail('Did not get the expected Model back');
         }
         // Check that failure is reported:
-        assert.equal(err.saveFailedForModels.length, 1);
+        assert.equal(err?.saveFailedForModels?.length, 1);
         const [failedModel, reason] = first(err.saveFailedForModels) || [];
         if (is('Carbs')(failedModel)) {
           assert.equal(failedModel.timestamp, model.timestamp);
@@ -105,6 +111,48 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
       },
     );
+  });
+
+  it('deletes models in bulk', () => {
+    return storage
+      .saveModels([model])
+      .then(models => storage.deleteModels(models))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
+      .then(loadedModels => assert.deepEqual(loadedModels, []));
+  });
+
+  it('reports deletion errors in bulk', () => {
+    return storage
+      .saveModels([model])
+      .then(models => storage.deleteModels(models.concat(model)))
+      .then(
+        () => {
+          throw new Error('Expecting a failure');
+        },
+        (err: StorageError) => {
+          assert.match(
+            err.message,
+            /Couldn't delete some models:\n.*"timeline\/.* => OK\n.*"timeline\/.* => .*update conflict/,
+          );
+          // Check that success is reported:
+          assert.equal(err?.deleteSucceededForModels?.length, 1);
+          const succeededModel = first(err.deleteSucceededForModels);
+          if (is('Carbs')(succeededModel)) {
+            assert.equal(succeededModel.timestamp, model.timestamp);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          // Check that failure is reported:
+          assert.equal(err?.deleteFailedForModels?.length, 1);
+          const [failedModel, reason] = first(err.deleteFailedForModels) || [];
+          if (is('Carbs')(failedModel)) {
+            assert.equal(failedModel.timestamp, model.timestamp);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          assert.equal(reason, REV_CONFLICT_DELETE_ERROR);
+        },
+      );
   });
 
   it('loads timeline models', () => {
@@ -338,12 +386,12 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         .then(() =>
           storage.loadModelRef({
             modelType: 'MeterEntry',
-            modelRef: 'timeline/2018-12-09T16:25:04.829Z/MeterEntry/Tos9mfFf',
+            modelRef: getStorageKey(model),
           }),
         )
         .then(
           assert.fail, // expecting a failure
-          err => assert.match(err.message, /modelRef.*MeterEntry.*Tos9mfFf/),
+          err => assert.match(err.message, /Couldn't load modelRef "timeline\/.*"/),
         );
     });
   });

@@ -41,7 +41,7 @@ export function uiNavigationReducer(
         timelineRangeEnd: rangeEnd,
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
-    case actions.TIMELINE_DATA_RECEIVED.type:
+    case actions.TIMELINE_DATA_UPDATED.type:
       const timelineModels = mergeIncomingModels(
         state.loadedModels.status === 'READY' ? state.loadedModels.timelineModels : [],
         action.timelineModels,
@@ -53,6 +53,16 @@ export function uiNavigationReducer(
       return {
         ...state,
         loadedModels: { status: 'READY', timelineModels, globalModels },
+      };
+    case actions.TIMELINE_DATA_DELETED.type:
+      if (state.loadedModels.status !== 'READY') return state; // deletions while there's no data loaded should be ignored
+      return {
+        ...state,
+        loadedModels: {
+          ...state.loadedModels,
+          timelineModels: removeDeletedModels(state.loadedModels.timelineModels, action.deletedModels),
+          globalModels: removeDeletedModels(state.loadedModels.globalModels, action.deletedModels),
+        },
       };
     case actions.TIMELINE_DATA_FAILED.type:
       return {
@@ -80,11 +90,21 @@ export function uiNavigationReducer(
       return {
         ...state,
         modelUuidBeingEdited: action.model.modelUuid, // keep whatever we just edited selected for further edits
-        timelineCursorAt: null, // ^ clear the cursor if it existed (as it does before creating a new model)
+        timelineCursorAt: null, // clear the cursor if it existed (as it does before creating a new model)
         loadedModels: {
-          // also to get a realistic re-render quicker, let's immediately merge the new Model in, even if the DB would soon emit it anyway
           ...state.loadedModels,
-          timelineModels: mergeIncomingModels(state.loadedModels.timelineModels, [action.model]),
+          timelineModels: mergeIncomingModels(state.loadedModels.timelineModels, [action.model]), // also to get a realistic re-render quicker, let's immediately merge the new Model in, even if the DB would soon emit it anyway
+        },
+      };
+    case actions.MODEL_DELETED_BY_USER.type:
+      if (state.loadedModels.status !== 'READY') return state; // deletions while there's no data loaded should be ignored
+      return {
+        ...state,
+        modelUuidBeingEdited: null,
+        timelineCursorAt: null, // clear the cursor if it existed (as it does before creating a new model)
+        loadedModels: {
+          ...state.loadedModels,
+          timelineModels: removeDeletedModels(state.loadedModels.timelineModels, [action.model]), // also to get a realistic re-render quicker, let's immediately remove the Model, even if the DB would soon emit it anyway
         },
       };
     case actions.DB_EMITTED_CHANGES.type:
@@ -126,4 +146,9 @@ function mergeIncomingModels<T extends Model>(existingModels: T[], incomingModel
       map.set(m.modelUuid, m);
     });
   return [...map.values()];
+}
+
+// Updates an array of existing Models, so that the given ones are removed from it
+function removeDeletedModels<T extends Model>(existingModels: T[], modelsToDelete: Model[]): T[] {
+  return existingModels.filter(existingModel => !modelsToDelete.find(isSameModel.bind(null, existingModel)));
 }

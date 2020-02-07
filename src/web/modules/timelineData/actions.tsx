@@ -1,4 +1,4 @@
-import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
+import { GlobalModel, TimelineModel, TimelineModelType, Model } from 'core/models/model';
 import { actionsWithType } from 'web/utils/redux';
 
 export const timelineDataActions = actionsWithType({
@@ -7,9 +7,12 @@ export const timelineDataActions = actionsWithType({
     rangeEnd,
     modelTypes,
   }),
-  TIMELINE_DATA_RECEIVED: (timelineModels: TimelineModel[], globalModels: GlobalModel[]) => ({
+  TIMELINE_DATA_UPDATED: (timelineModels: TimelineModel[], globalModels: GlobalModel[]) => ({
     timelineModels,
     globalModels,
+  }),
+  TIMELINE_DATA_DELETED: (deletedModels: Model[]) => ({
+    deletedModels,
   }),
   TIMELINE_DATA_FAILED: (err: Error) => ({ err }),
 });

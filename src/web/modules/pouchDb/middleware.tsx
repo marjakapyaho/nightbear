@@ -52,8 +52,20 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
               : reject(`Can't save Model changes without an active Storage`),
           )
           .then(
-            (res: typeof action.model) => store.dispatch(actions.TIMELINE_DATA_RECEIVED([res], [])),
+            (res: typeof action.model) => store.dispatch(actions.TIMELINE_DATA_UPDATED([res], [])),
             err => console.log('Save Model error:', err),
+          );
+      }
+      if (action.type === actions.MODEL_DELETED_BY_USER.type) {
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.deleteModel(action.model)
+              : reject(`Can't delete Model without an active Storage`),
+          )
+          .then(
+            (res: typeof action.model) => store.dispatch(actions.TIMELINE_DATA_DELETED([res])),
+            err => console.log('Delete Model error:', err),
           );
       }
       if (action.type === actions.PROFILE_ACTIVATED.type) {
@@ -129,7 +141,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
         ),
     ])
       .then(([globalModels, timelineModels]) =>
-        store.dispatch(actions.TIMELINE_DATA_RECEIVED(timelineModels, globalModels)),
+        store.dispatch(actions.TIMELINE_DATA_UPDATED(timelineModels, globalModels)),
       )
       .catch(err => store.dispatch(actions.TIMELINE_DATA_FAILED(err)));
   }
