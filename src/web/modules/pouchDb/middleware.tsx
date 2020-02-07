@@ -56,6 +56,18 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
             err => console.log('Save Model error:', err),
           );
       }
+      if (action.type === actions.MODEL_DELETED_BY_USER.type) {
+        Promise.resolve()
+          .then(() =>
+            activeStorage
+              ? activeStorage.deleteModel(action.model)
+              : reject(`Can't delete Model without an active Storage`),
+          )
+          .then(
+            (res: typeof action.model) => store.dispatch(actions.TIMELINE_DATA_DELETED([res])),
+            err => console.log('Delete Model error:', err),
+          );
+      }
       if (action.type === actions.PROFILE_ACTIVATED.type) {
         const activation = activateSavedProfile(action.profile, action.atTimestamp);
         Promise.resolve()
