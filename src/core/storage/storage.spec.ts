@@ -1,7 +1,13 @@
 import { assert } from 'chai';
 import { Alarm, Carbs, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { is } from 'core/models/utils';
-import { getModelRef, getStorageKey, REV_CONFLICT_SAVE_ERROR, timestampToString } from 'core/storage/couchDbStorage';
+import {
+  getModelRef,
+  getStorageKey,
+  REV_CONFLICT_SAVE_ERROR,
+  timestampToString,
+  REV_CONFLICT_DELETE_ERROR,
+} from 'core/storage/couchDbStorage';
 import { Storage, StorageError } from 'core/storage/storage';
 import { first, last } from 'lodash';
 import 'mocha';
@@ -105,6 +111,48 @@ export function storageTestSuite(createTestStorage: () => Storage) {
         assert.equal(reason, REV_CONFLICT_SAVE_ERROR);
       },
     );
+  });
+
+  it('deletes models in bulk', () => {
+    return storage
+      .saveModels([model])
+      .then(models => storage.deleteModels(models))
+      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
+      .then(loadedModels => assert.deepEqual(loadedModels, []));
+  });
+
+  it('reports deletion errors in bulk', () => {
+    return storage
+      .saveModels([model])
+      .then(models => storage.deleteModels(models.concat(model)))
+      .then(
+        () => {
+          throw new Error('Expecting a failure');
+        },
+        (err: StorageError) => {
+          assert.match(
+            err.message,
+            /Couldn't delete some models:\n.*"timeline\/.* => OK\n.*"timeline\/.* => .*update conflict/,
+          );
+          // Check that success is reported:
+          assert.equal(err?.deleteSucceededForModels?.length, 1);
+          const succeededModel = first(err.deleteSucceededForModels);
+          if (is('Carbs')(succeededModel)) {
+            assert.equal(succeededModel.timestamp, model.timestamp);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          // Check that failure is reported:
+          assert.equal(err?.deleteFailedForModels?.length, 1);
+          const [failedModel, reason] = first(err.deleteFailedForModels) || [];
+          if (is('Carbs')(failedModel)) {
+            assert.equal(failedModel.timestamp, model.timestamp);
+          } else {
+            assert.fail('Did not get the expected Model back');
+          }
+          assert.equal(reason, REV_CONFLICT_DELETE_ERROR);
+        },
+      );
   });
 
   it('loads timeline models', () => {

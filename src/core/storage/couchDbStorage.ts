@@ -16,6 +16,8 @@ export const PREFIX_TIMELINE = 'timeline';
 export const PREFIX_GLOBAL = 'global';
 export const REV_CONFLICT_SAVE_ERROR = 'Document update conflict.';
 export const UNKNOWN_SAVE_ERROR = 'UNKNOWN_SAVE_ERROR';
+export const REV_CONFLICT_DELETE_ERROR = 'Document update conflict.';
+export const UNKNOWN_DELETE_ERROR = 'UNKNOWN_DELETE_ERROR';
 
 type PouchDbResult = PouchDB.Core.Response | PouchDB.Core.Error;
 
@@ -101,6 +103,52 @@ export function createCouchDbStorage(
               modelMeta: updatedMeta,
             } as any;
           });
+        });
+    },
+
+    deleteModel(model) {
+      return self.deleteModels([model]).then(models => {
+        const model = first(models);
+        if (!model) throw new Error(`No model returned after deleteModels()`);
+        return model;
+      });
+    },
+
+    deleteModels(models) {
+      return Promise.resolve()
+        .then(() =>
+          models.map(createModelMeta).map(meta => ({
+            _id: meta._id,
+            _rev: meta._rev || undefined,
+            _deleted: true, // https://pouchdb.com/api.html#batch_create
+          })),
+        )
+        .then(docs => db.bulkDocs(docs))
+        .then((res: PouchDbResult[]) => {
+          if (res.some(isErrorResult)) {
+            const resMap = res.map(r => `  "${r.id}" => ${isErrorResult(r) ? `"${r.message}"` : 'OK'}`).join('\n');
+            const errorDetails: StorageErrorDetails = {
+              deleteSucceededForModels: res
+                .map((res, i) => (isNotErrorResult(res) ? models[i] : null))
+                .filter(isNotNull),
+              deleteFailedForModels: res
+                .map((res, i) =>
+                  isErrorResult(res)
+                    ? ([
+                        models[i],
+                        res.name === 'conflict' ? REV_CONFLICT_DELETE_ERROR : res.reason || UNKNOWN_DELETE_ERROR,
+                      ] as [Model, string])
+                    : null,
+                )
+                .filter(isNotNull),
+            };
+            if (res.length === 1) {
+              throw Object.assign(new Error(`Couldn't delete model: ${resMap.trim()}`), errorDetails);
+            } else {
+              throw Object.assign(new Error(`Couldn't delete some models:\n${resMap}`), errorDetails);
+            }
+          }
+          return models;
         });
     },
 

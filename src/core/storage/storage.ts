@@ -3,6 +3,8 @@ import { GlobalModel, Model, ModelOfType, ModelRef, ModelType } from 'core/model
 export interface Storage {
   saveModel<T extends Model>(model: T): Promise<T>;
   saveModels<T extends Model>(models: T[], upsert?: boolean): Promise<T[]>;
+  deleteModel<T extends Model>(model: T): Promise<T>;
+  deleteModels<T extends Model>(models: T[]): Promise<T[]>;
   loadTimelineModels<T extends ModelType>(
     modelType: T,
     range: number,
@@ -21,6 +23,8 @@ export interface Storage {
 export const NO_STORAGE: Storage = {
   saveModel: model => Promise.resolve(model),
   saveModels: models => Promise.resolve(models),
+  deleteModel: model => Promise.resolve(model),
+  deleteModels: models => Promise.resolve(models),
   loadTimelineModels: () => Promise.resolve([]),
   loadLatestTimelineModels: () => Promise.resolve([]),
   loadLatestTimelineModel: () => Promise.resolve(undefined),
@@ -31,6 +35,8 @@ export const NO_STORAGE: Storage = {
 export type StorageErrorDetails = Readonly<{
   saveSucceededForModels?: Model[];
   saveFailedForModels?: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_SAVE_ERROR ]
+  deleteSucceededForModels?: Model[];
+  deleteFailedForModels?: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_DELETE_ERROR ]
 }>;
 export type StorageError = Error & StorageErrorDetails;
 export const isStorageError = (err: Error): err is StorageError =>
