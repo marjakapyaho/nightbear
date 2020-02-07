@@ -29,8 +29,8 @@ export const NO_STORAGE: Storage = {
 };
 
 export type StorageErrorDetails = Readonly<{
-  saveSucceededForModels: Model[];
-  saveFailedForModels: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_SAVE_ERROR ]
+  saveSucceededForModels?: Model[];
+  saveFailedForModels?: Array<[Model, string]>; // e.g. [ model, REV_CONFLICT_SAVE_ERROR ]
 }>;
 export type StorageError = Error & StorageErrorDetails;
 export const isStorageError = (err: Error): err is StorageError =>

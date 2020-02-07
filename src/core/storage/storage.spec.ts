@@ -87,7 +87,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           /Couldn't save some models:\n.*timeline.*Carbs.*OK\n.*timeline.*Carbs.*update conflict/,
         );
         // Check that success is reported:
-        assert.equal(err.saveSucceededForModels.length, 1);
+        assert.equal(err?.saveSucceededForModels?.length, 1);
         const succeededModel = first(err.saveSucceededForModels);
         if (is('Carbs')(succeededModel)) {
           assert.equal(succeededModel.timestamp, model.timestamp);
@@ -95,7 +95,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assert.fail('Did not get the expected Model back');
         }
         // Check that failure is reported:
-        assert.equal(err.saveFailedForModels.length, 1);
+        assert.equal(err?.saveFailedForModels?.length, 1);
         const [failedModel, reason] = first(err.saveFailedForModels) || [];
         if (is('Carbs')(failedModel)) {
           assert.equal(failedModel.timestamp, model.timestamp);
