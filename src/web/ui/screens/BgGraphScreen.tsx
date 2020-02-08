@@ -54,6 +54,9 @@ export default (() => {
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
             selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
             onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
+            carbsModels={state.loadedModels.timelineModels.filter(is('Carbs'))}
+            selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
@@ -99,6 +102,7 @@ export default (() => {
           centerOn={8}
         />
         <ScrollNumberSelector
+          value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(
             state,
             actions,
