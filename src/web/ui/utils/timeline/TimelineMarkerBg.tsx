@@ -6,10 +6,14 @@ import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
   model: SensorEntry | MeterEntry;
+  isSelected: boolean;
+  onSelect: (model: SensorEntry | MeterEntry) => void;
 };
 
 export default (props => {
-  if (props.model.bloodGlucose === null) {
+  const { bloodGlucose } = props.model;
+
+  if (bloodGlucose === null) {
     console.warn(
       'Trying to render a BG marker without a BG; this is probably a filtering error somewhere higher up',
       props.model,
@@ -23,11 +27,16 @@ export default (props => {
         r: 5,
         stroke: 'red',
         strokeWidth: 2,
-        fill: 'blue',
       })}
+      style={
+        {
+          fill: props.model.modelType === 'MeterEntry' ? 'blue' : 'lightblue',
+          r: props.isSelected ? 10 : undefined,
+        } as any // the TS type defs won't accept "r" as a valid style prop :shrug:
+      }
       cx={tsToLeft(props.timelineConfig, props.model.timestamp)}
-      cy={bgToTop(props.timelineConfig, props.model.bloodGlucose)}
-      onClick={() => alert(`${new Date(props.model.timestamp)}\n\nbg = ${props.model.bloodGlucose}`)}
+      cy={bgToTop(props.timelineConfig, bloodGlucose)}
+      onClick={() => props.onSelect(props.model)}
     />
   );
 }) as React.FC<Props>;

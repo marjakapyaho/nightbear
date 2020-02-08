@@ -49,6 +49,8 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('ParakeetSensorEntry')),
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
+            selectedBgModel={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onBgModelSelect={model => (is('MeterEntry')(model) ? actions.MODEL_SELECTED_FOR_EDITING(model) : undefined)} // currently, of all the BG types, we only support editing MeterEntry's, because editing the other ones wouldn't make much sense
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
             selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
             onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}

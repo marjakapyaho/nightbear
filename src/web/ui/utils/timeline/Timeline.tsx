@@ -14,7 +14,11 @@ type Props = {
   timelineConfig: TimelineConfig;
   cursorTimestamp?: number | null;
   onCursorTimestampUpdate: (ts: number | null) => void;
+
   bgModels: (SensorEntry | MeterEntry)[];
+  selectedBgModel?: SensorEntry | MeterEntry;
+  onBgModelSelect: (model: SensorEntry | MeterEntry) => void;
+
   insulinModels: Insulin[];
   selectedInsulinModel?: Insulin;
   onInsulinModelSelect: (model: Insulin) => void;
@@ -81,7 +85,13 @@ export default (props => {
           >
             <TimelineGraphBg timelineConfig={c} bgModels={props.bgModels} />
             {props.bgModels.map((model, i) => (
-              <TimelineMarkerBg key={i} timelineConfig={c} model={model} />
+              <TimelineMarkerBg
+                key={i}
+                timelineConfig={c}
+                model={model}
+                isSelected={isSameModel(props.selectedBgModel, model)}
+                onSelect={props.onBgModelSelect}
+              />
             ))}
           </svg>
           <TimelineScaleTs timelineConfig={c} />
