@@ -31,10 +31,10 @@ export function mergeEntriesFeed([dexcomSensorEntries, dexcomRawSensorEntries, p
 ]) {
   return sortBy(
     unionBy(
+      meterEntries as TimelineModel[],
       dexcomSensorEntries as TimelineModel[],
       dexcomRawSensorEntries as TimelineModel[],
       parakeetSensorEntries as TimelineModel[],
-      meterEntries as TimelineModel[],
       entry => {
         return Math.round(entry.timestamp / (5 * MIN_IN_MS));
       },
