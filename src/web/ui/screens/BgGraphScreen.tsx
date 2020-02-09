@@ -1,11 +1,15 @@
 import { mergeEntriesFeed } from 'core/entries/entries';
-import { is } from 'core/models/utils';
+import { Model, TimelineModel } from 'core/models/model';
+import { is, isTimelineModel } from 'core/models/utils';
+import { generateUuid } from 'core/utils/id';
+import { ReduxActions } from 'web/modules/actions';
+import { getModelByUuid } from 'web/modules/uiNavigation/getters';
+import { UiNavigationState } from 'web/modules/uiNavigation/state';
 import 'web/ui/screens/BgGraphScreen.scss';
 import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
 import Timeline from 'web/ui/utils/timeline/Timeline';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
-import { generateUuid } from 'core/utils/id';
-import { getModelByUuid } from 'web/modules/uiNavigation/getters';
+import { isEqual } from 'lodash';
 
 type Props = {};
 
@@ -45,51 +49,73 @@ export default (() => {
               state.loadedModels.timelineModels.filter(is('ParakeetSensorEntry')),
               state.loadedModels.timelineModels.filter(is('MeterEntry')),
             ])}
+            selectedBgModel={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onBgModelSelect={model => (is('MeterEntry')(model) ? actions.MODEL_SELECTED_FOR_EDITING(model) : undefined)} // currently, of all the BG types, we only support editing MeterEntry's, because editing the other ones wouldn't make much sense
             insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
             selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
             onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
+            carbsModels={state.loadedModels.timelineModels.filter(is('Carbs'))}
+            selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
+            onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
           />
         )}
       </div>
       <div className="bottom">
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
-          onChange={newValue => {
-            if (state.timelineCursorAt && !modelBeingEdited) {
-              // Create new
-              actions.MODEL_UPDATED_BY_USER({
-                modelType: 'Insulin',
-                modelUuid: generateUuid(),
-                timestamp: state.timelineCursorAt,
-                amount: newValue,
-                insulinType: '',
-              });
-            } else if (is('Insulin')(modelBeingEdited) && modelBeingEdited.amount === newValue) {
-              // Same value selected again -> clear value -> delete model
-              actions.MODEL_DELETED_BY_USER(modelBeingEdited);
-            } else if (is('Insulin')(modelBeingEdited)) {
-              // Update existing
-              actions.MODEL_UPDATED_BY_USER({
-                ...modelBeingEdited,
-                amount: newValue,
-              });
-            }
-          }}
+          onChange={createChangeHandler(
+            state,
+            actions,
+            modelBeingEdited,
+            (timestamp, amount) => ({
+              modelType: 'Insulin',
+              modelUuid: generateUuid(),
+              timestamp,
+              amount,
+              insulinType: '',
+            }),
+            amount => ({ amount }),
+          )}
           min={1}
           max={20}
           step={1}
           centerOn={5}
         />
         <ScrollNumberSelector
-          value={is('ParakeetSensorEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
-          onChange={newValue => console.log('New BG value:', newValue)}
+          value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
+          onChange={createChangeHandler(
+            state,
+            actions,
+            modelBeingEdited,
+            (timestamp, bloodGlucose) => ({
+              modelType: 'MeterEntry',
+              modelUuid: generateUuid(),
+              timestamp,
+              source: 'ui',
+              bloodGlucose,
+            }),
+            bloodGlucose => ({ bloodGlucose }),
+          )}
           min={1}
           max={20}
           step={0.5}
           centerOn={8}
         />
         <ScrollNumberSelector
-          onChange={newValue => console.log('New carbs value:', newValue)}
+          value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
+          onChange={createChangeHandler(
+            state,
+            actions,
+            modelBeingEdited,
+            (timestamp, amount) => ({
+              modelType: 'Carbs',
+              modelUuid: generateUuid(),
+              timestamp,
+              amount,
+              carbsType: 'normal',
+            }),
+            amount => ({ amount }),
+          )}
           min={5}
           max={100}
           step={5}
@@ -99,3 +125,32 @@ export default (() => {
     </div>
   );
 }) as React.FC<Props>;
+
+function createChangeHandler<T extends TimelineModel>(
+  state: UiNavigationState,
+  actions: ReduxActions,
+  modelBeingEdited: Model | null,
+  modelCreateCallback: (timestamp: number, newValue: number) => T,
+  modelUpdateCallback: (newValue: number) => Partial<T>,
+) {
+  return (newValue: number) => {
+    if (modelBeingEdited) {
+      // Update an existing Model
+      if (!isTimelineModel(modelBeingEdited)) return; // currently, we only support editing of TimelineModel's, even though the type of modelBeingEdited is wider, for call-time convenience
+      const updatedModel = { ...modelBeingEdited, ...modelUpdateCallback(newValue) };
+      if (isEqual(modelBeingEdited, updatedModel)) {
+        actions.MODEL_DELETED_BY_USER(modelBeingEdited); // same value selected again -> clear value -> delete model
+      } else {
+        actions.MODEL_UPDATED_BY_USER(updatedModel); // perform the update
+      }
+    } else {
+      // Create new Model
+      actions.MODEL_UPDATED_BY_USER(
+        modelCreateCallback(
+          state.timelineCursorAt || Date.now(), // if there's no cursor, create at the current wall clock time
+          newValue,
+        ),
+      );
+    }
+  };
+}

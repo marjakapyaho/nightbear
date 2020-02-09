@@ -1,4 +1,4 @@
-import { Insulin, MeterEntry, SensorEntry } from 'core/models/model';
+import { Insulin, MeterEntry, SensorEntry, Carbs } from 'core/models/model';
 import { isSameModel } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
@@ -9,15 +9,24 @@ import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
 import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
 import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/utils/timeline/utils';
+import TimelineMarkerCarbs from 'web/ui/utils/timeline/TimelineMarkerCarbs';
 
 type Props = {
   timelineConfig: TimelineConfig;
   cursorTimestamp?: number | null;
   onCursorTimestampUpdate: (ts: number | null) => void;
+
   bgModels: (SensorEntry | MeterEntry)[];
+  selectedBgModel?: SensorEntry | MeterEntry;
+  onBgModelSelect: (model: SensorEntry | MeterEntry) => void;
+
   insulinModels: Insulin[];
   selectedInsulinModel?: Insulin;
   onInsulinModelSelect: (model: Insulin) => void;
+
+  carbsModels: Carbs[];
+  selectedCarbsModel?: Carbs;
+  onCarbsModelSelect: (model: Carbs) => void;
 };
 
 const rootCss = css({
@@ -81,7 +90,13 @@ export default (props => {
           >
             <TimelineGraphBg timelineConfig={c} bgModels={props.bgModels} />
             {props.bgModels.map((model, i) => (
-              <TimelineMarkerBg key={i} timelineConfig={c} model={model} />
+              <TimelineMarkerBg
+                key={i}
+                timelineConfig={c}
+                model={model}
+                isSelected={isSameModel(props.selectedBgModel, model)}
+                onSelect={props.onBgModelSelect}
+              />
             ))}
           </svg>
           <TimelineScaleTs timelineConfig={c} />
@@ -92,6 +107,15 @@ export default (props => {
               model={model}
               isSelected={isSameModel(props.selectedInsulinModel, model)}
               onSelect={props.onInsulinModelSelect}
+            />
+          ))}
+          {props.carbsModels.map((model, i) => (
+            <TimelineMarkerCarbs
+              key={i}
+              timelineConfig={c}
+              model={model}
+              isSelected={isSameModel(props.selectedCarbsModel, model)}
+              onSelect={props.onCarbsModelSelect}
             />
           ))}
           {props.cursorTimestamp ? (
