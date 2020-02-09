@@ -65,7 +65,7 @@ describe('api/calculateHba1c', () => {
         modelUuid: ERASED_UUID,
         source: 'calculated',
         timestamp: 1508672249758,
-        hba1cValue: 6.218815331010453,
+        hba1cValue: 6.044599303135889,
       };
 
       const mockResponseJson = [mockHba1c];
