@@ -6,7 +6,7 @@ export interface Storage {
   deleteModel<T extends Model>(model: T): Promise<T>;
   deleteModels<T extends Model>(models: T[]): Promise<T[]>;
   loadTimelineModels<T extends ModelType>(
-    modelType: T,
+    modelTypes: T[],
     range: number,
     rangeEnd: number,
   ): Promise<Array<ModelOfType<T>>>;

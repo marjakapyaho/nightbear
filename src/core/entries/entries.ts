@@ -16,10 +16,10 @@ export function getMergedEntriesFeed(
   rangeEnd: number = context.timestamp(),
 ): Promise<SensorEntry[]> {
   return Promise.all([
-    context.storage.loadTimelineModels('DexcomSensorEntry', range, rangeEnd),
-    context.storage.loadTimelineModels('DexcomRawSensorEntry', range, rangeEnd),
-    context.storage.loadTimelineModels('ParakeetSensorEntry', range, rangeEnd),
-    context.storage.loadTimelineModels('MeterEntry', range, rangeEnd),
+    context.storage.loadTimelineModels(['DexcomSensorEntry'], range, rangeEnd),
+    context.storage.loadTimelineModels(['DexcomRawSensorEntry'], range, rangeEnd),
+    context.storage.loadTimelineModels(['ParakeetSensorEntry'], range, rangeEnd),
+    context.storage.loadTimelineModels(['MeterEntry'], range, rangeEnd),
   ]).then(mergeEntriesFeed);
 }
 

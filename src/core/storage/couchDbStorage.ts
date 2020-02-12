@@ -153,7 +153,7 @@ export function createCouchDbStorage(
     },
 
     loadTimelineModels<T extends ModelType>(
-      modelType: T,
+      modelTypes: T[],
       range: number,
       rangeEnd: number,
     ): Promise<Array<ModelOfType<T>>> {

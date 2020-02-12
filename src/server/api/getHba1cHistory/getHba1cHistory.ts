@@ -9,6 +9,6 @@ export function getHba1cHistory(request: Request, context: Context): Response {
   const timePeriodInMs = timePeriodInMonths * MONTH_IN_MS;
 
   return Promise.resolve()
-    .then(() => context.storage.loadTimelineModels('Hba1c', timePeriodInMs, context.timestamp()))
+    .then(() => context.storage.loadTimelineModels(['Hba1c'], timePeriodInMs, context.timestamp()))
     .then(hba1cHistory => createResponse(hba1cHistory));
 }

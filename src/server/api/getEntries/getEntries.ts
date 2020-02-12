@@ -13,8 +13,8 @@ export function getEntries(request: Request, context: Context): Response {
 
   return Promise.all([
     getMergedEntriesFeed(context, rangeInt, rangeEndInt),
-    context.storage.loadTimelineModels('Insulin', rangeInt, rangeEndInt),
-    context.storage.loadTimelineModels('Carbs', rangeInt, rangeEndInt),
+    context.storage.loadTimelineModels(['Insulin'], rangeInt, rangeEndInt),
+    context.storage.loadTimelineModels(['Carbs'], rangeInt, rangeEndInt),
   ]).then(([sensorEntries, insulin, carbs]) => {
     const legacyResponseForWatch = chain(
       union(sensorEntries as TimelineModel[], insulin as TimelineModel[], carbs as TimelineModel[]),
