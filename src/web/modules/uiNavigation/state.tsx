@@ -50,7 +50,7 @@ export const uiNavigationInitState: UiNavigationState = {
   selectedScreen: 'BgGraphScreen',
   selectedModelTypes: TIMELINE_MODEL_TYPES,
   loadedModels: { status: 'FETCHING' },
-  timelineRange: 24 * HOUR_IN_MS,
+  timelineRange: 28 * HOUR_IN_MS,
   timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
   modelUuidBeingEdited: null,
   timelineCursorAt: null,
