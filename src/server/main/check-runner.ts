@@ -25,7 +25,7 @@ export function runChecks(context: Context) {
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
-    context.storage.loadTimelineModels('Insulin', ANALYSIS_RANGE, context.timestamp()),
+    context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
   ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {

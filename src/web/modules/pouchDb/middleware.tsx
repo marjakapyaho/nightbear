@@ -105,14 +105,10 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
     const [selectedModelTypes, timelineRange, timelineRangeEnd] = args;
     Promise.all([
       activeStorage ? activeStorage.loadGlobalModels() : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
-      Promise.all(
-        selectedModelTypes.map(
-          modelType =>
-            activeStorage
-              ? activeStorage.loadTimelineModels(modelType, timelineRange, timelineRangeEnd)
-              : Promise.resolve([]), // this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
-        ),
-      )
+      (activeStorage
+        ? activeStorage.loadTimelineModels(selectedModelTypes, timelineRange, timelineRangeEnd)
+        : Promise.resolve([])
+      ) // ^ this should be impossible, since the map() is synchronous, but we wouldn't be type safe without it
         .then(models => flatten(models))
         .then(
           (models): Promise<TimelineModel[]> => {

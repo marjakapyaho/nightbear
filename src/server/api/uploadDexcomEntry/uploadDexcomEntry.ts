@@ -49,7 +49,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
           const timestamp = parseInt(requestObject.date, 10);
           return Promise.resolve()
-            .then(() => context.storage.loadTimelineModels('MeterEntry', 0, timestamp)) // see if we can find a MeterEntry that already exists with this exact timestamp
+            .then(() => context.storage.loadTimelineModels(['MeterEntry'], 0, timestamp)) // see if we can find a MeterEntry that already exists with this exact timestamp
             .then(entries => first(entries))
             .then(existingEntry => {
               if (existingEntry) {
@@ -65,7 +65,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
         if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
           const timestamp = parseInt(requestObject.date, 10);
           return Promise.resolve()
-            .then(() => context.storage.loadTimelineModels('DexcomCalibration', 0, timestamp)) // see if we can find a DexcomCalibration that already exists with this exact timestamp
+            .then(() => context.storage.loadTimelineModels(['DexcomCalibration'], 0, timestamp)) // see if we can find a DexcomCalibration that already exists with this exact timestamp
             .then(cals => first(cals))
             .then(existingCal => {
               if (existingCal) {
@@ -76,7 +76,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
               const range = CAL_PAIRING.BEFORE + CAL_PAIRING.AFTER;
               const rangeEnd = timestamp + CAL_PAIRING.AFTER;
               return Promise.resolve()
-                .then(() => context.storage.loadTimelineModels('MeterEntry', range, rangeEnd))
+                .then(() => context.storage.loadTimelineModels(['MeterEntry'], range, rangeEnd))
                 .then(entries => entries.filter(entry => entry.source === 'dexcom'))
                 .then(entries => {
                   if (entries.length === 0) {

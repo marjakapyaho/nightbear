@@ -117,7 +117,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     return storage
       .saveModels([model])
       .then(models => storage.deleteModels(models))
-      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
+      .then(() => storage.loadTimelineModels(['Carbs'], 1000 * 60, timestamp))
       .then(loadedModels => assert.deepEqual(loadedModels, []));
   });
 
@@ -158,7 +158,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
   it('loads timeline models', () => {
     return storage
       .saveModel(model)
-      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
+      .then(() => storage.loadTimelineModels(['Carbs'], 1000 * 60, timestamp))
       .then(loadedModels => assertEqualWithoutMeta(findModel(loadedModels), model));
   });
 
@@ -188,7 +188,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
     assert.equal(model.amount, 10); // check baseline assumptions
     return storage
       .saveModel(model)
-      .then(() => storage.loadTimelineModels('Carbs', 1000 * 60, timestamp))
+      .then(() => storage.loadTimelineModels(['Carbs'], 1000 * 60, timestamp))
       .then(loadedModels => findModel(loadedModels))
       .then(loadedModel => ({ ...loadedModel, amount: 123 }))
       .then(storage.saveModel)

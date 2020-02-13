@@ -153,7 +153,7 @@ export function createCouchDbStorage(
     },
 
     loadTimelineModels<T extends ModelType>(
-      modelType: T,
+      modelTypes: T[],
       range: number,
       rangeEnd: number,
     ): Promise<Array<ModelOfType<T>>> {
@@ -164,7 +164,7 @@ export function createCouchDbStorage(
           endkey: `${PREFIX_TIMELINE}/${timestampToString(rangeEnd)}_`,
         })
         .then(res => res.rows.map(row => row.doc).map(reviveCouchDbRowIntoModel))
-        .then(models => models.filter((model): model is ModelOfType<T> => model.modelType === modelType))
+        .then(models => models.filter((model): model is ModelOfType<T> => modelTypes.includes(model.modelType as T)))
         .catch((errObj: PouchDB.Core.Error) => {
           throw new Error(`Couldn't load timeline models (caused by\n${errObj.message}\n)`); // refine the error before giving it out
         });
