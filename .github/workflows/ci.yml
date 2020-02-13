@@ -1,7 +1,7 @@
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow
 # https://itnext.io/automate-your-integration-tests-and-semantic-releases-with-github-actions-43875ad83092
 
-name: Continuous Integration
+name: Integration
 
 on:
   push:
