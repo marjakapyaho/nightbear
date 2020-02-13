@@ -93,6 +93,15 @@ export default () => {
       >
         Now
       </button>
+      <button
+        onClick={() => {
+          actions.DB_URL_SET('');
+          window.location.reload();
+        }}
+      >
+        Log out
+      </button>
+
       {state.timelineCursorAt &&
         state.loadedModels.status === 'READY' &&
         state.loadedModels.globalModels.map(model => (
