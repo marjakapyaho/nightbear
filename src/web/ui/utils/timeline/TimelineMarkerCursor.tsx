@@ -13,49 +13,48 @@ type Props = {
   onClick: () => void;
 };
 
+const styles = {
+  root: css({
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: WIDTH_CLICKABLE,
+    marginLeft: WIDTH_CLICKABLE / -2,
+  }),
+  verticalLine: css({
+    position: 'absolute',
+    top: 0,
+    left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
+    width: WIDTH_LINE,
+    bottom: 0,
+    background: 'cyan',
+  }),
+  textWrapper: css({
+    position: 'absolute',
+    top: 10,
+    left: (WIDTH_TEXT_MAX - WIDTH_CLICKABLE) / -2,
+    width: WIDTH_TEXT_MAX,
+    right: 0,
+    textAlign: 'center',
+  }),
+  textLabel: css({
+    border: '1px solid gray',
+    borderRadius: 100,
+    padding: 5,
+    background: 'white',
+  }),
+};
+
 export default (props => {
   return (
     <div
-      className={css({
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        width: WIDTH_CLICKABLE,
-        marginLeft: WIDTH_CLICKABLE / -2,
-      })}
-      style={{
-        left: tsToLeft(props.timelineConfig, props.timestamp),
-      }}
+      className={styles.root}
+      style={{ left: tsToLeft(props.timelineConfig, props.timestamp) }}
       onClick={() => props.onClick()}
     >
-      <div
-        className={css({
-          position: 'absolute',
-          top: 0,
-          left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
-          width: WIDTH_LINE,
-          bottom: 0,
-          background: 'cyan',
-        })}
-      />
-      <div
-        className={css({
-          position: 'absolute',
-          top: 10,
-          left: (WIDTH_TEXT_MAX - WIDTH_CLICKABLE) / -2,
-          width: WIDTH_TEXT_MAX,
-          right: 0,
-          textAlign: 'center',
-        })}
-      >
-        <span
-          className={css({
-            border: '1px solid gray',
-            borderRadius: 100,
-            padding: 5,
-            background: 'white',
-          })}
-        >
+      <div className={styles.verticalLine} />
+      <div className={styles.textWrapper}>
+        <span className={styles.textLabel}>
           <TimeAgo ts={props.timestamp} />
         </span>
       </div>
