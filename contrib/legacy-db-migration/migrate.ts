@@ -419,6 +419,7 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
 }
 
 function seedProfiles() {
+  if (INCREMENTAL) return; // let's not seed Profiles in incremental mode, because otherwise we'd create new ones on every run
   const day: SavedProfile = {
     modelType: 'SavedProfile',
     modelUuid: generateUuid(),
