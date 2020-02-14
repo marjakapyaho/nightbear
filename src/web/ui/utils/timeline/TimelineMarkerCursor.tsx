@@ -11,12 +11,6 @@ type Props = {
 
 const styles = {
   ...markerStyles,
-  verticalLine: cx(
-    markerStyles.verticalLine,
-    css({
-      background: 'orange',
-    }),
-  ),
 };
 
 export default (props => {
