@@ -1,4 +1,3 @@
-import { css, cx } from 'emotion';
 import React from 'react';
 import TimeAgo from 'web/ui/utils/TimeAgo';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/utils/timeline/utils';
