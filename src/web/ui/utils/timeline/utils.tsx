@@ -85,4 +85,11 @@ export const markerStyles = {
     padding: 5,
     background: 'white',
   }),
+  numberBubble: css({
+    background: 'gray',
+    margin: '30px auto 0 auto',
+    width: 40,
+    borderRadius: '100%',
+    padding: 10,
+  }),
 };
