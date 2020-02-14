@@ -1,4 +1,5 @@
 import { HOUR_IN_MS, roundTo1Decimals } from 'core/calculations/calculations';
+import { css } from 'emotion';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing
@@ -47,3 +48,48 @@ export function leftToTs(c: ExtendedTimelineConfig, left: number) {
 export function bgToTop(c: ExtendedTimelineConfig, bg: number) {
   return roundTo1Decimals(c.innerHeight - ((bg - c.bgMin) / (c.bgMax - c.bgMin)) * c.innerHeight + c.paddingTop);
 }
+
+const WIDTH_CLICKABLE = 20;
+const WIDTH_LINE = 4;
+const WIDTH_MAX = 150;
+
+// Common base styles for all vertical markers.
+// Some things (like colors) should be overridden before use to make them unique.
+export const markerStyles = {
+  root: css({
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: WIDTH_CLICKABLE,
+    marginLeft: WIDTH_CLICKABLE / -2,
+  }),
+  verticalLine: css({
+    position: 'absolute',
+    top: 0,
+    left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
+    width: WIDTH_LINE,
+    bottom: 0,
+    background: 'gray',
+  }),
+  centeringWrapper: css({
+    position: 'absolute',
+    top: 10,
+    left: (WIDTH_MAX - WIDTH_CLICKABLE) / -2,
+    width: WIDTH_MAX,
+    right: 0,
+    textAlign: 'center',
+  }),
+  textLabel: css({
+    border: '1px solid gray',
+    borderRadius: 100,
+    padding: 5,
+    background: 'white',
+  }),
+  numberBubble: css({
+    background: 'gray',
+    margin: '30px auto 0 auto',
+    width: 40,
+    borderRadius: '100%',
+    padding: 10,
+  }),
+};
