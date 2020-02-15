@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Situation } from 'core/models/model';
-import * as Pushover from 'pushover-notifications';
+import Pushover from 'pushover-notifications';
 
 export type PushoverClient = ReturnType<typeof createPushoverClient>;
 

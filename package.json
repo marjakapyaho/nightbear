@@ -28,7 +28,7 @@
     "fix-prettier": "prettier --write $(npm run --silent list-ts) $(npm run --silent list-scss)",
     "fix-eslint": "eslint --fix $(npm run --silent list-ts)",
     "\n==================== SERVER ====================": "",
-    "TODO:server-start": "npm run lint-node && NODE_PATH=. ts-node server/index.ts",
+    "server-start": "npm run lint-node && npm run ts-node src/server/index.ts",
     "\n==================== WEB ====================": "",
     "web-start": "npm run lint-node && BROWSER=none react-scripts start",
     "web-build": "npm run lint-node && react-scripts build",
