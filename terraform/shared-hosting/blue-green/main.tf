@@ -122,6 +122,21 @@ services:
       - PUSHOVER_LEVEL_2=jrwNexus5
       - PUSHOVER_LEVEL_3=bear-phone
 
+  server_stage:
+    image: node:8.10
+    working_dir: /app
+    command: bash -c 'npm install && npm run server-start'
+    restart: always
+    ports:
+      - "${var.port_map["server-stage"]}:3000"
+    environment:
+      - NIGHTBEAR_DB_URL=https://admin:${var.couchdb_admin_password}@db-stage-blue.nightbear.fi/migrate_test_54
+      - PUSHOVER_USER=TODO
+      - PUSHOVER_TOKEN=TODO
+      - PUSHOVER_CALLBACK=TODO
+    volumes:
+      - ./server-stage:/app
+
   backup:
     image: futurice/docker-volume-backup:2.0.1
     restart: always
