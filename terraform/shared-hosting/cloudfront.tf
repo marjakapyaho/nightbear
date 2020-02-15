@@ -1,3 +1,6 @@
+# NOTE: The reason why "colored" CloudFront proxies exist is because it's where SSL termination happens.
+# Without SSL, Couch won't replicate, for example.
+
 module "hosting_db_prod" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_reverse_proxy#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v11.0...master
