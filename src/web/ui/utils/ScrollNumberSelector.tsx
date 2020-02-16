@@ -11,6 +11,7 @@ type Props = {
   max: number;
   step: number;
   centerOn?: number;
+  decimals?: number;
 };
 
 export default (props => {
@@ -38,7 +39,7 @@ export default (props => {
           ref={val === props.value || (props.value === undefined && val === props.centerOn) ? selectedEl : null}
           onClick={() => props.onChange(val)}
         >
-          {val}
+          {val.toFixed(props.decimals)}
         </div>
       ))}
     </div>

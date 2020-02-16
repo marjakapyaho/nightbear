@@ -24,14 +24,12 @@ export default (props => {
   return (
     <circle
       className={css({
-        r: 5,
-        stroke: 'red',
-        strokeWidth: 2,
+        r: 4,
       })}
       style={
         {
-          fill: props.model.modelType === 'MeterEntry' ? 'blue' : 'lightblue',
-          r: props.isSelected ? 10 : undefined,
+          fill: props.model.modelType === 'MeterEntry' ? 'blue' : 'gray',
+          r: props.isSelected ? 5 : undefined,
         } as any // the TS type defs won't accept "r" as a valid style prop :shrug:
       }
       cx={tsToLeft(props.timelineConfig, props.model.timestamp)}

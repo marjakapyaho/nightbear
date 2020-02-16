@@ -6,6 +6,8 @@ html,
   margin: 0;
   padding: 0;
   overflow: hidden; // scrolling will be implemented by containers, where needed
+  font-family: Helvetica, 'Trebuchet MS', Verdana, sans-serif;
+  font-weight: lighter;
 
   > .nb-App {
     width: 100%;
