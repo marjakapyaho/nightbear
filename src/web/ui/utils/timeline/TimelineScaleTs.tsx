@@ -20,7 +20,7 @@ export default (props => {
           className={css({
             position: 'absolute',
             bottom: 0,
-            borderLeft: '1px dotted gray',
+            borderLeft: '1px solid #eee',
             top: 0,
             display: 'flex',
             alignItems: 'flex-end', // i.e. bottom-align the text

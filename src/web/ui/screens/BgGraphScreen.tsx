@@ -28,7 +28,7 @@ export default (() => {
     paddingBottom: 40,
     paddingLeft: 0,
     paddingRight: 20,
-    outerHeight: 400,
+    outerHeight: 320,
     bgMin: 2,
     bgMax: 18,
     bgStep: 1,
@@ -37,7 +37,7 @@ export default (() => {
 
   return (
     <div className="this">
-      <div className="top">
+      <div className="top" style={{height: timelineConfig.outerHeight}}>
         {state.loadedModels.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
@@ -62,26 +62,6 @@ export default (() => {
       </div>
       <div className="bottom">
         <ScrollNumberSelector
-          value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
-          onChange={createChangeHandler(
-            state,
-            actions,
-            modelBeingEdited,
-            (timestamp, amount) => ({
-              modelType: 'Insulin',
-              modelUuid: generateUuid(),
-              timestamp,
-              amount,
-              insulinType: '',
-            }),
-            amount => ({ amount }),
-          )}
-          min={1}
-          max={20}
-          step={1}
-          centerOn={5}
-        />
-        <ScrollNumberSelector
           value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
           onChange={createChangeHandler(
             state,
@@ -100,6 +80,7 @@ export default (() => {
           max={20}
           step={0.5}
           centerOn={8}
+          decimals={1}
         />
         <ScrollNumberSelector
           value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
@@ -120,6 +101,26 @@ export default (() => {
           max={100}
           step={5}
           centerOn={40}
+        />
+        <ScrollNumberSelector
+          value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
+          onChange={createChangeHandler(
+            state,
+            actions,
+            modelBeingEdited,
+            (timestamp, amount) => ({
+              modelType: 'Insulin',
+              modelUuid: generateUuid(),
+              timestamp,
+              amount,
+              insulinType: '',
+            }),
+            amount => ({ amount }),
+          )}
+          min={1}
+          max={20}
+          step={1}
+          centerOn={5}
         />
       </div>
     </div>

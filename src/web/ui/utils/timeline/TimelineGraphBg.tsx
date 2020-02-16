@@ -13,8 +13,8 @@ export default (props => {
   return (
     <polyline
       className={css({
-        stroke: 'orange',
-        strokeWidth: 3,
+        stroke: '#ccc',
+        strokeWidth: 1,
         fill: 'none',
       })}
       points={props.bgModels

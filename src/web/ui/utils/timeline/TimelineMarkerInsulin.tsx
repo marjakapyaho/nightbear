@@ -16,13 +16,14 @@ const styles = {
   verticalLine: cx(
     markerStyles.verticalLine,
     css({
-      background: 'hotpink',
+      background: '#EE776E',
     }),
   ),
   numberBubble: cx(
     markerStyles.numberBubble,
     css({
-      background: 'hotpink',
+      background: '#EE776E',
+      color: 'white',
     }),
   ),
 };
@@ -34,7 +35,7 @@ export default (props => {
       onClick={() => props.onSelect(props.model)}
       style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}
     >
-      <div className={styles.verticalLine} style={{ width: props.isSelected ? 10 : undefined }} />
+      <div className={styles.verticalLine} style={{ width: props.isSelected ? 5 : undefined }} />
       <div className={styles.centeringWrapper}>
         <span className={styles.textLabel}>
           <TimeAgo ts={props.model.timestamp} />

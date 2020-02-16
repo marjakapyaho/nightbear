@@ -1,16 +1,21 @@
 .nb-ScrollNumberSelector {
-  border: 1px dotted gray;
   overflow-x: hidden;
   overflow-y: scroll;
 
+  &:nth-child(1) { background: #F8CC6F; }
+  &:nth-child(2) { background: #9AD5B3; }
+  &:nth-child(3) { background: #EE776E; }
+
   > div {
+    color: white;
     font-size: 150%;
     text-align: center;
-    padding: 20px;
+    padding: 16px;
     cursor: pointer;
   }
 
   &-selected {
     background: gray;
+    opacity: 0.3;
   }
 }
