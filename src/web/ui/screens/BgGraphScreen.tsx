@@ -37,7 +37,7 @@ export default (() => {
 
   return (
     <div className="this">
-      <div className="top" style={{height: timelineConfig.outerHeight}}>
+      <div className="top" style={{ height: timelineConfig.outerHeight }}>
         {state.loadedModels.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
