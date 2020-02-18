@@ -152,6 +152,14 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # allow Docker commands from within the container
       - /data:/data:ro # expose the data volume, which we want to back up
+
+  logspout:
+    image: gliderlabs/logspout:v3.2.6
+    restart: always
+    command: syslog+tls://${var.papertrail_host_hosting}?filter.name=ubuntu_server_* # for now, let's just log the containers that are interesting; some others log a bit excessively
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
 EOF
 }
 
