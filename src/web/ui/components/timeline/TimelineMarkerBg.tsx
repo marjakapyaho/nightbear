@@ -1,7 +1,7 @@
 import { MeterEntry, SensorEntry } from 'core/models/model';
 import { css } from 'emotion';
 import React from 'react';
-import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/utils';
+import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -28,8 +28,8 @@ export default (props => {
       })}
       style={
         {
-          fill: props.model.modelType === 'MeterEntry' ? 'blue' : 'gray',
-          r: props.isSelected ? 5 : undefined,
+          fill: props.model.modelType === 'MeterEntry' ? '#f8cc6f' : 'gray',
+          r: props.isSelected ? 7 : undefined,
         } as any // the TS type defs won't accept "r" as a valid style prop :shrug:
       }
       cx={tsToLeft(props.timelineConfig, props.model.timestamp)}

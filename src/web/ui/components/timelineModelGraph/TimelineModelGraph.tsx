@@ -8,9 +8,9 @@ import { findIndex, first, last, range } from 'lodash';
 import { DateTime } from 'luxon';
 import { isNotNull } from 'server/utils/types';
 import { ReduxActions } from 'web/modules/actions';
-import Highcharts from 'web/ui/utils/Highcharts';
-import 'web/ui/utils/TimelineModelGraph.scss';
-import { getFormattedTimestamp } from 'web/ui/utils/Timestamp';
+import Highcharts from 'web/ui/components/highcharts/Highcharts';
+import 'web/ui/components/timelineModelGraph/TimelineModelGraph.scss';
+import { getFormattedTimestamp } from 'web/ui/components/timestamp/Timestamp';
 import { useCssNs, useReduxActions } from 'web/utils/react';
 import { objectKeys } from 'web/utils/types';
 

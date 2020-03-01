@@ -1,7 +1,7 @@
 import { TimelineModel } from 'core/models/model';
 import { get, reverse, sortBy } from 'lodash';
-import 'web/ui/utils/TimelineModelTable.scss';
-import Timestamp from 'web/ui/utils/Timestamp';
+import 'web/ui/components/timelineModelTable/TimelineModelTable.scss';
+import Timestamp from 'web/ui/components/timestamp/Timestamp';
 import { useCssNs } from 'web/utils/react';
 
 type Props = {

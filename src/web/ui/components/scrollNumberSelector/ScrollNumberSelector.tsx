@@ -1,7 +1,7 @@
 import { range } from 'lodash';
 import { useEffect, useRef } from 'react';
 import scrollIntoView from 'scroll-into-view';
-import 'web/ui/utils/ScrollNumberSelector.scss';
+import 'web/ui/components/scrollNumberSelector/ScrollNumberSelector.scss';
 import { useCssNs } from 'web/utils/react';
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   step: number;
   centerOn?: number;
   decimals?: number;
+  color: string;
 };
 
 export default (props => {
@@ -31,7 +32,7 @@ export default (props => {
   const options = range(props.min, props.max + props.step, props.step);
 
   return (
-    <div className="this">
+    <div className="this" style={{ background: props.color }}>
       {options.map((val, i) => (
         <div
           key={i}

@@ -1,5 +1,5 @@
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
-import 'web/ui/utils/MainNavBar.scss';
+import 'web/ui/components/mainNavBar/MainNavBar.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};

@@ -1,14 +1,14 @@
-import { Carbs } from 'core/models/model';
+import { Insulin } from 'core/models/model';
 import { css, cx } from 'emotion';
 import React from 'react';
-import TimeAgo from 'web/ui/utils/TimeAgo';
-import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/utils/timeline/utils';
+import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
+import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
-  model: Carbs;
+  model: Insulin;
   isSelected: boolean;
-  onSelect: (model: Carbs) => void;
+  onSelect: (model: Insulin) => void;
 };
 
 const styles = {
@@ -16,13 +16,13 @@ const styles = {
   verticalLine: cx(
     markerStyles.verticalLine,
     css({
-      background: '#F8CC6F',
+      background: '#EE776E',
     }),
   ),
   numberBubble: cx(
     markerStyles.numberBubble,
     css({
-      background: '#F8CC6F',
+      background: '#EE776E',
       color: 'white',
     }),
   ),
@@ -35,7 +35,7 @@ export default (props => {
       onClick={() => props.onSelect(props.model)}
       style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}
     >
-      <div className={styles.verticalLine} style={{ width: props.isSelected ? 5 : undefined }} />
+      <div className={styles.verticalLine} style={{ width: props.isSelected ? 1 : undefined }} />
       <div className={styles.centeringWrapper}>
         <span className={styles.textLabel}>
           <TimeAgo ts={props.model.timestamp} />
