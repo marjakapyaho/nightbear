@@ -1,9 +1,9 @@
 import { assertExhausted } from 'server/utils/types';
 import { ReduxState } from 'web/modules/state';
 import 'web/ui/App.scss';
-import BgGraphScreen from 'web/ui/screens/BgGraphScreen';
-import TimelineDebugScreen from 'web/ui/screens/TimelineDebugScreen';
-import MainNavBar from 'web/ui/utils/MainNavBar';
+import BgGraphScreen from 'web/ui/screens/bgGraphScreen/BgGraphScreen';
+import TimelineDebugScreen from 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen';
+import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
 import { useCssNs, useReduxState } from 'web/utils/react';
 
 type Props = {};

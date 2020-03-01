@@ -1,12 +1,12 @@
-import 'web/ui/screens/TimelineDebugScreen.scss';
+import 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen.scss';
 import { useCssNs, useReduxState, useReduxActions } from 'web/utils/react';
 import ReactModal from 'react-modal';
 import { isTimelineModel } from 'core/models/utils';
-import TimeRangeSelector from 'web/ui/utils/TimeRangeSelector';
-import Timestamp from 'web/ui/utils/Timestamp';
-import ModelTypeSelector from 'web/ui/utils/ModelTypeSelector';
-import TimelineModelGraph from 'web/ui/utils/TimelineModelGraph';
-import TimelineModelTable from 'web/ui/utils/TimelineModelTable';
+import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSelector';
+import Timestamp from 'web/ui/components/timestamp/Timestamp';
+import ModelTypeSelector from 'web/ui/components/modelTypeSelector/ModelTypeSelector';
+import TimelineModelGraph from 'web/ui/components/timelineModelGraph/TimelineModelGraph';
+import TimelineModelTable from 'web/ui/components/timelineModelTable/TimelineModelTable';
 
 type Props = {};
 

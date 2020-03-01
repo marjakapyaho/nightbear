@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { range } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { Fragment } from 'react';
-import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/utils/timeline/utils';
+import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -25,6 +25,8 @@ export default (props => {
             display: 'flex',
             alignItems: 'flex-end', // i.e. bottom-align the text
             pointerEvents: 'none',
+            color: '#aaa',
+            'font-size': '0.9em',
           })}
           style={{
             left: tsToLeft(props.timelineConfig, ts),
@@ -32,8 +34,10 @@ export default (props => {
           }}
           title={new Date(ts) + ''}
         >
-          {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
-          }
+          <span style={{ position: 'absolute', left: '-20px', bottom: '5px' }}>
+            {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+            }
+          </span>
         </div>
       ))}
     </Fragment>

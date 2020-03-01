@@ -5,9 +5,9 @@ import { generateUuid } from 'core/utils/id';
 import { ReduxActions } from 'web/modules/actions';
 import { getModelByUuid } from 'web/modules/uiNavigation/getters';
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
-import 'web/ui/screens/BgGraphScreen.scss';
-import ScrollNumberSelector from 'web/ui/utils/ScrollNumberSelector';
-import Timeline from 'web/ui/utils/timeline/Timeline';
+import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
+import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
+import Timeline from 'web/ui/components/timeline/Timeline';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import { isEqual } from 'lodash';
 
@@ -62,6 +62,27 @@ export default (() => {
       </div>
       <div className="bottom">
         <ScrollNumberSelector
+          value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
+          onChange={createChangeHandler(
+            state,
+            actions,
+            modelBeingEdited,
+            (timestamp, amount) => ({
+              modelType: 'Carbs',
+              modelUuid: generateUuid(),
+              timestamp,
+              amount,
+              carbsType: 'normal',
+            }),
+            amount => ({ amount }),
+          )}
+          min={5}
+          max={100}
+          step={5}
+          centerOn={40}
+          color="#9ad5b3"
+        />
+        <ScrollNumberSelector
           value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
           onChange={createChangeHandler(
             state,
@@ -81,26 +102,7 @@ export default (() => {
           step={0.5}
           centerOn={8}
           decimals={1}
-        />
-        <ScrollNumberSelector
-          value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
-          onChange={createChangeHandler(
-            state,
-            actions,
-            modelBeingEdited,
-            (timestamp, amount) => ({
-              modelType: 'Carbs',
-              modelUuid: generateUuid(),
-              timestamp,
-              amount,
-              carbsType: 'normal',
-            }),
-            amount => ({ amount }),
-          )}
-          min={5}
-          max={100}
-          step={5}
-          centerOn={40}
+          color="#f8cc6f"
         />
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
@@ -121,6 +123,7 @@ export default (() => {
           max={20}
           step={1}
           centerOn={5}
+          color="#ee776e"
         />
       </div>
     </div>

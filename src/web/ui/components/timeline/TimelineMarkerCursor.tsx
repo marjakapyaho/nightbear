@@ -1,6 +1,6 @@
 import React from 'react';
-import TimeAgo from 'web/ui/utils/TimeAgo';
-import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/utils/timeline/utils';
+import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
+import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;

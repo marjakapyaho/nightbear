@@ -2,14 +2,14 @@ import { Insulin, MeterEntry, SensorEntry, Carbs } from 'core/models/model';
 import { isSameModel } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
-import TimelineGraphBg from 'web/ui/utils/timeline/TimelineGraphBg';
-import TimelineMarkerBg from 'web/ui/utils/timeline/TimelineMarkerBg';
-import TimelineMarkerCursor from 'web/ui/utils/timeline/TimelineMarkerCursor';
-import TimelineMarkerInsulin from 'web/ui/utils/timeline/TimelineMarkerInsulin';
-import TimelineScaleBg from 'web/ui/utils/timeline/TimelineScaleBg';
-import TimelineScaleTs from 'web/ui/utils/timeline/TimelineScaleTs';
-import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/utils/timeline/utils';
-import TimelineMarkerCarbs from 'web/ui/utils/timeline/TimelineMarkerCarbs';
+import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
+import TimelineMarkerBg from 'web/ui/components/timeline/TimelineMarkerBg';
+import TimelineMarkerCursor from 'web/ui/components/timeline/TimelineMarkerCursor';
+import TimelineMarkerInsulin from 'web/ui/components/timeline/TimelineMarkerInsulin';
+import TimelineScaleBg from 'web/ui/components/timeline/TimelineScaleBg';
+import TimelineScaleTs from 'web/ui/components/timeline/TimelineScaleTs';
+import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/components/timeline/utils';
+import TimelineMarkerCarbs from 'web/ui/components/timeline/TimelineMarkerCarbs';
 
 type Props = {
   timelineConfig: TimelineConfig;
