@@ -2,6 +2,7 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { DEFAULT_STATE, Model, Situation, State, TimelineModel } from 'core/models/model';
 import { is } from 'core/models/utils';
+import { TypeOfArray } from 'core/types/utils';
 import { first, flatten, groupBy, last, range, values } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
@@ -22,7 +23,7 @@ export function performRollingAnalysis(models: Model[], timelineRange: number, t
   const buckets = getRollingAnalysisBuckets(timelineRange, timelineRangeEnd);
   const results = getRollingAnalysisResults(models, buckets);
   const lanes = toSituationLanes(results);
-  return lanes;
+  return toContiguousLanes(lanes);
 }
 
 function toSituationLanes(resultsPerBucket: Array<[number, State]>): RollingAnalysisResults {
@@ -39,6 +40,27 @@ function toSituationLanes(resultsPerBucket: Array<[number, State]>): RollingAnal
       first,
     ),
   );
+}
+
+// Performs a sweep over each lane, so that any overlapping (or touching) situations get merged into a single, longer one
+function toContiguousLanes(results: RollingAnalysisResults): RollingAnalysisResults {
+  return results.map(lane => {
+    let ongoing: TypeOfArray<typeof lane> | undefined = undefined;
+    return lane
+      .map(current => {
+        if (
+          ongoing && // there's an "ongoing situation" from a previous iteration of the loop
+          ongoing[0] === current[0] && // it's of the same type
+          ongoing[1] + ongoing[2] >= current[1] // its end timestamp is at (or later than) our start timestamp
+        ) {
+          ongoing[2] = current[1] + current[2] - ongoing[1]; // update the "ongoing situation", so its end timestamp becomes the same as our end timestamp
+          return null; // because the "ongoing situation" now encompasses this one, this one can be dropped
+        } else {
+          return (ongoing = current); // mark the current situation as the "ongoing" one, so if the next iteration finds a neighbor, we can tell
+        }
+      })
+      .filter(isNotNull);
+  });
 }
 
 // Runs analysis for each of the given buckets (i.e. 5 minute slices of time)
