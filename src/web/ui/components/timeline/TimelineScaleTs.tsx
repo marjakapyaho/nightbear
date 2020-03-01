@@ -27,6 +27,7 @@ export default (props => {
             pointerEvents: 'none',
             color: '#aaa',
             'font-size': '0.9em',
+            'z-index': '-1',
           })}
           style={{
             left: tsToLeft(props.timelineConfig, ts),

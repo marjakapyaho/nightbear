@@ -28,8 +28,10 @@ export default (props => {
       })}
       style={
         {
-          fill: props.model.modelType === 'MeterEntry' ? '#f8cc6f' : 'gray',
+          fill: props.model.modelType === 'MeterEntry' ? '#f8cc6f' : '#777',
           r: props.isSelected ? 7 : undefined,
+          stroke: 'white',
+          strokeWidth: 1,
         } as any // the TS type defs won't accept "r" as a valid style prop :shrug:
       }
       cx={tsToLeft(props.timelineConfig, props.model.timestamp)}
