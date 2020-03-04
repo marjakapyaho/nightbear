@@ -50,7 +50,7 @@ export function bgToTop(c: ExtendedTimelineConfig, bg: number) {
 }
 
 const WIDTH_CLICKABLE = 20;
-const WIDTH_LINE = 4;
+const WIDTH_LINE = 1;
 const WIDTH_MAX = 150;
 
 // Common base styles for all vertical markers.
@@ -65,11 +65,12 @@ export const markerStyles = {
   }),
   verticalLine: css({
     position: 'absolute',
-    top: 0,
+    top: 32,
     left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
     width: WIDTH_LINE,
-    bottom: 0,
-    background: 'gray',
+    bottom: 39,
+    background: '#bbb',
+    zIndex: -1,
   }),
   centeringWrapper: css({
     position: 'absolute',
@@ -80,16 +81,17 @@ export const markerStyles = {
     textAlign: 'center',
   }),
   textLabel: css({
-    border: '1px solid gray',
+    border: 'none',
     borderRadius: 100,
-    padding: 5,
-    background: 'white',
+    padding: 0,
+    background: 'none',
+    'font-size': '0.8em',
   }),
   numberBubble: css({
     background: 'gray',
-    margin: '30px auto 0 auto',
-    width: 40,
+    margin: '35px auto 0 auto',
+    width: 35,
     borderRadius: '100%',
-    padding: 10,
+    padding: 7,
   }),
 };

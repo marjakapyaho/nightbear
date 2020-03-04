@@ -13,12 +13,6 @@ type Props = {
 
 const styles = {
   ...markerStyles,
-  verticalLine: cx(
-    markerStyles.verticalLine,
-    css({
-      background: '#EE776E',
-    }),
-  ),
   numberBubble: cx(
     markerStyles.numberBubble,
     css({

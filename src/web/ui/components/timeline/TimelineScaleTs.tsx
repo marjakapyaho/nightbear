@@ -26,7 +26,8 @@ export default (props => {
             alignItems: 'flex-end', // i.e. bottom-align the text
             pointerEvents: 'none',
             color: '#aaa',
-            'font-size': '0.9em',
+            fontSize: '0.9em',
+            zIndex: -1,
           })}
           style={{
             left: tsToLeft(props.timelineConfig, ts),

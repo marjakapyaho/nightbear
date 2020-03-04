@@ -23,6 +23,7 @@ export default (props => {
             position: 'absolute',
             height: 1,
             background: 'whitesmoke',
+            zIndex: -1,
           })}
           style={{
             left: props.timelineConfig.paddingLeft,
@@ -52,6 +53,7 @@ export default (props => {
               left: 0,
               right: 0,
               fontSize: 10,
+              color: '#aaa',
               textAlign: 'left',
             })}
             style={{
