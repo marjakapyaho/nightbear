@@ -90,7 +90,7 @@ export const markerStyles = {
     borderRadius: 100,
     padding: 0,
     background: 'none',
-    'font-size': '0.8em',
+    fontSize: '0.8em',
   }),
   numberBubble: css({
     background: 'gray',
