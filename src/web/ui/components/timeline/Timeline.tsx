@@ -1,15 +1,17 @@
-import { Insulin, MeterEntry, SensorEntry, Carbs } from 'core/models/model';
+import { RollingAnalysisResults } from 'core/analyser/rolling-analysis';
+import { Carbs, Insulin, MeterEntry, SensorEntry } from 'core/models/model';
 import { isSameModel } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
 import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/components/timeline/TimelineMarkerBg';
+import TimelineMarkerCarbs from 'web/ui/components/timeline/TimelineMarkerCarbs';
 import TimelineMarkerCursor from 'web/ui/components/timeline/TimelineMarkerCursor';
 import TimelineMarkerInsulin from 'web/ui/components/timeline/TimelineMarkerInsulin';
+import TimelineMarkerSituation from 'web/ui/components/timeline/TimelineMarkerSituation';
 import TimelineScaleBg from 'web/ui/components/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/components/timeline/TimelineScaleTs';
 import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/components/timeline/utils';
-import TimelineMarkerCarbs from 'web/ui/components/timeline/TimelineMarkerCarbs';
 
 type Props = {
   timelineConfig: TimelineConfig;
@@ -27,6 +29,8 @@ type Props = {
   carbsModels: Carbs[];
   selectedCarbsModel?: Carbs;
   onCarbsModelSelect: (model: Carbs) => void;
+
+  rollingAnalysisResults?: RollingAnalysisResults;
 };
 
 const rootCss = css({
@@ -125,6 +129,19 @@ export default (props => {
               onClick={() => props.onCursorTimestampUpdate(null)}
             />
           ) : null}
+          {props.rollingAnalysisResults &&
+            props.rollingAnalysisResults.map((lane, laneIndex) =>
+              lane.map(([situation, startTs, situationDuration]) => (
+                <TimelineMarkerSituation
+                  key={laneIndex + '-' + startTs}
+                  timelineConfig={c}
+                  laneIndex={laneIndex}
+                  situation={situation}
+                  situationStartTs={startTs}
+                  situationDuration={situationDuration}
+                />
+              )),
+            )}
         </div>
       </div>
     </div>
