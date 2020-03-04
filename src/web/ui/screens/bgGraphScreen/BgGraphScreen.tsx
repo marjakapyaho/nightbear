@@ -18,6 +18,8 @@ export default (() => {
   const state = useReduxState(s => s.uiNavigation);
   const actions = useReduxActions();
 
+  if (state.selectedScreen !== 'BgGraphScreen') return null;
+
   const { timelineRange, timelineRangeEnd } = state;
   const modelBeingEdited = getModelByUuid(state, state.modelUuidBeingEdited);
 
@@ -151,7 +153,7 @@ function createChangeHandler<T extends TimelineModel>(
       // Create new Model
       actions.MODEL_UPDATED_BY_USER(
         modelCreateCallback(
-          state.timelineCursorAt || Date.now(), // if there's no cursor, create at the current wall clock time
+          ('timelineCursorAt' in state ? state.timelineCursorAt : null) || Date.now(), // if there's no cursor, create at the current wall clock time
           newValue,
         ),
       );

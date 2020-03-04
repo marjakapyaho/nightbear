@@ -17,7 +17,7 @@ export function uiNavigationReducer(
     case actions.UI_NAVIGATED.type:
       switch (action.newScreen) {
         case 'BgGraphScreen':
-          return { ...state, selectedScreen: 'BgGraphScreen' };
+          return uiNavigationInitState;
         case 'TimelineDebugScreen':
           return {
             ...state,
@@ -29,10 +29,15 @@ export function uiNavigationReducer(
             modelUuidBeingEdited: null,
             timelineCursorAt: null,
           };
+        case 'SettingsScreen':
+          return {
+            selectedScreen: 'SettingsScreen',
+          };
         default:
           return assertExhausted(action.newScreen);
       }
     case actions.TIMELINE_FILTERS_CHANGED.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       const { range, rangeEnd, modelTypes } = action;
       return {
         ...state,
@@ -42,6 +47,7 @@ export function uiNavigationReducer(
         loadedModels: { status: 'FETCHING' }, // TODO: Add token which we can check when response arrives?
       };
     case actions.TIMELINE_DATA_UPDATED.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       const timelineModels = mergeIncomingModels(
         state.loadedModels.status === 'READY' ? state.loadedModels.timelineModels : [],
         action.timelineModels,
@@ -55,6 +61,7 @@ export function uiNavigationReducer(
         loadedModels: { status: 'READY', timelineModels, globalModels },
       };
     case actions.TIMELINE_DATA_DELETED.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       if (state.loadedModels.status !== 'READY') return state; // deletions while there's no data loaded should be ignored
       return {
         ...state,
@@ -65,11 +72,13 @@ export function uiNavigationReducer(
         },
       };
     case actions.TIMELINE_DATA_FAILED.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       return {
         ...state,
         loadedModels: { status: 'ERROR', errorMessage: action.err.message },
       };
     case actions.MODEL_SELECTED_FOR_EDITING.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       let modelUuidBeingEdited = null;
       if (action.model && !isSameModel(getModelByUuid(state, state.modelUuidBeingEdited), action.model)) {
         modelUuidBeingEdited = action.model.modelUuid;
@@ -80,12 +89,14 @@ export function uiNavigationReducer(
         timelineCursorAt: null, // clear a possible previous cursor when starting edit
       };
     case actions.TIMELINE_CURSOR_UPDATED.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       return {
         ...state,
         modelUuidBeingEdited: null, // clear a possible previous edit when placing cursor
         timelineCursorAt: state.modelUuidBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
     case actions.MODEL_UPDATED_BY_USER.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       if (state.loadedModels.status !== 'READY') return state; // updates while there's no data loaded should be ignored
       return {
         ...state,
@@ -97,6 +108,7 @@ export function uiNavigationReducer(
         },
       };
     case actions.MODEL_DELETED_BY_USER.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       if (state.loadedModels.status !== 'READY') return state; // deletions while there's no data loaded should be ignored
       return {
         ...state,
@@ -108,6 +120,7 @@ export function uiNavigationReducer(
         },
       };
     case actions.DB_EMITTED_CHANGES.type:
+      if (state.selectedScreen === 'SettingsScreen') return state;
       if (state.loadedModels.status !== 'READY') return state;
       try {
         const newModels = action.changes.map(change => reviveCouchDbRowIntoModel(change.doc));
