@@ -14,16 +14,21 @@ export type RollingAnalysisResults = Array<
     [
       Situation,
       number, // start timestamp of the situation
-      number, // length of the situation
+      number, // duration of the situation
     ]
   >
 >;
 
-export function performRollingAnalysis(models: Model[], timelineRange: number, timelineRangeEnd: number) {
+export function performRollingAnalysis(
+  models: Model[],
+  timelineRange: number,
+  timelineRangeEnd: number,
+  mergeContiguousSituations = true,
+) {
   const buckets = getRollingAnalysisBuckets(timelineRange, timelineRangeEnd);
-  const results = getRollingAnalysisResults(models, buckets);
+  const results = getRawRollingAnalysisResults(models, buckets);
   const lanes = toSituationLanes(results);
-  return toContiguousLanes(lanes);
+  return mergeContiguousSituations ? toContiguousLanes(lanes) : lanes;
 }
 
 function toSituationLanes(resultsPerBucket: Array<[number, State]>): RollingAnalysisResults {
@@ -64,7 +69,7 @@ function toContiguousLanes(results: RollingAnalysisResults): RollingAnalysisResu
 }
 
 // Runs analysis for each of the given buckets (i.e. 5 minute slices of time)
-function getRollingAnalysisResults(models: Model[], buckets: RollingAnalysisBucket[]): RollingAnalysisRawResult[] {
+function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisBucket[]): RollingAnalysisRawResult[] {
   const activeProfile = last(models.filter(is('ActiveProfile')));
   if (!activeProfile) throw new Error('Could not find an ActiveProfile to perform rolling analysis');
   const sensorEntries = models.filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'));
