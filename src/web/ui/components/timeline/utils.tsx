@@ -65,12 +65,12 @@ export const markerStyles = {
   }),
   verticalLine: css({
     position: 'absolute',
-    top: '32px',
+    top: 32,
     left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
     width: WIDTH_LINE,
-    bottom: '39px',
+    bottom: 39,
     background: '#bbb',
-    'z-index': '-1',
+    zIndex: -1,
   }),
   centeringWrapper: css({
     position: 'absolute',
