@@ -34,6 +34,11 @@ export function getExtendedTimelineConfig(c: TimelineConfig): ExtendedTimelineCo
   };
 }
 
+// The CSS width value for rendering the given amount of time on the timeline
+export function timeToWidth(c: ExtendedTimelineConfig, time: number) {
+  return roundTo1Decimals(time * c.pixelsPerMs);
+}
+
 // The CSS left value for rendering the given timestamp
 export function tsToLeft(c: ExtendedTimelineConfig, ts: number) {
   return roundTo1Decimals(c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs);
