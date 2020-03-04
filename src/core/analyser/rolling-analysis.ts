@@ -19,6 +19,11 @@ export type RollingAnalysisResults = Array<
   >
 >;
 
+// Runs the analyser for each past point in time (granularity controlled by BUCKET_SIZE), so you can see what
+// situations the analyser had active at each such point. Even though the presence of a situation is the thing
+// that triggers the creation of alarms, this allows the user to view analyser results independent of alarms.
+// This can be very helpful when debugging the analyser itself, for example, or figuring out why an alarm was
+// raised at a specific time.
 export function performRollingAnalysis(
   models: Model[],
   timelineRange: number,
@@ -31,6 +36,9 @@ export function performRollingAnalysis(
   return mergeContiguousSituations ? toContiguousLanes(lanes) : lanes;
 }
 
+// Takes raw rolling analysis results, and formats them nicely for UI presentation purposes.
+// That is, returns an array ("lane") for each situation type, which contains start and duration
+// times, indicating when that situation started and how long it lasted.
 function toSituationLanes(resultsPerBucket: Array<[number, State]>): RollingAnalysisResults {
   const possibleSituations = objectKeys(DEFAULT_STATE);
   return values(
