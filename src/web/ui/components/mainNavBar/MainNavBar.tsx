@@ -12,6 +12,7 @@ export default (() => {
   return (
     <div className="this">
       {renderTab('BgGraphScreen', 'Log')}
+      {renderTab('SettingsScreen', 'Settings')}
       {renderTab('TimelineDebugScreen', 'Debug')}
     </div>
   );

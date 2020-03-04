@@ -19,6 +19,9 @@ export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
 
 export type UiNavigationState = Readonly<
   | {
+      selectedScreen: 'SettingsScreen';
+    }
+  | {
       selectedScreen: 'BgGraphScreen';
       // TODO: BEGIN COPY-PASTA
       timelineRange: number;

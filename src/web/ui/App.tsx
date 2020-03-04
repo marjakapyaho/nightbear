@@ -1,9 +1,10 @@
 import { assertExhausted } from 'server/utils/types';
 import { ReduxState } from 'web/modules/state';
 import 'web/ui/App.scss';
-import BgGraphScreen from 'web/ui/screens/bgGraphScreen/BgGraphScreen';
-import TimelineDebugScreen from 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen';
 import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
+import BgGraphScreen from 'web/ui/screens/bgGraphScreen/BgGraphScreen';
+import SettingsScreen from 'web/ui/screens/settingsScreen/SettingsScreen';
+import TimelineDebugScreen from 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen';
 import { useCssNs, useReduxState } from 'web/utils/react';
 
 type Props = {};
@@ -25,6 +26,8 @@ export default (() => {
         return <TimelineDebugScreen />;
       case 'BgGraphScreen':
         return <BgGraphScreen />;
+      case 'SettingsScreen':
+        return <SettingsScreen />;
       default:
         return assertExhausted(selectedScreen);
     }
