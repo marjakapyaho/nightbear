@@ -1,27 +1,33 @@
+import { performRollingAnalysis } from 'core/analyser/rolling-analysis';
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
 import { is, isTimelineModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
+import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
 import { getModelByUuid } from 'web/modules/uiNavigation/getters';
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
-import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
+import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
-import { isEqual } from 'lodash';
 
 type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const state = useReduxState(s => s.uiNavigation);
+  const configVars = useReduxState(s => s.configVars);
   const actions = useReduxActions();
 
   if (state.selectedScreen !== 'BgGraphScreen') return null;
 
   const { timelineRange, timelineRangeEnd } = state;
   const modelBeingEdited = getModelByUuid(state, state.modelUuidBeingEdited);
+  const rollingAnalysisResults =
+    configVars.showRollingAnalysis && state.loadedModels.status === 'READY'
+      ? performRollingAnalysis(state.loadedModels.timelineModels, timelineRange, timelineRangeEnd)
+      : undefined;
 
   const timelineConfig = {
     timelineRange,
@@ -59,6 +65,7 @@ export default (() => {
             carbsModels={state.loadedModels.timelineModels.filter(is('Carbs'))}
             selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
             onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
+            rollingAnalysisResults={rollingAnalysisResults}
           />
         )}
       </div>
