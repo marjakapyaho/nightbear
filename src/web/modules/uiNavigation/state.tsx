@@ -1,5 +1,5 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { GlobalModel, TimelineModel, TimelineModelType } from 'core/models/model';
+import { TimelineModelType } from 'core/models/model';
 
 export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
   'Sensor',
@@ -23,38 +23,26 @@ export type UiNavigationState = Readonly<
     }
   | {
       selectedScreen: 'BgGraphScreen';
-      // TODO: BEGIN COPY-PASTA
       timelineRange: number;
       timelineRangeEnd: number;
       selectedModelTypes: TimelineModelType[];
-      loadedModels:
-        | { status: 'FETCHING' }
-        | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
-        | { status: 'ERROR'; errorMessage: string };
       modelUuidBeingEdited: string | null;
       timelineCursorAt: number | null;
-      // TODO: END COPY-PASTA
     }
   | {
       selectedScreen: 'TimelineDebugScreen';
       timelineRange: number;
       timelineRangeEnd: number;
       selectedModelTypes: TimelineModelType[];
-      loadedModels:
-        | { status: 'FETCHING' }
-        | { status: 'READY'; timelineModels: TimelineModel[]; globalModels: GlobalModel[] }
-        | { status: 'ERROR'; errorMessage: string };
       modelUuidBeingEdited: string | null;
-      timelineCursorAt: number | null;
     }
 >;
 
 export const uiNavigationInitState: UiNavigationState = {
   selectedScreen: 'BgGraphScreen',
-  selectedModelTypes: TIMELINE_MODEL_TYPES,
-  loadedModels: { status: 'FETCHING' },
   timelineRange: 28 * HOUR_IN_MS,
   timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
+  selectedModelTypes: TIMELINE_MODEL_TYPES,
   modelUuidBeingEdited: null,
   timelineCursorAt: null,
 };
