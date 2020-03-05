@@ -37,7 +37,6 @@ export default (props => {
           position: 'absolute',
           top: 0,
           right: 0,
-          background: 'white',
           zIndex: 10,
         })}
         style={{
@@ -55,9 +54,10 @@ export default (props => {
               fontSize: 10,
               color: '#aaa',
               textAlign: 'left',
+              paddingLeft: props.timelineConfig.paddingRight / 2,
             })}
             style={{
-              top: bgToTop(props.timelineConfig, bg),
+              top: bgToTop(props.timelineConfig, bg) - 4, // the magic number is dependent on font size, and just makes the label placement more pleasant
             }}
           >
             {bg}
