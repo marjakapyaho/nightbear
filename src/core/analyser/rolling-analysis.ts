@@ -7,7 +7,8 @@ import { first, flatten, groupBy, last, range, values } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
 
-const BUCKET_SIZE = 5 * MIN_IN_MS;
+export const BUCKET_SIZE = 5 * MIN_IN_MS; // this determines the granularity of the rolling analysis - i.e. run analyser every 5 minutes
+export const PRE_MARGIN = 3 * HOUR_IN_MS; // how much history we want to make available to the analyser per each bucket
 
 export type RollingAnalysisResults = Array<
   Array<
@@ -106,9 +107,8 @@ type RollingAnalysisRawResult = [
 
 // Chops the given amount of time into "buckets"; for each, the analyser can be ran independently
 function getRollingAnalysisBuckets(timelineRange: number, timelineRangeEnd: number): RollingAnalysisBucket[] {
-  const preMargin = 3 * HOUR_IN_MS;
-  return range(timelineRangeEnd - timelineRange + BUCKET_SIZE, timelineRangeEnd, BUCKET_SIZE).map(startTs => [
-    startTs - preMargin,
+  return range(timelineRangeEnd - timelineRange, timelineRangeEnd, BUCKET_SIZE).map(startTs => [
+    startTs - PRE_MARGIN,
     startTs - BUCKET_SIZE,
     startTs,
   ]);

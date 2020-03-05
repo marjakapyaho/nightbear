@@ -1,4 +1,4 @@
-import { performRollingAnalysis } from 'core/analyser/rolling-analysis';
+import { performRollingAnalysis, BUCKET_SIZE } from 'core/analyser/rolling-analysis';
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
 import { is, isTimelineModel } from 'core/models/utils';
@@ -26,7 +26,11 @@ export default (() => {
   const modelBeingEdited = getModelByUuid(state, state.modelUuidBeingEdited);
   const rollingAnalysisResults =
     configVars.showRollingAnalysis && state.loadedModels.status === 'READY'
-      ? performRollingAnalysis(state.loadedModels.timelineModels, timelineRange, timelineRangeEnd)
+      ? performRollingAnalysis(
+          state.loadedModels.timelineModels,
+          state.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
+          state.timelineCursorAt || timelineRangeEnd, // ^ ditto
+        )
       : undefined;
 
   const timelineConfig = {
