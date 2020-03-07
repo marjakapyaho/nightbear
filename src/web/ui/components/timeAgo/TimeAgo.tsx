@@ -2,7 +2,7 @@ import { roundTo1Decimals } from 'core/calculations/calculations';
 import { Duration } from 'luxon';
 import React, { useLayoutEffect, useState } from 'react';
 
-type Props = { ts: number; verbose?: boolean };
+type Props = { ts: number; verbose?: boolean; frequentUpdates?: boolean };
 
 export default (props => {
   const [formattedTs, setFormattedTs] = useState(getFormattedTs(props.ts));
@@ -12,10 +12,10 @@ export default (props => {
   // https://reactjs.org/docs/hooks-reference.html#uselayouteffect
   useLayoutEffect(() => {
     const update = () => setFormattedTs(getFormattedTs(props.ts, props.verbose));
-    const interval = setInterval(update, 3000);
+    const interval = setInterval(update, props.frequentUpdates ? 1000 : 5000);
     update();
     return () => clearInterval(interval);
-  }, [props.ts, props.verbose]);
+  }, [props.ts, props.verbose, props.frequentUpdates]);
 
   return <span>{formattedTs}</span>;
 }) as React.FC<Props>;
