@@ -16,7 +16,7 @@ export function timelineDataReducer(
       const globalModels = mergeIncomingModels(state.globalModels, action.globalModels);
       return {
         ...state,
-        status: 'READY',
+        status: 'READY', // TODO: Don't overwrite previous error status if it exists..?
         timelineModels,
         globalModels,
       };
