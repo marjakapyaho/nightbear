@@ -1,18 +1,18 @@
 import { configInitState, ConfigState } from 'web/modules/config/state';
 import { pouchDbInitState, PouchDbState } from 'web/modules/pouchDb/state';
 import { timelineDataInitState, TimelineDataState } from 'web/modules/timelineData/state';
-import { uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
+import { navigationInitState, NavigationState } from 'web/modules/navigation/state';
 
 export const initReduxState: ReduxState = {
   config: configInitState,
-  uiNavigation: uiNavigationInitState,
+  navigation: navigationInitState,
   timelineData: timelineDataInitState,
   pouchDb: pouchDbInitState,
 };
 
 export type ReduxState = Readonly<{
   config: ConfigState;
-  uiNavigation: UiNavigationState;
+  navigation: NavigationState;
   timelineData: TimelineDataState;
   pouchDb: PouchDbState;
 }>;

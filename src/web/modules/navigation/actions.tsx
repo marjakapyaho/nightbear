@@ -1,9 +1,9 @@
 import { SavedProfile, TimelineModel } from 'core/models/model';
-import { UiNavigationState } from 'web/modules/uiNavigation/state';
+import { NavigationState } from 'web/modules/navigation/state';
 import { actionsWithType } from 'web/utils/redux';
 
-export const uiNavigationActions = actionsWithType({
-  UI_NAVIGATED: (newScreen: UiNavigationState['selectedScreen']) => ({
+export const navigationActions = actionsWithType({
+  UI_NAVIGATED: (newScreen: NavigationState['selectedScreen']) => ({
     newScreen,
   }),
   MODEL_SELECTED_FOR_EDITING: (model: TimelineModel | null) => ({ model }),

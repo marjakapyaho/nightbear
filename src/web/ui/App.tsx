@@ -11,16 +11,16 @@ type Props = {};
 
 export default (() => {
   const { React } = useCssNs('App');
-  const state = useReduxState(s => s.uiNavigation);
+  const navigationState = useReduxState(s => s.navigation);
 
   return (
     <div className="this">
       <MainNavBar />
-      <div className="screenContainer">{renderSelectedScreen(state.selectedScreen)}</div>
+      <div className="screenContainer">{renderSelectedScreen(navigationState.selectedScreen)}</div>
     </div>
   );
 
-  function renderSelectedScreen(selectedScreen: ReduxState['uiNavigation']['selectedScreen']) {
+  function renderSelectedScreen(selectedScreen: ReduxState['navigation']['selectedScreen']) {
     switch (selectedScreen) {
       case 'TimelineDebugScreen':
         return <TimelineDebugScreen />;

@@ -17,7 +17,7 @@ export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
   'ActiveProfile',
 ];
 
-export type UiNavigationState = Readonly<
+export type NavigationState = Readonly<
   | {
       selectedScreen: 'SettingsScreen';
     }
@@ -38,9 +38,9 @@ export type UiNavigationState = Readonly<
     }
 >;
 
-export const uiNavigationInitState: UiNavigationState = getUiNavigationInitState();
+export const navigationInitState: NavigationState = getNavigationInitState();
 
-export function getUiNavigationInitState() {
+export function getNavigationInitState() {
   return {
     selectedScreen: 'BgGraphScreen' as const,
     timelineRange: 28 * HOUR_IN_MS,

@@ -1,12 +1,12 @@
 import { configActions } from 'web/modules/config/actions';
 import { pouchDbActions } from 'web/modules/pouchDb/actions';
 import { timelineDataActions } from 'web/modules/timelineData/actions';
-import { uiNavigationActions } from 'web/modules/uiNavigation/actions';
+import { navigationActions } from 'web/modules/navigation/actions';
 import { ActionUnionFrom } from 'web/utils/redux';
 
 export const actions = {
   ...configActions,
-  ...uiNavigationActions,
+  ...navigationActions,
   ...pouchDbActions,
   ...timelineDataActions,
 };
@@ -14,7 +14,7 @@ export const actions = {
 // Export type describing the raw ACTION OBJECTS themselves
 export type ReduxAction =
   | ActionUnionFrom<typeof configActions>
-  | ActionUnionFrom<typeof uiNavigationActions>
+  | ActionUnionFrom<typeof navigationActions>
   | ActionUnionFrom<typeof pouchDbActions>
   | ActionUnionFrom<typeof timelineDataActions>;
 

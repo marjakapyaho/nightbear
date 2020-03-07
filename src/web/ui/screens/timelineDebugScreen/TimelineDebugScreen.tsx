@@ -12,15 +12,15 @@ type Props = {};
 
 export default () => {
   const { React, ns: cssNs } = useCssNs('TimelineDebugScreen');
-  const uiNavigation = useReduxState(s => s.uiNavigation);
+  const navigationState = useReduxState(s => s.navigation);
   const timelineData = useReduxState(s => s.timelineData);
   const actions = useReduxActions();
 
-  if (uiNavigation.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
+  if (navigationState.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
 
   return (
     <div className="this" onClick={() => actions.TIMELINE_CURSOR_UPDATED(null)}>
-      {uiNavigation.modelUuidBeingEdited && (
+      {navigationState.modelUuidBeingEdited && (
         <ReactModal
           isOpen
           ariaHideApp={false}
@@ -56,26 +56,26 @@ export default () => {
       <button
         onClick={() =>
           actions.TIMELINE_FILTERS_CHANGED(
-            uiNavigation.timelineRange,
-            uiNavigation.timelineRangeEnd - uiNavigation.timelineRange,
-            uiNavigation.selectedModelTypes,
+            navigationState.timelineRange,
+            navigationState.timelineRangeEnd - navigationState.timelineRange,
+            navigationState.selectedModelTypes,
           )
         }
       >
         Prev
       </button>
       <TimeRangeSelector
-        value={uiNavigation.timelineRange}
+        value={navigationState.timelineRange}
         onChange={range =>
-          actions.TIMELINE_FILTERS_CHANGED(range, uiNavigation.timelineRangeEnd, uiNavigation.selectedModelTypes)
+          actions.TIMELINE_FILTERS_CHANGED(range, navigationState.timelineRangeEnd, navigationState.selectedModelTypes)
         }
       />
       <button
         onClick={() =>
           actions.TIMELINE_FILTERS_CHANGED(
-            uiNavigation.timelineRange,
-            uiNavigation.timelineRangeEnd + uiNavigation.timelineRange,
-            uiNavigation.selectedModelTypes,
+            navigationState.timelineRange,
+            navigationState.timelineRangeEnd + navigationState.timelineRange,
+            navigationState.selectedModelTypes,
           )
         }
       >
@@ -84,9 +84,9 @@ export default () => {
       <button
         onClick={() =>
           actions.TIMELINE_FILTERS_CHANGED(
-            uiNavigation.timelineRange * 2,
-            uiNavigation.timelineRangeEnd + Math.round(uiNavigation.timelineRange / 2),
-            uiNavigation.selectedModelTypes,
+            navigationState.timelineRange * 2,
+            navigationState.timelineRangeEnd + Math.round(navigationState.timelineRange / 2),
+            navigationState.selectedModelTypes,
           )
         }
       >
@@ -94,7 +94,11 @@ export default () => {
       </button>
       <button
         onClick={() =>
-          actions.TIMELINE_FILTERS_CHANGED(uiNavigation.timelineRange, Date.now(), uiNavigation.selectedModelTypes)
+          actions.TIMELINE_FILTERS_CHANGED(
+            navigationState.timelineRange,
+            Date.now(),
+            navigationState.selectedModelTypes,
+          )
         }
       >
         Now
@@ -111,18 +115,18 @@ export default () => {
       <p>
         Showing from
         <strong>
-          <Timestamp ts={uiNavigation.timelineRangeEnd - uiNavigation.timelineRange} />
+          <Timestamp ts={navigationState.timelineRangeEnd - navigationState.timelineRange} />
         </strong>
         to
         <strong>
-          <Timestamp ts={uiNavigation.timelineRangeEnd} />
+          <Timestamp ts={navigationState.timelineRangeEnd} />
         </strong>
       </p>
       <ModelTypeSelector
         multiple
-        value={uiNavigation.selectedModelTypes}
+        value={navigationState.selectedModelTypes}
         onChange={newType =>
-          actions.TIMELINE_FILTERS_CHANGED(uiNavigation.timelineRange, uiNavigation.timelineRangeEnd, newType)
+          actions.TIMELINE_FILTERS_CHANGED(navigationState.timelineRange, navigationState.timelineRangeEnd, newType)
         }
       />
       {timelineData.status === 'FETCHING' && <pre>Fetching...</pre>}
@@ -130,9 +134,9 @@ export default () => {
       {timelineData.status === 'READY' && (
         <TimelineModelGraph
           timelineModels={timelineData.timelineModels}
-          selectedModelTypes={uiNavigation.selectedModelTypes}
-          timelineRange={uiNavigation.timelineRange}
-          timelineRangeEnd={uiNavigation.timelineRangeEnd}
+          selectedModelTypes={navigationState.selectedModelTypes}
+          timelineRange={navigationState.timelineRange}
+          timelineRangeEnd={navigationState.timelineRangeEnd}
           timelineCursorAt={null}
         />
       )}
