@@ -5,7 +5,7 @@ import { is, isTimelineModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/uiNavigation/getters';
+import { getModelByUuid } from 'web/modules/timelineData/getters';
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
@@ -16,23 +16,23 @@ type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
-  const state = useReduxState(s => s.uiNavigation);
   const configVars = useReduxState(s => s.configVars);
+  const uiNavState = useReduxState(s => s.uiNavigation);
+  const dataState = useReduxState(s => s.timelineData);
   const actions = useReduxActions();
 
-  if (state.selectedScreen !== 'BgGraphScreen') return null;
+  if (uiNavState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
 
-  const { timelineRange, timelineRangeEnd } = state;
-  const modelBeingEdited = getModelByUuid(state, state.modelUuidBeingEdited);
+  const { timelineRange, timelineRangeEnd } = uiNavState;
+  const modelBeingEdited = getModelByUuid(dataState, uiNavState.modelUuidBeingEdited);
   const rollingAnalysisResults =
-    configVars.showRollingAnalysis && state.loadedModels.status === 'READY'
+    configVars.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
-          state.loadedModels.timelineModels,
-          state.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
-          state.timelineCursorAt || timelineRangeEnd, // ^ ditto
+          dataState.timelineModels,
+          uiNavState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
+          uiNavState.timelineCursorAt || timelineRangeEnd, // ^ ditto
         )
       : undefined;
-
   const timelineConfig = {
     timelineRange,
     timelineRangeEnd,
@@ -50,34 +50,36 @@ export default (() => {
   return (
     <div className="this">
       <div className="top" style={{ height: timelineConfig.outerHeight }}>
-        {state.loadedModels.status === 'READY' && (
+        {dataState.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
-            cursorTimestamp={state.timelineCursorAt}
+            cursorTimestamp={uiNavState.timelineCursorAt}
             onCursorTimestampUpdate={actions.TIMELINE_CURSOR_UPDATED}
             bgModels={mergeEntriesFeed([
-              state.loadedModels.timelineModels.filter(is('DexcomSensorEntry')),
-              state.loadedModels.timelineModels.filter(is('DexcomRawSensorEntry')),
-              state.loadedModels.timelineModels.filter(is('ParakeetSensorEntry')),
-              state.loadedModels.timelineModels.filter(is('MeterEntry')),
+              dataState.timelineModels.filter(is('DexcomSensorEntry')),
+              dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
+              dataState.timelineModels.filter(is('ParakeetSensorEntry')),
+              dataState.timelineModels.filter(is('MeterEntry')),
             ])}
             selectedBgModel={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited : undefined}
             onBgModelSelect={model => (is('MeterEntry')(model) ? actions.MODEL_SELECTED_FOR_EDITING(model) : undefined)} // currently, of all the BG types, we only support editing MeterEntry's, because editing the other ones wouldn't make much sense
-            insulinModels={state.loadedModels.timelineModels.filter(is('Insulin'))}
+            insulinModels={dataState.timelineModels.filter(is('Insulin'))}
             selectedInsulinModel={is('Insulin')(modelBeingEdited) ? modelBeingEdited : undefined}
             onInsulinModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
-            carbsModels={state.loadedModels.timelineModels.filter(is('Carbs'))}
+            carbsModels={dataState.timelineModels.filter(is('Carbs'))}
             selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
             onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
             rollingAnalysisResults={rollingAnalysisResults}
           />
         )}
+        {dataState.status === 'FETCHING' && <pre>Loading...</pre>}
+        {dataState.status === 'ERROR' && <pre>Error: {dataState.errorMessage}</pre>}
       </div>
       <div className="bottom">
         <ScrollNumberSelector
           value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(
-            state,
+            uiNavState,
             actions,
             modelBeingEdited,
             (timestamp, amount) => ({
@@ -98,7 +100,7 @@ export default (() => {
         <ScrollNumberSelector
           value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
           onChange={createChangeHandler(
-            state,
+            uiNavState,
             actions,
             modelBeingEdited,
             (timestamp, bloodGlucose) => ({
@@ -120,7 +122,7 @@ export default (() => {
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(
-            state,
+            uiNavState,
             actions,
             modelBeingEdited,
             (timestamp, amount) => ({

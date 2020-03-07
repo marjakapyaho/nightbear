@@ -15,4 +15,6 @@ export const timelineDataActions = actionsWithType({
     deletedModels,
   }),
   TIMELINE_DATA_FAILED: (err: Error) => ({ err }),
+  MODEL_UPDATED_BY_USER: (model: TimelineModel) => ({ model }),
+  MODEL_DELETED_BY_USER: (model: TimelineModel) => ({ model }),
 });

@@ -1,17 +1,16 @@
-import { UiNavigationState } from 'web/modules/uiNavigation/state';
 import { Model } from 'core/models/model';
+import { TimelineDataState } from 'web/modules/timelineData/state';
 
 // Finds the Model (if any!) from the State, by its UUID.
 // For convenience, allow passing in null as well.
 // TODO: If this ends up being a hot path, let's keep a WeakMap<string, Model> around.
-export function getModelByUuid(state: UiNavigationState, modelUuid: string | null): Model | null {
-  if (!('loadedModels' in state)) return null;
+export function getModelByUuid(state: TimelineDataState, modelUuid: string | null): Model | null {
   return (
-    (state.loadedModels.status === 'READY' &&
+    (state.status === 'READY' &&
       modelUuid !== null &&
-      (_getModelByUuid(state.loadedModels.timelineModels, modelUuid) ||
-        _getModelByUuid(state.loadedModels.globalModels, modelUuid))) ||
-    null
+      (_getModelByUuid(state.timelineModels, modelUuid) || // either the Model is found here...
+        _getModelByUuid(state.globalModels, modelUuid))) || // ...or here
+    null // ...or not at all!
   );
 }
 
