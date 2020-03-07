@@ -4,7 +4,7 @@ import { assertExhausted } from 'server/utils/types';
 import { actions, ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
 import { getModelByUuid } from 'web/modules/timelineData/getters';
-import { uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
+import { getUiNavigationInitState, uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
 
 export function uiNavigationReducer(
   state: UiNavigationState = uiNavigationInitState,
@@ -15,7 +15,7 @@ export function uiNavigationReducer(
     case actions.UI_NAVIGATED.type:
       switch (action.newScreen) {
         case 'BgGraphScreen':
-          return uiNavigationInitState;
+          return getUiNavigationInitState();
         case 'TimelineDebugScreen':
           return {
             ...state,

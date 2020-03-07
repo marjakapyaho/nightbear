@@ -38,11 +38,15 @@ export type UiNavigationState = Readonly<
     }
 >;
 
-export const uiNavigationInitState: UiNavigationState = {
-  selectedScreen: 'BgGraphScreen',
-  timelineRange: 28 * HOUR_IN_MS,
-  timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
-  selectedModelTypes: TIMELINE_MODEL_TYPES,
-  modelUuidBeingEdited: null,
-  timelineCursorAt: null,
-};
+export const uiNavigationInitState: UiNavigationState = getUiNavigationInitState();
+
+export function getUiNavigationInitState() {
+  return {
+    selectedScreen: 'BgGraphScreen' as const,
+    timelineRange: 28 * HOUR_IN_MS,
+    timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
+    selectedModelTypes: TIMELINE_MODEL_TYPES,
+    modelUuidBeingEdited: null,
+    timelineCursorAt: null,
+  };
+}
