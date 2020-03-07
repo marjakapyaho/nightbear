@@ -28,6 +28,10 @@ export function createStore(initialState?: ReduxState): ReduxStore {
   return reduxCreateStore(rootReducer, initialState, composeWithDevTools(applyMiddleware(...middleware)));
 }
 
+// Returning this from a middleware function effectively makes it no-op.
+// This doesn't mean such middleware is useless, though: it can still e.g. observe some external system, and dispatch actions based on it.
+export const NO_OP_MIDDLEWARE = (next: ReduxDispatch) => (action: ReduxAction) => next(action);
+
 // Updates the given map of action creators so that their return value (i.e. the action object)
 // contains a "type" key with the type of each action, as determined by their key in the given map.
 // The function itself is also updated to have a "type" property, which contains the type of the action it produces.
