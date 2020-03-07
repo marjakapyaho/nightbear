@@ -1,12 +1,12 @@
 import { ReduxAction, actions } from 'web/modules/actions';
-import { configVarsInitState, ConfigVarsState } from 'web/modules/configVars/state';
+import { configInitState, ConfigState } from 'web/modules/config/state';
 import { ReduxState } from 'web/modules/state';
 
-export function configVarsReducer(
-  state: ConfigVarsState = configVarsInitState,
+export function configReducer(
+  state: ConfigState = configInitState,
   action: ReduxAction,
   _rootState: ReduxState,
-): ConfigVarsState {
+): ConfigState {
   switch (action.type) {
     case actions.DB_URL_SET.type:
       return { ...state, remoteDbUrl: action.newDbUrl };

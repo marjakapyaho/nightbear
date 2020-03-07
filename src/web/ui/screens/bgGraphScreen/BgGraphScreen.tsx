@@ -16,7 +16,7 @@ type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
-  const configVars = useReduxState(s => s.configVars);
+  const configState = useReduxState(s => s.config);
   const uiNavState = useReduxState(s => s.uiNavigation);
   const dataState = useReduxState(s => s.timelineData);
   const actions = useReduxActions();
@@ -26,7 +26,7 @@ export default (() => {
   const { timelineRange, timelineRangeEnd } = uiNavState;
   const modelBeingEdited = getModelByUuid(dataState, uiNavState.modelUuidBeingEdited);
   const rollingAnalysisResults =
-    configVars.showRollingAnalysis && dataState.status === 'READY'
+    configState.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
           dataState.timelineModels,
           uiNavState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler

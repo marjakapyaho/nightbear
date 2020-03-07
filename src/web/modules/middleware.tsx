@@ -1,4 +1,4 @@
-import { configVarsMiddleware } from 'web/modules/configVars/middleware';
+import { configMiddleware } from 'web/modules/config/middleware';
 import { pouchDbMiddleware } from 'web/modules/pouchDb/middleware';
 
-export const middleware = [configVarsMiddleware, pouchDbMiddleware];
+export const middleware = [configMiddleware, pouchDbMiddleware];

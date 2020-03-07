@@ -29,10 +29,10 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
 
   return next => {
     const observer = createChangeObserver(store, next);
-    observer.add(state => state.configVars.remoteDbUrl, remoteDbUrlChanged);
+    observer.add(state => state.config.remoteDbUrl, remoteDbUrlChanged);
     observer.add(
       state =>
-        state.configVars.remoteDbUrl &&
+        state.config.remoteDbUrl &&
         (state.uiNavigation.selectedScreen === 'TimelineDebugScreen' ||
           state.uiNavigation.selectedScreen === 'BgGraphScreen')
           ? ([
