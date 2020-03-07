@@ -1,7 +1,7 @@
 import { GlobalModel, TimelineModel, TimelineModelType, Model } from 'core/models/model';
 import { actionsWithType } from 'web/utils/redux';
 
-export const timelineDataActions = actionsWithType({
+export const dataActions = actionsWithType({
   TIMELINE_FILTERS_CHANGED: (range: number, rangeEnd: number, modelTypes: TimelineModelType[]) => ({
     range,
     rangeEnd,

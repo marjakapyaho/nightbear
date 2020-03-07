@@ -3,19 +3,19 @@ import { isSameModel } from 'core/models/utils';
 import { assertExhausted } from 'server/utils/types';
 import { actions, ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
-import { getModelByUuid } from 'web/modules/timelineData/getters';
-import { getUiNavigationInitState, uiNavigationInitState, UiNavigationState } from 'web/modules/uiNavigation/state';
+import { getModelByUuid } from 'web/modules/data/getters';
+import { getNavigationInitState, navigationInitState, NavigationState } from 'web/modules/navigation/state';
 
-export function uiNavigationReducer(
-  state: UiNavigationState = uiNavigationInitState,
+export function navigationReducer(
+  state: NavigationState = navigationInitState,
   action: ReduxAction,
   rootState: ReduxState,
-): UiNavigationState {
+): NavigationState {
   switch (action.type) {
     case actions.UI_NAVIGATED.type:
       switch (action.newScreen) {
         case 'BgGraphScreen':
-          return getUiNavigationInitState();
+          return getNavigationInitState();
         case 'TimelineDebugScreen':
           return {
             ...state,
@@ -44,10 +44,7 @@ export function uiNavigationReducer(
     case actions.MODEL_SELECTED_FOR_EDITING.type:
       if (state.selectedScreen !== 'BgGraphScreen') return state; // not in a relevant screen -> ignore
       let modelUuidBeingEdited = null;
-      if (
-        action.model &&
-        !isSameModel(getModelByUuid(rootState.timelineData, state.modelUuidBeingEdited), action.model)
-      ) {
+      if (action.model && !isSameModel(getModelByUuid(rootState.data, state.modelUuidBeingEdited), action.model)) {
         modelUuidBeingEdited = action.model.modelUuid;
       }
       return {

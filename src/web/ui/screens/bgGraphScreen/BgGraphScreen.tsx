@@ -5,8 +5,8 @@ import { is, isTimelineModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/timelineData/getters';
-import { UiNavigationState } from 'web/modules/uiNavigation/state';
+import { getModelByUuid } from 'web/modules/data/getters';
+import { NavigationState } from 'web/modules/navigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
 import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
@@ -16,21 +16,21 @@ type Props = {};
 
 export default (() => {
   const { React } = useCssNs('BgGraphScreen');
-  const configVars = useReduxState(s => s.configVars);
-  const uiNavState = useReduxState(s => s.uiNavigation);
-  const dataState = useReduxState(s => s.timelineData);
+  const configState = useReduxState(s => s.config);
+  const navigationState = useReduxState(s => s.navigation);
+  const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
-  if (uiNavState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
+  if (navigationState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
 
-  const { timelineRange, timelineRangeEnd } = uiNavState;
-  const modelBeingEdited = getModelByUuid(dataState, uiNavState.modelUuidBeingEdited);
+  const { timelineRange, timelineRangeEnd } = navigationState;
+  const modelBeingEdited = getModelByUuid(dataState, navigationState.modelUuidBeingEdited);
   const rollingAnalysisResults =
-    configVars.showRollingAnalysis && dataState.status === 'READY'
+    configState.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
           dataState.timelineModels,
-          uiNavState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
-          uiNavState.timelineCursorAt || timelineRangeEnd, // ^ ditto
+          navigationState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
+          navigationState.timelineCursorAt || timelineRangeEnd, // ^ ditto
         )
       : undefined;
   const timelineConfig = {
@@ -53,7 +53,7 @@ export default (() => {
         {dataState.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
-            cursorTimestamp={uiNavState.timelineCursorAt}
+            cursorTimestamp={navigationState.timelineCursorAt}
             onCursorTimestampUpdate={actions.TIMELINE_CURSOR_UPDATED}
             bgModels={mergeEntriesFeed([
               dataState.timelineModels.filter(is('DexcomSensorEntry')),
@@ -79,7 +79,7 @@ export default (() => {
         <ScrollNumberSelector
           value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(
-            uiNavState,
+            navigationState,
             actions,
             modelBeingEdited,
             (timestamp, amount) => ({
@@ -100,7 +100,7 @@ export default (() => {
         <ScrollNumberSelector
           value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
           onChange={createChangeHandler(
-            uiNavState,
+            navigationState,
             actions,
             modelBeingEdited,
             (timestamp, bloodGlucose) => ({
@@ -122,7 +122,7 @@ export default (() => {
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(
-            uiNavState,
+            navigationState,
             actions,
             modelBeingEdited,
             (timestamp, amount) => ({
@@ -146,7 +146,7 @@ export default (() => {
 }) as React.FC<Props>;
 
 function createChangeHandler<T extends TimelineModel>(
-  state: UiNavigationState,
+  state: NavigationState,
   actions: ReduxActions,
   modelBeingEdited: Model | null,
   modelCreateCallback: (timestamp: number, newValue: number) => T,

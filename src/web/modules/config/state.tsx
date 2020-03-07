@@ -1,9 +1,9 @@
-export type ConfigVarsState = Readonly<{
+export type ConfigState = Readonly<{
   remoteDbUrl: string;
   showRollingAnalysis: boolean;
 }>;
 
-export const configVarsInitState: ConfigVarsState = {
+export const configInitState: ConfigState = {
   remoteDbUrl: '',
   showRollingAnalysis: false,
 };

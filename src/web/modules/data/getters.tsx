@@ -1,10 +1,10 @@
 import { Model } from 'core/models/model';
-import { TimelineDataState } from 'web/modules/timelineData/state';
+import { DataState } from 'web/modules/data/state';
 
 // Finds the Model (if any!) from the State, by its UUID.
 // For convenience, allow passing in null as well.
 // TODO: If this ends up being a hot path, let's keep a WeakMap<string, Model> around.
-export function getModelByUuid(state: TimelineDataState, modelUuid: string | null): Model | null {
+export function getModelByUuid(state: DataState, modelUuid: string | null): Model | null {
   return (
     (state.status === 'READY' &&
       modelUuid !== null &&

@@ -1,7 +1,7 @@
 import { TimelineModelType } from 'core/models/model';
 import { first } from 'lodash';
 import { isNotNull } from 'server/utils/types';
-import { TIMELINE_MODEL_TYPES } from 'web/modules/uiNavigation/state';
+import { TIMELINE_MODEL_TYPES } from 'web/modules/navigation/state';
 import { useCssNs } from 'web/utils/react';
 
 type Props = {
