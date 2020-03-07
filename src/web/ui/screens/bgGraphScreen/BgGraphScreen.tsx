@@ -5,7 +5,7 @@ import { is, isTimelineModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/uiNavigation/getters';
+import { getModelByUuid } from 'web/modules/timelineData/getters';
 import { UiNavigationState } from 'web/modules/uiNavigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';

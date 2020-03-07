@@ -7,8 +7,6 @@ export const uiNavigationActions = actionsWithType({
     newScreen,
   }),
   MODEL_SELECTED_FOR_EDITING: (model: TimelineModel | null) => ({ model }),
-  MODEL_UPDATED_BY_USER: (model: TimelineModel) => ({ model }),
-  MODEL_DELETED_BY_USER: (model: TimelineModel) => ({ model }),
   TIMELINE_CURSOR_UPDATED: (timestamp: number | null) => ({ timestamp }),
   PROFILE_ACTIVATED: (profile: SavedProfile, atTimestamp: number) => ({ profile, atTimestamp }),
 });
