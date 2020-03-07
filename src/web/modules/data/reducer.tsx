@@ -3,13 +3,9 @@ import { isSameModel, isTimelineModel } from 'core/models/utils';
 import { reviveCouchDbRowIntoModel } from 'core/storage/couchDbStorage';
 import { actions, ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
-import { timelineDataInitState, TimelineDataState } from 'web/modules/timelineData/state';
+import { dataInitState, DataState } from 'web/modules/data/state';
 
-export function timelineDataReducer(
-  state: TimelineDataState = timelineDataInitState,
-  action: ReduxAction,
-  _rootState: ReduxState,
-): TimelineDataState {
+export function dataReducer(state: DataState = dataInitState, action: ReduxAction, _rootState: ReduxState): DataState {
   switch (action.type) {
     case actions.TIMELINE_DATA_UPDATED.type:
       const timelineModels = mergeIncomingModels(state.timelineModels, action.timelineModels);

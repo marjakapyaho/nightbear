@@ -13,7 +13,7 @@ type Props = {};
 export default () => {
   const { React, ns: cssNs } = useCssNs('TimelineDebugScreen');
   const navigationState = useReduxState(s => s.navigation);
-  const timelineData = useReduxState(s => s.timelineData);
+  const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
   if (navigationState.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
@@ -129,18 +129,18 @@ export default () => {
           actions.TIMELINE_FILTERS_CHANGED(navigationState.timelineRange, navigationState.timelineRangeEnd, newType)
         }
       />
-      {timelineData.status === 'FETCHING' && <pre>Fetching...</pre>}
-      {timelineData.status === 'ERROR' && <pre>Error while loading timeline models: {timelineData.errorMessage}</pre>}
-      {timelineData.status === 'READY' && (
+      {dataState.status === 'FETCHING' && <pre>Fetching...</pre>}
+      {dataState.status === 'ERROR' && <pre>Error while loading timeline models: {dataState.errorMessage}</pre>}
+      {dataState.status === 'READY' && (
         <TimelineModelGraph
-          timelineModels={timelineData.timelineModels}
+          timelineModels={dataState.timelineModels}
           selectedModelTypes={navigationState.selectedModelTypes}
           timelineRange={navigationState.timelineRange}
           timelineRangeEnd={navigationState.timelineRangeEnd}
           timelineCursorAt={null}
         />
       )}
-      {timelineData.status === 'READY' && <TimelineModelTable models={timelineData.timelineModels} />}
+      {dataState.status === 'READY' && <TimelineModelTable models={dataState.timelineModels} />}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { is, isTimelineModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/timelineData/getters';
+import { getModelByUuid } from 'web/modules/data/getters';
 import { NavigationState } from 'web/modules/navigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
@@ -18,7 +18,7 @@ export default (() => {
   const { React } = useCssNs('BgGraphScreen');
   const configState = useReduxState(s => s.config);
   const navigationState = useReduxState(s => s.navigation);
-  const dataState = useReduxState(s => s.timelineData);
+  const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
   if (navigationState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state

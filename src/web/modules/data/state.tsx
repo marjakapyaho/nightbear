@@ -1,6 +1,6 @@
 import { GlobalModel, TimelineModel } from 'core/models/model';
 
-export type TimelineDataState = Readonly<
+export type DataState = Readonly<
   (
     | { status: 'FETCHING' }
     | { status: 'READY' }
@@ -14,7 +14,7 @@ export type TimelineDataState = Readonly<
   }
 >;
 
-export const timelineDataInitState: TimelineDataState = {
+export const dataInitState: DataState = {
   status: 'FETCHING',
   timelineModels: [],
   globalModels: [],
