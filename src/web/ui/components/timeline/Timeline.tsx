@@ -1,8 +1,9 @@
 import { RollingAnalysisResults } from 'core/analyser/rolling-analysis';
 import { Carbs, Insulin, MeterEntry, SensorEntry } from 'core/models/model';
-import { isSameModel } from 'core/models/utils';
+import { isSameModel, last } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
+import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/components/timeline/TimelineMarkerBg';
 import TimelineMarkerCarbs from 'web/ui/components/timeline/TimelineMarkerCarbs';
@@ -69,6 +70,7 @@ export default (props => {
   useEffect(scrollRightOnMount, []);
 
   const c = getExtendedTimelineConfig(props.timelineConfig);
+  const latestBgModel = props.bgModels.find(last);
 
   return (
     <div className={rootCss}>
@@ -144,6 +146,9 @@ export default (props => {
             )}
         </div>
       </div>
+      <span className={css({ position: 'absolute', top: 0, left: 0, background: 'white', padding: 2 })}>
+        Last BG update: {latestBgModel ? <TimeAgo ts={latestBgModel.timestamp} frequentUpdates /> : 'n/a'} ago
+      </span>
     </div>
   );
 
