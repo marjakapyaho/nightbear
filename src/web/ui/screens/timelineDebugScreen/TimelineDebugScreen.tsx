@@ -105,7 +105,7 @@ export default () => {
       </button>
       <button
         onClick={() => {
-          actions.DB_URL_SET('');
+          actions.CONFIG_UPDATED({ remoteDbUrl: '' });
           window.location.reload();
         }}
       >

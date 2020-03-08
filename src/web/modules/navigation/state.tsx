@@ -19,7 +19,7 @@ export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
 
 export type NavigationState = Readonly<
   | {
-      selectedScreen: 'SettingsScreen';
+      selectedScreen: 'ConfigScreen';
     }
   | {
       selectedScreen: 'BgGraphScreen';

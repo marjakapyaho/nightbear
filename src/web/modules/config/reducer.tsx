@@ -8,10 +8,12 @@ export function configReducer(
   _rootState: ReduxState,
 ): ConfigState {
   switch (action.type) {
-    case actions.DB_URL_SET.type:
-      return { ...state, remoteDbUrl: action.newDbUrl };
+    case actions.CONFIG_UPDATED.type:
+      return { ...state, ...action.newConfig };
     case actions.ROLLING_ANALYSIS_TOGGLED.type:
       return { ...state, showRollingAnalysis: !state.showRollingAnalysis };
+    case actions.AUTO_REFRESH_TOGGLED.type:
+      return { ...state, autoRefreshData: !state.autoRefreshData };
     default:
       return state;
   }

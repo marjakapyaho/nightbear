@@ -25,9 +25,9 @@ export function navigationReducer(
             timelineRangeEnd: Date.now(),
             modelUuidBeingEdited: null,
           };
-        case 'SettingsScreen':
+        case 'ConfigScreen':
           return {
-            selectedScreen: 'SettingsScreen',
+            selectedScreen: 'ConfigScreen',
           };
         default:
           return assertExhausted(action.newScreen);

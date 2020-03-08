@@ -3,7 +3,7 @@ import { ReduxState } from 'web/modules/state';
 import 'web/ui/App.scss';
 import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
 import BgGraphScreen from 'web/ui/screens/bgGraphScreen/BgGraphScreen';
-import SettingsScreen from 'web/ui/screens/settingsScreen/SettingsScreen';
+import ConfigScreen from 'web/ui/screens/configScreen/ConfigScreen';
 import TimelineDebugScreen from 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen';
 import { useCssNs, useReduxState } from 'web/utils/react';
 
@@ -26,8 +26,8 @@ export default (() => {
         return <TimelineDebugScreen />;
       case 'BgGraphScreen':
         return <BgGraphScreen />;
-      case 'SettingsScreen':
-        return <SettingsScreen />;
+      case 'ConfigScreen':
+        return <ConfigScreen />;
       default:
         return assertExhausted(selectedScreen);
     }
