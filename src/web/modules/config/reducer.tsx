@@ -12,6 +12,8 @@ export function configReducer(
       return { ...state, remoteDbUrl: action.newDbUrl };
     case actions.ROLLING_ANALYSIS_TOGGLED.type:
       return { ...state, showRollingAnalysis: !state.showRollingAnalysis };
+    case actions.AUTO_REFRESH_TOGGLED.type:
+      return { ...state, autoRefreshData: !state.autoRefreshData };
     default:
       return state;
   }
