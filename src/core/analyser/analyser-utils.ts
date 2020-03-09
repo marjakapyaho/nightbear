@@ -15,7 +15,7 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
   const entriesWithSlopes = analyserEntries.map((entry, i) => {
     const currentBg = entry.bloodGlucose;
     const currentTimestamp = entry.timestamp;
-    const previousEntry = entries[i - 1];
+    const previousEntry = analyserEntries[i - 1];
     let currentSlope = null;
 
     if (previousEntry && previousEntry.bloodGlucose && previousEntry.timestamp) {
