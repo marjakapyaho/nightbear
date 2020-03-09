@@ -25,10 +25,16 @@ export default (() => {
 
   const { timelineRange, timelineRangeEnd } = navigationState;
   const modelBeingEdited = getModelByUuid(dataState, navigationState.modelUuidBeingEdited);
+  const bgModels = mergeEntriesFeed([
+    dataState.timelineModels.filter(is('DexcomSensorEntry')),
+    dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
+    dataState.timelineModels.filter(is('ParakeetSensorEntry')),
+    dataState.timelineModels.filter(is('MeterEntry')),
+  ]);
   const rollingAnalysisResults =
     configState.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
-          dataState.timelineModels,
+          (bgModels as Model[]).concat(dataState.timelineModels.filter(is('ActiveProfile'))),
           navigationState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
           navigationState.timelineCursorAt || timelineRangeEnd, // ^ ditto
         )
@@ -55,12 +61,7 @@ export default (() => {
             timelineConfig={timelineConfig}
             cursorTimestamp={navigationState.timelineCursorAt}
             onCursorTimestampUpdate={actions.TIMELINE_CURSOR_UPDATED}
-            bgModels={mergeEntriesFeed([
-              dataState.timelineModels.filter(is('DexcomSensorEntry')),
-              dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
-              dataState.timelineModels.filter(is('ParakeetSensorEntry')),
-              dataState.timelineModels.filter(is('MeterEntry')),
-            ])}
+            bgModels={bgModels}
             selectedBgModel={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited : undefined}
             onBgModelSelect={model => (is('MeterEntry')(model) ? actions.MODEL_SELECTED_FOR_EDITING(model) : undefined)} // currently, of all the BG types, we only support editing MeterEntry's, because editing the other ones wouldn't make much sense
             insulinModels={dataState.timelineModels.filter(is('Insulin'))}

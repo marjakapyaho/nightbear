@@ -13,9 +13,17 @@ type Props = {
 export default (props => {
   const { bloodGlucose } = props.model;
 
-  if (bloodGlucose === null) {
+  if (bloodGlucose === null || !isFinite(bloodGlucose)) {
     console.warn(
       'Trying to render a BG marker without a BG; this is probably a filtering error somewhere higher up',
+      props.model,
+    );
+    return null;
+  }
+
+  if (!isFinite(props.model.timestamp)) {
+    console.warn(
+      'Trying to render a BG marker without a timestamp; this is probably a filtering error somewhere higher up',
       props.model,
     );
     return null;

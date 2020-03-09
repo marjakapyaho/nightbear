@@ -18,8 +18,7 @@ const styles = {
     position: 'absolute',
     height: HEIGHT,
     background: 'orange',
-    overflow: 'hidden',
-    color: 'white',
+    color: '#868686',
     fontFamily: 'SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace',
     fontSize: 12,
     borderRadius: 8,
@@ -41,7 +40,6 @@ export default (props => {
         left: tsToLeft(props.timelineConfig, props.situationStartTs),
         width: timeToWidth(props.timelineConfig, props.situationDuration),
       }}
-      title={props.situation}
     >
       {props.situation}
     </div>
