@@ -146,7 +146,7 @@ export default (props => {
             )}
         </div>
       </div>
-      <span className={css({ position: 'absolute', top: 0, left: 0, background: 'white', padding: 2 })}>
+      <span className={css({ position: 'absolute', top: 0, left: 0, background: 'white', padding: 2, zIndex: -1 })}>
         Last BG update: {latestBgModel ? <TimeAgo ts={latestBgModel.timestamp} frequentUpdates /> : 'n/a'} ago
       </span>
     </div>
