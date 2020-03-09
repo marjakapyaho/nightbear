@@ -23,7 +23,7 @@ export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
       const previousTimestamp = previousEntry.timestamp;
       const timeBetweenEntries = currentTimestamp - previousTimestamp;
 
-      if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE) {
+      if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE && timeBetweenEntries > 0) {
         currentSlope = roundTo2Decimals(((currentBg - previousBg) / timeBetweenEntries) * MIN_IN_MS * 5);
       }
     }
