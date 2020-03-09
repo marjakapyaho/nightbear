@@ -53,6 +53,10 @@ export default (() => {
     pixelsPerHour: 100,
   };
 
+  if (navigationState.timelineCursorAt) {
+    console.debug('Timeline cursor', [new Date(navigationState.timelineCursorAt).toISOString()]);
+  }
+
   return (
     <div className="this">
       <div className="top" style={{ height: timelineConfig.outerHeight }}>

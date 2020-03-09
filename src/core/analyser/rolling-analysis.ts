@@ -34,6 +34,10 @@ export function performRollingAnalysis(
   const buckets = getRollingAnalysisBuckets(timelineRange, timelineRangeEnd);
   const results = getRawRollingAnalysisResults(models, buckets);
   const lanes = toSituationLanes(results);
+  console.debug(
+    'Rolling analysis buckets',
+    buckets.map(a => a.map(b => new Date(b).toISOString()).filter((_, i) => i > 0)),
+  );
   return mergeContiguousSituations ? toContiguousLanes(lanes) : lanes;
 }
 
