@@ -1,0 +1,25 @@
+{
+  "fitbit": {
+    "appUUID": "3b6f8412-0c49-4a01-9936-505dbd455770",
+    "appType": "app",
+    "appDisplayName": "Nightbear",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "#8bc34a",
+    "requestedPermissions": [
+      "run_background",
+      "access_internet"
+    ],
+    "buildTargets": [
+      "meson"
+    ],
+    "i18n": {
+      "en": {
+        "name": "Nightbear"
+      }
+    },
+    "defaultLanguage": "en-US"
+  },
+  "devDependencies": {
+    "@fitbit/sdk": "~3.1.0"
+  }
+}

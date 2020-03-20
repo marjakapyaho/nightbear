@@ -1,0 +1,12 @@
+.background {
+  viewport-fill: black;
+}
+
+#message {
+  fill: fb-lime;
+  font-size: 40;
+  font-family: System-Bold;
+  font-weight: bold;
+  text-anchor: middle;
+  text-length: 99;
+}
