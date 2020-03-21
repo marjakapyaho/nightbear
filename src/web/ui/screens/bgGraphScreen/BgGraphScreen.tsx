@@ -79,6 +79,7 @@ export default (() => {
             carbsModels={dataState.timelineModels.filter(is('Carbs'))}
             selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
             onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
+            profileModels={dataState.timelineModels.filter(is('ActiveProfile'))}
             rollingAnalysisResults={rollingAnalysisResults}
           />
         )}
