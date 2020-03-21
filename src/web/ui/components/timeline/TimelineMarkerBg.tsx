@@ -2,7 +2,7 @@ import { MeterEntry, SensorEntry } from 'core/models/model';
 import { css } from 'emotion';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
-import { nbGreen, nbRed, nbYellow } from 'web/utils/colors';
+import { nbGood, nbHigh, nbLow } from 'web/utils/colors';
 import { highLimit, lowLimit } from 'web/utils/config';
 
 type Props = {
@@ -33,12 +33,12 @@ export default (props => {
 
   function getFillColor(bg: number) {
     if (bg > highLimit) {
-      return nbYellow;
+      return nbHigh;
     }
     if (bg < lowLimit) {
-      return nbRed;
+      return nbLow;
     }
-    return nbGreen;
+    return nbGood;
   }
 
   return (
