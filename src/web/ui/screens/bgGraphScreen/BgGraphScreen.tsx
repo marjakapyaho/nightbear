@@ -54,7 +54,7 @@ export default (() => {
     bgMin: 2,
     bgMax: 18,
     bgStep: 1,
-    pixelsPerHour: 100,
+    pixelsPerHour: configState.zoomedInTimeline ? 350 : 100,
   };
 
   if (navigationState.timelineCursorAt) {

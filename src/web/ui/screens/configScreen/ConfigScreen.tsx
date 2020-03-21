@@ -26,6 +26,10 @@ export default (() => {
         <input type="checkbox" checked={configState.autoRefreshData} onChange={actions.AUTO_REFRESH_TOGGLED} />
         Auto-refresh timeline data
       </label>
+      <label className={styles.checkbox}>
+        <input type="checkbox" checked={configState.zoomedInTimeline} onChange={actions.ZOOMED_IN_TIMELINE_TOGGLED} />
+        Zoomed in timeline
+      </label>
     </div>
   );
 }) as React.FC<Props>;
