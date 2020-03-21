@@ -35,7 +35,7 @@ export default (props => {
           }}
           title={new Date(ts) + ''}
         >
-          <span style={{ position: 'absolute', left: '-20px', bottom: '5px' }}>
+          <span style={{ position: 'absolute', left: '-19px', bottom: '7px' }}>
             {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
             }
           </span>

@@ -52,7 +52,7 @@ export default (props => {
               left: 0,
               right: 0,
               fontSize: 10,
-              color: '#aaa',
+              color: bg % 2 === 0 ? '#aaa' : '#fff',
               textAlign: 'left',
               paddingLeft: props.timelineConfig.paddingRight / 2,
             })}
