@@ -34,6 +34,10 @@ export function performRollingAnalysis(
   const buckets = getRollingAnalysisBuckets(timelineRange, timelineRangeEnd);
   const results = getRawRollingAnalysisResults(models, buckets);
   const lanes = toSituationLanes(results);
+  console.debug(
+    'Rolling analysis buckets',
+    buckets.map(a => a.map(b => new Date(b).toISOString()).filter((_, i) => i > 0)),
+  );
   return mergeContiguousSituations ? toContiguousLanes(lanes) : lanes;
 }
 
@@ -107,11 +111,11 @@ type RollingAnalysisRawResult = [
 
 // Chops the given amount of time into "buckets"; for each, the analyser can be ran independently
 function getRollingAnalysisBuckets(timelineRange: number, timelineRangeEnd: number): RollingAnalysisBucket[] {
-  return range(timelineRangeEnd - timelineRange, timelineRangeEnd, BUCKET_SIZE).map(startTs => [
-    startTs - PRE_MARGIN,
-    startTs - BUCKET_SIZE,
-    startTs,
-  ]);
+  return range(
+    timelineRangeEnd - timelineRange + BUCKET_SIZE,
+    timelineRangeEnd + BUCKET_SIZE,
+    BUCKET_SIZE,
+  ).map(startTs => [startTs - PRE_MARGIN, startTs - BUCKET_SIZE, startTs]);
 }
 
 type RollingAnalysisBucket = [

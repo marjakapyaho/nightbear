@@ -14,6 +14,8 @@ export function configReducer(
       return { ...state, showRollingAnalysis: !state.showRollingAnalysis };
     case actions.AUTO_REFRESH_TOGGLED.type:
       return { ...state, autoRefreshData: !state.autoRefreshData };
+    case actions.ZOOMED_IN_TIMELINE_TOGGLED.type:
+      return { ...state, zoomedInTimeline: !state.zoomedInTimeline };
     default:
       return state;
   }

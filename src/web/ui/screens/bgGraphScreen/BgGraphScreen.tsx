@@ -1,7 +1,7 @@
 import { performRollingAnalysis, BUCKET_SIZE } from 'core/analyser/rolling-analysis';
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
-import { is, isTimelineModel } from 'core/models/utils';
+import { is, isTimelineModel, last } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
@@ -31,12 +31,16 @@ export default (() => {
     dataState.timelineModels.filter(is('ParakeetSensorEntry')),
     dataState.timelineModels.filter(is('MeterEntry')),
   ]);
+  const getAlignedRangeEnd = () => {
+    const latestBgModel = bgModels.find(last);
+    return latestBgModel ? latestBgModel.timestamp + BUCKET_SIZE / 2 : timelineRangeEnd;
+  };
   const rollingAnalysisResults =
     configState.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
           (bgModels as Model[]).concat(dataState.timelineModels.filter(is('ActiveProfile'))),
           navigationState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
-          navigationState.timelineCursorAt || timelineRangeEnd, // ^ ditto
+          navigationState.timelineCursorAt || getAlignedRangeEnd(),
         )
       : undefined;
   const timelineConfig = {
@@ -50,8 +54,12 @@ export default (() => {
     bgMin: 2,
     bgMax: 18,
     bgStep: 1,
-    pixelsPerHour: 100,
+    pixelsPerHour: configState.zoomedInTimeline ? 350 : 100,
   };
+
+  if (navigationState.timelineCursorAt) {
+    console.debug('Timeline cursor', [new Date(navigationState.timelineCursorAt).toISOString()]);
+  }
 
   return (
     <div className="this">

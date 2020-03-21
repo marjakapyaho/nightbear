@@ -40,6 +40,13 @@ export default (props => {
         left: tsToLeft(props.timelineConfig, props.situationStartTs),
         width: timeToWidth(props.timelineConfig, props.situationDuration),
       }}
+      onClick={() =>
+        console.debug('Situation', [
+          props.situation,
+          new Date(props.situationStartTs).toISOString(),
+          new Date(props.situationStartTs + props.situationDuration).toISOString(),
+        ])
+      }
     >
       {props.situation}
     </div>
