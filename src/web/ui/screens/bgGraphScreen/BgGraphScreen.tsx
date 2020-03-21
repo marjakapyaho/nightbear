@@ -11,6 +11,7 @@ import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollN
 import Timeline from 'web/ui/components/timeline/Timeline';
 import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
+import { nbGreen, nbRed, nbYellow } from 'web/utils/colors';
 
 type Props = {};
 
@@ -96,7 +97,7 @@ export default (() => {
           max={100}
           step={5}
           centerOn={40}
-          color="#9ad5b3"
+          color={nbGreen}
         />
         <ScrollNumberSelector
           value={is('MeterEntry')(modelBeingEdited) ? modelBeingEdited.bloodGlucose || undefined : undefined}
@@ -118,7 +119,7 @@ export default (() => {
           step={0.5}
           centerOn={8}
           decimals={1}
-          color="#f8cc6f"
+          color={nbYellow}
         />
         <ScrollNumberSelector
           value={is('Insulin')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
@@ -139,7 +140,7 @@ export default (() => {
           max={20}
           step={1}
           centerOn={5}
-          color="#ee776e"
+          color={nbRed}
         />
       </div>
     </div>

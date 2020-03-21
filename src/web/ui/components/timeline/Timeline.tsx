@@ -12,7 +12,13 @@ import TimelineMarkerInsulin from 'web/ui/components/timeline/TimelineMarkerInsu
 import TimelineMarkerSituation from 'web/ui/components/timeline/TimelineMarkerSituation';
 import TimelineScaleBg from 'web/ui/components/timeline/TimelineScaleBg';
 import TimelineScaleTs from 'web/ui/components/timeline/TimelineScaleTs';
-import { getExtendedTimelineConfig, leftToTs, TimelineConfig } from 'web/ui/components/timeline/utils';
+import {
+  bgToTop,
+  getExtendedTimelineConfig,
+  leftToTs,
+  TimelineConfig,
+  tsToLeft,
+} from 'web/ui/components/timeline/utils';
 
 type Props = {
   timelineConfig: TimelineConfig;
@@ -144,10 +150,33 @@ export default (props => {
                 />
               )),
             )}
+          {latestBgModel && (
+            <span
+              className={css({
+                position: 'absolute',
+                top: bgToTop(c, latestBgModel.bloodGlucose || 6) - 35,
+                left: tsToLeft(c, latestBgModel.timestamp) - 13,
+                fontSize: 20,
+                zIndex: 100,
+              })}
+            >
+              {latestBgModel.bloodGlucose}
+            </span>
+          )}
         </div>
       </div>
-      <span className={css({ position: 'absolute', top: 0, left: 0, background: 'white', padding: 2, zIndex: -1 })}>
-        Last BG update: {latestBgModel ? <TimeAgo ts={latestBgModel.timestamp} frequentUpdates /> : 'n/a'} ago
+      <span
+        className={css({
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          background: 'white',
+          color: '#777',
+          fontSize: 11,
+          padding: 4,
+        })}
+      >
+        {latestBgModel ? <TimeAgo ts={latestBgModel.timestamp} frequentUpdates /> : 'n/a'} ago
       </span>
     </div>
   );

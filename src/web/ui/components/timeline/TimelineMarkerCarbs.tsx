@@ -3,6 +3,7 @@ import { css, cx } from 'emotion';
 import React from 'react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
+import { nbGreen } from 'web/utils/colors';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -16,7 +17,7 @@ const styles = {
   numberBubble: cx(
     markerStyles.numberBubble,
     css({
-      background: '#9ad5b3',
+      background: nbGreen,
       color: 'white',
     }),
   ),

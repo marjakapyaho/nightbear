@@ -2,6 +2,8 @@ import { MeterEntry, SensorEntry } from 'core/models/model';
 import { css } from 'emotion';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
+import { nbGreen, nbRed, nbYellow } from 'web/utils/colors';
+import { highLimit, lowLimit } from 'web/utils/config';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -29,6 +31,16 @@ export default (props => {
     return null;
   }
 
+  function getFillColor(bg: number) {
+    if (bg > highLimit) {
+      return nbYellow;
+    }
+    if (bg < lowLimit) {
+      return nbRed;
+    }
+    return nbGreen;
+  }
+
   return (
     <circle
       className={css({
@@ -36,8 +48,8 @@ export default (props => {
       })}
       style={
         {
-          fill: props.model.modelType === 'MeterEntry' ? '#f8cc6f' : '#777',
-          r: props.isSelected ? 7 : undefined,
+          fill: props.model.modelType === 'MeterEntry' ? '#777' : getFillColor(bloodGlucose),
+          r: props.isSelected ? 5 : undefined,
           stroke: 'white',
           strokeWidth: 1,
         } as any // the TS type defs won't accept "r" as a valid style prop :shrug:
