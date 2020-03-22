@@ -51,7 +51,7 @@ export default (() => {
     paddingBottom: 40,
     paddingLeft: 0,
     paddingRight: 30,
-    outerHeight: 320,
+    outerHeight: 330,
     bgMin: 2,
     bgMax: 18,
     bgStep: 1,

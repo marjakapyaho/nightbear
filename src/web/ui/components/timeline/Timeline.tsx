@@ -20,6 +20,8 @@ import {
   TimelineConfig,
   tsToLeft,
 } from 'web/ui/components/timeline/utils';
+import { fontColorDark, fontColorLight } from 'web/utils/colors';
+import { fontSizeSmall } from 'web/utils/config';
 
 type Props = {
   timelineConfig: TimelineConfig;
@@ -164,6 +166,7 @@ export default (props => {
                 left: tsToLeft(c, latestBgModel.timestamp) - 13,
                 fontSize: 20,
                 zIndex: 100,
+                color: fontColorDark,
               })}
             >
               {latestBgModel.bloodGlucose}
@@ -177,8 +180,8 @@ export default (props => {
           top: 0,
           left: 0,
           background: 'white',
-          color: '#777',
-          fontSize: 11,
+          color: fontColorLight,
+          fontSize: fontSizeSmall,
           padding: 4,
         })}
       >

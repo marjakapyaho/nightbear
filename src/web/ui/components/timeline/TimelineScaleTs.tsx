@@ -4,6 +4,8 @@ import { range } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { Fragment } from 'react';
 import { ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
+import { borderColorLight, fontColorLight } from 'web/utils/colors';
+import { fontSize } from 'web/utils/config';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -20,13 +22,11 @@ export default (props => {
           className={css({
             position: 'absolute',
             bottom: 0,
-            borderLeft: '1px solid #eee',
+            borderLeft: `1px solid ${borderColorLight}`,
             top: 0,
             display: 'flex',
             alignItems: 'flex-end', // i.e. bottom-align the text
             pointerEvents: 'none',
-            color: '#aaa',
-            fontSize: '0.9em',
             zIndex: -1,
           })}
           style={{
@@ -35,7 +35,18 @@ export default (props => {
           }}
           title={new Date(ts) + ''}
         >
-          <span style={{ position: 'absolute', left: '-19px', bottom: '7px' }}>
+          <span
+            style={{
+              position: 'absolute',
+              left: '-19px',
+              bottom: '0',
+              paddingBottom: '7px',
+              paddingTop: '4px',
+              background: 'white',
+              fontSize: fontSize,
+              color: fontColorLight,
+            }}
+          >
             {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
             }
           </span>
