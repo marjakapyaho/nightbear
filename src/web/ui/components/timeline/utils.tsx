@@ -1,5 +1,7 @@
 import { HOUR_IN_MS, roundTo1Decimals } from 'core/calculations/calculations';
 import { css } from 'emotion';
+import { borderColor, fontColor } from 'web/utils/colors';
+import { fontSize } from 'web/utils/config';
 
 export type TimelineConfig = {
   timelineRange: number; // how many ms worth of timeline data are we showing
@@ -73,9 +75,9 @@ export const markerStyles = {
     top: 32,
     left: WIDTH_CLICKABLE / 2 - WIDTH_LINE / 2,
     width: WIDTH_LINE,
-    bottom: 39,
-    background: '#bbb',
+    bottom: 27,
     zIndex: -1,
+    borderLeft: `1px dashed ${borderColor}`,
   }),
   centeringWrapper: css({
     position: 'absolute',
@@ -90,13 +92,14 @@ export const markerStyles = {
     borderRadius: 100,
     padding: 0,
     background: 'none',
-    fontSize: '0.8em',
+    fontSize: fontSize,
+    color: fontColor,
   }),
   numberBubble: css({
     background: 'gray',
     margin: '35px auto 0 auto',
     width: 35,
     borderRadius: '100%',
-    padding: 7,
+    padding: 8,
   }),
 };
