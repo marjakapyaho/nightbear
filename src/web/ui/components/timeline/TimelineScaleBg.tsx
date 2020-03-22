@@ -2,6 +2,7 @@ import { css } from 'emotion';
 import { range } from 'lodash';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig } from 'web/ui/components/timeline/utils';
+import { highLimit } from 'web/utils/config';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -22,7 +23,7 @@ export default (props => {
           className={css({
             position: 'absolute',
             height: 1,
-            background: 'whitesmoke',
+            background: 'white',
             zIndex: -1,
           })}
           style={{
@@ -32,6 +33,19 @@ export default (props => {
           }}
         ></div>
       ))}
+      <div
+        className={css({
+          position: 'absolute',
+          height: 85,
+          background: '#f3f9f2',
+          zIndex: -1,
+        })}
+        style={{
+          left: props.timelineConfig.paddingLeft,
+          top: bgToTop(props.timelineConfig, highLimit),
+          right: 0,
+        }}
+      ></div>
       <div
         className={css({
           position: 'absolute',
