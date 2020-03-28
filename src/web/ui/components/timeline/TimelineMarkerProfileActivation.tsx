@@ -2,6 +2,7 @@ import { ActiveProfile } from 'core/models/model';
 import { css, cx } from 'emotion';
 import React from 'react';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
+import { borderColor } from 'web/utils/colors';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -14,18 +15,17 @@ const styles = {
     markerStyles.verticalLine,
     css({
       width: 0,
-      borderLeft: '3px dotted blue',
+      borderLeft: `3px dotted ${borderColor}`,
     }),
   ),
 };
 
 export default (props => {
-  console.log(props.model);
   return (
     <div className={styles.root} style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}>
       <div className={styles.verticalLine} />
       <div className={styles.centeringWrapper}>
-        <span className={styles.textLabel}>{props.model.profileName}</span>
+        <span className={styles.textLabel}>{props.model.profileName.toUpperCase()}</span>
       </div>
     </div>
   );
