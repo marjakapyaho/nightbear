@@ -53,7 +53,7 @@ export default (() => {
     paddingRight: 30,
     outerHeight: 330,
     bgMin: 2,
-    bgMax: 18,
+    bgMax: 22,
     bgStep: 1,
     pixelsPerHour: configState.zoomedInTimeline ? 350 : 100,
   };

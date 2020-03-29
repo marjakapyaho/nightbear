@@ -3,7 +3,7 @@ import { css, cx } from 'emotion';
 import React from 'react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
-import { nbInsulin } from 'web/utils/colors';
+import { borderColor, nbInsulin } from 'web/utils/colors';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
@@ -30,9 +30,12 @@ export default (props => {
       onClick={() => props.onSelect(props.model)}
       style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}
     >
-      <div className={styles.verticalLine} style={{ width: props.isSelected ? 1 : undefined }} />
+      <div
+        className={styles.verticalLine}
+        style={{ border: props.isSelected ? `1px solid ${borderColor}` : undefined }}
+      />
       <div className={styles.centeringWrapper}>
-        <span className={styles.textLabel}>
+        <span className={props.isSelected ? styles.textLabelSelected : styles.textLabel}>
           <TimeAgo ts={props.model.timestamp} />
         </span>
       </div>

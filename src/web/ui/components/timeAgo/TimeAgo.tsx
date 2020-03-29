@@ -1,4 +1,4 @@
-import { roundTo1Decimals } from 'core/calculations/calculations';
+import { roundTo0Decimals, roundTo1Decimals } from 'core/calculations/calculations';
 import { Duration } from 'luxon';
 import React, { useLayoutEffect, useState } from 'react';
 
@@ -45,7 +45,7 @@ function getFormattedTs(ts: number, verbose?: boolean): string {
     } else if (hours) {
       return roundTo1Decimals(d.shiftTo('hours').hours) + ' h';
     } else if (minutes) {
-      return roundTo1Decimals(d.shiftTo('minutes').minutes) + ' min';
+      return roundTo0Decimals(d.shiftTo('minutes').minutes) + ' min';
     } else {
       return seconds + ' s';
     }

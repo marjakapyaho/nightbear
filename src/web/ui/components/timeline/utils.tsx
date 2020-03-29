@@ -94,6 +94,16 @@ export const markerStyles = {
     background: 'none',
     fontSize: fontSize,
     color: fontColor,
+    zIndex: 1,
+  }),
+  textLabelSelected: css({
+    border: `1px solid ${borderColor}`,
+    borderRadius: 10,
+    padding: '3px 6px',
+    background: 'white',
+    fontSize: fontSize,
+    color: fontColor,
+    zIndex: 1,
   }),
   numberBubble: css({
     background: 'gray',
@@ -101,5 +111,6 @@ export const markerStyles = {
     width: 35,
     borderRadius: '100%',
     padding: 8,
+    border: '1px solid white',
   }),
 };
