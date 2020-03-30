@@ -26,7 +26,7 @@ export default (props => {
     // And even in other browsers, you can't scroll multiple targets simultaneously: https://stackoverflow.com/questions/55562289/how-to-smooth-scroll-two-elements-at-the-same-time-using-scrollintoview
     // So let's just give up and do it in JS ¯\_(ツ)_/¯
     scrollIntoView(selectedEl.current, { time: animSpeed.current });
-    if (!animSpeed.current) animSpeed.current = 750;
+    if (!animSpeed.current) animSpeed.current = 250;
   }, [props.value]); // note that even though we actually use selectedEl in this effect, it's mutable -> can't use with useEffect(); but props.value is a good enough proxy!
 
   const options = range(props.min, props.max + props.step, props.step);
@@ -37,6 +37,7 @@ export default (props => {
         <div
           key={i}
           className={props.value === val ? 'selected' : ''}
+          style={{ background: props.value === val ? 'white' : '', color: props.value === val ? props.color : '' }}
           ref={val === props.value || (props.value === undefined && val === props.centerOn) ? selectedEl : null}
           onClick={() => props.onChange(val)}
         >

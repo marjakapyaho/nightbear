@@ -67,7 +67,8 @@ export default (props => {
               left: 0,
               right: 0,
               fontSize: fontSizeExtraSmall,
-              color: bg % 2 === 0 ? fontColorExtraLight : '#fff',
+              color: fontColorExtraLight,
+              opacity: bg % 2 === 0 ? 1 : 0,
               textAlign: 'left',
               paddingLeft: props.timelineConfig.paddingRight / 2,
             })}

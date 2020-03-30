@@ -44,10 +44,11 @@ export default (props => {
   return (
     <circle
       className={css({
-        r: 4,
+        r: 3.7,
       })}
       style={
         {
+          pointerEvents: props.model.modelType === 'MeterEntry' ? 'auto' : 'none',
           fill: props.model.modelType === 'MeterEntry' ? '#777' : getFillColor(bloodGlucose),
           r: props.isSelected ? 5 : undefined,
           stroke: 'white',
