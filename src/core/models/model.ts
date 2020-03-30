@@ -38,12 +38,18 @@ export type Sensor = _Model<'Sensor'> &
     placementNote: string;
   }>;
 
-export type SensorEntry = DexcomSensorEntry | DexcomRawSensorEntry | ParakeetSensorEntry;
+export type SensorEntry = DexcomG6SensorEntry | DexcomSensorEntry | DexcomRawSensorEntry | ParakeetSensorEntry;
 
 type _SensorEntry = Readonly<{
   timestamp: number;
   bloodGlucose: number | null; // in mmol/L (as opposed to mg/dL, as used by Dexcom)
 }>;
+
+export type DexcomG6SensorEntry = _Model<'DexcomG6SensorEntry'> &
+  _SensorEntry &
+  Readonly<{
+    direction: string; // e.g. "FortyFiveDown"
+  }>;
 
 export type DexcomSensorEntry = _Model<'DexcomSensorEntry'> &
   _SensorEntry &
