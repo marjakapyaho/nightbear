@@ -1,6 +1,6 @@
 export const nbHigh = '#F8CC6F';
 export const nbLow = '#ee5a36';
-export const nbGood = '#65c873';
+export const nbGood = '#54c87e';
 
 export const nbBg = '#F8CC6F';
 export const nbInsulin = '#EE776E';

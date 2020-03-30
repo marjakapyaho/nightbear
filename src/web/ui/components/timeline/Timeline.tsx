@@ -3,7 +3,6 @@ import { ActiveProfile, Carbs, Insulin, MeterEntry, SensorEntry } from 'core/mod
 import { isSameModel, last } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
-import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/components/timeline/TimelineMarkerBg';
 import TimelineMarkerCarbs from 'web/ui/components/timeline/TimelineMarkerCarbs';
@@ -184,9 +183,7 @@ export default (props => {
           fontSize: fontSizeSmall,
           padding: 4,
         })}
-      >
-        {latestBgModel ? <TimeAgo ts={latestBgModel.timestamp} frequentUpdates /> : 'n/a'} ago
-      </span>
+      ></span>
     </div>
   );
 

@@ -58,7 +58,8 @@ export function bgToTop(c: ExtendedTimelineConfig, bg: number) {
 
 const WIDTH_CLICKABLE = 20;
 const WIDTH_LINE = 1;
-const WIDTH_MAX = 150;
+const WIDTH_MAX = 50;
+const BUBBLE_SIZE = 38;
 
 // Common base styles for all vertical markers.
 // Some things (like colors) should be overridden before use to make them unique.
@@ -98,8 +99,8 @@ export const markerStyles = {
   }),
   textLabelSelected: css({
     border: `1px solid ${borderColor}`,
-    borderRadius: 10,
-    padding: '3px 6px',
+    borderRadius: 15,
+    padding: '4px 8px',
     background: 'white',
     fontSize: fontSize,
     color: fontColor,
@@ -108,9 +109,11 @@ export const markerStyles = {
   numberBubble: css({
     background: 'gray',
     margin: '35px auto 0 auto',
-    width: 35,
+    width: BUBBLE_SIZE,
+    height: BUBBLE_SIZE,
+    lineHeight: `${BUBBLE_SIZE}px`,
     borderRadius: '100%',
-    padding: 8,
     border: '1px solid white',
+    fontSize: fontSize,
   }),
 };

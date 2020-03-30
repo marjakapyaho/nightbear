@@ -32,7 +32,7 @@ export default (props => {
     >
       <div
         className={styles.verticalLine}
-        style={{ border: props.isSelected ? `1px solid ${borderColor}` : undefined }}
+        style={{ borderLeft: props.isSelected ? `1px solid ${borderColor}` : undefined }}
       />
       <div className={styles.centeringWrapper}>
         <span className={props.isSelected ? styles.textLabelSelected : styles.textLabel}>
