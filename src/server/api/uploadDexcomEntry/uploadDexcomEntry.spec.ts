@@ -7,6 +7,7 @@ import {
   DexcomRawSensorEntry,
   DexcomSensorEntry,
   MeterEntry,
+  DexcomG6SensorEntry,
 } from 'core/models/model';
 import { first } from 'lodash';
 import 'mocha';
@@ -42,6 +43,22 @@ describe('api/uploadDexcomEntry', () => {
       type: 'sgv',
       date: timestampNow,
       noise: 1,
+    },
+  };
+
+  // As uploaded by xDrip+
+  const mockRequestG6Entry: Request = {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestHeaders: {},
+    requestParams: {},
+    requestBody: {
+      device: 'xDrip-DexcomG5 G5 Native',
+      date: 1585523700821,
+      dateString: '2020-03-30T02:15:00.821+0300',
+      sgv: 126,
+      direction: 'FortyFiveDown',
     },
   };
 
@@ -89,6 +106,14 @@ describe('api/uploadDexcomEntry', () => {
   };
 
   // Mock objects
+  const mockDexcomG6SensorEntry: DexcomG6SensorEntry = {
+    modelType: 'DexcomG6SensorEntry',
+    modelUuid: generateUuid(),
+    timestamp: 1585523700821,
+    bloodGlucose: 7,
+    direction: 'FortyFiveDown',
+  };
+
   const mockDexcomSensorEntry: DexcomSensorEntry = {
     modelType: 'DexcomSensorEntry',
     modelUuid: generateUuid(),
@@ -142,6 +167,15 @@ describe('api/uploadDexcomEntry', () => {
 
   // Assertions
   withStorage(createTestStorage => {
+    it('uploads and stores a Dexcom G6 entry from xDrip+', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => uploadDexcomEntry(mockRequestG6Entry, context))
+        .then(res => assert.equal(res.responseBody, mockRequestG6Entry.requestBody)) // match the Nightscout API convention of replying back with the incoming payload (not entirely sure xDrip+ needs it but oh well)
+        .then(() => context.storage.loadLatestTimelineModels('DexcomG6SensorEntry', 100))
+        .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockDexcomG6SensorEntry)]));
+    });
+
     it('uploads Dexcom sensor entry with correct response', () => {
       const context = createTestContext(createTestStorage());
       return Promise.resolve()

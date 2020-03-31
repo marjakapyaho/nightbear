@@ -115,6 +115,30 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             });
         }
 
+        // Handle Dexcom G6 upload from xDrip+
+        if ((requestObject.device || '').match(/^xDrip-Dexcom/)) {
+          const timestamp = parseInt(requestObject.date, 10);
+          return Promise.resolve()
+            .then(() => context.storage.loadTimelineModels(['DexcomG6SensorEntry'], 0, timestamp)) // see if we can find an entry of the same type that already exists with this exact timestamp
+            .then(entries => first(entries))
+            .then(existingEntry => {
+              if (existingEntry) {
+                // already exists in the DB -> no need to do anything!
+                console.log(`${logCtx}: ${existingEntry.modelType} already exists in DB`);
+                return Promise.resolve(null);
+              } else {
+                // we didn't find the entry yet -> create it
+                return context.storage.saveModel({
+                  modelType: 'DexcomG6SensorEntry',
+                  modelUuid: generateUuid(),
+                  timestamp: requestObject.date,
+                  bloodGlucose: changeBloodGlucoseUnitToMmoll(requestObject.sgv),
+                  direction: requestObject.direction,
+                });
+              }
+            });
+        }
+
         throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
       },
     )

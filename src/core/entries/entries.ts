@@ -7,6 +7,7 @@ import {
   ParakeetSensorEntry,
   SensorEntry,
   TimelineModel,
+  DexcomG6SensorEntry,
 } from 'core/models/model';
 import { sortBy, unionBy } from 'lodash';
 
@@ -16,6 +17,7 @@ export function getMergedEntriesFeed(
   rangeEnd: number = context.timestamp(),
 ): Promise<SensorEntry[]> {
   return Promise.all([
+    context.storage.loadTimelineModels(['DexcomG6SensorEntry'], range, rangeEnd),
     context.storage.loadTimelineModels(['DexcomSensorEntry'], range, rangeEnd),
     context.storage.loadTimelineModels(['DexcomRawSensorEntry'], range, rangeEnd),
     context.storage.loadTimelineModels(['ParakeetSensorEntry'], range, rangeEnd),
@@ -23,15 +25,17 @@ export function getMergedEntriesFeed(
   ]).then(mergeEntriesFeed);
 }
 
-export function mergeEntriesFeed([dexcomSensorEntries, dexcomRawSensorEntries, parakeetSensorEntries, meterEntries]: [
-  DexcomSensorEntry[],
-  DexcomRawSensorEntry[],
-  ParakeetSensorEntry[],
-  MeterEntry[],
-]) {
+export function mergeEntriesFeed([
+  dexcomG6SensorEntries,
+  dexcomSensorEntries,
+  dexcomRawSensorEntries,
+  parakeetSensorEntries,
+  meterEntries,
+]: [DexcomG6SensorEntry[], DexcomSensorEntry[], DexcomRawSensorEntry[], ParakeetSensorEntry[], MeterEntry[]]) {
   return sortBy(
     unionBy(
       meterEntries as TimelineModel[],
+      dexcomG6SensorEntries as TimelineModel[],
       dexcomSensorEntries as TimelineModel[],
       dexcomRawSensorEntries as TimelineModel[],
       parakeetSensorEntries as TimelineModel[],
