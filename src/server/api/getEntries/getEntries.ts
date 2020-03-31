@@ -23,10 +23,11 @@ export function getEntries(request: Request, context: Context): Response {
       .map((group: TimelineModel[], timestamp: string) => {
         const carbs = group.find(is('Carbs'));
         const insulin = group.find(is('Insulin'));
+        const dexcomG6SensorEntry = group.find(is('DexcomG6SensorEntry'));
         const dexcomSensorEntry = group.find(is('DexcomSensorEntry'));
         const dexcomRawSensorEntry = group.find(is('DexcomRawSensorEntry'));
         const parakeetSensorEntry = group.find(is('ParakeetSensorEntry'));
-        const sensorEntry = dexcomSensorEntry || dexcomRawSensorEntry || parakeetSensorEntry;
+        const sensorEntry = dexcomG6SensorEntry || dexcomSensorEntry || dexcomRawSensorEntry || parakeetSensorEntry;
         const isRaw = !!dexcomRawSensorEntry || !!parakeetSensorEntry;
         return {
           time: parseInt(timestamp, 10), // note: timestamp has become string as it was used as an object key in the result of the groupBy()

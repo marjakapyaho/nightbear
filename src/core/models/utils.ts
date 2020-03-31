@@ -39,6 +39,8 @@ export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & 
 export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2): (model: unknown, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2>;
 // prettier-ignore
 export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType, T3 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2, mt3: T3): (model: unknown, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2> | ModelOfType<T3>;
+// prettier-ignore
+export function is<ArrayType extends Model, T1 extends ArrayType['modelType'] & ModelType, T2 extends ArrayType['modelType'] & ModelType, T3 extends ArrayType['modelType'] & ModelType,  T4 extends ArrayType['modelType'] & ModelType>(mt1: T1, mt2: T2, mt3: T3, mt4: T4): (model: unknown, _index?: number, array?: ArrayType[]) => model is ModelOfType<T1> | ModelOfType<T2> | ModelOfType<T3> | ModelOfType<T4>;
 export function is(...modelTypes: string[]) {
   return (model: unknown, _index: number, _array: any[]) =>
     isModel(model) ? modelTypes.includes(model.modelType) : false;

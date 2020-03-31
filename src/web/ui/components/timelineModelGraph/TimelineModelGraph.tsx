@@ -176,7 +176,7 @@ function getOptions(
         .map(([base, from, to]): Highcharts.XAxisPlotBandsOptions | null => {
           if (!activeProfile) return null;
           const sensorEntries = models
-            .filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'))
+            .filter(is('DexcomG6SensorEntry', 'DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'))
             .filter(m => m.timestamp > base && m.timestamp < to);
           const state = runAnalysis(
             to,
@@ -231,6 +231,13 @@ function getOptions(
     },
     series: [
       // Blood glucose:
+      getSeries(
+        models,
+        Y_BG,
+        'DexcomG6SensorEntry',
+        model => model.modelType === 'DexcomG6SensorEntry' && model.bloodGlucose, // <- plotted value
+        { color: '#5bc0de' },
+      ),
       getSeries(
         models,
         Y_BG,

@@ -85,7 +85,9 @@ function toContiguousLanes(results: RollingAnalysisResults): RollingAnalysisResu
 function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisBucket[]): RollingAnalysisRawResult[] {
   const activeProfile = last(models.filter(is('ActiveProfile')));
   if (!activeProfile) throw new Error('Could not find an ActiveProfile to perform rolling analysis');
-  const sensorEntries = models.filter(is('DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'));
+  const sensorEntries = models.filter(
+    is('DexcomG6SensorEntry', 'DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'),
+  );
   const insulins = models.filter(is('Insulin'));
   const activeAlarms = models.filter(is('Alarm')).filter(a => a.isActive);
   return buckets.map(([base, from, to]) => {
