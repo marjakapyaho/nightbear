@@ -3,6 +3,7 @@ import { TimelineModelType } from 'core/models/model';
 
 export const TIMELINE_MODEL_TYPES: TimelineModelType[] = [
   'Sensor',
+  'DexcomG6SensorEntry',
   'DexcomSensorEntry',
   'DexcomRawSensorEntry',
   'ParakeetSensorEntry',
