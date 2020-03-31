@@ -261,6 +261,7 @@ function getOptions(
       ),
       getSeries(
         mergeEntriesFeed([
+          models.filter(is('DexcomG6SensorEntry')),
           models.filter(is('DexcomSensorEntry')),
           models.filter(is('DexcomRawSensorEntry')),
           models.filter(is('ParakeetSensorEntry')),
