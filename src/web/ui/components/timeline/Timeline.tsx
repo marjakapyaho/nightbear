@@ -19,8 +19,10 @@ import {
   TimelineConfig,
   tsToLeft,
 } from 'web/ui/components/timeline/utils';
-import { fontColorDark, fontColorLight } from 'web/utils/colors';
+import { fontColorDark, fontColorExtraLight, fontColorLight } from 'web/utils/colors';
 import { fontSizeSmall } from 'web/utils/config';
+import { set2Decimals } from 'web/utils/helpers';
+import { timestampIsUnderMaxAge } from 'core/calculations/calculations';
 
 type Props = {
   timelineConfig: TimelineConfig;
@@ -165,10 +167,13 @@ export default (props => {
                 left: tsToLeft(c, latestBgModel.timestamp) - 13,
                 fontSize: 20,
                 zIndex: 100,
-                color: fontColorDark,
+                pointerEvents: 'none',
+                color: timestampIsUnderMaxAge(Date.now(), latestBgModel.timestamp, 8)
+                  ? fontColorDark
+                  : fontColorExtraLight,
               })}
             >
-              {latestBgModel.bloodGlucose}
+              {set2Decimals(latestBgModel.bloodGlucose)}
             </span>
           )}
         </div>

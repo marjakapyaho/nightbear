@@ -28,7 +28,7 @@ export default (props => {
     <div
       className={styles.root}
       onClick={() => props.onSelect(props.model)}
-      style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}
+      style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp), zIndex: 10 }}
     >
       <div
         className={styles.verticalLine}
