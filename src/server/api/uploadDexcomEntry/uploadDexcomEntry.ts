@@ -139,6 +139,12 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             });
         }
 
+        // Handle phone status upload from xDrip+
+        if ((requestObject.device || '').match(/^HMD/)) {
+          const xdripStatus: DeviceStatus = parseXdripStatus(requestObject, timestamp);
+          return context.storage.saveModel(xdripStatus);
+        }
+
         throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
       },
     )
@@ -227,6 +233,22 @@ export function parseDexcomStatus(requestObject: { [key: string]: string }, time
     modelType: 'DeviceStatus',
     modelUuid: generateUuid(),
     deviceName: 'dexcom-uploader',
+    timestamp,
+    batteryLevel,
+    geolocation: null,
+  };
+}
+
+export function parseXdripStatus(
+  requestObject: { [key: string]: { [key: string]: string } },
+  timestamp: number,
+): DeviceStatus {
+  const batteryLevel = parseInt(requestObject.uploader.battery, 10);
+
+  return {
+    modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
+    deviceName: 'xdrip-uploader',
     timestamp,
     batteryLevel,
     geolocation: null,
