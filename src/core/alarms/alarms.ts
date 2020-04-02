@@ -2,15 +2,21 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { ActiveProfile, Alarm, AlarmState, Situation, State } from 'core/models/model';
 import { getAlarmState } from 'core/models/utils';
-import { filter, find, findIndex, map, sum, take } from 'lodash';
+import { generateUuid } from 'core/utils/id';
+import { filter, find, findIndex, last, map, sum, take } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
-import { generateUuid } from 'core/utils/id';
 
 const INITIAL_ALARM_LEVEL = 1;
 
 export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
+
+  const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(alarm.alarmStates)?.alarmLevel})`;
+  const situationToString = (situation: Situation) => `${situation} (new)`;
+  const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
+
+  context.log.info(`Active alarms: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
