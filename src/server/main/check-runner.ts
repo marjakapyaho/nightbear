@@ -3,7 +3,7 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context } from 'core/models/api';
-import { first } from 'lodash';
+import { first, map, identity } from 'lodash';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
@@ -35,10 +35,11 @@ export function runChecks(context: Context) {
     if (!activeProfile) throw new Error(`Couldn't find an active profile`);
 
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
-    context.log.info(`Run analysis returned state:`, state);
+    const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
+    context.log.info(`Analyser returned situations: ` + situations.length ? situations.join(', ') : 'n/a');
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
-      context.log.info(`Run checks returned alarms:`, alarms);
+      context.log.info(`Alarm checks returned ${alarms.length} alarms:`, alarms);
       return alarms;
     });
   });
