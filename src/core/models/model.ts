@@ -114,7 +114,7 @@ export type NightbearCalibration = _Model<'NightbearCalibration'> &
 
 export type DeviceStatus = _Model<'DeviceStatus'> &
   Readonly<{
-    deviceName: 'dexcom-uploader' | 'dexcom-transmitter' | 'parakeet';
+    deviceName: 'dexcom-uploader' | 'dexcom-transmitter' | 'parakeet' | 'xdrip-uploader';
     timestamp: number;
     batteryLevel: number;
     geolocation: string | null;
