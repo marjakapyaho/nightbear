@@ -39,7 +39,11 @@ export function runChecks(context: Context) {
     context.log.info(`Analyser returned situations: ` + situations.length ? situations.join(', ') : 'n/a');
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
-      context.log.info(`Alarm checks returned ${alarms.length} alarms:`, alarms);
+      context.log.info(
+        `There were changes in ${alarms.length} alarms with types: ${alarms
+          .map(alarm => alarm.situationType)
+          .join(', ')}`,
+      );
       return alarms;
     });
   });
