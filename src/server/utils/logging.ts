@@ -48,10 +48,10 @@ export function handlerWithLogging(handler: RequestHandler, log: Logger): Reques
   return (request, context) => {
     const then = context.timestamp();
     const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
-    log.debug(`Incoming request: ${request.requestMethod} ${request.requestPath}`, request);
+    log.debug(`Incoming request: ${request.requestMethod} ${request.requestPath}`, request.requestBody);
     return handler(request, context).then(
       res => {
-        log.debug(`Outgoing response`, res);
+        log.debug(`Outgoing response status`, res.responseStatus);
         log.info(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
         return res;
       },
