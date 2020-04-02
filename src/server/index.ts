@@ -9,6 +9,7 @@ import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntr
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
+import { checkRunnerTimer } from 'server/main/check-runner';
 
 const context = createNodeContext();
 
@@ -27,6 +28,6 @@ startExpressServer(
   err => context.log.error(`Nightbear server error: ${err.message}`, err),
 );
 
-// checkRunnerTimer(context).catch(err => context.log.error(`Nightbear check runner error: ${err.message}`, err));
+checkRunnerTimer(context).catch(err => context.log.error(`Nightbear check runner error: ${err.message}`, err));
 
 startAutomaticProfileActivation(context);
