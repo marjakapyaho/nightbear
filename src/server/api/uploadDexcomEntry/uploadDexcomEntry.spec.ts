@@ -105,6 +105,20 @@ describe('api/uploadDexcomEntry', () => {
     },
   };
 
+  const mockRequestXdripDeviceStatus: Request = {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestHeaders: {},
+    requestParams: {},
+    requestBody: {
+      device: 'HMD Global Nokia 1',
+      uploader: {
+        battery: 76,
+      },
+    },
+  };
+
   // Mock objects
   const mockDexcomG6SensorEntry: DexcomG6SensorEntry = {
     modelType: 'DexcomG6SensorEntry',
@@ -162,6 +176,15 @@ describe('api/uploadDexcomEntry', () => {
     deviceName: 'dexcom-uploader',
     timestamp: timestampNow,
     batteryLevel: 80,
+    geolocation: null,
+  };
+
+  const mockXdripDeviceStatus: DeviceStatus = {
+    modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
+    deviceName: 'xdrip-uploader',
+    timestamp: timestampNow,
+    batteryLevel: 76,
     geolocation: null,
   };
 
@@ -238,6 +261,17 @@ describe('api/uploadDexcomEntry', () => {
         })
         .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
         .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockDeviceStatus)]));
+    });
+
+    it('uploads xDrip device status with correct response', () => {
+      const context = createTestContext(createTestStorage());
+      return Promise.resolve()
+        .then(() => uploadDexcomEntry(mockRequestXdripDeviceStatus, context))
+        .then(res => {
+          assert.equal(res.responseBody, mockRequestXdripDeviceStatus.requestBody);
+        })
+        .then(() => context.storage.loadLatestTimelineModels('DeviceStatus', 100))
+        .then(models => assertEqualWithoutMeta(models.map(eraseModelUuid), [eraseModelUuid(mockXdripDeviceStatus)]));
     });
 
     it("doesn't generate the same DexcomCalibration again", () => {
