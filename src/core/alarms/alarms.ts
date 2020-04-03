@@ -74,7 +74,12 @@ function handleAlarmsToKeep(
       const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
 
       // Not yet valid
-      if (context.timestamp() <= getAlarmState(alarm).validAfterTimestamp) {
+      if (now <= validAfterTimestamp) {
+        context.log.debug(
+          `Alarm ${alarmToString(alarm)} is not yet valid (${Math.round(
+            (validAfterTimestamp - now) / MIN_IN_MS,
+          )} min snooze left)`,
+        );
         return Promise.resolve(null);
       }
 
