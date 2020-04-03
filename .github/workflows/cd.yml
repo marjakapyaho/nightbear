@@ -33,4 +33,4 @@ jobs:
           host: ${{ secrets.DEPLOY_SSH_HOST }}
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: cd server-stage && git pull && docker-compose up -d server_stage
+          script: cd server-stage && git pull && docker-compose restart server_stage
