@@ -70,12 +70,15 @@ function handleAlarmsToKeep(
 ): Promise<Array<Alarm | null>> {
   return Promise.all(
     alarms.map(alarm => {
+      const now = context.timestamp();
+      const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
+
       // Not yet valid
       if (context.timestamp() <= getAlarmState(alarm).validAfterTimestamp) {
         return Promise.resolve(null);
       }
 
-      const hasBeenValidFor = (context.timestamp() - getAlarmState(alarm).validAfterTimestamp) / MIN_IN_MS;
+      const hasBeenValidFor = (context.timestamp() - validAfterTimestamp) / MIN_IN_MS;
       const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
@@ -89,15 +92,15 @@ function handleAlarmsToKeep(
         )} has been valid for ${hasBeenValidFor} min => needs level ${neededLevel} (pushover "${pushoverRecipient}")`,
       );
 
-      if (neededLevel !== getAlarmState(alarm).alarmLevel) {
+      if (neededLevel !== alarmLevel) {
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
           return Promise.resolve(
             alarmWithUpdatedState(alarm, {
               alarmLevel: neededLevel,
-              validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
+              validAfterTimestamp,
               ackedBy: null,
-              pushoverReceipts: getAlarmState(alarm).pushoverReceipts,
+              pushoverReceipts,
             }),
           );
         } else {
@@ -108,9 +111,9 @@ function handleAlarmsToKeep(
               return Promise.resolve(
                 alarmWithUpdatedState(alarm, {
                   alarmLevel: neededLevel,
-                  validAfterTimestamp: getAlarmState(alarm).validAfterTimestamp,
+                  validAfterTimestamp,
                   ackedBy: null,
-                  pushoverReceipts: [...getAlarmState(alarm).pushoverReceipts, receipt],
+                  pushoverReceipts: [...pushoverReceipts, receipt],
                 }),
               );
             })
