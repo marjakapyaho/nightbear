@@ -9,13 +9,13 @@ import { objectKeys } from 'web/utils/types';
 
 const INITIAL_ALARM_LEVEL = 1;
 
+const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(alarm.alarmStates)?.alarmLevel})`;
+const situationToString = (situation: Situation) => `${situation} (new)`;
+
 export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
 
-  const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(alarm.alarmStates)?.alarmLevel})`;
-  const situationToString = (situation: Situation) => `${situation} (new)`;
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
-
   context.log.info(`Active alarms: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
@@ -81,7 +81,13 @@ function handleAlarmsToKeep(
       const neededLevel =
         findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
       const pushoverLevels = activeProfile.pushoverLevels;
-      const pushoverRecipient = neededLevel <= pushoverLevels.length ? pushoverLevels[neededLevel - 1] : 'none';
+      const pushoverRecipient = pushoverLevels[neededLevel - 2] || 'none';
+
+      context.log.debug(
+        `Alarm ${alarmToString(
+          alarm,
+        )} has been valid for ${hasBeenValidFor} min => needs level ${neededLevel} (pushover "${pushoverRecipient}")`,
+      );
 
       if (neededLevel !== getAlarmState(alarm).alarmLevel) {
         // If recipient is none, just hold alarm for this level (used for pull notifications)
