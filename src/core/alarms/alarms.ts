@@ -72,7 +72,7 @@ function handleAlarmsToKeep(
     alarms.map(alarm => {
       const now = context.timestamp();
       const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
-      const logPrefix = `Existing alarm ${alarmToString(alarm)}`;
+      let logPrefix = `Existing alarm ${alarmToString(alarm)}`;
 
       // Not yet valid
       if (now <= validAfterTimestamp) {
@@ -87,15 +87,16 @@ function handleAlarmsToKeep(
       const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
       const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
+      const nextTimeMilestone = accumulatedTimes.find(time => time > hasBeenValidFor);
       const neededLevel =
         findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
       const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = pushoverLevels[neededLevel - 2] || 'none';
 
+      logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
+
       if (neededLevel !== alarmLevel) {
-        context.log.debug(
-          `${logPrefix} has been valid for ${hasBeenValidFor} min => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`,
-        );
+        context.log.debug(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
 
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
@@ -124,7 +125,7 @@ function handleAlarmsToKeep(
             .catch(() => Promise.resolve(null));
         }
       } else {
-        context.log.debug(`${logPrefix} has been valid for ${hasBeenValidFor} min => not escalating yet`);
+        context.log.debug(`${logPrefix} => not escalating yet`);
 
         return Promise.resolve(null);
       }
