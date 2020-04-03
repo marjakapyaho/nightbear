@@ -95,7 +95,7 @@ function handleAlarmsToKeep(
             }),
           );
         } else {
-          /* return context.pushover
+          return context.pushover
             .sendAlarm(alarm.situationType, pushoverRecipient)
             .then((receipt: string) => {
               // only persist the level upgrade IF the alarm got sent (so we get retries)
@@ -108,8 +108,7 @@ function handleAlarmsToKeep(
                 }),
               );
             })
-            .catch(() => Promise.resolve(null));*/
-          return Promise.resolve(null);
+            .catch(() => Promise.resolve(null));
         }
       } else {
         return Promise.resolve(null);
