@@ -72,18 +72,19 @@ function handleAlarmsToKeep(
     alarms.map(alarm => {
       const now = context.timestamp();
       const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
+      const logPrefix = `Existing alarm ${alarmToString(alarm)}`;
 
       // Not yet valid
       if (now <= validAfterTimestamp) {
         context.log.debug(
-          `Alarm ${alarmToString(alarm)} is not yet valid (${Math.round(
+          `${logPrefix} is not yet valid again (${Math.round(
             (validAfterTimestamp - now) / MIN_IN_MS,
           )} min snooze left)`,
         );
         return Promise.resolve(null);
       }
 
-      const hasBeenValidFor = (context.timestamp() - validAfterTimestamp) / MIN_IN_MS;
+      const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
       const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
@@ -91,13 +92,11 @@ function handleAlarmsToKeep(
       const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = pushoverLevels[neededLevel - 2] || 'none';
 
-      context.log.debug(
-        `Alarm ${alarmToString(
-          alarm,
-        )} has been valid for ${hasBeenValidFor} min => needs level ${neededLevel} (pushover "${pushoverRecipient}")`,
-      );
-
       if (neededLevel !== alarmLevel) {
+        context.log.debug(
+          `${logPrefix} has been valid for ${hasBeenValidFor} min => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`,
+        );
+
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
           return Promise.resolve(
@@ -125,6 +124,8 @@ function handleAlarmsToKeep(
             .catch(() => Promise.resolve(null));
         }
       } else {
+        context.log.debug(`${logPrefix} has been valid for ${hasBeenValidFor} min => not escalating yet`);
+
         return Promise.resolve(null);
       }
     }),
