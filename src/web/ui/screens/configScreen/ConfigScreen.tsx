@@ -1,6 +1,7 @@
-import { useReduxActions, useReduxState } from 'web/utils/react';
-import React from 'react';
+import { is, last } from 'core/models/utils';
 import { css } from 'emotion';
+import React from 'react';
+import { useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
@@ -18,24 +19,13 @@ const styles = {
   }),
 };
 
-const profiles = [
-  {
-    profileName: 'Day',
-    selected: true,
-  },
-  {
-    profileName: 'Night',
-    selected: false,
-  },
-  {
-    profileName: 'OFF',
-    selected: false,
-  },
-];
-
 export default (() => {
   const configState = useReduxState(s => s.config);
+  const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
+
+  const profiles = dataState.globalModels.filter(is('SavedProfile'));
+  const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(last);
 
   return (
     <div>
@@ -60,7 +50,12 @@ export default (() => {
         <h1>Profiles</h1>
         <div>
           {profiles.map(profile => (
-            <div className={styles.profile} style={profile.selected ? { background: '#7a7a7a', color: 'white' } : {}}>
+            <div
+              className={styles.profile}
+              style={
+                profile.profileName === activeProfile?.profileName ? { background: '#7a7a7a', color: 'white' } : {}
+              }
+            >
               {profile.profileName}
             </div>
           ))}
