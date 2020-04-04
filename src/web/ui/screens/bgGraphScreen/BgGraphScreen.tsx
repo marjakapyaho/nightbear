@@ -33,6 +33,7 @@ export default (() => {
     dataState.timelineModels.filter(is('ParakeetSensorEntry')),
     dataState.timelineModels.filter(is('MeterEntry')),
   ]);
+  const activeProfiles = dataState.timelineModels.filter(is('ActiveProfile'));
   const getAlignedRangeEnd = () => {
     const latestBgModel = bgModels.find(last);
     return latestBgModel ? latestBgModel.timestamp + BUCKET_SIZE / 2 : timelineRangeEnd;
@@ -40,7 +41,7 @@ export default (() => {
   const rollingAnalysisResults =
     configState.showRollingAnalysis && dataState.status === 'READY'
       ? performRollingAnalysis(
-          (bgModels as Model[]).concat(dataState.timelineModels.filter(is('ActiveProfile'))),
+          (bgModels as Model[]).concat(activeProfiles),
           navigationState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
           navigationState.timelineCursorAt || getAlignedRangeEnd(),
         )
@@ -80,7 +81,7 @@ export default (() => {
             carbsModels={dataState.timelineModels.filter(is('Carbs'))}
             selectedCarbsModel={is('Carbs')(modelBeingEdited) ? modelBeingEdited : undefined}
             onCarbsModelSelect={actions.MODEL_SELECTED_FOR_EDITING}
-            profileModels={dataState.timelineModels.filter(is('ActiveProfile'))}
+            profileModels={activeProfiles}
             rollingAnalysisResults={rollingAnalysisResults}
           />
         )}
