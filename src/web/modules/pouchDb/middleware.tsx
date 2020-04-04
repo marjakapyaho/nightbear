@@ -77,7 +77,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
               : reject(`Can't save ActiveProfile without an active Storage`),
           )
           .then(
-            res => console.log('Save ActiveProfile result:', res),
+            (res: typeof activation) => store.dispatch(actions.TIMELINE_DATA_UPDATED([res], [])),
             err => console.log('Save ActiveProfile error:', err),
           );
       }
