@@ -10,7 +10,28 @@ const styles = {
     padding: 10,
     margin: 10,
   }),
+  profile: css({
+    padding: 20,
+    background: 'whitesmoke',
+    cursor: 'pointer',
+    marginBottom: 10,
+  }),
 };
+
+const profiles = [
+  {
+    profileName: 'Day',
+    selected: true,
+  },
+  {
+    profileName: 'Night',
+    selected: false,
+  },
+  {
+    profileName: 'OFF',
+    selected: false,
+  },
+];
 
 export default (() => {
   const configState = useReduxState(s => s.config);
@@ -38,37 +59,11 @@ export default (() => {
       >
         <h1>Profiles</h1>
         <div>
-          <div
-            style={{
-              padding: 20,
-              background: '#7a7a7a',
-              color: 'white',
-              cursor: 'pointer',
-              marginBottom: 10,
-            }}
-          >
-            Day
-          </div>
-          <div
-            style={{
-              padding: 20,
-              background: 'whitesmoke',
-              cursor: 'pointer',
-              marginBottom: 10,
-            }}
-          >
-            Night
-          </div>
-          <div
-            style={{
-              padding: 20,
-              background: 'whitesmoke',
-              cursor: 'pointer',
-              marginBottom: 10,
-            }}
-          >
-            OFF
-          </div>
+          {profiles.map(profile => (
+            <div className={styles.profile} style={profile.selected ? { background: '#7a7a7a', color: 'white' } : {}}>
+              {profile.profileName}
+            </div>
+          ))}
         </div>
       </div>
     </div>
