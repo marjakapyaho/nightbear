@@ -1,8 +1,8 @@
 import { Context } from 'core/models/api';
-import { is, activateSavedProfile } from 'core/models/utils';
-import { pad } from 'lodash';
 import { SavedProfile } from 'core/models/model';
+import { activateSavedProfile, is } from 'core/models/utils';
 import { CronJob } from 'cron';
+import { padStart } from 'lodash';
 
 export function startAutomaticProfileActivation(context: Context) {
   context.storage
@@ -12,7 +12,7 @@ export function startAutomaticProfileActivation(context: Context) {
       profiles.forEach(profile => {
         if (!profile.activatedAtUtc) return;
         const { hours, minutes } = profile.activatedAtUtc;
-        const readableTime = `${pad(hours + '', 2, '0')}:${pad(minutes + '', 2, '0')} UTC`;
+        const readableTime = `${padStart(hours + '', 2, '0')}:${padStart(minutes + '', 2, '0')} UTC`;
         context.log.info(`Profile "${profile.profileName}" set to automatically activate at ${readableTime}`);
         new CronJob(
           `0 ${minutes} ${hours} * * *`,
