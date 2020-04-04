@@ -60,6 +60,7 @@ export default (() => {
     pixelsPerHour: configState.zoomedInTimeline ? 350 : 100,
   };
 
+  console.debug('Active profile', activeProfiles.find(last));
   if (navigationState.timelineCursorAt) {
     console.debug('Timeline cursor', [new Date(navigationState.timelineCursorAt).toISOString()]);
   }
