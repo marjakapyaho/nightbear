@@ -1,6 +1,6 @@
 import * as messaging from "messaging";
 
-const BEAR_STATUS_URL = 'https://router.nightbear.fi/legacy-api/v1/status'
+const API_ACK_ALARM = 'https://router.nightbear.fi/ack-latest-alarm';
 
 messaging.peerSocket.onmessage = function(evt) {
   if (evt.data.ack) {
@@ -17,7 +17,7 @@ messaging.peerSocket.onmessage = function(evt) {
 
 function ackAlarm() {
   return new Promise(function(resolve, reject) {
-    fetch(BEAR_STATUS_URL, { method: 'POST', body: 'dummy' }).then(function(response) {
+    fetch(API_ACK_ALARM, { method: 'POST', body: 'dummy' }).then(function(response) {
       return response;
     }).then(function(response) {
       resolve(response);

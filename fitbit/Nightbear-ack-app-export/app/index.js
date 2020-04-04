@@ -2,7 +2,6 @@ import * as messaging from "messaging"
 import document from "document"
 import { me } from "appbit";
 
-const BEAR_BASE_URL = 'http://legacy.nightbear.fi/api/v1'
 const messageEl = document.getElementById("message");
 
 // Listen for the onopen event
