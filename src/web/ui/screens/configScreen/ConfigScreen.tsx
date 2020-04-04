@@ -55,6 +55,7 @@ export default (() => {
               style={
                 profile.profileName === activeProfile?.profileName ? { background: '#7a7a7a', color: 'white' } : {}
               }
+              onClick={() => actions.PROFILE_ACTIVATED(profile, Date.now())}
             >
               {profile.profileName}
             </div>
