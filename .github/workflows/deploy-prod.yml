@@ -1,14 +1,12 @@
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow
-
-name: Deployment
+name: Deploy prod
 
 on:
-  push:
-    branches:
-      - next
+  release:
+    types:
+      - created # ...but not e.g. "edited", "deleted" etc
 
 jobs:
-  deploy:
+  main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,18 +17,19 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run web-build
-      - uses: jakejarvis/s3-sync-action@v0.5.1
+      - name: Deploy frontend
+        uses: jakejarvis/s3-sync-action@v0.5.1
         with:
           args: --acl public-read --follow-symlinks --delete --cache-control no-store,must-revalidate
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: aws-static-site---nightbear-fi
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: build
-      - name: Deploy latest server to stage
+      - name: Deploy server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEPLOY_SSH_HOST }}
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: cd server-stage && git pull && docker-compose restart server_stage
+          script: cd server-prod && git pull && docker-compose restart server_prod
