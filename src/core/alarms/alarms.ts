@@ -3,7 +3,7 @@ import { Context } from 'core/models/api';
 import { ActiveProfile, Alarm, AlarmState, Situation, State } from 'core/models/model';
 import { getAlarmState } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
-import { filter, find, findIndex, last, map, sum, take } from 'lodash';
+import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
 
@@ -87,12 +87,12 @@ function handleAlarmsToKeep(
       const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
       const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
-      const nextTimeMilestone = accumulatedTimes.find(time => time > hasBeenValidFor);
       const neededLevel =
         findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
       const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = pushoverLevels[neededLevel - 2] || 'none';
 
+      const nextTimeMilestone = accumulatedTimes.find(time => time >= hasBeenValidFor) || max(accumulatedTimes) || '?';
       logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
 
       if (neededLevel !== alarmLevel) {
