@@ -22,6 +22,7 @@ export function startRunningChecks(context: Context) {
 }
 
 export function runChecks(context: Context) {
+  context.log.info('Starting check run (#1)');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -29,12 +30,14 @@ export function runChecks(context: Context) {
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
   ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
+    context.log.info('Starting check run (#2)');
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
     if (!activeProfile) throw new Error(`Couldn't find an active profile`);
 
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
+    context.log.info('Analyser returned raw state:', state);
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
     context.log.info(`Analyser returned situations: ` + situations.length ? situations.join(', ') : 'n/a');
 
