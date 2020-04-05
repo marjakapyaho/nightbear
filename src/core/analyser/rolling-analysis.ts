@@ -1,9 +1,9 @@
 import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { DEFAULT_STATE, Model, Situation, State, TimelineModel } from 'core/models/model';
-import { is } from 'core/models/utils';
+import { firstModel, is, lastModel } from 'core/models/utils';
 import { TypeOfArray } from 'core/types/utils';
-import { first, flatten, groupBy, last, range, values } from 'lodash';
+import { first, flatten, groupBy, range, values } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
 
@@ -36,7 +36,7 @@ export function performRollingAnalysis(
   const lanes = toSituationLanes(results);
   console.debug(
     'Rolling analysis buckets',
-    buckets.map(a => a.map(b => new Date(b).toISOString()).filter((_, i) => i > 0)),
+    buckets.map(a => a.map(isoString).filter((_, i) => i > 0)),
   );
   return mergeContiguousSituations ? toContiguousLanes(lanes) : lanes;
 }
@@ -83,15 +83,22 @@ function toContiguousLanes(results: RollingAnalysisResults): RollingAnalysisResu
 
 // Runs analysis for each of the given buckets (i.e. 5 minute slices of time)
 function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisBucket[]): RollingAnalysisRawResult[] {
-  const activeProfile = last(models.filter(is('ActiveProfile')));
-  if (!activeProfile) throw new Error('Could not find an ActiveProfile to perform rolling analysis');
+  const activeProfiles = models.filter(is('ActiveProfile'));
+  if (!activeProfiles.length) throw new Error('Need at least one ActiveProfile to perform rolling analysis');
   const sensorEntries = models.filter(
     is('DexcomG6SensorEntry', 'DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'),
   );
   const insulins = models.filter(is('Insulin'));
   const activeAlarms = models.filter(is('Alarm')).filter(a => a.isActive);
-  return buckets.map(([base, from, to]) => {
+  let missingProfileBefore: number | undefined;
+  const res = buckets.map(([base, from, to]) => {
     const relevantToThisBucket = (m: TimelineModel) => m.timestamp > base && m.timestamp < to;
+    let activeProfile = activeProfiles.filter(m => m.timestamp < base).find(lastModel);
+    if (!activeProfile) {
+      activeProfile = activeProfiles.find(firstModel);
+      if (!activeProfile) throw new Error('Could not find a fallback ActiveProfile for rolling analysis bucket');
+      missingProfileBefore = to;
+    }
     return [
       from,
       runAnalysis(
@@ -102,8 +109,16 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
         undefined, // TODO: Which DeviceStatus should go here..?
         activeAlarms.filter(relevantToThisBucket),
       ),
-    ];
+    ] as RollingAnalysisRawResult;
   });
+  if (missingProfileBefore) {
+    console.warn(
+      `Could not find ActiveProfile for rolling analysis up to ${isoString(
+        missingProfileBefore,
+      )}; results before this may not be accurate`,
+    );
+  }
+  return res;
 }
 
 type RollingAnalysisRawResult = [
@@ -125,3 +140,7 @@ type RollingAnalysisBucket = [
   number, // "from" - timestamp of the start of the bucket
   number, // "to" - timestamp of the end of the bucket
 ];
+
+function isoString(ts: number): string {
+  return new Date(ts).toISOString();
+}
