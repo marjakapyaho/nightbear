@@ -9,16 +9,16 @@ const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
 let nextCheck: NodeJS.Timer;
 
-export function checkRunnerTimer(context: Context) {
+export function startRunningChecks(context: Context) {
   // Clear previous timer (if exists)
   if (nextCheck) {
     global.clearTimeout(nextCheck);
   }
 
   // And set next one
-  nextCheck = global.setTimeout(checkRunnerTimer, CHECK_RUN_INTERVAL, context);
+  nextCheck = global.setTimeout(startRunningChecks, CHECK_RUN_INTERVAL, context);
 
-  return runChecks(context);
+  return runChecks(context).catch(err => context.log.error(`Nightbear check runner error: ${err.message}`, err));
 }
 
 export function runChecks(context: Context) {
