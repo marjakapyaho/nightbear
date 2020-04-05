@@ -11,6 +11,12 @@ import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
 import { startRunningChecks } from 'server/main/check-runner';
 
+import debug from 'debug';
+
+debug.enable('*');
+const log = debug('nightbear');
+const serverLog = log.extend('server');
+
 const context = createNodeContext();
 
 startExpressServer(
@@ -24,7 +30,10 @@ startExpressServer(
   ['post', '/upload-dexcom-entry', uploadDexcomEntry],
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
-  port => context.log.info(`Nightbear server listening on ${port}`),
+  port => {
+    context.log.info(`Nightbear server listening on ${port}`);
+    serverLog(`Listening on port %d`, port);
+  },
   err => context.log.error(`Nightbear server error: ${err.message}`, err),
 );
 
