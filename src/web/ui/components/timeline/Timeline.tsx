@@ -1,6 +1,6 @@
 import { RollingAnalysisResults } from 'core/analyser/rolling-analysis';
 import { ActiveProfile, Carbs, Insulin, MeterEntry, SensorEntry } from 'core/models/model';
-import { isSameModel, last } from 'core/models/utils';
+import { isSameModel, lastModel } from 'core/models/utils';
 import { css, cx } from 'emotion';
 import React, { useEffect, useRef } from 'react';
 import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
@@ -82,7 +82,7 @@ export default (props => {
   useEffect(scrollRightOnMount, []);
 
   const c = getExtendedTimelineConfig(props.timelineConfig);
-  const latestBgModel = props.bgModels.find(last);
+  const latestBgModel = props.bgModels.find(lastModel);
 
   return (
     <div className={rootCss}>

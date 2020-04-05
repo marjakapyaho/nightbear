@@ -1,7 +1,7 @@
 import { performRollingAnalysis, BUCKET_SIZE } from 'core/analyser/rolling-analysis';
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
-import { is, isTimelineModel, last } from 'core/models/utils';
+import { is, isTimelineModel, lastModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
@@ -35,7 +35,7 @@ export default (() => {
   ]);
   const activeProfiles = dataState.timelineModels.filter(is('ActiveProfile'));
   const getAlignedRangeEnd = () => {
-    const latestBgModel = bgModels.find(last);
+    const latestBgModel = bgModels.find(lastModel);
     return latestBgModel ? latestBgModel.timestamp + BUCKET_SIZE / 2 : timelineRangeEnd;
   };
   const rollingAnalysisResults =
@@ -60,7 +60,7 @@ export default (() => {
     pixelsPerHour: configState.zoomedInTimeline ? 350 : 100,
   };
 
-  console.debug('Active profile', activeProfiles.find(last));
+  console.debug('Active profile', activeProfiles.find(lastModel));
   if (navigationState.timelineCursorAt) {
     console.debug('Timeline cursor', [new Date(navigationState.timelineCursorAt).toISOString()]);
   }

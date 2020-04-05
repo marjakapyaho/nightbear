@@ -55,13 +55,13 @@ export function by<T extends Model>(property: keyof T, order: 'largest-first' | 
   };
 }
 
-// @example array.find(first)
-export function first<T extends Model>(_: T, index: number, _array: T[]) {
+// @example array.find(firstModel)
+export function firstModel<T extends Model>(_: T, index: number, _array: T[]) {
   return index === 0;
 }
 
-// @example array.find(last)
-export function last<T extends Model>(_: T, index: number, array: T[]) {
+// @example array.find(lastModel)
+export function lastModel<T extends Model>(_: T, index: number, array: T[]) {
   return index === array.length - 1;
 }
 
