@@ -18,6 +18,12 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
       return createResponse();
     }
 
+    context.log.info(
+      `[Check]: Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
+        .map(alarm => alarm.situationType)
+        .join(', ')}`,
+    );
+
     let allPushOverReceipts: string[] = [];
     const updatedAlarms = latestActiveAlarms.map(alarm => {
       const snoozeTime = activeProfile.alarmSettings[alarm.situationType].snoozeMinutes;
