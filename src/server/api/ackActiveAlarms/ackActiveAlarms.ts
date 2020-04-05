@@ -18,6 +18,12 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
       return createResponse();
     }
 
+    // Disable watch ack at night
+    if (activeProfile.profileName === 'night' && ackedBy === 'fitbit') {
+      context.log.info(`Ack cancelled with profile ${activeProfile.profileName} and source ${ackedBy}`);
+      return createResponse();
+    }
+
     context.log.info(
       `[Check]: Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
         .map(alarm => alarm.situationType)
