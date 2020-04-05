@@ -99,4 +99,21 @@ describe('core/alarms', () => {
       ]),
     );
   });
+
+  it('run alarm checks with alarms off', () => {
+    const stateWithLow = getMockState('LOW');
+    const activeAlarms = getMockActiveAlarms(currentTimestamp, 'LOW');
+    const context = createTestContext();
+
+    return runAlarmChecks(
+      context,
+      stateWithLow,
+      activeProfile('day', currentTimestamp, false),
+      activeAlarms,
+    ).then(alarms =>
+      assert.deepEqual(alarms.map(eraseModelUuid), [
+        eraseModelUuid(getMockAlarm(currentTimestamp, 'LOW', false, currentTimestamp)),
+      ]),
+    );
+  });
 });

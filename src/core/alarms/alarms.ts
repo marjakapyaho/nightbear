@@ -13,10 +13,16 @@ const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(al
 const situationToString = (situation: Situation) => `${situation} (new)`;
 
 export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
-  const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
+  // If alarms are not enabled, remove all existing alarms and exit
+  if (!activeProfile.alarmsEnabled) {
+    return handleAlarmsToRemove(activeAlarms, context).then(alarms => {
+      return context.storage.saveModels(alarms);
+    });
+  }
 
+  const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
-  context.log.info(`Active alarms: ${alarmsToLog.join(', ') || 'n/a'}`);
+  context.log.info(`[Check]: Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
@@ -72,7 +78,7 @@ function handleAlarmsToKeep(
     alarms.map(alarm => {
       const now = context.timestamp();
       const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
-      let logPrefix = `Existing alarm ${alarmToString(alarm)}`;
+      let logPrefix = `[Check]: Existing alarm ${alarmToString(alarm)}`;
 
       // Not yet valid
       if (now <= validAfterTimestamp) {
