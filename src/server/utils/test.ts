@@ -107,13 +107,13 @@ export function savedProfile(profileName: string): SavedProfile {
   };
 }
 
-export function activeProfile(profileName: string, timestamp: number): ActiveProfile {
+export function activeProfile(profileName: string, timestamp: number, isEnabled: boolean = true): ActiveProfile {
   return {
     modelType: 'ActiveProfile',
     modelUuid: generateUuid(),
     timestamp,
     profileName,
-    alarmsEnabled: true,
+    alarmsEnabled: !!isEnabled,
     analyserSettings: {
       HIGH_LEVEL_REL: 10,
       TIME_SINCE_BG_LIMIT: 20,
