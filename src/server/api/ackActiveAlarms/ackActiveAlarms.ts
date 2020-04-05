@@ -46,6 +46,6 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
     return context.pushover
       .ackAlarms(allPushOverReceipts)
       .then(() => context.storage.saveModels(updatedAlarms))
-      .then(() => createResponse());
+      .then(alarms => createResponse(alarms));
   });
 }
