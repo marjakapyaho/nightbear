@@ -2,7 +2,7 @@ import { NavigationState } from 'web/modules/navigation/state';
 import 'web/ui/components/mainNavBar/MainNavBar.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
-import { is, last } from 'core/models/utils';
+import { is, lastModel } from 'core/models/utils';
 import { mergeEntriesFeed } from 'core/entries/entries';
 
 type Props = {};
@@ -21,7 +21,7 @@ export default (props => {
     dataState.timelineModels.filter(is('MeterEntry')),
   ]);
 
-  const latestBgModel = bgModels.find(last);
+  const latestBgModel = bgModels.find(lastModel);
 
   return (
     <div className="this">

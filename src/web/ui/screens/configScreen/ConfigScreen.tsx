@@ -1,4 +1,4 @@
-import { is, last } from 'core/models/utils';
+import { is, lastModel } from 'core/models/utils';
 import { css } from 'emotion';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
@@ -25,7 +25,7 @@ export default (() => {
   const actions = useReduxActions();
 
   const profiles = dataState.globalModels.filter(is('SavedProfile'));
-  const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(last);
+  const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
 
   return (
     <div>
