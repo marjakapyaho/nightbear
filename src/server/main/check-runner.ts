@@ -18,11 +18,13 @@ export function startRunningChecks(context: Context) {
   // And set next one
   nextCheck = global.setTimeout(startRunningChecks, CHECK_RUN_INTERVAL, context);
 
-  return runChecks(context).catch(err => context.log.error(`Nightbear check runner error: ${err.message}`, err));
+  return runChecks(context).catch(err =>
+    context.log.error(`[Check]: Nightbear check runner error: ${err.message}`, err),
+  );
 }
 
 export function runChecks(context: Context) {
-  context.log.info('Starting check run (#1)');
+  context.log.info('[Check]: -------- Started runChecks() --------');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -30,23 +32,26 @@ export function runChecks(context: Context) {
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
   ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
-    context.log.info('Starting check run (#2)');
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
-    if (!activeProfile) throw new Error(`Couldn't find an active profile`);
+    if (!activeProfile) throw new Error('[Check]: Could not find active profile');
 
+    context.log.info(`[Check]: 1. Running analysis with profile: ${activeProfile?.profileName}`);
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
-    context.log.info('Analyser returned raw state:', state);
+
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
-    context.log.info(`Analyser returned situations: ` + situations.length ? situations.join(', ') : 'n/a');
+    context.log.info(
+      '[Check]: 2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'),
+    );
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
       context.log.info(
-        `There were changes in ${alarms.length} alarms with types: ${alarms
+        `[Check]: 3. There were changes in ${alarms.length} alarms with types: ${alarms
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
+      context.log.info('[Check]: -------- Ended runChecks() --------');
       return alarms;
     });
   });
