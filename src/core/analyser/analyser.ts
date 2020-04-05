@@ -14,8 +14,8 @@ import {
 import { chain, filter, find, some } from 'lodash';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
-const HIGH_CLEARING_THRESHOLD = 2;
-const LOW_CLEARING_THRESHOLD = 2;
+const HIGH_CLEARING_THRESHOLD = 0.5;
+const LOW_CLEARING_THRESHOLD = 0.5;
 
 const slopeLimits = {
   SLOW: 0.3,
