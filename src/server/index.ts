@@ -1,4 +1,6 @@
 import { createNodeContext } from 'core/models/api';
+import { extendLogger, consoleLogStream } from 'core/utils/logging';
+import debug from 'debug';
 import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
 import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
 import { getEntries } from 'server/api/getEntries/getEntries';
@@ -7,15 +9,15 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
+import { startRunningChecks } from 'server/main/check-runner';
 import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
-import { startRunningChecks } from 'server/main/check-runner';
-
-import debug from 'debug';
 
 debug.enable('*');
+debug.log = consoleLogStream;
 
 const context = createNodeContext();
+const log = extendLogger(context.log, 'server');
 
 startExpressServer(
   context,
@@ -29,9 +31,9 @@ startExpressServer(
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
   port => {
-    context.log(`Server listening on ${port}`);
+    log(`Server listening on ${port}`);
   },
-  err => context.log(`Server error: ${err.message}`, err),
+  err => log(`Server error: ${err.message}`, err),
 );
 
 startRunningChecks(context);

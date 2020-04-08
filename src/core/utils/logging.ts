@@ -28,6 +28,16 @@ export function extendLogger(x: Context | Logger, namespace: string): Context | 
   }
 }
 
+// Output stream that writes to console.log(), with the exact formatting we want.
+// See: https://github.com/visionmedia/debug#output-streams
+export function consoleLogStream(x: string) {
+  const ts = new Date().toISOString().replace(/.*?T(.....).*/, '$1'); // e.g. "12:34"
+  x = x.replace(/^ */gm, ''); // remove leading spaces; see https://github.com/visionmedia/debug/issues/619
+  x = x.replace(/([^ ]*)nightbear:/, '$1'); // remove the common "nightbear:" prefix; it's good to have in the namespace for filtering etc, but we don't want to show it all the time
+  x = `${ts} ${x}`;
+  console.log(x);
+}
+
 // Type guard for our Logger
 function isLogger(x: unknown): x is Logger {
   return typeof x === 'function' && 'color' in x && 'extend' in x && 'namespace' in x; // close enough ¯\_(ツ)_/¯
