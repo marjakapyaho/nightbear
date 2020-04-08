@@ -13,7 +13,7 @@ export function startAutomaticProfileActivation(context: Context) {
         if (!profile.activatedAtUtc) return;
         const { hours, minutes } = profile.activatedAtUtc;
         const readableTime = `${padStart(hours + '', 2, '0')}:${padStart(minutes + '', 2, '0')} UTC`;
-        context.log.info(`Profile "${profile.profileName}" set to automatically activate at ${readableTime}`);
+        context.log(`Profile "${profile.profileName}" set to automatically activate at ${readableTime}`);
         new CronJob(
           `0 ${minutes} ${hours} * * *`,
           () => activateProfile(context, profile),
@@ -26,10 +26,10 @@ export function startAutomaticProfileActivation(context: Context) {
 }
 
 function activateProfile(context: Context, profile: SavedProfile) {
-  context.log.debug(`Activating profile "${profile.profileName}"`);
+  context.log(`Activating profile "${profile.profileName}"`);
   const activation = activateSavedProfile(profile, context.timestamp());
   return context.storage.saveModel(activation).then(
-    () => context.log.info(`Activated profile "${profile.profileName}"`),
-    err => context.log.error(`Activating profile "${profile.profileName}" failed`, err),
+    () => context.log(`Activated profile "${profile.profileName}"`),
+    err => context.log(`Activating profile "${profile.profileName}" failed`, err),
   );
 }

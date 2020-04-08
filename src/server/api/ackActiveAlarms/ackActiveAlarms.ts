@@ -18,7 +18,7 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
       return createResponse();
     }
 
-    context.log.info(
+    context.log(
       `[Check]: Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
         .map(alarm => alarm.situationType)
         .join(', ')}`,

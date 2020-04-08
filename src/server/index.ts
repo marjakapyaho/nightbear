@@ -14,8 +14,6 @@ import { startRunningChecks } from 'server/main/check-runner';
 import debug from 'debug';
 
 debug.enable('*');
-const log = debug('nightbear');
-const serverLog = log.extend('server');
 
 const context = createNodeContext();
 
@@ -31,10 +29,9 @@ startExpressServer(
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
   port => {
-    context.log.info(`Nightbear server listening on ${port}`);
-    serverLog(`Listening on port %d`, port);
+    context.log(`Server listening on ${port}`);
   },
-  err => context.log.error(`Nightbear server error: ${err.message}`, err),
+  err => context.log(`Server error: ${err.message}`, err),
 );
 
 startRunningChecks(context);

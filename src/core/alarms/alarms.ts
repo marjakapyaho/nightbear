@@ -22,7 +22,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
 
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
-  context.log.info(`[Check]: Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
+  context.log(`[Check]: Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
@@ -82,7 +82,7 @@ function handleAlarmsToKeep(
 
       // Not yet valid
       if (now <= validAfterTimestamp) {
-        context.log.debug(
+        context.log(
           `${logPrefix} is not yet valid again (${Math.round(
             (validAfterTimestamp - now) / MIN_IN_MS,
           )} min snooze left)`,
@@ -102,7 +102,7 @@ function handleAlarmsToKeep(
       logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
 
       if (neededLevel !== alarmLevel) {
-        context.log.debug(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
+        context.log(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
 
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
@@ -131,7 +131,7 @@ function handleAlarmsToKeep(
             .catch(() => Promise.resolve(null));
         }
       } else {
-        context.log.debug(`${logPrefix} => not escalating yet`);
+        context.log(`${logPrefix} => not escalating yet`);
 
         return Promise.resolve(null);
       }

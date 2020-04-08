@@ -1,10 +1,10 @@
 import * as bodyParser from 'body-parser';
 import { Context, Headers, Request, RequestHandler } from 'core/models/api';
-import cors from 'cors';
-import express from 'express';
-import { Request as ExpressRequest } from 'express';
-import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
 import { generateUuid } from 'core/utils/id';
+import { extendLogger, Logger } from 'core/utils/logging';
+import cors from 'cors';
+import express, { Request as ExpressRequest } from 'express';
+import { getContextName } from 'server/utils/logging';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
@@ -19,7 +19,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
         const requestId = req.get('X-Request-ID') || generateUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
           .then(request => {
-            const log = bindLoggingContext(context.log, getContextName('request', requestId));
+            const log = extendLogger(context.log, getContextName('req', requestId));
             return handlerWithLogging(handler, log)(request, context);
           })
           .then(
@@ -57,5 +57,26 @@ function normalizeRequest(requestId: string, req: ExpressRequest): Request {
     requestParams: req.query,
     requestHeaders: (req.headers ? req.headers : {}) as Headers, // without this cast, TS refuses to accept this because req.headers can be undefined (the ternary will handle that)
     requestBody: req.body,
+  };
+}
+
+// Wraps the given handler with logging for input/output
+function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
+  return (request, context) => {
+    const then = context.timestamp();
+    const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
+    log(`Incoming request: ${request.requestMethod} ${request.requestPath}`, request.requestBody);
+    return handler(request, context).then(
+      res => {
+        log(`Outgoing response status`, res.responseStatus);
+        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
+        return res;
+      },
+      err => {
+        log(`Outgoing error`, err);
+        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
+        return Promise.reject(err);
+      },
+    );
   };
 }

@@ -18,13 +18,11 @@ export function startRunningChecks(context: Context) {
   // And set next one
   nextCheck = global.setTimeout(startRunningChecks, CHECK_RUN_INTERVAL, context);
 
-  return runChecks(context).catch(err =>
-    context.log.error(`[Check]: Nightbear check runner error: ${err.message}`, err),
-  );
+  return runChecks(context).catch(err => context.log(`[Check]: Check runner error: ${err.message}`, err));
 }
 
 export function runChecks(context: Context) {
-  context.log.info('[Check]: -------- Started runChecks() --------');
+  context.log('[Check]: -------- Started runChecks() --------');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -37,21 +35,19 @@ export function runChecks(context: Context) {
 
     if (!activeProfile) throw new Error('[Check]: Could not find active profile');
 
-    context.log.info(`[Check]: 1. Running analysis with profile: ${activeProfile?.profileName}`);
+    context.log(`[Check]: 1. Running analysis with profile: ${activeProfile?.profileName}`);
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
-    context.log.info(
-      '[Check]: 2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'),
-    );
+    context.log('[Check]: 2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
-      context.log.info(
+      context.log(
         `[Check]: 3. There were changes in ${alarms.length} alarms with types: ${alarms
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
-      context.log.info('[Check]: -------- Ended runChecks() --------');
+      context.log('[Check]: -------- Ended runChecks() --------');
       return alarms;
     });
   });

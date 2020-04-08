@@ -4,11 +4,10 @@ import { Context, Request } from 'core/models/api';
 import { ActiveProfile, DexcomCalibration, MeterEntry, Model, SavedProfile } from 'core/models/model';
 import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
 import PouchDB from 'core/storage/PouchDb';
-import { NO_STORAGE } from 'core/storage/storage';
-import { Storage } from 'core/storage/storage';
-import 'mocha';
-import { NO_LOGGING } from 'server/utils/logging';
+import { NO_STORAGE, Storage } from 'core/storage/storage';
 import { generateUuid } from 'core/utils/id';
+import { NO_LOGGING } from 'core/utils/logging';
+import 'mocha';
 
 export type TestSuite = (storage: () => Storage) => void;
 
