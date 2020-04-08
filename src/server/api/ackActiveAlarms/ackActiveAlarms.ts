@@ -3,8 +3,10 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context, createResponse, Request, Response } from 'core/models/api';
 import { getAlarmState } from 'core/models/utils';
 import { first } from 'lodash';
+import { extendLogger } from 'core/utils/logging';
 
 export function ackActiveAlarms(request: Request, context: Context): Response {
+  const log = extendLogger(context.log, 'check');
   return Promise.all([
     context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
@@ -18,10 +20,8 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
       return createResponse();
     }
 
-    context.log(
-      `[Check]: Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
-        .map(alarm => alarm.situationType)
-        .join(', ')}`,
+    log(
+      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms.map(alarm => alarm.situationType).join(', ')}`,
     );
 
     let allPushOverReceipts: string[] = [];
