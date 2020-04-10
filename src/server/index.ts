@@ -13,11 +13,15 @@ import { startRunningChecks } from 'server/main/check-runner';
 import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
 
-debug.enable('*');
 debug.log = consoleLogStream;
+debug.enable(
+  [
+    'nightbear*', // log everything under the "nightbear" namespace
+    '-nightbear:http:req-*', // ...except HTTP request details; there's too much of it
+  ].join(','),
+);
 
 const context = createNodeContext();
-const log = extendLogger(context.log, 'server');
 
 startExpressServer(
   context,
@@ -31,9 +35,9 @@ startExpressServer(
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
 ).then(
   port => {
-    log(`Server listening on ${port}`);
+    context.log(`Server listening on ${port}`);
   },
-  err => log(`Server error: ${err.message}`, err),
+  err => context.log(`Server error: ${err.message}`, err),
 );
 
 startRunningChecks(context);

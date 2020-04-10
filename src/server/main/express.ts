@@ -9,6 +9,7 @@ export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
 
 export function startExpressServer(context: Context, ...handlers: RequestHandlerTuple[]): Promise<number> {
+  const log = extendLogger(context.log, 'http');
   return new Promise((resolve, reject) => {
     const app = express();
     app.use(cors());
@@ -17,10 +18,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
       app[method](path, (req, res) => {
         const requestId = req.get('X-Request-ID') || generateUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
-          .then(request => {
-            const log = extendLogger(context.log, getLoggingNamespace('req', requestId));
-            return handlerWithLogging(handler, log)(request, context);
-          })
+          .then(request => handlerWithLogging(handler, log)(request, context))
           .then(
             response => {
               const { responseBody, responseStatus } = response;
@@ -62,17 +60,18 @@ function normalizeRequest(requestId: string, req: ExpressRequest): Request {
 // Wraps the given handler with logging for input/output
 function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
   return (request, context) => {
+    const debug = extendLogger(log, getLoggingNamespace('req', request.requestId), true);
     const then = context.timestamp();
     const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
-    log(`Incoming request: ${request.requestMethod} ${request.requestPath}`, request.requestBody);
+    debug(`Incoming request: ${request.requestMethod} ${request.requestPath}\n%O`, request.requestBody);
     return handler(request, context).then(
       res => {
-        log(`Outgoing response status`, res.responseStatus);
+        debug(`Outgoing ${res.responseStatus} response:\n%O`, res.responseBody);
         log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
         return res;
       },
       err => {
-        log(`Outgoing error`, err);
+        debug(`Outgoing error`, err);
         log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
         return Promise.reject(err);
       },
