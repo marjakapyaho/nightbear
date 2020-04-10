@@ -14,12 +14,6 @@ import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
 
 debug.log = consoleLogStream;
-debug.enable(
-  [
-    'nightbear*', // log everything under the "nightbear" namespace
-    '-nightbear:http:req-*', // ...except HTTP request details; there's too much of it
-  ].join(','),
-);
 
 const context = createNodeContext();
 
