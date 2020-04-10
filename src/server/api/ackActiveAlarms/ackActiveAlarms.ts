@@ -28,9 +28,7 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
     }
 
     log(
-      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
-        .map(alarm => alarm.situationType)
-        .join(', ')}`,
+      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms.map(alarm => alarm.situationType).join(', ')}`,
     );
 
     let allPushOverReceipts: string[] = [];
