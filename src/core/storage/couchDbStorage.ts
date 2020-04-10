@@ -4,6 +4,7 @@ import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
 import { first } from 'lodash';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
+import { NO_LOGGING, extendLogger } from 'core/utils/logging';
 
 export interface CouchDbModelMeta {
   readonly _id: string;
@@ -27,9 +28,11 @@ const isNotErrorResult = (res: PouchDbResult): res is PouchDB.Core.Response => !
 export function createCouchDbStorage(
   dbUrl: string,
   options: PouchDB.Configuration.DatabaseConfiguration = {},
+  logger = NO_LOGGING,
 ): Storage {
   assert(dbUrl, 'CouchDB storage requires a non-empty DB URL');
 
+  const log = extendLogger(logger, 'db');
   const db = new PouchDB(dbUrl, options);
   const indexPrepLookup: { [key: string]: Promise<void> } = {};
 
@@ -246,10 +249,10 @@ export function createCouchDbStorage(
   function ensureIndexExists(fields: string[]): Promise<void> {
     const key = fields.join(',');
     if (!indexPrepLookup[key]) {
-      console.log(`Running createIndex() for "${key}"`);
+      log(`Running createIndex() for "${key}"`);
       indexPrepLookup[key] = Promise.resolve() // once started, don't allow others to start the creation of this specific index
         .then(() => db.createIndex({ index: { fields } }))
-        .then(res => console.log(`Finished createIndex() for "${key}" with result "${res.result}"`))
+        .then(res => log(`Finished createIndex() for "${key}" with result "${res.result}"`))
         .catch((errObj: PouchDB.Core.Error) => {
           delete indexPrepLookup[key]; // if the operation failed, allow it to be retried later
           throw new Error(`Couldn't create index for loadLatestTimelineModels() (caused by\n${errObj.message}\n)`); // refine the error before giving it out
