@@ -23,7 +23,7 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
 
     // Disable watch ack at night
     if (activeProfile.profileName === NIGHT_PROFILE_NAME && ackedBy === WATCH_NAME) {
-      context.log.info(`Ack cancelled with profile ${activeProfile.profileName} and source ${ackedBy}`);
+      context.log(`Ack cancelled with profile ${activeProfile.profileName} and source ${ackedBy}`);
       return createResponse();
     }
 
