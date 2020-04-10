@@ -17,6 +17,7 @@ import { isModel } from 'core/models/utils';
 import { getModelRef } from 'core/storage/couchDbStorage';
 import { first } from 'lodash';
 import { generateUuid } from 'core/utils/id';
+import { extendLogger } from 'core/utils/logging';
 
 const ENTRY_TYPES = {
   BG_ENTRY: 'sgv',
@@ -34,7 +35,8 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const { requestBody } = request;
   const requestObject = requestBody as any; // we don't know what this object is yet
   const timestamp = context.timestamp();
-  const logCtx = `uploadDexcomEntry: "${requestObject.type}" at "${requestObject.date || ''}"`;
+  const log = extendLogger(context.log, 'upload');
+  const logCtx = `"${requestObject.type}" at "${requestObject.date || ''}"`;
 
   return Promise.resolve()
     .then(
@@ -54,7 +56,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(existingEntry => {
               if (existingEntry) {
                 // already exists in the DB -> no need to do anything!
-                console.log(`${logCtx}: MeterEntry already exists in DB`);
+                log(`${logCtx}: MeterEntry already exists in DB`);
                 return Promise.resolve(null);
               }
               return context.storage.saveModel(parseMeterEntry(requestObject)); // we didn't find the entry yet -> create it
@@ -70,7 +72,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(existingCal => {
               if (existingCal) {
                 // already exists in the DB -> no need to do anything!
-                console.log(`${logCtx}: DexcomCalibration already exists in DB`);
+                log(`${logCtx}: DexcomCalibration already exists in DB`);
                 return Promise.resolve(null);
               }
               const range = CAL_PAIRING.BEFORE + CAL_PAIRING.AFTER;
@@ -81,11 +83,11 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
                 .then(entries => {
                   if (entries.length === 0) {
                     // TODO: Retry until it's found..?
-                    console.log(`${logCtx}: Didn't find a MeterEntry to link with -> ignoring`);
+                    log(`${logCtx}: Didn't find a MeterEntry to link with -> ignoring`);
                     return Promise.resolve(null);
                   }
                   if (entries.length > 1) {
-                    console.log(`${logCtx}: Found more than 1 MeterEntry to link with -> very suspicious -> ignoring`);
+                    log(`${logCtx}: Found more than 1 MeterEntry to link with -> very suspicious -> ignoring`);
                     return Promise.resolve(null);
                   }
                   const newCal = {
@@ -103,11 +105,11 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(() => context.storage.loadLatestTimelineModel('DexcomCalibration'))
             .then(cal => {
               if (!cal) {
-                console.log(`${logCtx}: Didn't find a DexcomCalibration -> ignoring`);
+                log(`${logCtx}: Didn't find a DexcomCalibration -> ignoring`);
                 return Promise.resolve(null);
               }
               if (cal.slope === null) {
-                console.log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
+                log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
                 return Promise.resolve(null);
               }
               const newEntries = parseDexcomEntry(requestObject, cal);
@@ -124,7 +126,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
             .then(existingEntry => {
               if (existingEntry) {
                 // already exists in the DB -> no need to do anything!
-                console.log(`${logCtx}: ${existingEntry.modelType} already exists in DB`);
+                log(`${logCtx}: ${existingEntry.modelType} already exists in DB`);
                 return Promise.resolve(null);
               } else {
                 // we didn't find the entry yet -> create it
@@ -149,9 +151,9 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
       },
     )
     .then((model: Model | Model[] | null) => {
-      if (!model) console.log(`${logCtx} => null`);
-      else if (isModel(model)) console.log(`${logCtx} => "${model.modelType}"`);
-      else console.log(`${logCtx} => ${model.map(m => `"${m.modelType}"`).join(' & ')}`);
+      if (!model) log(`${logCtx} => null`);
+      else if (isModel(model)) log(`${logCtx} => "${model.modelType}"`);
+      else log(`${logCtx} => ${model.map(m => `"${m.modelType}"`).join(' & ')}`);
     })
     .then(() => Promise.resolve(createResponse(requestObject)));
 }

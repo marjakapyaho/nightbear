@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Situation } from 'core/models/model';
 import Pushover from 'pushover-notifications';
+import { Logger, extendLogger } from 'core/utils/logging';
 
 export type PushoverClient = ReturnType<typeof createPushoverClient>;
 
@@ -9,8 +10,9 @@ export const NO_PUSHOVER: PushoverClient = {
   ackAlarms: () => Promise.resolve(null),
 };
 
-export function createPushoverClient(user: string, token: string, callbackUrl: string) {
+export function createPushoverClient(user: string, token: string, callbackUrl: string, logger: Logger) {
   const api = new Pushover({ user, token });
+  const log = extendLogger(logger, 'pushover');
 
   return {
     sendAlarm(situationType: Situation, recipient: string): Promise<string> {
@@ -28,11 +30,11 @@ export function createPushoverClient(user: string, token: string, callbackUrl: s
       return new Promise((resolve, reject) => {
         api.send(message, (err: object, result: string) => {
           if (err) {
-            console.log('Could not send alarm:', err);
+            log('Could not send alarm:', err);
             return reject(err);
           }
           const receipt: string = JSON.parse(result).receipt;
-          console.log('Alarm sent with receipt:', receipt);
+          log('Alarm sent with receipt:', receipt);
           resolve(receipt);
         });
       });
