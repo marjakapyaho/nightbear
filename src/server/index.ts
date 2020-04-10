@@ -1,5 +1,5 @@
 import { createNodeContext } from 'core/models/api';
-import { extendLogger, consoleLogStream } from 'core/utils/logging';
+import { consoleLogStream } from 'core/utils/logging';
 import debug from 'debug';
 import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
 import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
