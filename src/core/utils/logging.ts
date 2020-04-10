@@ -21,11 +21,9 @@ export function createLogger(): Logger {
 // When given a Context, creates a new Context with the Logger replaced with the extended one.
 export function extendLogger<T extends Context | Logger>(x: T, namespace: string): T;
 export function extendLogger(x: Context | Logger, namespace: string): Context | Logger {
-  if (isLogger(x)) {
-    return unwrapLogger(x).extend(namespace);
-  } else {
-    return { ...x, log: unwrapLogger(x.log).extend(namespace) };
-  }
+  if (isNoopLogger(x)) return x;
+  if (isConcreteLogger(x)) return x.extend(namespace);
+  return { ...x, log: extendLogger(x.log, namespace) };
 }
 
 // Output stream that writes to console.log(), with the exact formatting we want.
@@ -38,16 +36,10 @@ export function consoleLogStream(x: string) {
   console.log(x);
 }
 
-// Type guard for our Logger
-function isLogger(x: unknown): x is Logger {
-  return typeof x === 'function' && 'color' in x && 'extend' in x && 'namespace' in x; // close enough ¯\_(ツ)_/¯
+function isNoopLogger(x: unknown): x is typeof noop {
+  return x === noop;
 }
 
-// Expose the full 'debug' API for internal use
-function unwrapLogger(logger: Logger): Debugger {
-  if (isLogger(logger)) {
-    return logger as any;
-  } else {
-    throw new Error("Given Logger doesn't look like a wrapped Debugger");
-  }
+function isConcreteLogger(x: unknown): x is Debugger {
+  return typeof x === 'function' && 'color' in x && 'extend' in x && 'namespace' in x; // close enough ¯\_(ツ)_/¯
 }
