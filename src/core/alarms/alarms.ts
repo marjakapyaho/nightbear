@@ -6,6 +6,7 @@ import { generateUuid } from 'core/utils/id';
 import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
+import { extendLogger } from 'core/utils/logging';
 
 const INITIAL_ALARM_LEVEL = 1;
 
@@ -13,6 +14,8 @@ const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(al
 const situationToString = (situation: Situation) => `${situation} (new)`;
 
 export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
+  const log = extendLogger(context.log, 'check');
+
   // If alarms are not enabled, remove all existing alarms and exit
   if (!activeProfile.alarmsEnabled) {
     return handleAlarmsToRemove(activeAlarms, context).then(alarms => {
@@ -22,7 +25,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
 
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
-  context.log.info(`[Check]: Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
+  log(`Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),
@@ -74,15 +77,17 @@ function handleAlarmsToKeep(
   activeProfile: ActiveProfile,
   context: Context,
 ): Promise<Array<Alarm | null>> {
+  const log = extendLogger(context.log, 'check');
+
   return Promise.all(
     alarms.map(alarm => {
       const now = context.timestamp();
       const { alarmLevel, validAfterTimestamp, pushoverReceipts } = getAlarmState(alarm);
-      let logPrefix = `[Check]: Existing alarm ${alarmToString(alarm)}`;
+      let logPrefix = `Existing alarm ${alarmToString(alarm)}`;
 
       // Not yet valid
       if (now <= validAfterTimestamp) {
-        context.log.debug(
+        log(
           `${logPrefix} is not yet valid again (${Math.round(
             (validAfterTimestamp - now) / MIN_IN_MS,
           )} min snooze left)`,
@@ -102,7 +107,7 @@ function handleAlarmsToKeep(
       logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
 
       if (neededLevel !== alarmLevel) {
-        context.log.debug(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
+        log(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
 
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {
@@ -131,7 +136,7 @@ function handleAlarmsToKeep(
             .catch(() => Promise.resolve(null));
         }
       } else {
-        context.log.debug(`${logPrefix} => not escalating yet`);
+        log(`${logPrefix} => not escalating yet`);
 
         return Promise.resolve(null);
       }

@@ -1,15 +1,15 @@
 import * as bodyParser from 'body-parser';
 import { Context, Headers, Request, RequestHandler } from 'core/models/api';
-import cors from 'cors';
-import express from 'express';
-import { Request as ExpressRequest } from 'express';
-import { bindLoggingContext, getContextName, handlerWithLogging } from 'server/utils/logging';
 import { generateUuid } from 'core/utils/id';
+import { extendLogger, Logger } from 'core/utils/logging';
+import cors from 'cors';
+import express, { Request as ExpressRequest } from 'express';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
 
 export function startExpressServer(context: Context, ...handlers: RequestHandlerTuple[]): Promise<number> {
+  const log = extendLogger(context.log, 'http');
   return new Promise((resolve, reject) => {
     const app = express();
     app.use(cors());
@@ -18,10 +18,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
       app[method](path, (req, res) => {
         const requestId = req.get('X-Request-ID') || generateUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
-          .then(request => {
-            const log = bindLoggingContext(context.log, getContextName('request', requestId));
-            return handlerWithLogging(handler, log)(request, context);
-          })
+          .then(request => handlerWithLogging(handler, log)(request, context))
           .then(
             response => {
               const { responseBody, responseStatus } = response;
@@ -58,4 +55,34 @@ function normalizeRequest(requestId: string, req: ExpressRequest): Request {
     requestHeaders: (req.headers ? req.headers : {}) as Headers, // without this cast, TS refuses to accept this because req.headers can be undefined (the ternary will handle that)
     requestBody: req.body,
   };
+}
+
+// Wraps the given handler with logging for input/output
+function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
+  return (request, context) => {
+    const debug = extendLogger(log, getLoggingNamespace('req', request.requestId), true);
+    const then = context.timestamp();
+    const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
+    debug(`Incoming request: ${request.requestMethod} ${request.requestPath}\n%O`, request.requestBody);
+    return handler(request, context).then(
+      res => {
+        debug(`Outgoing ${res.responseStatus} response:\n%O`, res.responseBody);
+        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
+        return res;
+      },
+      err => {
+        debug(`Outgoing error`, err);
+        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
+        return Promise.reject(err);
+      },
+    );
+  };
+}
+
+// Transform an UUID into a helpful logging context/namespace
+// @example getContextName() => "default-32846a768f5f"
+// @example getContextName('request', req.get('X-Request-ID')) => "request-32846a768f5f"
+function getLoggingNamespace(label = 'default', uuid?: string) {
+  const [id] = (uuid || generateUuid()).split('-');
+  return `${label}-${id}`;
 }

@@ -4,6 +4,7 @@ import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context } from 'core/models/api';
 import { first, map, identity } from 'lodash';
+import { extendLogger } from 'core/utils/logging';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
@@ -18,13 +19,12 @@ export function startRunningChecks(context: Context) {
   // And set next one
   nextCheck = global.setTimeout(startRunningChecks, CHECK_RUN_INTERVAL, context);
 
-  return runChecks(context).catch(err =>
-    context.log.error(`[Check]: Nightbear check runner error: ${err.message}`, err),
-  );
+  return runChecks(context).catch(err => context.log(`Check runner error: ${err.message}`, err));
 }
 
 export function runChecks(context: Context) {
-  context.log.info('[Check]: -------- Started runChecks() --------');
+  const log = extendLogger(context.log, 'check');
+  log('-------- Started runChecks() --------');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -35,23 +35,21 @@ export function runChecks(context: Context) {
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
-    if (!activeProfile) throw new Error('[Check]: Could not find active profile');
+    if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
-    context.log.info(`[Check]: 1. Running analysis with profile: ${activeProfile?.profileName}`);
+    log(`1. Running analysis with profile: ${activeProfile?.profileName}`);
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
-    context.log.info(
-      '[Check]: 2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'),
-    );
+    log('2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
-      context.log.info(
-        `[Check]: 3. There were changes in ${alarms.length} alarms with types: ${alarms
+      log(
+        `3. There were changes in ${alarms.length} alarms with types: ${alarms
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
-      context.log.info('[Check]: -------- Ended runChecks() --------');
+      log('-------- Ended runChecks() --------');
       return alarms;
     });
   });

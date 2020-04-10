@@ -1,7 +1,7 @@
 import { createPushoverClient, PushoverClient } from 'core/alarms/pushover-client';
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
-import { createConsoleLogger, Logger } from 'server/utils/logging';
+import { createLogger, Logger } from 'core/utils/logging';
 
 export function createNodeContext(): Context {
   const { NIGHTBEAR_DB_URL, PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK } = process.env;
@@ -9,12 +9,13 @@ export function createNodeContext(): Context {
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
+  const log = createLogger();
   return {
     httpPort: 3000,
     timestamp: Date.now,
-    log: createConsoleLogger(),
+    log,
     storage: createCouchDbStorage(NIGHTBEAR_DB_URL),
-    pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK),
+    pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
   };
 }
 
