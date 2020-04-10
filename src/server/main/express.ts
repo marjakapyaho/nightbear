@@ -4,7 +4,6 @@ import { generateUuid } from 'core/utils/id';
 import { extendLogger, Logger } from 'core/utils/logging';
 import cors from 'cors';
 import express, { Request as ExpressRequest } from 'express';
-import { getContextName } from 'server/utils/logging';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
@@ -19,7 +18,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
         const requestId = req.get('X-Request-ID') || generateUuid(); // use Heroku-style req-ID where available, but fall back to our own
         Promise.resolve(normalizeRequest(requestId, req))
           .then(request => {
-            const log = extendLogger(context.log, getContextName('req', requestId));
+            const log = extendLogger(context.log, getLoggingNamespace('req', requestId));
             return handlerWithLogging(handler, log)(request, context);
           })
           .then(
@@ -79,4 +78,12 @@ function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandle
       },
     );
   };
+}
+
+// Transform an UUID into a helpful logging context/namespace
+// @example getContextName() => "default-32846a768f5f"
+// @example getContextName('request', req.get('X-Request-ID')) => "request-32846a768f5f"
+function getLoggingNamespace(label = 'default', uuid?: string) {
+  const [id] = (uuid || generateUuid()).split('-');
+  return `${label}-${id}`;
 }
