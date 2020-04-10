@@ -4,6 +4,7 @@ import { Context, createResponse, Request, Response } from 'core/models/api';
 import { getAlarmState } from 'core/models/utils';
 import { first } from 'lodash';
 import { extendLogger } from 'core/utils/logging';
+import { NIGHT_PROFILE_NAME, WATCH_NAME } from 'core/models/const';
 
 export function ackActiveAlarms(request: Request, context: Context): Response {
   const log = extendLogger(context.log, 'check');
@@ -20,8 +21,16 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
       return createResponse();
     }
 
+    // Disable watch ack at night
+    if (activeProfile.profileName === NIGHT_PROFILE_NAME && ackedBy === WATCH_NAME) {
+      context.log.info(`Ack cancelled with profile ${activeProfile.profileName} and source ${ackedBy}`);
+      return createResponse();
+    }
+
     log(
-      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms.map(alarm => alarm.situationType).join(', ')}`,
+      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms
+        .map(alarm => alarm.situationType)
+        .join(', ')}`,
     );
 
     let allPushOverReceipts: string[] = [];
@@ -39,6 +48,6 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
     return context.pushover
       .ackAlarms(allPushOverReceipts)
       .then(() => context.storage.saveModels(updatedAlarms))
-      .then(() => createResponse());
+      .then(alarms => createResponse(alarms));
   });
 }
