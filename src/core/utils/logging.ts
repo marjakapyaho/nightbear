@@ -31,8 +31,8 @@ export function extendLogger(x: Context | Logger, namespace: string): Context | 
 export function consoleLogStream(x: string) {
   const ts = new Date().toISOString().replace(/.*?T(.....).*/, '$1'); // e.g. "12:34"
   x = x.replace(/^ */gm, ''); // remove leading spaces; see https://github.com/visionmedia/debug/issues/619
-  x = x.replace(/([^ ]*)nightbear:/, '$1'); // remove the common "nightbear:" prefix; it's good to have in the namespace for filtering etc, but we don't want to show it all the time
-  x = `${ts} ${x}`;
+  x = x.replace(/^([^ ]*)nightbear:/gm, '$1'); // remove the common "nightbear:" prefix; it's good to have in the namespace for filtering etc, but we don't want to show it all the time
+  x = x.replace(/^/gm, `${ts} `); // prefix each line with our timestamp
   console.log(x);
 }
 
