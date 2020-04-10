@@ -19,11 +19,17 @@ export function createLogger(): Logger {
 
 // Adds a namespace to the given Logger.
 // When given a Context, creates a new Context with the Logger replaced with the extended one.
-export function extendLogger<T extends Context | Logger>(x: T, namespace: string): T;
-export function extendLogger(x: Context | Logger, namespace: string): Context | Logger {
-  if (isNoopLogger(x)) return x;
-  if (isConcreteLogger(x)) return x.extend(namespace);
-  return { ...x, log: extendLogger(x.log, namespace) };
+export function extendLogger<T extends Context | Logger>(x: T, namespace: string, keepColor?: boolean): T;
+export function extendLogger(x: Context | Logger, namespace: string, keepColor = false): Context | Logger {
+  if (isNoopLogger(x)) {
+    return x;
+  } else if (isConcreteLogger(x)) {
+    const e = x.extend(namespace);
+    if (keepColor) e.color = x.color;
+    return e;
+  } else {
+    return { ...x, log: extendLogger(x.log, namespace, keepColor) };
+  }
 }
 
 // Output stream that writes to console.log(), with the exact formatting we want.
