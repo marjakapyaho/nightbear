@@ -1,4 +1,6 @@
-export const MODEL_VERSION = 1;
+import { ModelVersion } from 'core/models/migrations';
+
+export const MODEL_VERSION: ModelVersion = 2;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
