@@ -76,12 +76,12 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_REL: 6.5,
           TIME_SINCE_BG_LIMIT: 20,
           BATTERY_LIMIT: 30,
-          LOW_LEVEL_BAD: 4.7, // NEW IN THIS MODEL VERSION
+          LOW_LEVEL_BAD: 3, // NEW IN THIS MODEL VERSION
           LOW_LEVEL_ABS: 4.7,
           ALARM_EXPIRE: 10800,
           LOW_LEVEL_REL: 9,
           HIGH_LEVEL_ABS: 8,
-          HIGH_LEVEL_BAD: 8, // NEW IN THIS MODEL VERSION
+          HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
         },
         alarmSettings: {
@@ -198,12 +198,12 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_REL: 6.5,
           TIME_SINCE_BG_LIMIT: 20,
           BATTERY_LIMIT: 30,
-          LOW_LEVEL_BAD: 4.7, // NEW IN THIS MODEL VERSION
+          LOW_LEVEL_BAD: 3, // NEW IN THIS MODEL VERSION
           LOW_LEVEL_ABS: 4.7,
           ALARM_EXPIRE: 10800,
           LOW_LEVEL_REL: 9,
           HIGH_LEVEL_ABS: 8,
-          HIGH_LEVEL_BAD: 8, // NEW IN THIS MODEL VERSION
+          HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
         },
         alarmSettings: {
