@@ -51,6 +51,7 @@ export default (() => {
         <div>
           {profiles.map(profile => (
             <div
+              key={profile.modelUuid}
               className={styles.profile}
               style={
                 profile.profileName === activeProfile?.profileName ? { background: '#7a7a7a', color: 'white' } : {}
