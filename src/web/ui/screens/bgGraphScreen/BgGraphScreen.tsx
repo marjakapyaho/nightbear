@@ -96,6 +96,7 @@ export default (() => {
             navigationState,
             actions,
             modelBeingEdited,
+            is('Carbs'),
             (timestamp, amount) => ({
               modelType: 'Carbs',
               modelUuid: generateUuid(),
@@ -117,6 +118,7 @@ export default (() => {
             navigationState,
             actions,
             modelBeingEdited,
+            is('MeterEntry'),
             (timestamp, bloodGlucose) => ({
               modelType: 'MeterEntry',
               modelUuid: generateUuid(),
@@ -139,6 +141,7 @@ export default (() => {
             navigationState,
             actions,
             modelBeingEdited,
+            is('Insulin'),
             (timestamp, amount) => ({
               modelType: 'Insulin',
               modelUuid: generateUuid(),
@@ -163,11 +166,12 @@ function createChangeHandler<T extends TimelineModel>(
   state: NavigationState,
   actions: ReduxActions,
   modelBeingEdited: Model | null,
+  isModelOfCorrectType: (model: unknown) => boolean,
   modelCreateCallback: (timestamp: number, newValue: number) => T,
   modelUpdateCallback: (newValue: number) => Partial<T>,
 ) {
   return (newValue: number) => {
-    if (modelBeingEdited) {
+    if (isModelOfCorrectType(modelBeingEdited)) {
       // Update an existing Model
       if (!isTimelineModel(modelBeingEdited)) return; // currently, we only support editing of TimelineModel's, even though the type of modelBeingEdited is wider, for call-time convenience
       const updatedModel = { ...modelBeingEdited, ...modelUpdateCallback(newValue) };
@@ -180,7 +184,9 @@ function createChangeHandler<T extends TimelineModel>(
       // Create new Model
       actions.MODEL_UPDATED_BY_USER(
         modelCreateCallback(
-          ('timelineCursorAt' in state ? state.timelineCursorAt : null) || Date.now(), // if there's no cursor, create at the current wall clock time
+          ('timelineCursorAt' in state ? state.timelineCursorAt : null) || // if there's a cursor, place the new Model there
+          (isTimelineModel(modelBeingEdited) && modelBeingEdited.timestamp) || // if not, but a Model of another type is selected, place the new Model at the same timestamp
+            Date.now(), // if nothing else, create at the current wall clock time
           newValue,
         ),
       );
