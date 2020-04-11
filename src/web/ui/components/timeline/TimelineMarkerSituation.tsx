@@ -11,22 +11,24 @@ type Props = {
   situationDuration: number;
 };
 
-const HEIGHT = 15;
+const HEIGHT = 20;
 
 const styles = {
   root: css({
     position: 'absolute',
     height: HEIGHT,
-    background: 'orange',
-    color: '#868686',
+    background: '#ffe358',
+    color: '#b1a21e',
     fontFamily: 'SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace',
-    fontSize: 12,
+    fontSize: 10,
     borderRadius: 8,
     textAlign: 'center',
-    padding: '2px 4px',
+    cursor: 'pointer',
+    padding: '5px 4px',
     '&:hover': {
       height: '100%', // i.e. extend AT LEAST all the way to the bottom
       opacity: 0.5, // make semi-transparent so the relevant timeline entries are visible below us
+      color: 'black',
     },
   }),
 };

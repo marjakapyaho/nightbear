@@ -37,7 +37,7 @@ export default (props => {
       <div
         className={css({
           position: 'absolute',
-          height: 85,
+          height: 74,
           background: goodBackground,
           zIndex: -1,
         })}

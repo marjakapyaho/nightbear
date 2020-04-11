@@ -58,7 +58,7 @@ export function bgToTop(c: ExtendedTimelineConfig, bg: number) {
 
 const WIDTH_CLICKABLE = 20;
 const WIDTH_LINE = 1;
-const WIDTH_MAX = 60;
+const WIDTH_MAX = 65;
 const BUBBLE_SIZE = 38;
 
 // Common base styles for all vertical markers.
@@ -70,6 +70,7 @@ export const markerStyles = {
     bottom: 0,
     width: WIDTH_CLICKABLE,
     marginLeft: WIDTH_CLICKABLE / -2,
+    cursor: 'pointer',
   }),
   verticalLine: css({
     position: 'absolute',
