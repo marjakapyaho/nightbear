@@ -5,7 +5,6 @@ import { isTimelineModel } from 'core/models/utils';
 import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSelector';
 import Timestamp from 'web/ui/components/timestamp/Timestamp';
 import ModelTypeSelector from 'web/ui/components/modelTypeSelector/ModelTypeSelector';
-import TimelineModelGraph from 'web/ui/components/timelineModelGraph/TimelineModelGraph';
 import TimelineModelTable from 'web/ui/components/timelineModelTable/TimelineModelTable';
 
 type Props = {};
@@ -131,15 +130,6 @@ export default () => {
       />
       {dataState.status === 'FETCHING' && <pre>Fetching...</pre>}
       {dataState.status === 'ERROR' && <pre>Error while loading timeline models: {dataState.errorMessage}</pre>}
-      {dataState.status === 'READY' && (
-        <TimelineModelGraph
-          timelineModels={dataState.timelineModels}
-          selectedModelTypes={navigationState.selectedModelTypes}
-          timelineRange={navigationState.timelineRange}
-          timelineRangeEnd={navigationState.timelineRangeEnd}
-          timelineCursorAt={null}
-        />
-      )}
       {dataState.status === 'READY' && <TimelineModelTable models={dataState.timelineModels} />}
     </div>
   );
