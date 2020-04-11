@@ -138,6 +138,7 @@ function detectBadLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry) 
 
 function detectFalling(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
+    !state.BAD_LOW &&
     !state.LOW &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_REL &&
     !!entry.slope &&
@@ -180,6 +181,7 @@ function detectBadHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry)
 
 function detectRising(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
+    !state.BAD_HIGH &&
     !state.HIGH &&
     entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_REL &&
     !!entry.slope &&

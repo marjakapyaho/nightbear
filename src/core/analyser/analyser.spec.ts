@@ -12,6 +12,8 @@ import { Alarm, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
 import 'mocha';
 import { activeProfile } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
+import { entriesBadLow } from 'core/analyser/test-data/bad-low';
+import { entriesBadHigh } from 'core/analyser/test-data/bad-high';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -103,6 +105,23 @@ describe('utils/analyser', () => {
     );
   });
 
+  it('detects bad low', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('day', currentTimestamp),
+        entriesBadLow(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        BAD_LOW: true,
+      },
+    );
+  });
+
   it('detects falling', () => {
     assert.deepEqual(
       runAnalysis(
@@ -150,6 +169,23 @@ describe('utils/analyser', () => {
       {
         ...DEFAULT_STATE,
         HIGH: true,
+      },
+    );
+  });
+
+  it('detects bad high', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('day', currentTimestamp),
+        entriesBadHigh(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        BAD_HIGH: true,
       },
     );
   });
