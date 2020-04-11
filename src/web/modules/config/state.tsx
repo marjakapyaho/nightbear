@@ -4,6 +4,7 @@ export type ConfigState = Readonly<{
   showRollingAnalysis: boolean;
   autoRefreshData: boolean;
   zoomedInTimeline: boolean;
+  timelineResetTimeout: number;
 }>;
 
 export const configInitState: ConfigState = {
@@ -12,4 +13,5 @@ export const configInitState: ConfigState = {
   showRollingAnalysis: false,
   autoRefreshData: true,
   zoomedInTimeline: false,
+  timelineResetTimeout: 1000 * 30,
 };
