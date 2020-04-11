@@ -58,9 +58,16 @@ export function runAnalysis(
     return state;
   }
 
+  // Must be before LOW
   state = {
     ...state,
-    LOW: detectLow(activeProfile, latestEntry, existingActiveAlarms),
+    BAD_LOW: detectBadLow(activeProfile, latestEntry),
+  };
+
+  // Must be before FALLING
+  state = {
+    ...state,
+    LOW: detectLow(state, activeProfile, latestEntry, existingActiveAlarms),
   };
 
   state = {
@@ -73,9 +80,16 @@ export function runAnalysis(
     COMPRESSION_LOW: detectCompressionLow(activeProfile, entries, insulin),
   };
 
+  // Must be before HIGH
   state = {
     ...state,
-    HIGH: detectHigh(activeProfile, latestEntry, existingActiveAlarms),
+    BAD_HIGH: detectBadHigh(activeProfile, latestEntry),
+  };
+
+  // Must be before RISING
+  state = {
+    ...state,
+    HIGH: detectHigh(state, activeProfile, latestEntry, existingActiveAlarms),
   };
 
   state = {
@@ -103,17 +117,28 @@ function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry
   }
 }
 
-function detectLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, existingActiveAlarms: Alarm[]) {
+function detectLow(
+  state: State,
+  activeProfile: ActiveProfile,
+  latestEntry: AnalyserEntry,
+  existingActiveAlarms: Alarm[],
+) {
   const situationType: Situation = 'LOW';
   return (
+    !state.BAD_LOW &&
     latestEntry.bloodGlucose <
-    activeProfile.analyserSettings.LOW_LEVEL_ABS +
-      (find(existingActiveAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
+      activeProfile.analyserSettings.LOW_LEVEL_ABS +
+        (find(existingActiveAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0)
   );
+}
+
+function detectBadLow(activeProfile: ActiveProfile, latestEntry: AnalyserEntry) {
+  return latestEntry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_BAD;
 }
 
 function detectFalling(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
+    !state.BAD_LOW &&
     !state.LOW &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_REL &&
     !!entry.slope &&
@@ -136,14 +161,27 @@ function detectCompressionLow(activeProfile: ActiveProfile, entries: AnalyserEnt
   return !!find(entries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
 }
 
-function detectHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, existingActiveAlarms: Alarm[]) {
+function detectHigh(
+  state: State,
+  activeProfile: ActiveProfile,
+  latestEntry: AnalyserEntry,
+  existingActiveAlarms: Alarm[],
+) {
   const situationType: Situation = 'HIGH';
   const correctionIfAlreadyHigh = find(existingActiveAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
-  return latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh;
+  return (
+    !state.BAD_HIGH &&
+    latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh
+  );
+}
+
+function detectBadHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry) {
+  return latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_BAD;
 }
 
 function detectRising(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
   return (
+    !state.BAD_HIGH &&
     !state.HIGH &&
     entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_REL &&
     !!entry.slope &&

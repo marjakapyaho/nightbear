@@ -1,10 +1,11 @@
+import { migrateModelIfNeeded } from 'core/models/migrations';
 import { Model, ModelOfType, ModelRef, ModelType, MODEL_VERSION } from 'core/models/model';
 import { is, isGlobalModel } from 'core/models/utils';
 import PouchDB from 'core/storage/PouchDb';
 import { Storage, StorageErrorDetails } from 'core/storage/storage';
+import { extendLogger, NO_LOGGING } from 'core/utils/logging';
 import { first } from 'lodash';
 import { assert, assertExhausted, isNotNull } from 'server/utils/types';
-import { NO_LOGGING, extendLogger } from 'core/utils/logging';
 
 export interface CouchDbModelMeta {
   readonly _id: string;
@@ -284,9 +285,12 @@ export function reviveCouchDbRowIntoModel(doc: any): Model {
   });
 
   // Turn into standard Model object:
-  const model: Model = doc;
+  const modelPayload: Model = doc;
   const modelMeta: CouchDbModelMeta = { _id, _rev, modelVersion };
-  return { ...model, modelMeta };
+  const model = { ...modelPayload, modelMeta };
+
+  // Run migrations if necessary:
+  return migrateModelIfNeeded(model, modelVersion);
 }
 
 function isModelMeta(meta: any): meta is CouchDbModelMeta {

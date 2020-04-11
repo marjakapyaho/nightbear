@@ -1,4 +1,6 @@
-export const MODEL_VERSION = 1;
+import { ModelVersion } from 'core/models/migrations';
+
+export const MODEL_VERSION: ModelVersion = 2;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
@@ -144,11 +146,13 @@ export type Carbs = _Model<'Carbs'> &
 const defaultState = {
   BATTERY: false,
   OUTDATED: false,
-  LOW: false,
   FALLING: false,
+  RISING: false,
+  LOW: false,
+  BAD_LOW: false,
   COMPRESSION_LOW: false,
   HIGH: false,
-  RISING: false,
+  BAD_HIGH: false,
   PERSISTENT_HIGH: false,
 };
 
@@ -181,9 +185,11 @@ type _Profile = Readonly<{
     HIGH_LEVEL_REL: number;
     TIME_SINCE_BG_LIMIT: number; // minutes
     BATTERY_LIMIT: number;
+    LOW_LEVEL_BAD: number;
     LOW_LEVEL_ABS: number;
     LOW_LEVEL_REL: number;
     HIGH_LEVEL_ABS: number;
+    HIGH_LEVEL_BAD: number;
     ALARM_RETRY: number; // seconds, min in Pushover 30
     ALARM_EXPIRE: number; // seconds, max in Pushover 10800
   }>;
