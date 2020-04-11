@@ -67,12 +67,12 @@ function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandle
     return handler(request, context).then(
       res => {
         debug(`Outgoing ${res.responseStatus} response:\n%O`, res.responseBody);
-        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
+        log(`${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`);
         return res;
       },
       err => {
         debug(`Outgoing error`, err);
-        log(`Served request: ${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
+        log(`${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
         return Promise.reject(err);
       },
     );

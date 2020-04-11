@@ -25,7 +25,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
 
   const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
-  log(`Active alarms after analysis: ${alarmsToLog.join(', ') || 'n/a'}`);
+  log(`3. Active alarms: ${alarmsToLog.join(', ') || 'n/a'}`);
 
   return Promise.all([
     handleAlarmsToRemove(alarmsToRemove, context),

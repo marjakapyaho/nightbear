@@ -23,13 +23,11 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
 
     // Disable watch ack at night
     if (activeProfile.profileName === NIGHT_PROFILE_NAME && ackedBy === WATCH_NAME) {
-      context.log(`Ack cancelled with profile ${activeProfile.profileName} and source ${ackedBy}`);
+      context.log(`Ack cancelled (profile: ${activeProfile.profileName}, source: ${ackedBy})`);
       return createResponse();
     }
 
-    log(
-      `Acking (by: ${ackedBy}) alarms with types: ${latestActiveAlarms.map(alarm => alarm.situationType).join(', ')}`,
-    );
+    log(`Acking (by: "${ackedBy}") alarms: ${latestActiveAlarms.map(alarm => alarm.situationType).join(', ')}`);
 
     let allPushOverReceipts: string[] = [];
     const updatedAlarms = latestActiveAlarms.map(alarm => {
