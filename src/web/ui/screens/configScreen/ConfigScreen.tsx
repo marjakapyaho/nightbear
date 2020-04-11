@@ -1,4 +1,6 @@
+import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
+import { humanReadableShortTime } from 'core/utils/time';
 import { css } from 'emotion';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
@@ -59,6 +61,7 @@ export default (() => {
               onClick={() => actions.PROFILE_ACTIVATED(profile, Date.now())}
             >
               {profile.profileName}
+              {profile.activatedAtUtc && <span>&nbsp;(activates {getAutoActTime(profile)})</span>}
             </div>
           ))}
         </div>
@@ -77,3 +80,12 @@ export default (() => {
     </div>
   );
 }) as React.FC<Props>;
+
+function getAutoActTime(profile: SavedProfile): string {
+  if (!profile.activatedAtUtc) return '';
+  const d = new Date();
+  d.setUTCHours(profile.activatedAtUtc.hours);
+  d.setUTCMinutes(profile.activatedAtUtc.minutes);
+  d.setUTCSeconds(0);
+  return humanReadableShortTime(d.getTime());
+}
