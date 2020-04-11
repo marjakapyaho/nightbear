@@ -1,11 +1,14 @@
-import 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen.scss';
-import { useCssNs, useReduxState, useReduxActions } from 'web/utils/react';
-import ReactModal from 'react-modal';
+import { TimelineModel } from 'core/models/model';
 import { isTimelineModel } from 'core/models/utils';
-import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSelector';
-import Timestamp from 'web/ui/components/timestamp/Timestamp';
+import ReactModal from 'react-modal';
+import { DataState } from 'web/modules/data/state';
+import { NavigationState } from 'web/modules/navigation/state';
 import ModelTypeSelector from 'web/ui/components/modelTypeSelector/ModelTypeSelector';
 import TimelineModelTable from 'web/ui/components/timelineModelTable/TimelineModelTable';
+import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSelector';
+import Timestamp from 'web/ui/components/timestamp/Timestamp';
+import 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen.scss';
+import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
@@ -130,7 +133,18 @@ export default () => {
       />
       {dataState.status === 'FETCHING' && <pre>Fetching...</pre>}
       {dataState.status === 'ERROR' && <pre>Error while loading timeline models: {dataState.errorMessage}</pre>}
-      {dataState.status === 'READY' && <TimelineModelTable models={dataState.timelineModels} />}
+      {dataState.status === 'READY' && <TimelineModelTable models={filterTimelineModels(dataState, navigationState)} />}
     </div>
   );
 };
+
+function filterTimelineModels(data: DataState, filters: NavigationState): TimelineModel[] {
+  if (filters.selectedScreen !== 'TimelineDebugScreen') return [];
+  const { timelineRange, timelineRangeEnd, selectedModelTypes } = filters;
+  return data.timelineModels.filter(
+    model =>
+      model.timestamp >= timelineRangeEnd - timelineRange &&
+      model.timestamp < timelineRangeEnd &&
+      selectedModelTypes.includes(model.modelType),
+  );
+}
