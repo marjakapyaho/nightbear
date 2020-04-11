@@ -1,4 +1,5 @@
 export type ConfigState = Readonly<{
+  nightbearApiUrl: string;
   remoteDbUrl: string;
   showRollingAnalysis: boolean;
   autoRefreshData: boolean;
@@ -6,6 +7,7 @@ export type ConfigState = Readonly<{
 }>;
 
 export const configInitState: ConfigState = {
+  nightbearApiUrl: '',
   remoteDbUrl: '',
   showRollingAnalysis: false,
   autoRefreshData: true,

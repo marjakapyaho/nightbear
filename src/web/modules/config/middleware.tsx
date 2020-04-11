@@ -20,6 +20,10 @@ export const configMiddleware: ReduxMiddleware = store => {
       // If there's no DB URL set, prompt the user for it, otherwise the app is kinda useless
       store.dispatch(actions.CONFIG_UPDATED({ remoteDbUrl: prompt('Enter DB URL:') || '' }));
     }
+    if (!store.getState().config.nightbearApiUrl) {
+      // If there's no API URL set, prompt the user for it, otherwise the app is kinda useless
+      store.dispatch(actions.CONFIG_UPDATED({ nightbearApiUrl: prompt('Enter API URL:') || '' }));
+    }
   }
 
   function write(newConfig: ConfigState) {
