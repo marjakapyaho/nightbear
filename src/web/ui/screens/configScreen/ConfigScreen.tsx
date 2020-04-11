@@ -62,6 +62,17 @@ export default (() => {
           ))}
         </div>
       </div>
+
+      <div
+        style={{
+          padding: 20,
+        }}
+      >
+        <h1>Misc</h1>
+        <div>
+          <button onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>Ack latest alarm</button>
+        </div>
+      </div>
     </div>
   );
 }) as React.FC<Props>;
