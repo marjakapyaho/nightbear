@@ -24,7 +24,7 @@ export function startRunningChecks(context: Context) {
 
 export function runChecks(context: Context) {
   const log = extendLogger(context.log, 'check');
-  log('-------- Started runChecks() --------');
+  log('--- Started runChecks() ---');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -37,19 +37,18 @@ export function runChecks(context: Context) {
 
     if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
-    log(`1. Running analysis with profile: ${activeProfile?.profileName}`);
+    log(`1. Using profile: ${activeProfile?.profileName}`);
     const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
-    log('2. Analyser returned situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
+    log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
 
     return runAlarmChecks(context, state, activeProfile, alarms).then(alarms => {
       log(
-        `3. There were changes in ${alarms.length} alarms with types: ${alarms
+        `There were changes in ${alarms.length} alarms with types: ${alarms
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
-      log('-------- Ended runChecks() --------');
       return alarms;
     });
   });

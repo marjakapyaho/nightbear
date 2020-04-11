@@ -36,7 +36,7 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const requestObject = requestBody as any; // we don't know what this object is yet
   const timestamp = context.timestamp();
   const log = extendLogger(context.log, 'upload');
-  const logCtx = `"${requestObject.type}" at "${requestObject.date || ''}"`;
+  const logCtx = `with device "${requestObject.device}"`;
 
   return Promise.resolve()
     .then(
