@@ -1,12 +1,29 @@
 import { actions } from 'web/modules/actions';
-import { NO_OP_MIDDLEWARE, ReduxMiddleware } from 'web/utils/redux';
+import { createChangeObserver, ReduxMiddleware } from 'web/utils/redux';
 
 const AUTO_REFRESH_INTERVAL = 15 * 1000;
 
 export const navigationMiddleware: ReduxMiddleware = store => {
   setInterval(updateTimelineRangeEnd, AUTO_REFRESH_INTERVAL);
+  let timelineCursorReset: NodeJS.Timeout | undefined;
 
-  return NO_OP_MIDDLEWARE;
+  return next => {
+    const observer = createChangeObserver(store, next);
+    observer.add(
+      state => (state.navigation.selectedScreen === 'BgGraphScreen' && state.navigation.timelineCursorAt) || undefined,
+      timelineCursorMoved,
+    );
+    return observer.run;
+  };
+
+  function timelineCursorMoved(newCursorAt?: number) {
+    if (timelineCursorReset) clearTimeout(timelineCursorReset);
+    if (newCursorAt) {
+      timelineCursorReset = setTimeout(() => {
+        store.dispatch(actions.TIMELINE_CURSOR_UPDATED(null));
+      }, store.getState().config.timelineResetTimeout);
+    }
+  }
 
   function updateTimelineRangeEnd() {
     const state = store.getState();
