@@ -53,6 +53,7 @@ export default (props => {
           top: 0,
           right: 0,
           zIndex: 10,
+          pointerEvents: 'none',
         })}
         style={{
           bottom: props.timelineConfig.paddingBottom,
@@ -71,6 +72,7 @@ export default (props => {
               opacity: bg % 2 === 0 ? 1 : 0,
               textAlign: 'left',
               paddingLeft: props.timelineConfig.paddingRight / 2,
+              pointerEvents: 'none',
             })}
             style={{
               top: bgToTop(props.timelineConfig, bg) - 4, // the magic number is dependent on font size, and just makes the label placement more pleasant
