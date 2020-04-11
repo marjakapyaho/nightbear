@@ -25,7 +25,9 @@ function getProfile(profileName: string): SavedProfile {
       LOW_LEVEL_ABS: 0,
       ALARM_EXPIRE: 0,
       LOW_LEVEL_REL: 0,
+      LOW_LEVEL_BAD: 0,
       HIGH_LEVEL_ABS: 0,
+      HIGH_LEVEL_BAD: 0,
       ALARM_RETRY: 0,
     },
     alarmSettings: {
@@ -37,11 +39,19 @@ function getProfile(profileName: string): SavedProfile {
         escalationAfterMinutes: [],
         snoozeMinutes: 0,
       },
+      BAD_HIGH: {
+        escalationAfterMinutes: [],
+        snoozeMinutes: 0,
+      },
       PERSISTENT_HIGH: {
         escalationAfterMinutes: [],
         snoozeMinutes: 0,
       },
       LOW: {
+        escalationAfterMinutes: [],
+        snoozeMinutes: 0,
+      },
+      BAD_LOW: {
         escalationAfterMinutes: [],
         snoozeMinutes: 0,
       },

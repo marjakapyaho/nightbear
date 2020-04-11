@@ -120,7 +120,9 @@ export function activeProfile(profileName: string, timestamp: number, isEnabled:
       LOW_LEVEL_ABS: 5,
       ALARM_EXPIRE: 20,
       LOW_LEVEL_REL: 9,
+      LOW_LEVEL_BAD: 3,
       HIGH_LEVEL_ABS: 15,
+      HIGH_LEVEL_BAD: 18,
       ALARM_RETRY: 2,
     },
     alarmSettings: {
@@ -132,11 +134,19 @@ export function activeProfile(profileName: string, timestamp: number, isEnabled:
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 90,
       },
+      BAD_HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
       PERSISTENT_HIGH: {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 90,
       },
       LOW: {
+        escalationAfterMinutes: [6, 7, 10],
+        snoozeMinutes: 15,
+      },
+      BAD_LOW: {
         escalationAfterMinutes: [6, 7, 10],
         snoozeMinutes: 15,
       },

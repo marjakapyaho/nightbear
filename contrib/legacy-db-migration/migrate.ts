@@ -436,7 +436,9 @@ function seedProfiles() {
       LOW_LEVEL_ABS: 4.7,
       ALARM_EXPIRE: 10800,
       LOW_LEVEL_REL: 9,
+      LOW_LEVEL_BAD: 3,
       HIGH_LEVEL_ABS: 8,
+      HIGH_LEVEL_BAD: 15,
       ALARM_RETRY: 30,
     },
     alarmSettings: {
@@ -448,11 +450,19 @@ function seedProfiles() {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 90,
       },
+      BAD_HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 90,
+      },
       PERSISTENT_HIGH: {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 90,
       },
       LOW: {
+        escalationAfterMinutes: [10, 10, 10],
+        snoozeMinutes: 20,
+      },
+      BAD_LOW: {
         escalationAfterMinutes: [10, 10, 10],
         snoozeMinutes: 20,
       },
@@ -491,7 +501,9 @@ function seedProfiles() {
       LOW_LEVEL_ABS: 4.3,
       ALARM_EXPIRE: 10800,
       LOW_LEVEL_REL: 6,
+      LOW_LEVEL_BAD: 3,
       HIGH_LEVEL_ABS: 7.5,
+      HIGH_LEVEL_BAD: 15,
       ALARM_RETRY: 30,
     },
     alarmSettings: {
@@ -503,11 +515,19 @@ function seedProfiles() {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 60,
       },
+      BAD_HIGH: {
+        escalationAfterMinutes: [10, 20, 20],
+        snoozeMinutes: 60,
+      },
       PERSISTENT_HIGH: {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 60,
       },
       LOW: {
+        escalationAfterMinutes: [8, 10, 10],
+        snoozeMinutes: 10,
+      },
+      BAD_LOW: {
         escalationAfterMinutes: [8, 10, 10],
         snoozeMinutes: 10,
       },
