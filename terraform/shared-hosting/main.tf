@@ -14,11 +14,11 @@ module "hosting_blue" {
   source = "./blue-green"
 
   color                   = "blue"
-  port_map                = "${local.port_map}"
-  couchdb_admin_password  = "${var.couchdb_admin_password}"
-  pushover_user           = "${var.pushover_user}"
-  pushover_token          = "${var.pushover_token}"
-  papertrail_host_legacy  = "${var.papertrail_host_legacy}"
-  papertrail_host_hosting = "${var.papertrail_host_hosting}"
-  backup_config           = "${local.backup_config}"
+  port_map                = local.port_map
+  couchdb_admin_password  = var.couchdb_admin_password
+  pushover_user           = var.pushover_user
+  pushover_token          = var.pushover_token
+  papertrail_host_legacy  = var.papertrail_host_legacy
+  papertrail_host_hosting = var.papertrail_host_hosting
+  backup_config           = local.backup_config
 }

@@ -29,17 +29,24 @@ variable "aws_region" {
 
 variable "aws_ami" {
   description = "Which AMI to use on EC2"
-  default     = "ami-236f0d4c"            # == Ubuntu 17.10 on eu-central-1
+  default     = "ami-236f0d4c" # == Ubuntu 17.10 on eu-central-1
 }
 
-variable "mailgun_api_key" {}
+variable "mailgun_api_key" {
+}
 
-variable "mailgun_smtp_password" {}
+variable "mailgun_smtp_password" {
+}
 
-variable "pushover_user" {}
+variable "pushover_user" {
+}
 
-variable "pushover_token" {}
+variable "pushover_token" {
+}
 
-variable "papertrail_host_legacy" {}
+variable "papertrail_host_legacy" {
+}
 
-variable "papertrail_host_hosting" {}
+variable "papertrail_host_hosting" {
+}
+

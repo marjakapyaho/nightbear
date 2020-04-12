@@ -8,7 +8,7 @@ module "mailgun_domain" {
   source = "./utils/aws_mailgun_domain"
 
   mail_domain   = "nightbear.fi"
-  smtp_password = "${var.mailgun_smtp_password}"
+  smtp_password = var.mailgun_smtp_password
 }
 
 module "metrics" {
@@ -47,14 +47,15 @@ module "ui_prod" {
 
 module "siren_ui" {
   source            = "./siren-ui"
-  siren_ui_password = "${var.siren_ui_password}"
+  siren_ui_password = var.siren_ui_password
 }
 
 module "hosting" {
   source                  = "./shared-hosting"
-  couchdb_admin_password  = "${var.db_admin_password}"
-  pushover_user           = "${var.pushover_user}"
-  pushover_token          = "${var.pushover_token}"
-  papertrail_host_legacy  = "${var.papertrail_host_legacy}"
-  papertrail_host_hosting = "${var.papertrail_host_hosting}"
+  couchdb_admin_password  = var.db_admin_password
+  pushover_user           = var.pushover_user
+  pushover_token          = var.pushover_token
+  papertrail_host_legacy  = var.papertrail_host_legacy
+  papertrail_host_hosting = var.papertrail_host_hosting
 }
+

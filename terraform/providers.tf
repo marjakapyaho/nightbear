@@ -1,9 +1,9 @@
 # Specify the provider and access details
 provider "aws" {
   version    = "~> 2.4"
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret_key}"
-  region     = "${var.aws_region}"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = var.aws_region
 }
 
 # https://docs.aws.amazon.com/acm/latest/userguide/acm-services.html
@@ -12,15 +12,15 @@ provider "aws" {
 provider "aws" {
   version    = "~> 2.4"
   alias      = "us_east_1"
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret_key}"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
   region     = "us-east-1"
 }
 
 # https://www.terraform.io/docs/providers/mailgun/index.html
 provider "mailgun" {
   version = "~> 0.1"
-  api_key = "${var.mailgun_api_key}"
+  api_key = var.mailgun_api_key
 }
 
 # As per best practices, pin provider versions:
@@ -36,3 +36,4 @@ provider "archive" {
 provider "template" {
   version = "~> 2.1"
 }
+
