@@ -13,6 +13,7 @@ import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParake
 import { createFilesystemJournal, runCronjobs } from 'server/main/cronjobs';
 import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
+import { DateTime } from 'luxon';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -39,6 +40,7 @@ startExpressServer(
 );
 
 // Start running periodic tasks
+context.log(`Server timezone is "${DateTime.local().zoneName}"`);
 const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
 const run = () => runCronjobs(context, journal);
 setInterval(run, 2 * MIN_IN_MS);
