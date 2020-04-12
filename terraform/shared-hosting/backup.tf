@@ -79,7 +79,7 @@ resource "aws_s3_bucket" "backup_manual" {
     enabled = true
 
     # When the backup is older than a day, move it to Glacier
-    noncurrent_version_transition {
+    transition {
       days          = 1
       storage_class = "GLACIER"
     }
