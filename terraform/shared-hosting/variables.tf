@@ -5,6 +5,7 @@ variable "pushover_user" {}
 variable "pushover_token" {}
 
 variable "papertrail_host_legacy" {}
+variable "papertrail_host_hosting" {}
 
 locals {
   active_color = "blue"
