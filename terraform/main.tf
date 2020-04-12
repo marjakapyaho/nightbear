@@ -5,7 +5,7 @@ resource "aws_route53_zone" "main" {
 module "mailgun_domain" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_mailgun_domain#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
-  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_mailgun_domain?ref=v9.4"
+  source = "./utils/aws_mailgun_domain"
 
   mail_domain   = "nightbear.fi"
   smtp_password = "${var.mailgun_smtp_password}"
