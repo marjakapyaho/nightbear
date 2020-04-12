@@ -14,6 +14,8 @@ import { activeProfile } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 import { entriesBadLow } from 'core/analyser/test-data/bad-low';
 import { entriesBadHigh } from 'core/analyser/test-data/bad-high';
+import { entriesBadHighToHigh } from 'core/analyser/test-data/bad-high-to-high';
+import { entriesBadLowToLow } from 'core/analyser/test-data/bad-low-to-low';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -221,6 +223,34 @@ describe('utils/analyser', () => {
         ...DEFAULT_STATE,
         PERSISTENT_HIGH: true,
       },
+    );
+  });
+
+  it('does not detect high when coming down from bad high', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesBadHighToHigh(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      DEFAULT_STATE,
+    );
+  });
+
+  it('does not detect low when coming up from bad low', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesBadLowToLow(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      DEFAULT_STATE,
     );
   });
 });
