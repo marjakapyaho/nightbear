@@ -1,6 +1,7 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { extendLogger } from 'core/utils/logging';
+import { readFileSync, writeFileSync } from 'fs';
 import { runChecks } from 'server/main/check-runner';
 
 // Executes a SINGLE RUN of our periodic jobs.
@@ -32,6 +33,25 @@ export function createInMemoryJournal(): CronjobsJournal {
     },
     setPreviousExecutionTime(ts: number) {
       previousExecutionTime = ts;
+      return Promise.resolve();
+    },
+  };
+}
+
+// Creates a persistent journal that tracks runs in the local filesystem.
+// Won't miss jobs while process is down, but DOES require a non-ephemeral filesystem (i.e. won't work on Lambda for example).
+export function createFilesystemJournal(file: string): CronjobsJournal {
+  return {
+    getPreviousExecutionTime() {
+      try {
+        const res = parseInt(readFileSync(file) + '');
+        return Promise.resolve(Number.isFinite(res) ? res : Date.now());
+      } catch (err) {
+        return Promise.resolve(Date.now());
+      }
+    },
+    setPreviousExecutionTime(ts: number) {
+      writeFileSync(file, ts);
       return Promise.resolve();
     },
   };

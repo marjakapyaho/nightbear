@@ -10,7 +10,7 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { createInMemoryJournal, runCronjobs } from 'server/main/cronjobs';
+import { createFilesystemJournal, runCronjobs } from 'server/main/cronjobs';
 import { startExpressServer } from 'server/main/express';
 import { startAutomaticProfileActivation } from 'server/main/profile-activation';
 
@@ -39,7 +39,7 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-const journal = createInMemoryJournal();
+const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
 const run = () => runCronjobs(context, journal);
 setInterval(run, 2 * MIN_IN_MS);
 run();
