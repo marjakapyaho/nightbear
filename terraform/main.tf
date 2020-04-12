@@ -46,11 +46,6 @@ module "ui_prod" {
   }
 }
 
-module "siren_ui" {
-  source            = "./siren-ui"
-  siren_ui_password = var.siren_ui_password
-}
-
 module "hosting" {
   source    = "./shared-hosting"
   providers = { aws.us_east_1 = aws.us_east_1 } # this alias is needed because ACM is only available in the "us-east-1" region
