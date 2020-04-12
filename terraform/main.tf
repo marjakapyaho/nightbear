@@ -16,7 +16,8 @@ module "metrics" {
 }
 
 module "router" {
-  source = "./router"
+  source    = "./router"
+  providers = { aws.us_east_1 = aws.us_east_1 } # this alias is needed because ACM is only available in the "us-east-1" region
 }
 
 module "ui_stage" {
@@ -51,7 +52,9 @@ module "siren_ui" {
 }
 
 module "hosting" {
-  source                  = "./shared-hosting"
+  source    = "./shared-hosting"
+  providers = { aws.us_east_1 = aws.us_east_1 } # this alias is needed because ACM is only available in the "us-east-1" region
+
   couchdb_admin_password  = var.db_admin_password
   pushover_user           = var.pushover_user
   pushover_token          = var.pushover_token

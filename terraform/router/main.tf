@@ -1,7 +1,8 @@
 module "router" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_lambda_api#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
-  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_lambda_api?ref=v9.4"
+  source    = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_lambda_api?ref=v9.4"
+  providers = { aws.us_east_1 = aws.us_east_1 } # this alias is needed because ACM is only available in the "us-east-1" region
 
   api_domain             = "router.nightbear.fi"
   function_zipfile       = "${path.module}/lambda-multicast-proxy-v1.2.1.zip" # https://github.com/jareware/lambda-multicast-proxy
