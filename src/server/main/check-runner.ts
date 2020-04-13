@@ -7,6 +7,7 @@ import { first, map, identity } from 'lodash';
 import { extendLogger } from 'core/utils/logging';
 
 const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
+const ANALYSIS_RANGE_FOR_ALARMS = HOUR_IN_MS;
 const CHECK_RUN_INTERVAL = 2 * MIN_IN_MS;
 let nextCheck: NodeJS.Timer;
 
@@ -30,7 +31,7 @@ export function runChecks(context: Context) {
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
-    context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
+    context.storage.loadTimelineModels(['Alarm'], ANALYSIS_RANGE_FOR_ALARMS, context.timestamp()),
   ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);

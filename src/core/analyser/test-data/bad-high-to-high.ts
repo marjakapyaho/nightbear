@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
-import { DexcomG6SensorEntry } from 'core/models/model';
+import { Alarm, DexcomG6SensorEntry } from 'core/models/model';
 import { generateUuid } from 'core/utils/id';
 
 export function entriesBadHighToHigh(currentTimestamp: number): DexcomG6SensorEntry[] {
@@ -31,6 +31,27 @@ export function entriesBadHighToHigh(currentTimestamp: number): DexcomG6SensorEn
       timestamp: currentTimestamp - 5 * MIN_IN_MS,
       bloodGlucose: 15.5,
       direction: '',
+    },
+  ];
+}
+
+export function alarmsWithInactiveBadHigh(currentTimestamp: number): Alarm[] {
+  return [
+    {
+      modelType: 'Alarm',
+      modelUuid: generateUuid(),
+      timestamp: currentTimestamp - 40 * MIN_IN_MS,
+      situationType: 'BAD_HIGH',
+      isActive: false,
+      deactivationTimestamp: currentTimestamp - 15 * MIN_IN_MS,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: currentTimestamp - 40 * MIN_IN_MS,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
     },
   ];
 }
