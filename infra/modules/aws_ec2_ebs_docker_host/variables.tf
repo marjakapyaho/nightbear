@@ -13,11 +13,13 @@ locals {
     ${file("${path.module}/provision-docker.sh")}
     ${file("${path.module}/provision-ebs.sh")}
     ${file("${path.module}/provision-swap.sh")}
-  EOF
+  
+EOF
+
 }
 
 locals {
-  availability_zone = "${data.aws_availability_zones.this.names[0]}" # use the first available AZ in the region (AWS ensures this is constant per user)
+  availability_zone = data.aws_availability_zones.this.names[0] # use the first available AZ in the region (AWS ensures this is constant per user)
 }
 
 variable "hostname" {
@@ -32,7 +34,7 @@ variable "instance_type" {
 
 variable "instance_ami" {
   description = "See https://cloud-images.ubuntu.com/locator/ec2/ for options"
-  default     = "ami-0bdf93799014acdc4"                                        # Ubuntu 18.04.1 LTS (eu-central-1, amd64, hvm:ebs-ssd, 2018-09-12)
+  default     = "ami-0bdf93799014acdc4" # Ubuntu 18.04.1 LTS (eu-central-1, amd64, hvm:ebs-ssd, 2018-09-12)
 }
 
 variable "ssh_private_key_path" {
@@ -62,22 +64,22 @@ variable "reprovision_trigger" {
 
 variable "root_volume_size" {
   description = "Size (in GiB) of the EBS volume that will be created and mounted as the root fs for the host"
-  default     = 8                                                                                              # this matches the other defaults, including the selected AMI
+  default     = 8 # this matches the other defaults, including the selected AMI
 }
 
 variable "data_volume_id" {
   description = "The ID of the EBS volume to mount as `/data`"
-  default     = ""                                             # empty string means no EBS volume will be attached
+  default     = "" # empty string means no EBS volume will be attached
 }
 
 variable "swap_file_size" {
   description = "Size of the swap file allocated on the root volume"
-  default     = "512M"                                               # a smallish default to match default 8 GiB EBS root volume
+  default     = "512M" # a smallish default to match default 8 GiB EBS root volume
 }
 
 variable "swap_swappiness" {
   description = "Swappiness value provided when creating the swap file"
-  default     = "10"                                                    # 100 will make the host use the swap as much as possible, 0 will make it use only in case of emergency
+  default     = "10" # 100 will make the host use the swap as much as possible, 0 will make it use only in case of emergency
 }
 
 variable "allow_incoming_http" {
@@ -97,6 +99,7 @@ variable "allow_incoming_dns" {
 
 variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
-  type        = "map"
+  type        = map(string)
   default     = {}
 }
+
