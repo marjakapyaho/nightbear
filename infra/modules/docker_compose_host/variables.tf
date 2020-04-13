@@ -4,7 +4,7 @@ variable "public_ip" {
 
 variable "ssh_username" {
   description = "SSH username, which can be used for provisioning the host"
-  default     = "ubuntu"                                                    # to match the corresponding default in aws_ec2_ebs_docker_host
+  default     = "ubuntu" # to match the corresponding default in aws_ec2_ebs_docker_host
 }
 
 variable "ssh_private_key" {
@@ -49,4 +49,6 @@ locals {
 # See: https://docs.docker.com/compose/extends/#multiple-compose-files
 version: "3"
 EOF
+
 }
+
