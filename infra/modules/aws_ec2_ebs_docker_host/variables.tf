@@ -1,6 +1,6 @@
 # Whenever the contents of this block changes, the host should be re-provisioned
 locals {
-  reprovision_trigger = <<EOF
+  reprovision_trigger = <<-EOF
     # Trigger reprovision on variable changes:
     ${var.hostname}
     ${var.ssh_username}
@@ -13,9 +13,7 @@ locals {
     ${file("${path.module}/provision-docker.sh")}
     ${file("${path.module}/provision-ebs.sh")}
     ${file("${path.module}/provision-swap.sh")}
-  
-EOF
-
+  EOF
 }
 
 locals {
@@ -34,7 +32,7 @@ variable "instance_type" {
 
 variable "instance_ami" {
   description = "See https://cloud-images.ubuntu.com/locator/ec2/ for options"
-  default     = "ami-0bdf93799014acdc4" # Ubuntu 18.04.1 LTS (eu-central-1, amd64, hvm:ebs-ssd, 2018-09-12)
+  default     = "ami-0701e7be9b2a77600" # Ubuntu 18.04 LTS (eu-west-1, amd64, hvm:ebs-ssd, 2020-04-08), or "ami-0bdf93799014acdc4" for eu-central-1
 }
 
 variable "ssh_private_key_path" {
@@ -102,4 +100,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-

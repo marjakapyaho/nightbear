@@ -8,18 +8,8 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = [aws_security_group.this.id]
   subnet_id              = data.aws_subnet.this.id
   user_data              = sha1(local.reprovision_trigger) # this value isn't used by the EC2 instance, but its change will trigger re-creation of the resource
-  tags = merge(
-    var.tags,
-    {
-      "Name" = var.hostname
-    },
-  )
-  volume_tags = merge(
-    var.tags,
-    {
-      "Name" = var.hostname
-    },
-  ) # give the root EBS volume a name (+ other possible tags) that makes it easier to identify as belonging to this host
+  tags                   = merge(var.tags, { Name = var.hostname })
+  volume_tags            = merge(var.tags, { Name = var.hostname }) # give the root EBS volume a name (+ other possible tags) that makes it easier to identify as belonging to this host
 
   root_block_device {
     volume_size = var.root_volume_size
@@ -78,16 +68,13 @@ resource "null_resource" "provisioners" {
   }
 
   # When creating the attachment
-  # When creating the attachment
   provisioner "remote-exec" {
     script = "${path.module}/provision-ebs.sh"
   }
 
-  # When tearing down the attachment
   # When tearing down the attachment
   provisioner "remote-exec" {
     when   = destroy
     inline = ["sudo umount -v ${aws_volume_attachment.this[0].device_name}"]
   }
 }
-

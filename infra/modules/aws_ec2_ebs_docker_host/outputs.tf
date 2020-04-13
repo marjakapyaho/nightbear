@@ -37,4 +37,3 @@ output "security_group_id" {
   description = "Security Group ID, for attaching additional security rules externally"
   value       = aws_security_group.this.id
 }
-
