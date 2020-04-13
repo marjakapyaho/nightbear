@@ -13,17 +13,16 @@ resource "null_resource" "provisioners" {
 
   provisioner "remote-exec" {
     inline = [
-      <<EOF
-command -v docker-compose && (docker-compose -v | grep ${var.docker_compose_version})
-if [ "$?" -gt 0 ]; then
-  sudo curl -L https://github.com/docker/compose/releases/download/${var.docker_compose_version}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose # https://docs.docker.com/compose/install/
-  sudo chmod +x /usr/local/bin/docker-compose
-  echo "docker-compose (${var.docker_compose_version}) installed"
-else
-  echo "docker-compose (${var.docker_compose_version}) already installed"
-fi
-EOF
-      ,
+      <<-EOF
+        command -v docker-compose && (docker-compose -v | grep ${var.docker_compose_version})
+        if [ "$?" -gt 0 ]; then
+          sudo curl -L https://github.com/docker/compose/releases/download/${var.docker_compose_version}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose # https://docs.docker.com/compose/install/
+          sudo chmod +x /usr/local/bin/docker-compose
+          echo "docker-compose (${var.docker_compose_version}) installed"
+        else
+          echo "docker-compose (${var.docker_compose_version}) already installed"
+        fi
+      EOF
     ]
   }
 
@@ -51,4 +50,3 @@ EOF
     inline = [var.docker_compose_down_command]
   }
 }
-

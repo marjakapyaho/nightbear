@@ -44,11 +44,9 @@ variable "docker_compose_down_command" {
 }
 
 locals {
-  docker_compose_override_yml_default = <<EOF
-# Any docker-compose services defined here will be merged on top of docker-compose.yml
-# See: https://docs.docker.com/compose/extends/#multiple-compose-files
-version: "3"
-EOF
-
+  docker_compose_override_yml_default = <<-EOF
+    # Any docker-compose services defined here will be merged on top of docker-compose.yml
+    # See: https://docs.docker.com/compose/extends/#multiple-compose-files
+    version: "3"
+  EOF
 }
-
