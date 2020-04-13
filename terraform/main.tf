@@ -1,7 +1,3 @@
-resource "aws_route53_zone" "main" {
-  name = "nightbear.fi"
-}
-
 module "mailgun_domain" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_mailgun_domain#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
