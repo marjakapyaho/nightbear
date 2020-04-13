@@ -15,19 +15,6 @@ module "metrics" {
   source = "./metrics"
 }
 
-module "ui_stage" {
-  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_static_site#inputs
-  # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
-  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_static_site?ref=v9.4"
-
-  site_domain = "stage.nightbear.fi"
-
-  tags = {
-    Nightbear_Component   = "ui"
-    Nightbear_Environment = "stage"
-  }
-}
-
 module "ui_prod" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_static_site#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
