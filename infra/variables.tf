@@ -12,3 +12,7 @@ variable "tags" {
     Environment = "infra"
   }
 }
+
+variable "papertrail_host_hosting" {
+  description = "Docker hosting for all envs should log to this destination, e.g. using logspout"
+}

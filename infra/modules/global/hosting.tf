@@ -54,3 +54,31 @@ EOF
     inline = ["sudo rm -fv ${local.unattended_upgrades_file}"]
   }
 }
+
+module "docker_compose" {
+  source = "../docker_compose_host"
+
+  public_ip       = module.docker_host.public_ip
+  ssh_username    = module.docker_host.ssh_username
+  ssh_private_key = module.docker_host.ssh_private_key
+
+  docker_compose_yml = <<EOF
+version: "3"
+
+services:
+
+  test:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+
+  logspout:
+    image: gliderlabs/logspout:v3.2.6
+    restart: always
+    command: syslog+tls://${var.papertrail_host_hosting}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+EOF
+}

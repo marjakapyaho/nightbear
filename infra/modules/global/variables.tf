@@ -6,3 +6,7 @@ variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
   type        = map(string)
 }
+
+variable "papertrail_host_hosting" {
+  description = "Docker hosting for all envs should log to this destination, e.g. using logspout"
+}
