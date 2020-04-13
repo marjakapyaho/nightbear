@@ -8,13 +8,12 @@ import {
   DeviceStatus,
   Insulin,
   SensorEntry,
-  Situation,
   State,
 } from 'core/models/model';
 import { chain, filter, find, some } from 'lodash';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
-const HIGH_CLEARING_THRESHOLD = 0.5;
+const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
 
 const slopeLimits = {
@@ -29,7 +28,7 @@ export function runAnalysis(
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
   deviceStatus: DeviceStatus | undefined,
-  existingActiveAlarms: Alarm[],
+  latestAlarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries)
@@ -67,7 +66,7 @@ export function runAnalysis(
   // Must be before FALLING
   state = {
     ...state,
-    LOW: detectLow(state, activeProfile, latestEntry, existingActiveAlarms),
+    LOW: detectLow(state, activeProfile, latestEntry, latestAlarms),
   };
 
   state = {
@@ -89,7 +88,7 @@ export function runAnalysis(
   // Must be before RISING
   state = {
     ...state,
-    HIGH: detectHigh(state, activeProfile, latestEntry, existingActiveAlarms),
+    HIGH: detectHigh(state, activeProfile, latestEntry, latestAlarms),
   };
 
   state = {
@@ -117,13 +116,16 @@ function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry
   }
 }
 
-function detectLow(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry, existingActiveAlarms: Alarm[]) {
-  const situationType: Situation = 'LOW';
-  const correctionIfAlreadyLow = find(existingActiveAlarms, { situationType }) ? LOW_CLEARING_THRESHOLD : 0;
+function detectLow(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry, latestAlarms: Alarm[]) {
+  const notCurrentlyBadLow = !state.BAD_LOW;
+  const notComingUpFromBadLow = !find(latestAlarms, { situationType: 'BAD_LOW' });
+  const correctionIfAlreadyLow = find(latestAlarms, { situationType: 'LOW', isActive: true })
+    ? LOW_CLEARING_THRESHOLD
+    : 0;
   return (
-    !state.BAD_LOW &&
-    entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_ABS + correctionIfAlreadyLow &&
-    (!entry.slope || (!!entry.slope && entry.slope < 0))
+    notCurrentlyBadLow &&
+    notComingUpFromBadLow &&
+    entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_ABS + correctionIfAlreadyLow
   );
 }
 
@@ -156,18 +158,16 @@ function detectCompressionLow(activeProfile: ActiveProfile, entries: AnalyserEnt
   return !!find(entries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
 }
 
-function detectHigh(
-  state: State,
-  activeProfile: ActiveProfile,
-  entry: AnalyserEntry,
-  existingActiveAlarms: Alarm[],
-): boolean {
-  const situationType: Situation = 'HIGH';
-  const correctionIfAlreadyHigh = find(existingActiveAlarms, { situationType }) ? HIGH_CLEARING_THRESHOLD : 0;
+function detectHigh(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry, latestAlarms: Alarm[]): boolean {
+  const notCurrentlyBadHigh = !state.BAD_HIGH;
+  const notComingDownFromBadHigh = !find(latestAlarms, { situationType: 'BAD_HIGH' });
+  const correctionIfAlreadyHigh = find(latestAlarms, { situationType: 'HIGH', isActive: true })
+    ? HIGH_CLEARING_THRESHOLD
+    : 0;
   return (
-    !state.BAD_HIGH &&
-    entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh &&
-    (!entry.slope || (!!entry.slope && entry.slope > 0))
+    notCurrentlyBadHigh &&
+    notComingDownFromBadHigh &&
+    entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh
   );
 }
 

@@ -14,8 +14,10 @@ import { activeProfile } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
 import { entriesBadLow } from 'core/analyser/test-data/bad-low';
 import { entriesBadHigh } from 'core/analyser/test-data/bad-high';
-import { entriesBadHighToHigh } from 'core/analyser/test-data/bad-high-to-high';
-import { entriesBadLowToLow } from 'core/analyser/test-data/bad-low-to-low';
+import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'core/analyser/test-data/bad-high-to-high';
+import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'core/analyser/test-data/bad-low-to-low';
+import { entriesHighFluctuations } from 'core/analyser/test-data/high-fluctuations';
+import { entriesLowFluctuations } from 'core/analyser/test-data/low-fluctuations';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -234,7 +236,7 @@ describe('utils/analyser', () => {
         entriesBadHighToHigh(currentTimestamp),
         insulin,
         deviceStatus,
-        latestAlarms,
+        alarmsWithInactiveBadHigh(currentTimestamp),
       ),
       DEFAULT_STATE,
     );
@@ -248,9 +250,43 @@ describe('utils/analyser', () => {
         entriesBadLowToLow(currentTimestamp),
         insulin,
         deviceStatus,
-        latestAlarms,
+        alarmsWithInactiveBadLow(currentTimestamp),
       ),
       DEFAULT_STATE,
+    );
+  });
+
+  it('keeps high alarm regardless of fluctuations', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesHighFluctuations(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        HIGH: true,
+      },
+    );
+  });
+
+  it('keeps low alarm regardless of fluctuations', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesLowFluctuations(currentTimestamp),
+        insulin,
+        deviceStatus,
+        latestAlarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        LOW: true,
+      },
     );
   });
 });
