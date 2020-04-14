@@ -23,6 +23,7 @@ describe('utils/analyser', () => {
   // Mock objects
   const currentTimestamp = 1508672249758;
   const insulin: Insulin[] = [];
+  const activeAlarms: Alarm[] = [];
   const latestAlarms: Alarm[] = [];
 
   const deviceStatus: DeviceStatus = {
@@ -43,6 +44,7 @@ describe('utils/analyser', () => {
         entriesNoSituation(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       DEFAULT_STATE,
@@ -66,6 +68,7 @@ describe('utils/analyser', () => {
         entriesNoSituation(currentTimestamp),
         insulin,
         deviceStatusBattery,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -83,6 +86,7 @@ describe('utils/analyser', () => {
         entriesOutdated(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -100,6 +104,7 @@ describe('utils/analyser', () => {
         entriesLow(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -117,6 +122,7 @@ describe('utils/analyser', () => {
         entriesBadLow(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -134,6 +140,7 @@ describe('utils/analyser', () => {
         entriesFalling(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -151,6 +158,7 @@ describe('utils/analyser', () => {
         entriesCompressionLow(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -168,6 +176,7 @@ describe('utils/analyser', () => {
         entriesHigh(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -185,6 +194,7 @@ describe('utils/analyser', () => {
         entriesBadHigh(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -202,6 +212,7 @@ describe('utils/analyser', () => {
         entriesRising(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -219,6 +230,7 @@ describe('utils/analyser', () => {
         entriesPersistentHigh(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -236,6 +248,7 @@ describe('utils/analyser', () => {
         entriesBadHighToHigh(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         alarmsWithInactiveBadHigh(currentTimestamp),
       ),
       DEFAULT_STATE,
@@ -250,6 +263,7 @@ describe('utils/analyser', () => {
         entriesBadLowToLow(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         alarmsWithInactiveBadLow(currentTimestamp),
       ),
       DEFAULT_STATE,
@@ -264,6 +278,7 @@ describe('utils/analyser', () => {
         entriesHighFluctuations(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {
@@ -281,6 +296,7 @@ describe('utils/analyser', () => {
         entriesLowFluctuations(currentTimestamp),
         insulin,
         deviceStatus,
+        activeAlarms,
         latestAlarms,
       ),
       {

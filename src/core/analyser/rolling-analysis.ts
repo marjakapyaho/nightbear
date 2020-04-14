@@ -108,6 +108,7 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
         insulins.filter(relevantToThisBucket),
         undefined, // TODO: Which DeviceStatus should go here..?
         activeAlarms.filter(relevantToThisBucket),
+        activeAlarms.filter(relevantToThisBucket), // TODO: this should be latest
       ),
     ] as RollingAnalysisRawResult;
   });
