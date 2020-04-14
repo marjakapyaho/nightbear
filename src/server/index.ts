@@ -1,6 +1,8 @@
+import { MIN_IN_MS } from 'core/calculations/calculations';
 import { createNodeContext } from 'core/models/api';
 import { consoleLogStream } from 'core/utils/logging';
 import debug from 'debug';
+import { DateTime } from 'luxon';
 import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
 import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
 import { getEntries } from 'server/api/getEntries/getEntries';
@@ -9,14 +11,16 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { startRunningChecks } from 'server/main/check-runner';
+import { createFilesystemJournal, runCronjobs } from 'server/main/cronjobs';
 import { startExpressServer } from 'server/main/express';
-import { startAutomaticProfileActivation } from 'server/main/profile-activation';
 
+// Direct log output to where we want it
 debug.log = consoleLogStream;
 
+// Create application runtime context
 const context = createNodeContext();
 
+// Start serving API requests
 startExpressServer(
   context,
   ['post', '/ack-latest-alarm', ackActiveAlarms],
@@ -34,5 +38,9 @@ startExpressServer(
   err => context.log(`Server error: ${err.message}`, err),
 );
 
-startRunningChecks(context);
-startAutomaticProfileActivation(context);
+// Start running periodic tasks
+context.log(`Server timezone is "${DateTime.local().zoneName}"`);
+const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
+const run = () => runCronjobs(context, journal);
+setInterval(run, 2 * MIN_IN_MS);
+run();

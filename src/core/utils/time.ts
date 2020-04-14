@@ -4,3 +4,13 @@ import { DateTime } from 'luxon';
 export function humanReadableShortTime(utcTs: number) {
   return DateTime.fromMillis(utcTs).toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 }
+
+// Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.
+// Note that this may be in the past or in the future, relevant to Date.now().
+export function getActivationTimestamp(spec: { hours: number; minutes?: number; seconds?: number }) {
+  const d = new Date();
+  d.setUTCHours(spec.hours);
+  d.setUTCMinutes(spec?.minutes || 0);
+  d.setUTCSeconds(spec?.seconds || 0);
+  return d.getTime();
+}

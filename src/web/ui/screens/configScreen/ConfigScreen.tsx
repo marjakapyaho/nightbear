@@ -1,6 +1,6 @@
 import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
-import { humanReadableShortTime } from 'core/utils/time';
+import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time';
 import { css } from 'emotion';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
@@ -83,9 +83,5 @@ export default (() => {
 
 function getAutoActTime(profile: SavedProfile): string {
   if (!profile.activatedAtUtc) return '';
-  const d = new Date();
-  d.setUTCHours(profile.activatedAtUtc.hours);
-  d.setUTCMinutes(profile.activatedAtUtc.minutes);
-  d.setUTCSeconds(0);
-  return humanReadableShortTime(d.getTime());
+  return humanReadableShortTime(getActivationTimestamp(profile.activatedAtUtc));
 }
