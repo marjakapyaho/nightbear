@@ -1,4 +1,4 @@
-import { SensorEntry } from 'core/models/model';
+import { Alarm, SensorEntry } from 'core/models/model';
 
 export type ObjMap<K extends string, V> = { [P in K]: V };
 
@@ -16,3 +16,5 @@ export function mapObject<K extends string, V1, V2>(object: ObjMap<K, V1>, mappe
 export type SensorEntryWithBg = SensorEntry & { bloodGlucose: number };
 
 export const hasBloodGlucose = (e: SensorEntry): e is SensorEntryWithBg => !!e.bloodGlucose;
+
+export const onlyActive = (alarms: Alarm[]) => alarms.filter(alarm => alarm.isActive);

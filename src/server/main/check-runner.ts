@@ -3,10 +3,12 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context } from 'core/models/api';
+import { first, map, identity } from 'lodash';
 import { extendLogger } from 'core/utils/logging';
-import { first, identity, map } from 'lodash';
+import { onlyActive } from 'server/utils/data';
 
-const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
+export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
+export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
 export function runChecks(context: Context) {
   const log = extendLogger(context.log, 'check');
@@ -16,30 +18,20 @@ export function runChecks(context: Context) {
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
-    context.storage.loadLatestTimelineModels('Alarm', undefined, { isActive: true }),
-    // TODO: we actually need ALL active alarms + alarms that have deactivationTimestamp within past hour
-    context.storage.loadTimelineModels(['Alarm'], ANALYSIS_RANGE, context.timestamp()),
-  ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, activeAlarms, latestAlarms]) => {
+    context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),
+  ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
     if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
     log(`1. Using profile: ${activeProfile?.profileName}`);
-    const state = runAnalysis(
-      context.timestamp(),
-      activeProfile,
-      sensorEntries,
-      insulin,
-      deviceStatus,
-      activeAlarms,
-      latestAlarms,
-    );
+    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
     log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
 
-    return runAlarmChecks(context, state, activeProfile, activeAlarms).then(alarms => {
+    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {
       log(
         `There were changes in ${alarms.length} alarms with types: ${alarms
           .map(alarm => alarm.situationType)

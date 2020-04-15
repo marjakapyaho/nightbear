@@ -1,14 +1,15 @@
 import { runAnalysis } from 'core/analyser/analyser';
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 import { DEFAULT_STATE, Model, Situation, State, TimelineModel } from 'core/models/model';
 import { firstModel, is, lastModel } from 'core/models/utils';
 import { TypeOfArray } from 'core/types/utils';
 import { first, flatten, groupBy, range, values } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
+import { ALARM_FETCH_RANGE, ANALYSIS_RANGE } from 'server/main/check-runner';
 
 export const BUCKET_SIZE = 5 * MIN_IN_MS; // this determines the granularity of the rolling analysis - i.e. run analyser every 5 minutes
-export const PRE_MARGIN = 3 * HOUR_IN_MS; // how much history we want to make available to the analyser per each bucket
+export const PRE_MARGIN = ANALYSIS_RANGE; // how much history we want to make available to the analyser per each bucket
 
 export type RollingAnalysisResults = Array<
   Array<
@@ -89,7 +90,7 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
     is('DexcomG6SensorEntry', 'DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'),
   );
   const insulins = models.filter(is('Insulin'));
-  const activeAlarms = models.filter(is('Alarm')).filter(a => a.isActive);
+  const alarms = models.filter(is('Alarm'));
   let missingProfileBefore: number | undefined;
   const res = buckets.map(([base, from, to]) => {
     const relevantToThisBucket = (m: TimelineModel) => m.timestamp > base && m.timestamp < to;
@@ -107,8 +108,7 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
         sensorEntries.filter(relevantToThisBucket),
         insulins.filter(relevantToThisBucket),
         undefined, // TODO: Which DeviceStatus should go here..?
-        activeAlarms.filter(relevantToThisBucket),
-        activeAlarms.filter(relevantToThisBucket), // TODO: this should be latest
+        alarms.filter(m => m.timestamp > to - ALARM_FETCH_RANGE && m.timestamp < to),
       ),
     ] as RollingAnalysisRawResult;
   });

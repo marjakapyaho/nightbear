@@ -11,10 +11,13 @@ import {
   State,
 } from 'core/models/model';
 import { chain, filter, find, some } from 'lodash';
+import { onlyActive } from 'server/utils/data';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
+const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
+const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -28,8 +31,7 @@ export function runAnalysis(
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
   deviceStatus: DeviceStatus | undefined,
-  activeAlarms: Alarm[],
-  latestAlarms: Alarm[],
+  alarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries)
@@ -67,7 +69,7 @@ export function runAnalysis(
   // Must be before FALLING
   state = {
     ...state,
-    LOW: detectLow(state, activeProfile, latestEntry, activeAlarms, latestAlarms),
+    LOW: detectLow(state, activeProfile, latestEntry, alarms, currentTimestamp),
   };
 
   state = {
@@ -89,7 +91,7 @@ export function runAnalysis(
   // Must be before RISING
   state = {
     ...state,
-    HIGH: detectHigh(state, activeProfile, latestEntry, activeAlarms, latestAlarms),
+    HIGH: detectHigh(state, activeProfile, latestEntry, alarms, currentTimestamp),
   };
 
   state = {
@@ -121,12 +123,17 @@ function detectLow(
   state: State,
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
-  activeAlarms: Alarm[],
-  latestAlarms: Alarm[],
+  alarms: Alarm[],
+  currentTimestamp: number,
 ) {
   const notCurrentlyBadLow = !state.BAD_LOW;
-  const notComingUpFromBadLow = !find(latestAlarms, { situationType: 'BAD_LOW' });
-  const correctionIfAlreadyLow = find(activeAlarms, { situationType: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
+  const notComingUpFromBadLow = !find(
+    alarms,
+    alarm =>
+      (!alarm.deactivationTimestamp || alarm.deactivationTimestamp > currentTimestamp - BAD_LOW_QUARANTINE_WINDOW) &&
+      alarm.situationType === 'BAD_LOW',
+  );
+  const correctionIfAlreadyLow = find(onlyActive(alarms), { situationType: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
   return (
     notCurrentlyBadLow &&
     notComingUpFromBadLow &&
@@ -167,12 +174,17 @@ function detectHigh(
   state: State,
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
-  activeAlarms: Alarm[],
-  latestAlarms: Alarm[],
+  alarms: Alarm[],
+  currentTimestamp: number,
 ): boolean {
   const notCurrentlyBadHigh = !state.BAD_HIGH;
-  const notComingDownFromBadHigh = !find(latestAlarms, { situationType: 'BAD_HIGH' });
-  const correctionIfAlreadyHigh = find(activeAlarms, { situationType: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
+  const notComingDownFromBadHigh = !find(
+    alarms,
+    alarm =>
+      (!alarm.deactivationTimestamp || alarm.deactivationTimestamp > currentTimestamp - BAD_HIGH_QUARANTINE_WINDOW) &&
+      alarm.situationType === 'BAD_HIGH',
+  );
+  const correctionIfAlreadyHigh = find(onlyActive(alarms), { situationType: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
   return (
     notCurrentlyBadHigh &&
     notComingDownFromBadHigh &&
