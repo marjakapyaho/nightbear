@@ -1,6 +1,6 @@
 import { runAlarmChecks } from 'core/alarms/alarms';
 import { runAnalysis } from 'core/analyser/analyser';
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
 import { Context } from 'core/models/api';
 import { first, map, identity } from 'lodash';
