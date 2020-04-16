@@ -11,19 +11,6 @@ module "metrics" {
   source = "./metrics"
 }
 
-module "ui_prod" {
-  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_static_site#inputs
-  # Check for updates: https://github.com/futurice/terraform-utils/compare/v9.4...master
-  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_static_site?ref=v9.4"
-
-  site_domain = "nightbear.fi"
-
-  tags = {
-    Nightbear_Component   = "ui"
-    Nightbear_Environment = "prod"
-  }
-}
-
 module "hosting" {
   source    = "./shared-hosting"
   providers = { aws.us_east_1 = aws.us_east_1 } # this alias is needed because ACM is only available in the "us-east-1" region

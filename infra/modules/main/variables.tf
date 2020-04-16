@@ -6,3 +6,7 @@ variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
   type        = map(string)
 }
+
+variable "ui_domain" {
+  description = "Domain on which the UI will be made available (e.g. `\"www.example.com\"`)"
+}
