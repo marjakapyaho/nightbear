@@ -55,7 +55,7 @@ type _SensorEntry = Readonly<{
 export type DexcomG6ShareEntry = _Model<'DexcomG6ShareEntry'> &
   _SensorEntry &
   Readonly<{
-    trend: number; // e.g. 4
+    trend: number; // e.g. 4, unit is mg/dL/min
   }>;
 
 export type DexcomG6SensorEntry = _Model<'DexcomG6SensorEntry'> &
