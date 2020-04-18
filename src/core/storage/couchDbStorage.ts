@@ -317,6 +317,7 @@ export function getStorageKey(model: Model): string {
   switch (model.modelType) {
     case 'Alarm':
     case 'Sensor':
+    case 'DexcomG6ShareEntry':
     case 'DexcomG6SensorEntry':
     case 'DexcomSensorEntry':
     case 'DexcomRawSensorEntry':
