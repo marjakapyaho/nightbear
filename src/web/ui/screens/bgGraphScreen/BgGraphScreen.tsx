@@ -27,6 +27,7 @@ export default (() => {
   const { timelineRange, timelineRangeEnd } = navigationState;
   const modelBeingEdited = getModelByUuid(dataState, navigationState.modelUuidBeingEdited);
   const bgModels = mergeEntriesFeed([
+    dataState.timelineModels.filter(is('DexcomG6ShareEntry')),
     dataState.timelineModels.filter(is('DexcomG6SensorEntry')),
     dataState.timelineModels.filter(is('DexcomSensorEntry')),
     dataState.timelineModels.filter(is('DexcomRawSensorEntry')),

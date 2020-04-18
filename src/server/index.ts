@@ -12,6 +12,7 @@ import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { createFilesystemJournal, runCronjobs } from 'server/main/cronjobs';
+import { startDexcomSharePolling } from 'server/main/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 
 // Direct log output to where we want it
@@ -44,3 +45,6 @@ const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
 const run = () => runCronjobs(context, journal);
 setInterval(run, 2 * MIN_IN_MS);
 run();
+
+// Start experimental Dexcom Share integration
+startDexcomSharePolling(context);

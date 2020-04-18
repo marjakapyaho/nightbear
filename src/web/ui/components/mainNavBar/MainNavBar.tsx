@@ -14,6 +14,7 @@ export default (props => {
   const dataState = useReduxState(s => s.data);
 
   const bgModels = mergeEntriesFeed([
+    dataState.timelineModels.filter(is('DexcomG6ShareEntry')),
     dataState.timelineModels.filter(is('DexcomG6SensorEntry')),
     dataState.timelineModels.filter(is('DexcomSensorEntry')),
     dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
