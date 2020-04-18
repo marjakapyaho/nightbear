@@ -5,6 +5,11 @@ const DEXCOM_APPLICATION_ID = 'd8665ade-9673-4e27-9ff6-92db4ce13d13';
 
 export type DexcomShareClient = ReturnType<typeof createDexcomShareClient>;
 
+export const NO_DEXCOM_SHARE: DexcomShareClient = {
+  login: () => Promise.resolve(''),
+  fetchBg: () => Promise.resolve([]),
+};
+
 export function createDexcomShareClient(username: string, password: string, logger: Logger) {
   const log = extendLogger(logger, 'dexcom-share');
 
