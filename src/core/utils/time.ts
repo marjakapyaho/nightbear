@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 export const TZ = 'Europe/Helsinki';
 
 // @example "12:34"
-export function humanReadableShortTime(msUtc: number) {
+export function humanReadableShortTime(msUtc: number = Date.now()) {
   return DateTime.fromMillis(msUtc)
     .setZone(TZ)
     .toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
