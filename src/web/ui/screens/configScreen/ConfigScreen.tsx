@@ -4,15 +4,15 @@ import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time'
 import { css } from 'emotion';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
+import { Checkbox } from 'pretty-checkbox-react';
+import { fontColor } from 'web/utils/colors';
+import { fontSize } from 'web/utils/config';
 
 type Props = {};
 
+const checkboxStyles = { display: 'block', marginBottom: 20, color: fontColor, fontSize: fontSize };
+
 const styles = {
-  checkbox: css({
-    display: 'block',
-    padding: 10,
-    margin: 10,
-  }),
   profile: css({
     padding: 20,
     background: 'whitesmoke',
@@ -30,23 +30,30 @@ export default (() => {
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
 
   return (
-    <div>
-      <label className={styles.checkbox}>
-        <input type="checkbox" checked={configState.showRollingAnalysis} onChange={actions.ROLLING_ANALYSIS_TOGGLED} />
-        Show rolling analysis
-      </label>
-      <label className={styles.checkbox}>
-        <input type="checkbox" checked={configState.autoRefreshData} onChange={actions.AUTO_REFRESH_TOGGLED} />
+    <div
+      style={{
+        padding: 20,
+      }}
+    >
+      <Checkbox
+        style={checkboxStyles}
+        className="p-curve"
+        state={configState.autoRefreshData}
+        onChange={actions.AUTO_REFRESH_TOGGLED}
+      >
         Auto-refresh timeline data
-      </label>
-      <label className={styles.checkbox}>
-        <input type="checkbox" checked={configState.zoomedInTimeline} onChange={actions.ZOOMED_IN_TIMELINE_TOGGLED} />
+      </Checkbox>
+      <Checkbox
+        style={checkboxStyles}
+        className="p-curve"
+        state={configState.zoomedInTimeline}
+        onChange={actions.ZOOMED_IN_TIMELINE_TOGGLED}
+      >
         Zoomed in timeline
-      </label>
-
+      </Checkbox>
       <div
         style={{
-          padding: 20,
+          paddingTop: 20,
         }}
       >
         <h1>Misc</h1>
@@ -57,7 +64,7 @@ export default (() => {
 
       <div
         style={{
-          padding: 20,
+          paddingTop: 20,
         }}
       >
         <h1>Profiles</h1>
