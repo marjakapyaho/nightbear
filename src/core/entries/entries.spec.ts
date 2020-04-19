@@ -13,11 +13,36 @@ import {
   ERASED_UUID,
 } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
+import { parseDexcomG6ShareEntryFromRequest } from 'server/share/dexcom-share-utils';
+import { DexcomShareBgResponse } from 'server/share/dexcom-share-client';
 
 describe('core/entries', () => {
   const timestamp = 1508672249758;
 
-  // Mock requests
+  // Mock requests (and mock share entry)
+  const mockG6ShareEntry: DexcomShareBgResponse = {
+    DT: '/Date(1426780716000-0700)/',
+    ST: '/Date(1426784306000)/',
+    Trend: 4,
+    Value: 99,
+    WT: `/Date(${timestamp - 40 * MIN_IN_MS})/`,
+  };
+
+  const mockRequestG6SensorEntry: Request = {
+    requestId: '',
+    requestMethod: '',
+    requestPath: '',
+    requestHeaders: {},
+    requestParams: {},
+    requestBody: {
+      device: 'xDrip-DexcomG5 G5 Native',
+      date: timestamp - 35 * MIN_IN_MS,
+      dateString: '2020-03-30T02:15:00.821+0300',
+      sgv: 126,
+      direction: 'FortyFiveDown',
+    },
+  };
+
   const mockRequestDexcomEntry: Request = {
     requestId: '',
     requestMethod: '',
@@ -127,6 +152,8 @@ describe('core/entries', () => {
             },
           ),
         )
+        .then(() => context.storage.saveModel(parseDexcomG6ShareEntryFromRequest(mockG6ShareEntry)))
+        .then(() => uploadDexcomEntry(mockRequestG6SensorEntry, context))
         .then(() => uploadDexcomEntry(mockRequestDexcomEntry, context))
         .then(() => uploadParakeetEntry(mockRequestParakeetEntryHidden, context))
         .then(() => uploadDexcomEntry(mockRequestRawDexcomEntry, context))
@@ -135,6 +162,20 @@ describe('core/entries', () => {
         .then(() => getMergedEntriesFeed(context, 24 * HOUR_IN_MS, timestamp))
         .then(entries => {
           assertEqualWithoutMeta(entries.map(eraseModelUuid), [
+            {
+              modelType: 'DexcomG6ShareEntry',
+              modelUuid: ERASED_UUID,
+              timestamp: timestamp - 40 * MIN_IN_MS,
+              bloodGlucose: 5.5,
+              trend: 4,
+            },
+            {
+              modelType: 'DexcomG6SensorEntry',
+              modelUuid: ERASED_UUID,
+              timestamp: timestamp - 35 * MIN_IN_MS,
+              bloodGlucose: 7,
+              direction: 'FortyFiveDown',
+            },
             {
               modelType: 'MeterEntry',
               modelUuid: ERASED_UUID,

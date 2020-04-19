@@ -1,9 +1,9 @@
-import { changeBloodGlucoseUnitToMmoll, HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { DexcomG6ShareEntry } from 'core/models/model';
-import { generateUuid } from 'core/utils/id';
 import { extendLogger } from 'core/utils/logging';
 import { first, isArray } from 'lodash';
+import { parseDexcomG6ShareEntryFromRequest } from 'server/share/dexcom-share-utils';
 
 export function startDexcomSharePolling(context: Context) {
   const log = extendLogger(context.log, 'dexcom-share');
@@ -38,13 +38,7 @@ export function startDexcomSharePolling(context: Context) {
         if (!isArray(res)) throw new Error(`Unexpected response payload: ${typeof res}`);
         if (res.length !== 1) throw new Error(`Unexpected response length: ${res.length}`);
         const [val] = res;
-        const model: DexcomG6ShareEntry = {
-          modelType: 'DexcomG6ShareEntry',
-          modelUuid: generateUuid(),
-          timestamp: parseInt(val.WT.replace(/.*Date\(([0-9]+).*/, '$1'), 10), // e.g. "/Date(1587217854000)/" => 1587217854000
-          bloodGlucose: changeBloodGlucoseUnitToMmoll(val.Value),
-          trend: val.Trend,
-        };
+        const model: DexcomG6ShareEntry = parseDexcomG6ShareEntryFromRequest(val);
         log(
           `BG is ${model.bloodGlucose}, trend is ${model.trend}, timestamp is ${new Date(
             model.timestamp,
