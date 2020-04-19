@@ -26,7 +26,7 @@ export default (() => {
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
-  const profiles = dataState.globalModels.filter(is('SavedProfile'));
+  const profiles = dataState.globalModels.filter(is('SavedProfile')).filter(profile => profile.profileName !== 'OFF');
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
 
   return (
@@ -49,6 +49,17 @@ export default (() => {
           padding: 20,
         }}
       >
+        <h1>Misc</h1>
+        <div>
+          <button onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>Ack latest alarm</button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: 20,
+        }}
+      >
         <h1>Profiles</h1>
         <div>
           {profiles.map(profile => (
@@ -64,17 +75,6 @@ export default (() => {
               {profile.activatedAtUtc && <span>&nbsp;(activates {getAutoActTime(profile)})</span>}
             </div>
           ))}
-        </div>
-      </div>
-
-      <div
-        style={{
-          padding: 20,
-        }}
-      >
-        <h1>Misc</h1>
-        <div>
-          <button onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>Ack latest alarm</button>
         </div>
       </div>
     </div>
