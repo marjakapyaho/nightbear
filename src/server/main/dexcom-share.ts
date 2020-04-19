@@ -3,7 +3,7 @@ import { Context } from 'core/models/api';
 import { DexcomG6ShareEntry } from 'core/models/model';
 import { generateUuid } from 'core/utils/id';
 import { extendLogger } from 'core/utils/logging';
-import { isArray } from 'lodash';
+import { first, isArray } from 'lodash';
 
 export function startDexcomSharePolling(context: Context) {
   const log = extendLogger(context.log, 'dexcom-share');
@@ -50,6 +50,19 @@ export function startDexcomSharePolling(context: Context) {
             model.timestamp,
           ).toISOString()}`,
         );
+        return Promise.resolve()
+          .then(() => context.storage.loadTimelineModels(['DexcomG6ShareEntry'], 0, model.timestamp)) // see if we can find an entry of the same type that already exists with this exact timestamp
+          .then(entries => first(entries))
+          .then(existingEntry => {
+            if (existingEntry) {
+              // Already exists in the DB -> no need to do anything!
+              log(`This ${existingEntry.modelType} already exists in DB`);
+            } else {
+              // We didn't find the entry yet -> create it
+              return context.storage.saveModel(model);
+            }
+          })
+          .then(() => log(`Saved new ${model.modelType} to DB`));
       })
       .catch(err => {
         log(`Could not fetch BG (caused by\n${err}\n)`);
