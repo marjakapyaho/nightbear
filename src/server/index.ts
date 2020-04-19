@@ -1,6 +1,7 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { createNodeContext } from 'core/models/api';
 import { consoleLogStream } from 'core/utils/logging';
+import { TZ } from 'core/utils/time';
 import debug from 'debug';
 import { DateTime } from 'luxon';
 import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
@@ -40,7 +41,7 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-context.log(`Server timezone is "${DateTime.local().zoneName}"`);
+context.log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${TZ}"`);
 const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
 const run = () => runCronjobs(context, journal);
 setInterval(run, 2 * MIN_IN_MS);

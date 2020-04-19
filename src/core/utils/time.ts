@@ -1,5 +1,8 @@
 import { DateTime } from 'luxon';
 
+// TODO: Make this configurable via env (or just use env.TZ as-is)
+export const TZ = 'Europe/Helsinki';
+
 // @example "12:34"
 export function humanReadableShortTime(utcTs: number) {
   return DateTime.fromMillis(utcTs).toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
