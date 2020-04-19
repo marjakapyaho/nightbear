@@ -2,8 +2,8 @@ import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { extendLogger } from 'core/utils/logging';
 import { readFileSync, writeFileSync } from 'fs';
+import { activateProfilesIfNeeded } from 'server/cronjobs/profile-activation';
 import { runChecks } from 'server/main/check-runner';
-import { activateProfilesIfNeeded } from 'server/main/profile-activation';
 
 // Executes a SINGLE RUN of our periodic jobs.
 // Not all jobs necessarily run every time.
