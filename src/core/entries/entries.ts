@@ -44,6 +44,7 @@ export function mergeEntriesFeed([
 ]) {
   return sortBy(
     unionBy(
+      dexcomG6ShareEntries as TimelineModel[],
       meterEntries as TimelineModel[],
       dexcomG6SensorEntries as TimelineModel[],
       dexcomSensorEntries as TimelineModel[],
