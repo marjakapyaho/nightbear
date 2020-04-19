@@ -1,4 +1,5 @@
 import { Context } from 'core/models/api';
+import { humanReadableShortTime } from 'core/utils/time';
 import debug, { Debugger } from 'debug';
 import { noop } from 'lodash';
 
@@ -35,7 +36,7 @@ export function extendLogger(x: Context | Logger, namespace: string, keepColor =
 // Output stream that writes to console.log(), with the exact formatting we want.
 // See: https://github.com/visionmedia/debug#output-streams
 export function consoleLogStream(x: string) {
-  const ts = new Date().toISOString().replace(/.*?T(.....).*/, '$1'); // e.g. "12:34"
+  const ts = humanReadableShortTime();
   x = x.replace(/^ */gm, ''); // remove leading spaces; see https://github.com/visionmedia/debug/issues/619
   x = x.replace(/^([^ ]*)nightbear:/gm, '$1'); // remove the common "nightbear:" prefix; it's good to have in the namespace for filtering etc, but we don't want to show it all the time
   x = x.replace(/^/gm, `${ts} `); // prefix each line with our timestamp
