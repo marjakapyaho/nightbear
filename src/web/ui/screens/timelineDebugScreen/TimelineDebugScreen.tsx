@@ -10,7 +10,7 @@ import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 
 type Props = {};
 
-export default () => {
+export default (() => {
   const { React } = useCssNs('TimelineDebugScreen');
   const navigationState = useReduxState(s => s.navigation);
   const dataState = useReduxState(s => s.data);
@@ -101,7 +101,7 @@ export default () => {
       {dataState.status === 'READY' && <TimelineModelTable models={filterTimelineModels(dataState, navigationState)} />}
     </div>
   );
-};
+}) as React.FC<Props>;
 
 function filterTimelineModels(data: DataState, filters: NavigationState): TimelineModel[] {
   if (filters.selectedScreen !== 'TimelineDebugScreen') return [];
