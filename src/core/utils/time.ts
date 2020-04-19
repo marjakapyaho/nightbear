@@ -4,8 +4,10 @@ import { DateTime } from 'luxon';
 export const TZ = 'Europe/Helsinki';
 
 // @example "12:34"
-export function humanReadableShortTime(utcTs: number) {
-  return DateTime.fromMillis(utcTs).toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+export function humanReadableShortTime(msUtc: number) {
+  return DateTime.fromMillis(msUtc)
+    .setZone(TZ)
+    .toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 }
 
 // Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.
