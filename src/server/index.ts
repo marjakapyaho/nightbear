@@ -12,7 +12,8 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { createFilesystemJournal, runCronjobs } from 'server/cronjobs';
+import { runCronjobs } from 'server/cronjobs';
+import { createFilesystemJournal } from 'server/cronjobs/cronjobs-journal';
 import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 
