@@ -1,16 +1,15 @@
-import 'web/ui/components/mainNavBar/MainNavBar.scss';
-import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
+import { useReduxActions, useReduxState } from 'web/utils/react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import { is, lastModel } from 'core/models/utils';
 import { mergeEntriesFeed } from 'core/entries/entries';
 import { fontColor, fontColorDark, fontColorLight } from 'web/utils/colors';
 import { fontSize, fontSizeExtraSmall } from 'web/utils/config';
 import { Checkbox } from 'pretty-checkbox-react';
+import React from 'react';
 
 type Props = {};
 
 export default (props => {
-  const { React } = useCssNs('MainNavBar');
   const dataState = useReduxState(s => s.data);
   const configState = useReduxState(s => s.config);
   const actions = useReduxActions();
@@ -29,7 +28,13 @@ export default (props => {
   const latestBgModel = bgModels.find(lastModel);
 
   return (
-    <div className="this">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        height: 30,
+      }}
+    >
       <div
         style={{
           padding: '7px 12px',
