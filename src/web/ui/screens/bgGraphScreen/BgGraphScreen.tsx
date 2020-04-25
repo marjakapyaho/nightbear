@@ -12,6 +12,7 @@ import Timeline from 'web/ui/components/timeline/Timeline';
 import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import { nbBg, nbCarbs, nbInsulin } from 'web/utils/colors';
+import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
 
 type Props = {};
 
@@ -68,6 +69,7 @@ export default (() => {
 
   return (
     <div className="this">
+      <MainNavBar />
       <div className="top" style={{ height: timelineConfig.outerHeight }}>
         {dataState.status === 'READY' && (
           <Timeline
