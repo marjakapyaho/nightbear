@@ -4,7 +4,7 @@ import ConfigScreen from 'web/ui/screens/configScreen/ConfigScreen';
 import TimelineDebugScreen from 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen';
 import { useCssNs } from 'web/utils/react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
+import StatsScreen from 'web/ui/screens/statsScreen/StatsScreen';
 
 type Props = {};
 
@@ -13,12 +13,12 @@ export default (() => {
 
   return (
     <div className="this">
-      <MainNavBar />
       <Router>
         <Switch>
           <Route path="/" component={BgGraphScreen} exact />
           <Route path="/config" component={ConfigScreen} exact />
           <Route path="/debug" component={TimelineDebugScreen} exact />
+          <Route path="/stats" component={StatsScreen} exact />
         </Switch>
       </Router>
     </div>
