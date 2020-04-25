@@ -16,7 +16,7 @@ resource "aws_s3_bucket" "this" {
   # Note, though, that when accessing the bucket over its SSL endpoint, the index_document will not be used
   website {
     index_document = "index.html"
-    error_document = "error.html"
+    error_document = "index.html"
   }
 }
 

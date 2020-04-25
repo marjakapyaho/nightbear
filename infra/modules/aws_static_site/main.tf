@@ -25,4 +25,10 @@ module "aws_reverse_proxy" {
   basic_auth_body        = var.basic_auth_body
   lambda_logging_enabled = var.lambda_logging_enabled
   tags                   = var.tags
+
+  # Because our S3 bucket has error_document = "index.html", our client-side routing should handle all URL's that don't point to a physical file on S3.
+  # These overrides ensure that when S3 responds with 404, it gets turned into a 200.
+  override_response_code   = 200
+  override_response_status = "OK"
+  override_only_on_code    = "404"
 }
