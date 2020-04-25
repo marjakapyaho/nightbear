@@ -1,11 +1,11 @@
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
-import { is, lastModel } from 'core/models/utils';
-import { mergeEntriesFeed } from 'core/entries/entries';
+import { lastModel } from 'core/models/utils';
 import { fontColor, fontColorDark, fontColorLight } from 'web/utils/colors';
 import { fontSize, fontSizeExtraSmall } from 'web/utils/config';
 import { Checkbox } from 'pretty-checkbox-react';
 import React from 'react';
+import { getEntriesFeed } from 'web/modules/data/getters';
 
 type Props = {};
 
@@ -13,18 +13,8 @@ export default (props => {
   const dataState = useReduxState(s => s.data);
   const configState = useReduxState(s => s.config);
   const actions = useReduxActions();
-
   const checkboxStyles = { display: 'block', marginBottom: 20, color: fontColor, fontSize: fontSize };
-
-  const bgModels = mergeEntriesFeed([
-    dataState.timelineModels.filter(is('DexcomG6ShareEntry')),
-    dataState.timelineModels.filter(is('DexcomG6SensorEntry')),
-    dataState.timelineModels.filter(is('DexcomSensorEntry')),
-    dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
-    dataState.timelineModels.filter(is('ParakeetSensorEntry')),
-    dataState.timelineModels.filter(is('MeterEntry')),
-  ]);
-
+  const bgModels = getEntriesFeed(dataState);
   const latestBgModel = bgModels.find(lastModel);
 
   return (

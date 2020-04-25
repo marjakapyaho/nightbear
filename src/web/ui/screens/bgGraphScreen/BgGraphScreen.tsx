@@ -1,11 +1,10 @@
 import { performRollingAnalysis, BUCKET_SIZE } from 'core/analyser/rolling-analysis';
-import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
 import { is, isTimelineModel, lastModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/data/getters';
+import { getEntriesFeed, getModelByUuid } from 'web/modules/data/getters';
 import { NavigationState } from 'web/modules/navigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
@@ -27,14 +26,7 @@ export default (() => {
 
   const { timelineRange, timelineRangeEnd } = navigationState;
   const modelBeingEdited = getModelByUuid(dataState, navigationState.modelUuidBeingEdited);
-  const bgModels = mergeEntriesFeed([
-    dataState.timelineModels.filter(is('DexcomG6ShareEntry')),
-    dataState.timelineModels.filter(is('DexcomG6SensorEntry')),
-    dataState.timelineModels.filter(is('DexcomSensorEntry')),
-    dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
-    dataState.timelineModels.filter(is('ParakeetSensorEntry')),
-    dataState.timelineModels.filter(is('MeterEntry')),
-  ]);
+  const bgModels = getEntriesFeed(dataState);
   const activeProfiles = dataState.timelineModels.filter(is('ActiveProfile'));
   const getAlignedRangeEnd = () => {
     const latestBgModel = bgModels.find(lastModel);
