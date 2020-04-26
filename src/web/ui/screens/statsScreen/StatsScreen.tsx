@@ -2,11 +2,17 @@ import React, { useEffect } from 'react';
 import { getEntriesFeed } from 'web/modules/data/getters';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { SensorEntry } from 'core/models/model';
-import { highLimit, lowLimit, pagePadding } from 'web/utils/config';
+import {
+  pagePadding,
+  reallyHighLimit,
+  reallyLowLimit,
+  timeInRangeHighLimit,
+  timeInRangeLowLimit,
+} from 'web/utils/config';
 import { css } from 'emotion';
 import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow } from 'web/utils/colors';
 import { calculateHba1c } from 'core/calculations/calculations';
-import { set2Decimals } from 'web/utils/helpers';
+import { setOneDecimal } from 'web/utils/helpers';
 
 type Props = {};
 
@@ -98,6 +104,44 @@ export default (() => {
               fontSize: '18px',
             }}
           >
+            Avg BG
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            for 7 days
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            color: nbGood,
+          }}
+        >
+          {getBgAverage(bgModels)}
+        </span>
+      </div>
+
+      <div
+        style={{
+          padding: pagePadding,
+          borderBottom: `8px solid ${borderColorLight}`,
+          alignItems: 'center',
+          display: 'flex',
+        }}
+      >
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
             Hba1c
           </span>
           <span
@@ -156,7 +200,7 @@ export default (() => {
             color: nbLow,
           }}
         >
-          {calculateOccuranceOfLows(bgModels, 3.7)}
+          {calculateOccuranceOfSituations(bgModels, 3.7, true)}
         </span>
 
         <div>
@@ -185,7 +229,46 @@ export default (() => {
             color: nbLow,
           }}
         >
-          {calculateOccuranceOfLows(bgModels, 3)}
+          {calculateOccuranceOfSituations(bgModels, reallyLowLimit, true)}
+        </span>
+      </div>
+
+      <div
+        style={{
+          padding: pagePadding,
+          borderBottom: `8px solid ${borderColorLight}`,
+          alignItems: 'center',
+          display: 'flex',
+        }}
+      >
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
+            HIGH
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            over {reallyHighLimit}
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            marginRight: 50,
+            color: nbHigh,
+          }}
+        >
+          {calculateOccuranceOfSituations(bgModels, reallyHighLimit, false)}
         </span>
       </div>
     </>
@@ -195,7 +278,8 @@ export default (() => {
 function calculateTimeInRange(bgModels: SensorEntry[]) {
   const totalCount = bgModels.length;
   const goodCount = bgModels.filter(
-    model => model.bloodGlucose && model.bloodGlucose >= lowLimit && model.bloodGlucose <= highLimit,
+    model =>
+      model.bloodGlucose && model.bloodGlucose >= timeInRangeLowLimit && model.bloodGlucose <= timeInRangeHighLimit,
   ).length;
 
   return Math.round((goodCount / totalCount) * 100);
@@ -203,36 +287,41 @@ function calculateTimeInRange(bgModels: SensorEntry[]) {
 
 function calculateTimeLow(bgModels: SensorEntry[]) {
   const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < lowLimit).length;
+  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < timeInRangeLowLimit).length;
 
   return Math.round((goodCount / totalCount) * 100);
 }
 
 function calculateTimeHigh(bgModels: SensorEntry[]) {
   const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > highLimit).length;
+  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > timeInRangeHighLimit).length;
 
   return Math.round((goodCount / totalCount) * 100);
 }
 
 function getHba1cValue(bgModels: SensorEntry[]) {
-  return set2Decimals(calculateHba1c(bgModels)) || '';
+  return setOneDecimal(calculateHba1c(bgModels)) || '';
 }
 
-function calculateOccuranceOfLows(bgModels: SensorEntry[], limit: number) {
+function calculateOccuranceOfSituations(bgModels: SensorEntry[], limit: number, low: boolean) {
   let counter = 0;
-  let lowBeingRecorded: boolean;
+  let incidentBeingRecorded: boolean;
 
   bgModels.forEach(model => {
-    if (model.bloodGlucose && model.bloodGlucose < limit) {
-      if (!lowBeingRecorded) {
+    if (model.bloodGlucose && (low ? model.bloodGlucose < limit : model.bloodGlucose > limit)) {
+      if (!incidentBeingRecorded) {
         counter++;
-        lowBeingRecorded = true;
+        incidentBeingRecorded = true;
       }
     } else {
-      lowBeingRecorded = false;
+      incidentBeingRecorded = false;
     }
   });
 
   return counter;
+}
+
+function getBgAverage(bgModels: SensorEntry[]) {
+  const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
+  return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
 }
