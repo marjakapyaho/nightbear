@@ -34,6 +34,7 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
       state =>
         state.config.remoteDbUrl &&
         (state.navigation.selectedScreen === 'TimelineDebugScreen' ||
+          state.navigation.selectedScreen === 'StatsScreen' ||
           state.navigation.selectedScreen === 'BgGraphScreen')
           ? ([
               state.navigation.selectedModelTypes,

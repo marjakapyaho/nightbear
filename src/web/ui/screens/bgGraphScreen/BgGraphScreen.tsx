@@ -12,6 +12,7 @@ import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import { nbBg, nbCarbs, nbInsulin } from 'web/utils/colors';
 import StatusBar from 'web/ui/components/statusBar/StatusBar';
+import { useEffect } from 'react';
 
 type Props = {};
 
@@ -21,6 +22,10 @@ export default (() => {
   const navigationState = useReduxState(s => s.navigation);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
+
+  useEffect(() => {
+    actions.UI_NAVIGATED('BgGraphScreen');
+  }, [actions]);
 
   if (navigationState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
 

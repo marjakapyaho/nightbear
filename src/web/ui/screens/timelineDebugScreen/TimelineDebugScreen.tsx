@@ -7,6 +7,7 @@ import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSele
 import Timestamp from 'web/ui/components/timestamp/Timestamp';
 import 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
+import { useEffect } from 'react';
 
 type Props = {};
 
@@ -15,6 +16,10 @@ export default (() => {
   const navigationState = useReduxState(s => s.navigation);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
+
+  useEffect(() => {
+    actions.UI_NAVIGATED('TimelineDebugScreen');
+  }, [actions]);
 
   if (navigationState.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
 

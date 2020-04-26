@@ -1,10 +1,15 @@
-import { HOUR_IN_MS } from 'core/calculations/calculations';
+import { DAY_IN_MS, HOUR_IN_MS } from 'core/calculations/calculations';
 import { isSameModel } from 'core/models/utils';
 import { assertExhausted } from 'server/utils/types';
 import { actions, ReduxAction } from 'web/modules/actions';
 import { ReduxState } from 'web/modules/state';
 import { getModelByUuid } from 'web/modules/data/getters';
-import { getNavigationInitState, navigationInitState, NavigationState } from 'web/modules/navigation/state';
+import {
+  getNavigationInitState,
+  navigationInitState,
+  NavigationState,
+  TIMELINE_MODEL_TYPES,
+} from 'web/modules/navigation/state';
 
 export function navigationReducer(
   state: NavigationState = navigationInitState,
@@ -24,6 +29,14 @@ export function navigationReducer(
             timelineRange: 12 * HOUR_IN_MS,
             timelineRangeEnd: Date.now(),
             modelUuidBeingEdited: null,
+          };
+        case 'StatsScreen':
+          return {
+            ...state,
+            selectedScreen: 'StatsScreen',
+            selectedModelTypes: TIMELINE_MODEL_TYPES,
+            timelineRange: 7 * DAY_IN_MS,
+            timelineRangeEnd: Date.now(),
           };
         case 'ConfigScreen':
           return {

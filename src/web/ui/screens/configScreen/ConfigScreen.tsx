@@ -2,11 +2,11 @@ import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
 import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time';
 import { css } from 'emotion';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { Checkbox } from 'pretty-checkbox-react';
 import { fontColor } from 'web/utils/colors';
-import { fontSize } from 'web/utils/config';
+import { fontSize, pagePadding } from 'web/utils/config';
 
 type Props = {};
 
@@ -26,13 +26,17 @@ export default (() => {
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
+  useEffect(() => {
+    actions.UI_NAVIGATED('ConfigScreen');
+  }, [actions]);
+
   const profiles = dataState.globalModels.filter(is('SavedProfile')).filter(profile => profile.profileName !== 'OFF');
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
 
   return (
     <div
       style={{
-        padding: 20,
+        padding: pagePadding,
       }}
     >
       <Checkbox
