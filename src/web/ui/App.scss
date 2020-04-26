@@ -2,10 +2,6 @@
   display: flex;
   flex-direction: column;
 
-  > .nb-MainNavBar {
-    height: 30px;
-  }
-
   &-screenContainer {
     flex: 1;
     overflow: auto; // if the screen overflows its container, let it scroll

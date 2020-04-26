@@ -38,6 +38,12 @@ export type NavigationState = Readonly<
       selectedModelTypes: TimelineModelType[];
       modelUuidBeingEdited: string | null;
     }
+  | {
+      selectedScreen: 'StatsScreen';
+      timelineRange: number;
+      timelineRangeEnd: number;
+      selectedModelTypes: TimelineModelType[];
+    }
 >;
 
 export const navigationInitState: NavigationState = getNavigationInitState();

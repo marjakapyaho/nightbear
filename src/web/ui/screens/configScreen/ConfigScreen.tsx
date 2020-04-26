@@ -6,7 +6,7 @@ import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { Checkbox } from 'pretty-checkbox-react';
 import { fontColor } from 'web/utils/colors';
-import { fontSize } from 'web/utils/config';
+import { fontSize, pagePadding } from 'web/utils/config';
 
 type Props = {};
 
@@ -32,7 +32,7 @@ export default (() => {
   return (
     <div
       style={{
-        padding: 20,
+        padding: pagePadding,
       }}
     >
       <Checkbox

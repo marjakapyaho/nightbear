@@ -1,18 +1,18 @@
 import { performRollingAnalysis, BUCKET_SIZE } from 'core/analyser/rolling-analysis';
-import { mergeEntriesFeed } from 'core/entries/entries';
 import { Model, TimelineModel } from 'core/models/model';
 import { is, isTimelineModel, lastModel } from 'core/models/utils';
 import { generateUuid } from 'core/utils/id';
 import { isEqual } from 'lodash';
 import { ReduxActions } from 'web/modules/actions';
-import { getModelByUuid } from 'web/modules/data/getters';
+import { getEntriesFeed, getModelByUuid } from 'web/modules/data/getters';
 import { NavigationState } from 'web/modules/navigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
 import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
 import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
 import { nbBg, nbCarbs, nbInsulin } from 'web/utils/colors';
-import MainNavBar from 'web/ui/components/mainNavBar/MainNavBar';
+import StatusBar from 'web/ui/components/statusBar/StatusBar';
+import { useEffect } from 'react';
 
 type Props = {};
 
@@ -23,18 +23,16 @@ export default (() => {
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
+  useEffect(() => {
+    actions.UI_NAVIGATED('BgGraphScreen');
+    // eslint-disable-next-line
+  }, []);
+
   if (navigationState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
 
   const { timelineRange, timelineRangeEnd } = navigationState;
   const modelBeingEdited = getModelByUuid(dataState, navigationState.modelUuidBeingEdited);
-  const bgModels = mergeEntriesFeed([
-    dataState.timelineModels.filter(is('DexcomG6ShareEntry')),
-    dataState.timelineModels.filter(is('DexcomG6SensorEntry')),
-    dataState.timelineModels.filter(is('DexcomSensorEntry')),
-    dataState.timelineModels.filter(is('DexcomRawSensorEntry')),
-    dataState.timelineModels.filter(is('ParakeetSensorEntry')),
-    dataState.timelineModels.filter(is('MeterEntry')),
-  ]);
+  const bgModels = getEntriesFeed(dataState);
   const activeProfiles = dataState.timelineModels.filter(is('ActiveProfile'));
   const getAlignedRangeEnd = () => {
     const latestBgModel = bgModels.find(lastModel);
@@ -69,7 +67,7 @@ export default (() => {
 
   return (
     <div className="this">
-      <MainNavBar />
+      <StatusBar />
       <div className="top" style={{ height: timelineConfig.outerHeight }}>
         {dataState.status === 'READY' && (
           <Timeline
