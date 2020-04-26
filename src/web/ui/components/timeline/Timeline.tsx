@@ -21,7 +21,7 @@ import {
 } from 'web/ui/components/timeline/utils';
 import { fontColorDark, fontColorExtraLight, fontColorLight } from 'web/utils/colors';
 import { fontSizeSmall } from 'web/utils/config';
-import { set2Decimals } from 'web/utils/helpers';
+import { setOneDecimal } from 'web/utils/helpers';
 import { timestampIsUnderMaxAge } from 'core/calculations/calculations';
 
 type Props = {
@@ -173,7 +173,7 @@ export default (props => {
                   : fontColorExtraLight,
               })}
             >
-              {set2Decimals(latestBgModel.bloodGlucose)}
+              {setOneDecimal(latestBgModel.bloodGlucose)}
             </span>
           )}
         </div>

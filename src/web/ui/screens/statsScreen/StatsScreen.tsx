@@ -4,7 +4,9 @@ import { useReduxActions, useReduxState } from 'web/utils/react';
 import { SensorEntry } from 'core/models/model';
 import { highLimit, lowLimit, pagePadding } from 'web/utils/config';
 import { css } from 'emotion';
-import { nbGood, nbHigh, nbLow } from 'web/utils/colors';
+import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow } from 'web/utils/colors';
+import { calculateHba1c } from 'core/calculations/calculations';
+import { set2Decimals } from 'web/utils/helpers';
 
 type Props = {};
 
@@ -45,39 +47,148 @@ export default (() => {
   if (navigationState.selectedScreen !== 'StatsScreen') return null;
 
   return (
-    <div
-      style={{
-        padding: pagePadding,
-        display: 'flex',
-      }}
-    >
+    <>
       <div
-        className={styles.stat}
         style={{
-          background: nbGood,
-          marginRight: 21,
+          padding: pagePadding,
+          display: 'flex',
         }}
       >
-        Good <strong className={styles.statStrong}>{timeInRange}%</strong>
+        <div
+          className={styles.stat}
+          style={{
+            background: nbGood,
+            marginRight: 21,
+          }}
+        >
+          Good <strong className={styles.statStrong}>{timeInRange}%</strong>
+        </div>
+        <div
+          className={styles.stat}
+          style={{
+            background: nbLow,
+            marginRight: 21,
+          }}
+        >
+          Low <strong className={styles.statStrong}>{timeLow}%</strong>
+        </div>
+        <div
+          className={styles.stat}
+          style={{
+            background: nbHigh,
+          }}
+        >
+          High <strong className={styles.statStrong}>{timeHigh}%</strong>
+        </div>
       </div>
+
       <div
-        className={styles.stat}
         style={{
-          background: nbLow,
-          marginRight: 21,
+          padding: pagePadding,
+          borderTop: `8px solid ${borderColorLight}`,
+          borderBottom: `8px solid ${borderColorLight}`,
+          alignItems: 'center',
+          display: 'flex',
         }}
       >
-        Low <strong className={styles.statStrong}>{timeLow}%</strong>
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
+            Hba1c
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            for 7 days
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            color: nbGood,
+          }}
+        >
+          {getHba1cValue(bgModels)}
+        </span>
       </div>
+
       <div
-        className={styles.stat}
         style={{
-          background: nbHigh,
+          padding: pagePadding,
+          borderBottom: `8px solid ${borderColorLight}`,
+          alignItems: 'center',
+          display: 'flex',
         }}
       >
-        High <strong className={styles.statStrong}>{timeHigh}%</strong>
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
+            LOW
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            below 3.7
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            marginRight: 50,
+            color: nbLow,
+          }}
+        >
+          {calculateOccuranceOfLows(bgModels, 3.7)}
+        </span>
+
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
+            LOW
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            below 3.0
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            color: nbLow,
+          }}
+        >
+          {calculateOccuranceOfLows(bgModels, 3)}
+        </span>
       </div>
-    </div>
+    </>
   );
 }) as React.FC<Props>;
 
@@ -102,4 +213,26 @@ function calculateTimeHigh(bgModels: SensorEntry[]) {
   const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > highLimit).length;
 
   return Math.round((goodCount / totalCount) * 100);
+}
+
+function getHba1cValue(bgModels: SensorEntry[]) {
+  return set2Decimals(calculateHba1c(bgModels)) || '';
+}
+
+function calculateOccuranceOfLows(bgModels: SensorEntry[], limit: number) {
+  let counter = 0;
+  let lowBeingRecorded: boolean;
+
+  bgModels.forEach(model => {
+    if (model.bloodGlucose && model.bloodGlucose < limit) {
+      if (!lowBeingRecorded) {
+        counter++;
+        lowBeingRecorded = true;
+      }
+    } else {
+      lowBeingRecorded = false;
+    }
+  });
+
+  return counter;
 }
