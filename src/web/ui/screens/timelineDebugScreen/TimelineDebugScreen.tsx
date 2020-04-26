@@ -19,7 +19,8 @@ export default (() => {
 
   useEffect(() => {
     actions.UI_NAVIGATED('TimelineDebugScreen');
-  }, [actions]);
+    // eslint-disable-next-line
+  }, []);
 
   if (navigationState.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
 

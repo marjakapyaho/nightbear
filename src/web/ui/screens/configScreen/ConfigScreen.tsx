@@ -28,7 +28,8 @@ export default (() => {
 
   useEffect(() => {
     actions.UI_NAVIGATED('ConfigScreen');
-  }, [actions]);
+    // eslint-disable-next-line
+  }, []);
 
   const profiles = dataState.globalModels.filter(is('SavedProfile')).filter(profile => profile.profileName !== 'OFF');
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);

@@ -25,7 +25,8 @@ export default (() => {
 
   useEffect(() => {
     actions.UI_NAVIGATED('BgGraphScreen');
-  }, [actions]);
+    // eslint-disable-next-line
+  }, []);
 
   if (navigationState.selectedScreen !== 'BgGraphScreen') return null; // this screen can only be rendered if it's been selected in state
 

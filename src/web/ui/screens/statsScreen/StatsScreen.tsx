@@ -10,7 +10,6 @@ type Props = {};
 
 const styles = {
   stat: css({
-    marginRight: 15,
     background: 'whitesmoke',
     borderRadius: '100%',
     width: 90,
@@ -40,7 +39,8 @@ export default (() => {
 
   useEffect(() => {
     actions.UI_NAVIGATED('StatsScreen');
-  }, [actions]);
+    // eslint-disable-next-line
+  }, []);
 
   if (navigationState.selectedScreen !== 'StatsScreen') return null;
 
@@ -55,6 +55,7 @@ export default (() => {
         className={styles.stat}
         style={{
           background: nbGood,
+          marginRight: 21,
         }}
       >
         Good <strong className={styles.statStrong}>{timeInRange}%</strong>
@@ -63,6 +64,7 @@ export default (() => {
         className={styles.stat}
         style={{
           background: nbLow,
+          marginRight: 21,
         }}
       >
         Low <strong className={styles.statStrong}>{timeLow}%</strong>
