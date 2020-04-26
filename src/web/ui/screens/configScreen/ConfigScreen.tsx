@@ -2,7 +2,7 @@ import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
 import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time';
 import { css } from 'emotion';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { Checkbox } from 'pretty-checkbox-react';
 import { fontColor } from 'web/utils/colors';
@@ -25,11 +25,6 @@ export default (() => {
   const configState = useReduxState(s => s.config);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
-
-  useEffect(() => {
-    actions.UI_NAVIGATED('ConfigScreen');
-    // eslint-disable-next-line
-  }, []);
 
   const profiles = dataState.globalModels.filter(is('SavedProfile')).filter(profile => profile.profileName !== 'OFF');
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
