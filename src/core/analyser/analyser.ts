@@ -18,6 +18,7 @@ const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
 const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
 const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
+const HIGH_CORRECTION_SUPPRESSION_WINDOW = 2 * HOUR_IN_MS;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -91,7 +92,7 @@ export function runAnalysis(
   // Must be before RISING
   state = {
     ...state,
-    HIGH: detectHigh(state, activeProfile, latestEntry, alarms, currentTimestamp),
+    HIGH: detectHigh(state, activeProfile, latestEntry, alarms, insulin, currentTimestamp),
   };
 
   state = {
@@ -175,6 +176,7 @@ function detectHigh(
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
   alarms: Alarm[],
+  insulins: Insulin[],
   currentTimestamp: number,
 ): boolean {
   const notCurrentlyBadHigh = !state.BAD_HIGH;
@@ -185,9 +187,14 @@ function detectHigh(
       alarm.situationType === 'BAD_HIGH',
   );
   const correctionIfAlreadyHigh = find(onlyActive(alarms), { situationType: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
+  const thereIsNoCorrectionInsulin = !find(
+    insulins,
+    insulin => insulin.timestamp > currentTimestamp - HIGH_CORRECTION_SUPPRESSION_WINDOW,
+  );
   return (
     notCurrentlyBadHigh &&
     notComingDownFromBadHigh &&
+    thereIsNoCorrectionInsulin &&
     entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_ABS - correctionIfAlreadyHigh
   );
 }

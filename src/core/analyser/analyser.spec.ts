@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { runAnalysis } from 'core/analyser/analyser';
 import { entriesCompressionLow } from 'core/analyser/test-data/compression-low';
 import { entriesFalling } from 'core/analyser/test-data/falling';
-import { entriesHigh } from 'core/analyser/test-data/high';
+import { entriesHigh, recentInsulin } from 'core/analyser/test-data/high';
 import { entriesLow } from 'core/analyser/test-data/low';
 import { entriesNoSituation } from 'core/analyser/test-data/no-situation';
 import { entriesOutdated } from 'core/analyser/test-data/outdated';
@@ -286,6 +286,23 @@ describe('utils/analyser', () => {
       {
         ...DEFAULT_STATE,
         LOW: true,
+      },
+    );
+  });
+
+  it('does not detect high if there is recent insulin (detects rising instead)', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesHigh(currentTimestamp),
+        recentInsulin(currentTimestamp),
+        deviceStatus,
+        alarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        RISING: true,
       },
     );
   });
