@@ -17,16 +17,17 @@ export function runChecks(context: Context) {
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
+    context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),
-  ]).then(([latestActiveProfile, sensorEntries, insulin, latestDeviceStatus, alarms]) => {
+  ]).then(([latestActiveProfile, sensorEntries, insulin, carbs, latestDeviceStatus, alarms]) => {
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
 
     if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
     log(`1. Using profile: ${activeProfile?.profileName}`);
-    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, deviceStatus, alarms);
+    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, carbs, deviceStatus, alarms);
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
     log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
