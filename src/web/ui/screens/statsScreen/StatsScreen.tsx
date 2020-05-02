@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { getEntriesFeed } from 'web/modules/data/getters';
 import { useReduxActions, useReduxState } from 'web/utils/react';
-import { SensorEntry } from 'core/models/model';
+import { Insulin, SensorEntry } from 'core/models/model';
 import {
   pagePadding,
   reallyHighLimit,
@@ -13,6 +13,7 @@ import { css } from 'emotion';
 import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow } from 'web/utils/colors';
 import { calculateHba1c } from 'core/calculations/calculations';
 import { setOneDecimal } from 'web/utils/helpers';
+import { is } from 'core/models/utils';
 
 type Props = {};
 
@@ -40,10 +41,14 @@ export default (() => {
   const dataState = useReduxState(s => s.data);
   const navigationState = useReduxState(s => s.navigation);
   const actions = useReduxActions();
+
   const bgModels = getEntriesFeed(dataState);
+  const insulins = dataState.timelineModels.filter(is('Insulin'));
+
   const timeInRange = calculateTimeInRange(bgModels) || '';
   const timeLow = calculateTimeLow(bgModels) || '';
   const timeHigh = calculateTimeHigh(bgModels) || '';
+  const totalInsulin = calculateTotalInsulin(insulins);
 
   useEffect(() => {
     actions.UI_NAVIGATED('StatsScreen');
@@ -53,7 +58,11 @@ export default (() => {
   if (navigationState.selectedScreen !== 'StatsScreen') return null;
 
   return (
-    <>
+    <div
+      style={{
+        overflowY: 'scroll',
+      }}
+    >
       <div
         style={{
           padding: pagePadding,
@@ -271,7 +280,45 @@ export default (() => {
           {calculateOccuranceOfSituations(bgModels, reallyHighLimit, false)}
         </span>
       </div>
-    </>
+
+      <div
+        style={{
+          padding: pagePadding,
+          borderBottom: `8px solid ${borderColorLight}`,
+          alignItems: 'center',
+          display: 'flex',
+        }}
+      >
+        <div>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '18px',
+            }}
+          >
+            Insulin
+          </span>
+          <span
+            style={{
+              display: 'block',
+              fontSize: '10px',
+              color: fontColorExtraLight,
+            }}
+          >
+            total 7 days
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 50,
+            marginLeft: 25,
+            marginRight: 50,
+          }}
+        >
+          {totalInsulin}
+        </span>
+      </div>
+    </div>
   );
 }) as React.FC<Props>;
 
@@ -324,4 +371,8 @@ function calculateOccuranceOfSituations(bgModels: SensorEntry[], limit: number, 
 function getBgAverage(bgModels: SensorEntry[]) {
   const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
   return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
+}
+
+function calculateTotalInsulin(insulins: Insulin[]) {
+  return insulins.reduce((sum, value) => sum + value.amount, 0);
 }
