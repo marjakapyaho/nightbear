@@ -90,6 +90,7 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
     is('DexcomG6SensorEntry', 'DexcomSensorEntry', 'DexcomRawSensorEntry', 'ParakeetSensorEntry'),
   );
   const insulins = models.filter(is('Insulin'));
+  const carbs = models.filter(is('Carbs'));
   const alarms = models.filter(is('Alarm'));
   let missingProfileBefore: number | undefined;
   const res = buckets.map(([base, from, to]) => {
@@ -107,6 +108,7 @@ function getRawRollingAnalysisResults(models: Model[], buckets: RollingAnalysisB
         activeProfile,
         sensorEntries.filter(relevantToThisBucket),
         insulins.filter(relevantToThisBucket),
+        carbs.filter(relevantToThisBucket),
         undefined, // TODO: Which DeviceStatus should go here..?
         alarms.filter(m => m.timestamp > to - ALARM_FETCH_RANGE && m.timestamp < to),
       ),

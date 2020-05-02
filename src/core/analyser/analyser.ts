@@ -4,6 +4,7 @@ import {
   ActiveProfile,
   Alarm,
   AnalyserEntry,
+  Carbs,
   DEFAULT_STATE,
   DeviceStatus,
   Insulin,
@@ -19,6 +20,7 @@ const LOW_CLEARING_THRESHOLD = 0.5;
 const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
 const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 const HIGH_CORRECTION_SUPPRESSION_WINDOW = 2 * HOUR_IN_MS;
+const LOW_CORRECTION_SUPPRESSION_WINDOW = 20 * MIN_IN_MS;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -31,6 +33,7 @@ export function runAnalysis(
   activeProfile: ActiveProfile,
   sensorEntries: SensorEntry[],
   insulin: Insulin[],
+  carbs: Carbs[],
   deviceStatus: DeviceStatus | undefined,
   alarms: Alarm[],
 ): State {
@@ -70,7 +73,7 @@ export function runAnalysis(
   // Must be before FALLING
   state = {
     ...state,
-    LOW: detectLow(state, activeProfile, latestEntry, alarms, currentTimestamp),
+    LOW: detectLow(state, activeProfile, latestEntry, alarms, carbs, currentTimestamp),
   };
 
   state = {
@@ -125,6 +128,7 @@ function detectLow(
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
   alarms: Alarm[],
+  carbs: Carbs[],
   currentTimestamp: number,
 ) {
   const notCurrentlyBadLow = !state.BAD_LOW;
@@ -135,9 +139,14 @@ function detectLow(
       alarm.situationType === 'BAD_LOW',
   );
   const correctionIfAlreadyLow = find(onlyActive(alarms), { situationType: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
+  const thereAreNoCorrectionCarbs = !find(
+    carbs,
+    carbs => carbs.timestamp > currentTimestamp - LOW_CORRECTION_SUPPRESSION_WINDOW,
+  );
   return (
     notCurrentlyBadLow &&
     notComingUpFromBadLow &&
+    thereAreNoCorrectionCarbs &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_ABS + correctionIfAlreadyLow
   );
 }

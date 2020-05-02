@@ -3,12 +3,12 @@ import { runAnalysis } from 'core/analyser/analyser';
 import { entriesCompressionLow } from 'core/analyser/test-data/compression-low';
 import { entriesFalling } from 'core/analyser/test-data/falling';
 import { entriesHigh, recentInsulin } from 'core/analyser/test-data/high';
-import { entriesLow } from 'core/analyser/test-data/low';
+import { entriesLow, recentCarbs } from 'core/analyser/test-data/low';
 import { entriesNoSituation } from 'core/analyser/test-data/no-situation';
 import { entriesOutdated } from 'core/analyser/test-data/outdated';
 import { entriesPersistentHigh } from 'core/analyser/test-data/persistent-high';
 import { entriesRising } from 'core/analyser/test-data/rising';
-import { Alarm, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
+import { Alarm, Carbs, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
 import 'mocha';
 import { activeProfile } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
@@ -23,6 +23,7 @@ describe('utils/analyser', () => {
   // Mock objects
   const currentTimestamp = 1508672249758;
   const insulin: Insulin[] = [];
+  const carbs: Carbs[] = [];
   const alarms: Alarm[] = [];
 
   const deviceStatus: DeviceStatus = {
@@ -42,6 +43,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesNoSituation(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -65,6 +67,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesNoSituation(currentTimestamp),
         insulin,
+        carbs,
         deviceStatusBattery,
         alarms,
       ),
@@ -82,6 +85,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesOutdated(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -99,6 +103,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesLow(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -116,6 +121,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesBadLow(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -133,6 +139,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesFalling(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -150,6 +157,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesCompressionLow(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -167,6 +175,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesHigh(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -184,6 +193,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesBadHigh(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -201,6 +211,7 @@ describe('utils/analyser', () => {
         activeProfile('day', currentTimestamp),
         entriesRising(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -218,6 +229,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesPersistentHigh(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -235,6 +247,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesBadHighToHigh(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarmsWithInactiveBadHigh(currentTimestamp),
       ),
@@ -249,6 +262,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesBadLowToLow(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarmsWithInactiveBadLow(currentTimestamp),
       ),
@@ -263,6 +277,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesHighFluctuations(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -280,6 +295,7 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesLowFluctuations(currentTimestamp),
         insulin,
+        carbs,
         deviceStatus,
         alarms,
       ),
@@ -297,12 +313,31 @@ describe('utils/analyser', () => {
         activeProfile('night', currentTimestamp),
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp),
+        carbs,
         deviceStatus,
         alarms,
       ),
       {
         ...DEFAULT_STATE,
         RISING: true,
+      },
+    );
+  });
+
+  it('does not detect low if there are recent carbs (detects falling instead)', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesLow(currentTimestamp),
+        insulin,
+        recentCarbs(currentTimestamp),
+        deviceStatus,
+        alarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        FALLING: true,
       },
     );
   });

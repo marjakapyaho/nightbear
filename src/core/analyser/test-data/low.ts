@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
-import { DexcomG6SensorEntry } from 'core/models/model';
+import { DexcomG6SensorEntry, Carbs } from 'core/models/model';
 import { generateUuid } from 'core/utils/id';
 
 export function entriesLow(currentTimestamp: number): DexcomG6SensorEntry[] {
@@ -31,6 +31,18 @@ export function entriesLow(currentTimestamp: number): DexcomG6SensorEntry[] {
       timestamp: currentTimestamp - 5 * MIN_IN_MS,
       bloodGlucose: 3.8,
       direction: '',
+    },
+  ];
+}
+
+export function recentCarbs(currentTimestamp: number): Carbs[] {
+  return [
+    {
+      modelType: 'Carbs',
+      modelUuid: generateUuid(),
+      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      amount: 30,
+      carbsType: 'normal',
     },
   ];
 }
