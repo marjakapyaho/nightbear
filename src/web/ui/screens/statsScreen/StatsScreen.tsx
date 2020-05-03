@@ -1,19 +1,20 @@
 import React, { useEffect } from 'react';
 import { getEntriesFeed } from 'web/modules/data/getters';
 import { useReduxActions, useReduxState } from 'web/utils/react';
-import { Insulin, SensorEntry } from 'core/models/model';
-import {
-  pagePadding,
-  reallyHighLimit,
-  reallyLowLimit,
-  timeInRangeHighLimit,
-  timeInRangeLowLimit,
-} from 'web/utils/config';
+import { pagePadding, reallyHighLimit, reallyLowLimit } from 'web/utils/config';
 import { css } from 'emotion';
-import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow } from 'web/utils/colors';
-import { calculateHba1c } from 'core/calculations/calculations';
-import { setOneDecimal } from 'web/utils/helpers';
+import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow, fontColor } from 'web/utils/colors';
 import { is } from 'core/models/utils';
+import {
+  calculateHba1c,
+  calculateInsulinPerDay,
+  countSituations,
+  calculateTimeHigh,
+  calculateTimeInRange,
+  calculateTimeLow,
+  getBgAverage,
+} from 'core/calculations/calculations';
+import { setOneDecimal } from 'web/utils/helpers';
 
 type Props = {};
 
@@ -37,6 +38,49 @@ const styles = {
   }),
 };
 
+function statLine(title: string, subtitle: string, figure: number | string, color: string = fontColor) {
+  return (
+    <div
+      style={{
+        padding: pagePadding,
+        borderBottom: `8px solid ${borderColorLight}`,
+        alignItems: 'center',
+        display: 'flex',
+      }}
+    >
+      <div>
+        <span
+          style={{
+            display: 'block',
+            fontSize: '18px',
+          }}
+        >
+          {title}
+        </span>
+        <span
+          style={{
+            display: 'block',
+            fontSize: '10px',
+            color: fontColorExtraLight,
+          }}
+        >
+          {subtitle}
+        </span>
+      </div>
+      <span
+        style={{
+          fontSize: 50,
+          marginLeft: 25,
+          marginRight: 50,
+          color: color,
+        }}
+      >
+        {figure}
+      </span>
+    </div>
+  );
+}
+
 export default (() => {
   const dataState = useReduxState(s => s.data);
   const navigationState = useReduxState(s => s.navigation);
@@ -48,7 +92,8 @@ export default (() => {
   const timeInRange = calculateTimeInRange(bgModels) || '';
   const timeLow = calculateTimeLow(bgModels) || '';
   const timeHigh = calculateTimeHigh(bgModels) || '';
-  const totalInsulin = calculateTotalInsulin(insulins);
+  const hba1c = setOneDecimal(calculateHba1c(bgModels)) || '';
+  const totalInsulin = calculateInsulinPerDay(insulins);
 
   useEffect(() => {
     actions.UI_NAVIGATED('StatsScreen');
@@ -97,282 +142,12 @@ export default (() => {
         </div>
       </div>
 
-      <div
-        style={{
-          padding: pagePadding,
-          borderTop: `8px solid ${borderColorLight}`,
-          borderBottom: `8px solid ${borderColorLight}`,
-          alignItems: 'center',
-          display: 'flex',
-        }}
-      >
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            Avg BG
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            for 7 days
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            color: nbGood,
-          }}
-        >
-          {getBgAverage(bgModels)}
-        </span>
-      </div>
-
-      <div
-        style={{
-          padding: pagePadding,
-          borderBottom: `8px solid ${borderColorLight}`,
-          alignItems: 'center',
-          display: 'flex',
-        }}
-      >
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            Hba1c
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            for 7 days
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            color: nbGood,
-          }}
-        >
-          {getHba1cValue(bgModels)}
-        </span>
-      </div>
-
-      <div
-        style={{
-          padding: pagePadding,
-          borderBottom: `8px solid ${borderColorLight}`,
-          alignItems: 'center',
-          display: 'flex',
-        }}
-      >
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            LOW
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            below 3.7
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            marginRight: 50,
-            color: nbLow,
-          }}
-        >
-          {calculateOccuranceOfSituations(bgModels, 3.7, true)}
-        </span>
-
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            LOW
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            below 3.0
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            color: nbLow,
-          }}
-        >
-          {calculateOccuranceOfSituations(bgModels, reallyLowLimit, true)}
-        </span>
-      </div>
-
-      <div
-        style={{
-          padding: pagePadding,
-          borderBottom: `8px solid ${borderColorLight}`,
-          alignItems: 'center',
-          display: 'flex',
-        }}
-      >
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            HIGH
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            over {reallyHighLimit}
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            marginRight: 50,
-            color: nbHigh,
-          }}
-        >
-          {calculateOccuranceOfSituations(bgModels, reallyHighLimit, false)}
-        </span>
-      </div>
-
-      <div
-        style={{
-          padding: pagePadding,
-          borderBottom: `8px solid ${borderColorLight}`,
-          alignItems: 'center',
-          display: 'flex',
-        }}
-      >
-        <div>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '18px',
-            }}
-          >
-            Insulin
-          </span>
-          <span
-            style={{
-              display: 'block',
-              fontSize: '10px',
-              color: fontColorExtraLight,
-            }}
-          >
-            total 7 days
-          </span>
-        </div>
-        <span
-          style={{
-            fontSize: 50,
-            marginLeft: 25,
-            marginRight: 50,
-          }}
-        >
-          {totalInsulin}
-        </span>
-      </div>
+      {statLine('Avg BG', 'for 7 days', getBgAverage(bgModels), nbGood)}
+      {statLine('Hba1c', 'for 7 days', hba1c, nbGood)}
+      {statLine('LOW', 'below 3.7', countSituations(bgModels, 3.7, true), nbLow)}
+      {statLine('LOW', 'below 3.0', countSituations(bgModels, reallyLowLimit, true), nbLow)}
+      {statLine('HIGH', `over ${reallyHighLimit}`, countSituations(bgModels, reallyHighLimit, false), nbHigh)}
+      {statLine('Insulin', 'Units per day', totalInsulin)}
     </div>
   );
 }) as React.FC<Props>;
-
-function calculateTimeInRange(bgModels: SensorEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(
-    model =>
-      model.bloodGlucose && model.bloodGlucose >= timeInRangeLowLimit && model.bloodGlucose <= timeInRangeHighLimit,
-  ).length;
-
-  return Math.round((goodCount / totalCount) * 100);
-}
-
-function calculateTimeLow(bgModels: SensorEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < timeInRangeLowLimit).length;
-
-  return Math.round((goodCount / totalCount) * 100);
-}
-
-function calculateTimeHigh(bgModels: SensorEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > timeInRangeHighLimit).length;
-
-  return Math.round((goodCount / totalCount) * 100);
-}
-
-function getHba1cValue(bgModels: SensorEntry[]) {
-  return setOneDecimal(calculateHba1c(bgModels)) || '';
-}
-
-function calculateOccuranceOfSituations(bgModels: SensorEntry[], limit: number, low: boolean) {
-  let counter = 0;
-  let incidentBeingRecorded: boolean;
-
-  bgModels.forEach(model => {
-    if (model.bloodGlucose && (low ? model.bloodGlucose < limit : model.bloodGlucose > limit)) {
-      if (!incidentBeingRecorded) {
-        counter++;
-        incidentBeingRecorded = true;
-      }
-    } else {
-      incidentBeingRecorded = false;
-    }
-  });
-
-  return counter;
-}
-
-function getBgAverage(bgModels: SensorEntry[]) {
-  const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
-  return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
-}
-
-function calculateTotalInsulin(insulins: Insulin[]) {
-  return insulins.reduce((sum, value) => sum + value.amount, 0);
-}

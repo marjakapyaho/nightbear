@@ -1,16 +1,23 @@
 import { assert } from 'chai';
 import {
   calculateHba1c,
+  countSituations,
   calculateRaw,
+  calculateTimeHigh,
+  calculateTimeInRange,
+  calculateTimeLow,
   changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
   isDexcomEntryValid,
   MIN_IN_MS,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
+  getBgAverage,
+  calculateInsulinPerDay,
 } from 'core/calculations/calculations';
 import { sensorEntries1, sensorEntries2 } from 'core/calculations/test-data/sensor-entries';
 import 'mocha';
+import { insulins } from 'core/calculations/test-data/insulins';
 
 describe('core/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
@@ -82,5 +89,39 @@ describe('core/calculations', () => {
   it('calculateHba1c', () => {
     assert.deepEqual(calculateHba1c(sensorEntries1), 5.3278247884519665);
     assert.deepEqual(calculateHba1c(sensorEntries2), 8.56326530612245);
+  });
+
+  it('calculateTimeInRange', () => {
+    assert.deepEqual(calculateTimeInRange(sensorEntries1), 100);
+    assert.deepEqual(calculateTimeInRange(sensorEntries2), 14);
+  });
+
+  it('calculateTimeLow', () => {
+    assert.deepEqual(calculateTimeLow(sensorEntries1), 0);
+    assert.deepEqual(calculateTimeLow(sensorEntries2), 0);
+  });
+
+  it('calculateTimeHigh', () => {
+    assert.deepEqual(calculateTimeHigh(sensorEntries1), 0);
+    assert.deepEqual(calculateTimeHigh(sensorEntries2), 86);
+  });
+
+  it('calculateTimeHigh', () => {
+    assert.deepEqual(calculateTimeHigh(sensorEntries1), 0);
+    assert.deepEqual(calculateTimeHigh(sensorEntries2), 86);
+  });
+
+  it('countSituations', () => {
+    assert.deepEqual(countSituations(sensorEntries1, 7.5, true), 2);
+    assert.deepEqual(countSituations(sensorEntries2, 13, false), 2);
+  });
+
+  it('getBgAverage', () => {
+    assert.deepEqual(getBgAverage(sensorEntries1), '6.9');
+    assert.deepEqual(getBgAverage(sensorEntries2), '12.0');
+  });
+
+  it('calculateInsulinPerDay', () => {
+    assert.deepEqual(calculateInsulinPerDay(insulins), 3);
   });
 });
