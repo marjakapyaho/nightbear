@@ -1,6 +1,8 @@
-import { SensorEntry } from 'core/models/model';
+import { Insulin, SensorEntry } from 'core/models/model';
 import { reduce } from 'lodash';
 import { hasBloodGlucose } from 'server/utils/data';
+import { timeInRangeHighLimit, timeInRangeLowLimit } from 'web/utils/config';
+import { setOneDecimal } from 'web/utils/helpers';
 
 export const MIN_IN_MS = 60 * 1000;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
@@ -72,4 +74,56 @@ export function calculateHba1c(entries: SensorEntry[]) {
 
   // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
   return (avgGlucose + 46.7) / 28.7 - 0.6;
+}
+
+export function calculateTimeInRange(bgModels: SensorEntry[]) {
+  const totalCount = bgModels.length;
+  const goodCount = bgModels.filter(
+    model =>
+      model.bloodGlucose && model.bloodGlucose >= timeInRangeLowLimit && model.bloodGlucose <= timeInRangeHighLimit,
+  ).length;
+
+  return Math.round((goodCount / totalCount) * 100);
+}
+
+export function calculateTimeLow(bgModels: SensorEntry[]) {
+  const totalCount = bgModels.length;
+  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < timeInRangeLowLimit).length;
+
+  return Math.round((goodCount / totalCount) * 100);
+}
+
+export function calculateTimeHigh(bgModels: SensorEntry[]) {
+  const totalCount = bgModels.length;
+  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > timeInRangeHighLimit).length;
+
+  return Math.round((goodCount / totalCount) * 100);
+}
+
+// Note: if there is e.g. 10 entries over limit in a row, it's categorized as one single occurrence of situation
+export function countSituations(bgModels: SensorEntry[], limit: number, low: boolean) {
+  let counter = 0;
+  let incidentBeingRecorded: boolean;
+
+  bgModels.forEach(model => {
+    if (model.bloodGlucose && (low ? model.bloodGlucose < limit : model.bloodGlucose > limit)) {
+      if (!incidentBeingRecorded) {
+        counter++;
+        incidentBeingRecorded = true;
+      }
+    } else {
+      incidentBeingRecorded = false;
+    }
+  });
+
+  return counter;
+}
+
+export function getBgAverage(bgModels: SensorEntry[]) {
+  const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
+  return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
+}
+
+export function calculateInsulinPerDay(insulins: Insulin[]) {
+  return Math.round(insulins.reduce((sum, value) => sum + value.amount, 0) / 7);
 }
