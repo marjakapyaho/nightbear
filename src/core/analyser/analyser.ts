@@ -24,7 +24,7 @@ const LOW_CORRECTION_SUPPRESSION_WINDOW = 20 * MIN_IN_MS;
 
 const slopeLimits = {
   SLOW: 0.3,
-  MEDIUM: 0.7,
+  MEDIUM: 0.6,
   FAST: 1.3,
 };
 
@@ -70,6 +70,12 @@ export function runAnalysis(
     BAD_LOW: detectBadLow(activeProfile, latestEntry),
   };
 
+  // Must be before LOW and FALLING
+  state = {
+    ...state,
+    COMPRESSION_LOW: detectCompressionLow(state, activeProfile, entries, insulin, currentTimestamp),
+  };
+
   // Must be before FALLING
   state = {
     ...state,
@@ -79,11 +85,6 @@ export function runAnalysis(
   state = {
     ...state,
     FALLING: detectFalling(state, activeProfile, latestEntry),
-  };
-
-  state = {
-    ...state,
-    COMPRESSION_LOW: detectCompressionLow(activeProfile, entries, insulin),
   };
 
   // Must be before HIGH
@@ -132,6 +133,7 @@ function detectLow(
   currentTimestamp: number,
 ) {
   const notCurrentlyBadLow = !state.BAD_LOW;
+  const notCurrentlyCompressionLow = !state.COMPRESSION_LOW;
   const notComingUpFromBadLow = !find(
     alarms,
     alarm =>
@@ -145,6 +147,7 @@ function detectLow(
   );
   return (
     notCurrentlyBadLow &&
+    notCurrentlyCompressionLow &&
     notComingUpFromBadLow &&
     thereAreNoCorrectionCarbs &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_ABS + correctionIfAlreadyLow
@@ -159,25 +162,36 @@ function detectFalling(state: State, activeProfile: ActiveProfile, entry: Analys
   return (
     !state.BAD_LOW &&
     !state.LOW &&
+    !state.COMPRESSION_LOW &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_REL &&
     !!entry.slope &&
     entry.slope < -slopeLimits.MEDIUM
   );
 }
 
-function detectCompressionLow(activeProfile: ActiveProfile, entries: AnalyserEntry[], insulin: Insulin[]) {
-  const recentInsulin = insulin.length;
-  const isDay = activeProfile.profileName === 'day';
-  const lastFiveEntries = chain(entries)
+function detectCompressionLow(
+  state: State,
+  activeProfile: ActiveProfile,
+  entries: AnalyserEntry[],
+  insulin: Insulin[],
+  currentTimestamp: number,
+) {
+  const noRecentInsulin = !insulin.length;
+  const isNight = activeProfile.profileName === 'night';
+  const entriesToCheck = 4;
+  const lastEntries = chain(entries)
     .sortBy('timestamp')
-    .slice(-5)
+    .slice(-entriesToCheck)
     .value();
+  const lastEntriesAreFresh =
+    lastEntries.length === entriesToCheck && lastEntries[0].timestamp > currentTimestamp - 30 * MIN_IN_MS;
 
-  if (recentInsulin || isDay || lastFiveEntries.length < 5) {
-    return false;
-  }
-
-  return !!find(entries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2);
+  return (
+    noRecentInsulin &&
+    isNight &&
+    lastEntriesAreFresh &&
+    !!find(lastEntries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2)
+  );
 }
 
 function detectHigh(
