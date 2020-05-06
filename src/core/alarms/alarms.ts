@@ -45,7 +45,7 @@ export function detectAlarmActions(state: State, activeAlarms: Alarm[]) {
   const alarmsToKeep = filter(activeAlarms, alarm => state[alarm.situationType]);
   const alarmsToCreate = objectKeys(state)
     .map(situation => {
-      if (!state[situation]) return null;
+      if (!state[situation] || situation === 'COMPRESSION_LOW') return null;
       if (find(alarmsToKeep, { situationType: situation })) return null;
       return situation;
     })
