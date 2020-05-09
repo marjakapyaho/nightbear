@@ -27,6 +27,17 @@ describe('core/alarms', () => {
     });
   });
 
+  it('does not create alarm for COMPRESSION_LOW', () => {
+    const stateWithCompressionLow = getMockState('COMPRESSION_LOW');
+    const activeAlarms = getMockActiveAlarms(currentTimestamp);
+
+    assert.deepEqual(detectAlarmActions(stateWithCompressionLow, activeAlarms), {
+      alarmsToRemove: [],
+      alarmsToKeep: [],
+      alarmsToCreate: [],
+    });
+  });
+
   it('alarm actions to keep', () => {
     const stateWithHigh = getMockState('HIGH');
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'HIGH');
