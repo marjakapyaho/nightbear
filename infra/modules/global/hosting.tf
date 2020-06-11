@@ -2,6 +2,13 @@ locals {
   hostname                    = "${var.name_prefix}-hosting"
   unattended_upgrades_enabled = true
   unattended_upgrades_file    = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
+  auth_username               = "nightbear"
+  auth_password               = random_string.hosting_basic_auth_password.result
+}
+
+resource "random_string" "hosting_basic_auth_password" {
+  length  = 32
+  special = false
 }
 
 resource "aws_ebs_volume" "data" {
@@ -24,6 +31,7 @@ module "docker_host" {
   data_volume_id       = aws_ebs_volume.data.id
   tags                 = merge(var.tags, { Component = "hosting" })
   allow_incoming_http  = true # by default, only incoming SSH is allowed; other protocols for the security group are opt-in
+  allow_incoming_https = true
 }
 
 resource "null_resource" "unattended_upgrades" {
@@ -55,6 +63,48 @@ EOF
   }
 }
 
+resource "null_resource" "patches" {
+  depends_on = [module.docker_host] # wait until other provisioners within the module have finished
+
+  connection {
+    host        = module.docker_host.public_ip
+    user        = module.docker_host.ssh_username
+    private_key = module.docker_host.ssh_private_key
+    agent       = false
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/hosting-nginx.tmpl"
+    destination = "/home/${module.docker_host.ssh_username}/nginx.tmpl"
+  }
+
+  provisioner "file" {
+    destination = "/home/${module.docker_host.ssh_username}/first-time-provision.sh"
+    content     = <<-EOF
+      #!/bin/bash
+
+      # Fix default 1 MB body size limit (replication needs more):
+      echo 'client_max_body_size 500m;' | sudo tee /data/nginx-extras.conf
+
+      # Generate nginx htpasswd files:
+      docker run --rm --entrypoint /bin/sh xmartlabs/htpasswd -c "htpasswd -bn ${local.auth_username} ${local.auth_password}" | sudo tee /data/nginx-htpasswd/db.nightbear.fi
+
+      # Configure CouchDB server:
+      docker-compose exec db curl -X POST -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_cluster_setup -d '{"action":"enable_single_node","username":"${local.auth_username}","password":"${local.auth_password}","bind_address":"0.0.0.0","port":5984,"singlenode":true}'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/httpd/enable_cors -d '"true"'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/origins -d '"*"'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/credentials -d '"true"'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/headers -d '"accept, authorization, content-type, origin, referer"'
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/couch_httpd_auth/timeout -d '"31556952"' # i.e. one year
+      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/log/level -d '"warning"'
+
+      # Move patched (https://github.com/nginx-proxy/nginx-proxy/pull/1176) nginx config template into place:
+      sudo mv nginx.tmpl /data
+    EOF
+  }
+}
+
 module "docker_compose" {
   source = "../docker_compose_host"
 
@@ -67,18 +117,69 @@ version: "3"
 
 services:
 
-  test:
-    image: nginx:latest
+  # https://github.com/nginx-proxy/nginx-proxy/
+  nginx:
+    container_name: nginx
+    image: jwilder/nginx-proxy
     restart: always
     ports:
-      - "80:80"
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /data/nginx-certs:/etc/nginx/certs:ro
+      - /data/nginx-data:/etc/nginx/vhost.d
+      - /data/nginx-data:/usr/share/nginx/html
+      - /data/nginx-htpasswd:/etc/nginx/htpasswd:ro
+      - /data/nginx-extras.conf:/etc/nginx/conf.d/nginx-extras.conf:ro
+      - /data/nginx.tmpl:/app/nginx.tmpl
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
 
+  # https://github.com/nginx-proxy/docker-letsencrypt-nginx-proxy-companion
+  letsencrypt:
+    container_name: letsencrypt
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /data/nginx-certs:/etc/nginx/certs:rw
+      - /data/nginx-data:/etc/nginx/vhost.d
+      - /data/nginx-data:/usr/share/nginx/html
+
+  # https://hub.docker.com/_/couchdb
+  db:
+    container_name: db
+    image: couchdb:2.3.1
+    restart: always
+    environment:
+      - COUCHDB_USER=${local.auth_username}
+      - COUCHDB_PASSWORD=${local.auth_password}
+      - LETSENCRYPT_EMAIL=admin@nightbear.fi
+      - LETSENCRYPT_HOST=db.nightbear.fi
+      - VIRTUAL_HOST=db.nightbear.fi
+      - VIRTUAL_PORT=5984
+    volumes:
+      - /data/db:/opt/couchdb/data
+
+  # https://github.com/gliderlabs/logspout
   logspout:
+    container_name: logspout
     image: gliderlabs/logspout:v3.2.6
     restart: always
     command: syslog+tls://${var.papertrail_host_hosting}
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SYSLOG_HOSTNAME=hosting
 
 EOF
+}
+
+resource "aws_route53_record" "hosting" {
+  zone_id = aws_route53_zone.this.zone_id
+  name    = "db.nightbear.fi"
+  type    = "A"
+  ttl     = 300
+  records = [module.docker_host.public_ip]
 }
