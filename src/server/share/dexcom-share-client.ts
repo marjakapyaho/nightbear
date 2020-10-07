@@ -39,7 +39,7 @@ export function createDexcomShareClient(username: string, password: string, logg
         .then(res => res.data)
         .catch((err: AxiosError) => {
           if (err.isAxiosError)
-            log('Login request failed', pick(err.response, 'data', 'status', 'statusText', 'headers'));
+            log('Login request failed:\n%O', pick(err.response, 'data', 'status', 'statusText', 'headers'));
           return Promise.reject(new Error(`DexcomShareClient login request failed (caused by\n${err}\n)`));
         });
     },
@@ -58,7 +58,7 @@ export function createDexcomShareClient(username: string, password: string, logg
         .then(res => res.data)
         .catch((err: AxiosError) => {
           if (err.isAxiosError)
-            log('BG fetch request failed', pick(err.response, 'data', 'status', 'statusText', 'headers'));
+            log('BG fetch request failed:\n%O', pick(err.response, 'data', 'status', 'statusText', 'headers'));
           return Promise.reject(new Error(`DexcomShareClient BG fetch request failed (caused by\n${err}\n)`));
         });
     },
