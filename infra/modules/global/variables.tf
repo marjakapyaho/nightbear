@@ -10,3 +10,7 @@ variable "tags" {
 variable "papertrail_host_hosting" {
   description = "Docker hosting for all envs should log to this destination, e.g. using logspout"
 }
+
+variable "http_auth_password" {
+  description = "Password for HTTP Basic Auth"
+}

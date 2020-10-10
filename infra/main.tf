@@ -4,6 +4,7 @@ module "global" {
   name_prefix             = "${var.name_prefix}-global"
   tags                    = merge(var.tags, { Environment = "global" })
   papertrail_host_hosting = var.papertrail_host_hosting
+  http_auth_password      = var.http_auth_password
 }
 
 module "stage" {

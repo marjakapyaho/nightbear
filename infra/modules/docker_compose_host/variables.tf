@@ -13,7 +13,7 @@ variable "ssh_private_key" {
 
 variable "docker_compose_version" {
   description = "Version of docker-compose to install during provisioning (see https://github.com/docker/compose/releases)"
-  default     = "1.23.2"
+  default     = "1.27.4"
 }
 
 variable "docker_compose_env" {

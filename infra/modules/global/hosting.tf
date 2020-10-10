@@ -1,20 +1,14 @@
 locals {
-  hostname                    = "${var.name_prefix}-hosting"
-  unattended_upgrades_enabled = true
-  unattended_upgrades_file    = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
-  auth_username               = "nightbear"
-  auth_password               = random_string.hosting_basic_auth_password.result
-}
-
-resource "random_string" "hosting_basic_auth_password" {
-  length  = 32
-  special = false
+  hostname                 = "${var.name_prefix}-hosting"
+  unattended_upgrades_file = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
+  auth_username            = "nightbear"
+  auth_password            = var.http_auth_password
 }
 
 resource "aws_ebs_volume" "data" {
   availability_zone = module.docker_host.availability_zone # ensure the volume is created in the same AZ the docker host
   type              = "gp2"                                # i.e. "Amazon EBS General Purpose SSD"
-  size              = 64                                   # in GiB; if you change this in-place, you need to SSH over and run e.g. $ sudo resize2fs /dev/xvdh
+  size              = 32                                   # in GiB; if you change this in-place, you need to SSH over and run e.g. $ sudo resize2fs /dev/xvdh
 
   tags = merge(var.tags, {
     Component = "hosting"
@@ -35,8 +29,7 @@ module "docker_host" {
 }
 
 resource "null_resource" "unattended_upgrades" {
-  depends_on = [module.docker_host]                      # wait until other provisioners within the module have finished
-  count      = local.unattended_upgrades_enabled ? 1 : 0 # somewhat unintuitively, "destroy" time provisioners only run on "count = 0", not when this resource is destroyed
+  depends_on = [module.docker_host] # wait until other provisioners within the module have finished
 
   connection {
     host        = module.docker_host.public_ip
@@ -56,11 +49,6 @@ Unattended-Upgrade::Automatic-Reboot-Time "13:00";
 EOF
     ]
   }
-
-  provisioner "remote-exec" {
-    when   = destroy
-    inline = ["sudo rm -fv ${local.unattended_upgrades_file}"]
-  }
 }
 
 resource "null_resource" "patches" {
@@ -78,16 +66,23 @@ resource "null_resource" "patches" {
     destination = "/home/${module.docker_host.ssh_username}/nginx.tmpl"
   }
 
-  provisioner "file" {
-    destination = "/home/${module.docker_host.ssh_username}/first-time-provision.sh"
-    content     = <<-EOF
-      #!/bin/bash
+  provisioner "remote-exec" {
+    inline = [
+      # Move patched (https://github.com/nginx-proxy/nginx-proxy/pull/1176) nginx config template into place:
+      "sudo mv nginx.tmpl /data",
 
       # Fix default 1 MB body size limit (replication needs more):
-      echo 'client_max_body_size 500m;' | sudo tee /data/nginx-extras.conf
+      "echo 'client_max_body_size 500m;' | sudo tee /data/nginx-extras.conf",
 
       # Generate nginx htpasswd files:
-      docker run --rm --entrypoint /bin/sh xmartlabs/htpasswd -c "htpasswd -bn ${local.auth_username} ${local.auth_password}" | sudo tee /data/nginx-htpasswd/db.nightbear.fi
+      "docker run --rm --entrypoint /bin/sh xmartlabs/htpasswd -c \"htpasswd -bn ${local.auth_username} ${local.auth_password}\" | sudo tee /data/nginx-htpasswd/db.nightbear.fi",
+    ]
+  }
+
+  provisioner "file" {
+    destination = "/home/${module.docker_host.ssh_username}/post-provision-setup.sh"
+    content     = <<-EOF
+      #!/bin/bash
 
       # Configure CouchDB server:
       docker-compose exec db curl -X POST -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_cluster_setup -d '{"action":"enable_single_node","username":"${local.auth_username}","password":"${local.auth_password}","bind_address":"0.0.0.0","port":5984,"singlenode":true}'
@@ -98,9 +93,6 @@ resource "null_resource" "patches" {
       docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/headers -d '"accept, authorization, content-type, origin, referer"'
       docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/couch_httpd_auth/timeout -d '"31556952"' # i.e. one year
       docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/log/level -d '"warning"'
-
-      # Move patched (https://github.com/nginx-proxy/nginx-proxy/pull/1176) nginx config template into place:
-      sudo mv nginx.tmpl /data
     EOF
   }
 }
@@ -165,20 +157,25 @@ services:
   # https://github.com/gliderlabs/logspout
   logspout:
     container_name: logspout
-    image: gliderlabs/logspout:v3.2.6
+    image: gliderlabs/logspout:v3.2.11
     restart: always
-    command: syslog+tls://${var.papertrail_host_hosting}
+    command: syslog+tls://${var.papertrail_host_hosting}?filter.labels=send-logs-to-papertrail:true # by default, container logs aren't shipped off host, because logging costs money; add "send-logs-to-papertrail=true" label to any container to include it
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - SYSLOG_HOSTNAME=hosting
+      - SYSLOG_HOSTNAME=${module.docker_host.hostname}
 
 EOF
 }
 
 resource "aws_route53_record" "hosting" {
+  for_each = toset([
+    "hosting.nightbear.fi",
+    "db.nightbear.fi",
+  ])
+
   zone_id = aws_route53_zone.this.zone_id
-  name    = "db.nightbear.fi"
+  name    = each.value
   type    = "A"
   ttl     = 300
   records = [module.docker_host.public_ip]
