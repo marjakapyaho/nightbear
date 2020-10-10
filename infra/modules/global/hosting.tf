@@ -3,6 +3,9 @@ locals {
   unattended_upgrades_file = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
   auth_username            = "nightbear"
   auth_password            = var.http_auth_password
+  metrics_host             = "influxdb.jrw.fi"
+  metrics_username         = "writer"
+  metrics_password         = var.influxdb_password_writer
 }
 
 resource "aws_ebs_volume" "data" {
@@ -97,6 +100,59 @@ resource "null_resource" "patches" {
   }
 }
 
+locals {
+  telegraf_conf = <<-EOF
+
+    [agent]
+      interval = "60s" # Default data collection interval for all inputs
+      collection_jitter = "3s" # Collection jitter is used to jitter the collection by a random amount.
+      flush_jitter = "3s" # Jitter the flush interval by a random amount. This is primarily to avoid large write spikes for users running a large number of telegraf instances.
+
+    [[outputs.influxdb]]
+      urls = ["https://${local.metrics_host}"] # The full HTTP or UDP URL for your InfluxDB instance.
+      username = "${local.metrics_username}"
+      password = "${local.metrics_password}"
+
+    [[inputs.disk]]
+      ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"] # Ignore FS types that probably aren't very interesting
+
+    [[inputs.cpu]]
+    [[inputs.diskio]]
+    [[inputs.kernel]]
+    [[inputs.mem]]
+    [[inputs.processes]]
+    [[inputs.swap]]
+    [[inputs.system]]
+    [[inputs.docker]]
+    [[inputs.net]]
+
+  EOF
+}
+
+resource "null_resource" "telegraf_conf" {
+  depends_on = [module.docker_host]                    # wait until other provisioners within the module have finished
+  triggers   = { telegraf_conf = local.telegraf_conf } # re-run if the config changes
+
+  connection {
+    host        = module.docker_host.public_ip
+    user        = module.docker_host.ssh_username
+    private_key = module.docker_host.ssh_private_key
+    agent       = false
+  }
+
+  # Create/update remote Telegraf config file
+  # https://github.com/influxdata/telegraf/blob/master/docs/CONFIGURATION.md
+  provisioner "file" {
+    destination = "/home/${module.docker_host.ssh_username}/telegraf.conf"
+    content     = local.telegraf_conf
+  }
+
+  # Let Telegraf know the config might've changed
+  provisioner "remote-exec" {
+    inline = ["docker restart telegraf && echo 'Successfully restarted Telegraf with new config' || echo 'Telegraf not running, no need to restart'"]
+  }
+}
+
 module "docker_compose" {
   source = "../docker_compose_host"
 
@@ -164,6 +220,28 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - SYSLOG_HOSTNAME=${module.docker_host.hostname}
+
+  # https://hub.docker.com/_/telegraf
+  telegraf:
+    container_name: telegraf
+    image: telegraf:1.13.4
+    restart: always
+    hostname: ${module.docker_host.hostname}
+    environment:
+      # From https://github.com/influxdata/telegraf/blob/master/docs/FAQ.md
+      - HOST_ETC=/hostfs/etc
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_MOUNT_PREFIX=/hostfs
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # From https://github.com/influxdata/telegraf/blob/master/docs/FAQ.md
+      - /:/hostfs:ro
+      - /etc:/hostfs/etc:ro
+      - /proc:/hostfs/proc:ro
+      - /sys:/hostfs/sys:ro
+      - /var/run/utmp:/var/run/utmp:ro
 
 EOF
 }

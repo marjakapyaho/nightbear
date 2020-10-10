@@ -14,3 +14,7 @@ variable "papertrail_host_hosting" {
 variable "http_auth_password" {
   description = "Password for HTTP Basic Auth"
 }
+
+variable "influxdb_password_writer" {
+  description = "Password for the InfluxDB server we write Telegraf metrics to"
+}
