@@ -79,6 +79,13 @@ resource "null_resource" "patches" {
 
       # Generate nginx htpasswd files:
       "docker run --rm --entrypoint /bin/sh xmartlabs/htpasswd -c \"htpasswd -bn ${local.auth_username} ${local.auth_password}\" | sudo tee /data/nginx-htpasswd/db.nightbear.fi",
+
+      # Check out "master" as the "stage" env codebase:
+      "git clone https://github.com/marjakapyaho/nightbear.git server-stage",
+
+      # Check out the latest tag (hopefully a release) as the prod codebase:
+      "git clone https://github.com/marjakapyaho/nightbear.git server-prod",
+      "cd server-prod && git checkout $(git describe --tags | cut -d - -f 1)"
     ]
   }
 
