@@ -70,3 +70,13 @@ Issue a final `terraform apply` to ensure everything is up to spec.
 Logs are sent to Papertrail, but only some of them, because we pay by the MB.
 
 All logs are available locally with e.g. `docker-compose logs`.
+
+# Restoring from backup
+
+As the saying goes, if you never try restoring your backups... you don't have backups. So here goes:
+
+    aws s3 cp s3://nightbear-global-hosting-backup/latest.tar.gz .
+    tar -xf latest.tar.gz
+    docker run -p 5984:5984 -v $(pwd)/db:/opt/couchdb/data couchdb:2.3.1
+
+Open up http://localhost:5984/_utils and take a look around to see if the latest data is there
