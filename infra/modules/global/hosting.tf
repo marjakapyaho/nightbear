@@ -243,6 +243,29 @@ services:
       - /sys:/hostfs/sys:ro
       - /var/run/utmp:/var/run/utmp:ro
 
+  # https://github.com/futurice/docker-volume-backup
+  backup:
+    container_name: backup
+    image: futurice/docker-volume-backup:2.1.0
+    restart: always
+    hostname: ${module.docker_host.hostname}
+    environment:
+      - BACKUP_CRON_EXPRESSION=00 01 * * * # run backup at 3 or 4 AM every night, Finnish time
+      - BACKUP_FILENAME=latest.tar.gz # because the bucket is versioned, we can always use the same file name
+      - AWS_S3_BUCKET_NAME=${aws_s3_bucket.backup.id}
+      - AWS_ACCESS_KEY_ID=${aws_iam_access_key.backup.id}
+      - AWS_SECRET_ACCESS_KEY=${aws_iam_access_key.backup.secret}
+      - AWS_DEFAULT_REGION=${data.aws_region.this.name}
+      - INFLUXDB_URL=https://${local.metrics_host}
+      - INFLUXDB_DB=misc
+      - INFLUXDB_CREDENTIALS=${local.metrics_username}:${local.metrics_password}
+      - INFLUXDB_MEASUREMENT=docker_host_backups
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # allow Docker commands from within the container
+      - /data:/backup:ro # mount the data path into the container, so it gets backed up
+    labels:
+      - send-logs-to-papertrail=true
+
 EOF
 }
 
@@ -257,4 +280,63 @@ resource "aws_route53_record" "hosting" {
   type    = "A"
   ttl     = 300
   records = [module.docker_host.public_ip]
+}
+
+# Backups for this host are stored in this bucket
+resource "aws_s3_bucket" "backup" {
+  bucket = "${module.docker_host.hostname}-backup"
+  acl    = "private"
+
+  # Enable versioning so we can just keep writing to the same file, without losing older backups
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    id      = "Move to Glacier after 1 day, remove old versions after 1 year"
+    enabled = true
+
+    # When the backup is older than a day, move it to Glacier
+    transition {
+      days          = 1
+      storage_class = "GLACIER"
+    }
+
+    # When it's older than a year, remove it (though the latest one never expires)
+    noncurrent_version_expiration {
+      days = 365
+    }
+  }
+}
+
+# Create a separate IAM user for running the backups, which has access to the one backup bucket and nothing else
+resource "aws_iam_user" "backup" {
+  name = "${module.docker_host.hostname}-backup"
+}
+
+resource "aws_iam_access_key" "backup" {
+  user = aws_iam_user.backup.name
+}
+
+resource "aws_iam_user_policy" "backup" {
+  name = "${module.docker_host.hostname}-backup"
+  user = aws_iam_user.backup.name
+  policy = jsonencode(
+    {
+      Version : "2012-10-17",
+      Statement : [
+        {
+          Effect : "Allow",
+          Action : "s3:*",
+          Resource : [
+            "arn:aws:s3:::${aws_s3_bucket.backup.id}",
+            "arn:aws:s3:::${aws_s3_bucket.backup.id}/*",
+          ],
+        },
+      ],
+  })
+}
+
+output "backup_bucket" {
+  value = aws_s3_bucket.backup.id
 }
