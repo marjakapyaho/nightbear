@@ -20,7 +20,7 @@ const LOW_CLEARING_THRESHOLD = 0.5;
 const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
 const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 const HIGH_CORRECTION_SUPPRESSION_WINDOW = 2 * HOUR_IN_MS + 15 * MIN_IN_MS;
-const LOW_CORRECTION_SUPPRESSION_WINDOW = 20 * MIN_IN_MS;
+const LOW_CORRECTION_SUPPRESSION_WINDOW = 30 * MIN_IN_MS;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -164,6 +164,7 @@ function detectFalling(state: State, activeProfile: ActiveProfile, entry: Analys
     !state.LOW &&
     !state.COMPRESSION_LOW &&
     entry.bloodGlucose < activeProfile.analyserSettings.LOW_LEVEL_REL &&
+    entry.bloodGlucose >= activeProfile.analyserSettings.LOW_LEVEL_ABS &&
     !!entry.slope &&
     entry.slope < -slopeLimits.MEDIUM
   );

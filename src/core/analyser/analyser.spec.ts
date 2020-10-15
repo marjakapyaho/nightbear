@@ -324,7 +324,7 @@ describe('utils/analyser', () => {
     );
   });
 
-  it('does not detect low if there are recent carbs (detects falling instead)', () => {
+  it('does not detect low if there are recent carbs', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
@@ -337,7 +337,7 @@ describe('utils/analyser', () => {
       ),
       {
         ...DEFAULT_STATE,
-        FALLING: true,
+        FALLING: false,
       },
     );
   });
