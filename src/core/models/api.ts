@@ -2,7 +2,7 @@ import { createPushoverClient, PushoverClient } from 'core/alarms/pushover-clien
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
 import { createLogger, Logger } from 'core/utils/logging';
-import { createDexcomShareClient, DexcomShareClient } from 'server/share/dexcom-share-client';
+import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
 
 export function createNodeContext(): Context {
   const {
@@ -17,8 +17,6 @@ export function createNodeContext(): Context {
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
-  if (!DEXCOM_SHARE_USERNAME) throw new Error(`Missing required env-var: DEXCOM_SHARE_USERNAME`);
-  if (!DEXCOM_SHARE_PASSWORD) throw new Error(`Missing required env-var: DEXCOM_SHARE_PASSWORD`);
   const log = createLogger();
   return {
     httpPort: 3000,
@@ -26,7 +24,10 @@ export function createNodeContext(): Context {
     log,
     storage: createCouchDbStorage(NIGHTBEAR_DB_URL),
     pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
-    dexcomShare: createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log),
+    dexcomShare:
+      DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
+        ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)
+        : NO_DEXCOM_SHARE,
   };
 }
 
