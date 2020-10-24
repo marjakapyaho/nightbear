@@ -63,7 +63,7 @@ function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandle
     const debug = extendLogger(log, getLoggingNamespace('req', request.requestId), true);
     const then = context.timestamp();
     const duration = () => ((context.timestamp() - then) / 1000).toFixed(3) + ' sec';
-    debug(`Incoming request: ${request.requestMethod} ${request.requestPath}\n%O`, request.requestBody);
+    debug(`Incoming request: ${request.requestMethod} ${request.requestPath}\n%O`, request);
     return handler(request, context).then(
       res => {
         debug(`Outgoing ${res.responseStatus} response:\n%O`, res.responseBody);
@@ -71,7 +71,7 @@ function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandle
         return res;
       },
       err => {
-        debug(`Outgoing error`, err);
+        debug(`Outgoing error:\n%O`, err);
         log(`${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`);
         return Promise.reject(err);
       },
