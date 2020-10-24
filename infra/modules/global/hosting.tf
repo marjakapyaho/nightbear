@@ -25,6 +25,7 @@ module "docker_host" {
   hostname             = local.hostname
   ssh_private_key_path = "terraform.id_rsa"
   ssh_public_key_path  = "terraform.id_rsa.pub"
+  root_volume_size     = 12 # GB
   data_volume_id       = aws_ebs_volume.data.id
   tags                 = merge(var.tags, { Component = "hosting" })
   allow_incoming_http  = true # by default, only incoming SSH is allowed; other protocols for the security group are opt-in
@@ -217,6 +218,64 @@ services:
     volumes:
       - /data/db:/opt/couchdb/data
 
+  # https://github.com/marjakapyaho/nightbear
+  server_stage:
+    container_name: server-stage
+    image: node:8.10
+    working_dir: /app
+    command: bash -c 'npm install && npm run server-start'
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - NIGHTBEAR_DB_URL=http://db:5984/stage
+      # - DEXCOM_SHARE_USERNAME=TODO
+      # - DEXCOM_SHARE_PASSWORD=TODO
+      - NODE_TLS_REJECT_UNAUTHORIZED=0 # TODO: Remove this once we've migrated to a more recent node (needed for Dexcom Share)
+      - PUSHOVER_USER=TODO
+      - PUSHOVER_TOKEN=TODO
+      - PUSHOVER_CALLBACK=TODO
+      - DEBUG=nightbear*
+      - DEBUG_COLORS=1
+      - DEBUG_HIDE_DATE=1
+      - LETSENCRYPT_EMAIL=admin@nightbear.fi
+      - LETSENCRYPT_HOST=server.stage.nightbear.fi
+      - VIRTUAL_HOST=server.stage.nightbear.fi
+      - VIRTUAL_PORT=3000
+    volumes:
+      - ./server-stage:/app
+    labels:
+      - send-logs-to-papertrail=true
+
+  # https://github.com/marjakapyaho/nightbear
+  server_prod:
+    container_name: server-prod
+    image: node:8.10
+    working_dir: /app
+    command: bash -c 'npm install && npm run server-start'
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - NIGHTBEAR_DB_URL=http://db:5984/prod
+      # - DEXCOM_SHARE_USERNAME=TODO
+      # - DEXCOM_SHARE_PASSWORD=TODO
+      - NODE_TLS_REJECT_UNAUTHORIZED=0 # TODO: Remove this once we've migrated to a more recent node (needed for Dexcom Share)
+      - PUSHOVER_USER=TODO
+      - PUSHOVER_TOKEN=TODO
+      - PUSHOVER_CALLBACK=TODO
+      - DEBUG=nightbear*
+      - DEBUG_COLORS=1
+      - DEBUG_HIDE_DATE=1
+      - LETSENCRYPT_EMAIL=admin@nightbear.fi
+      - LETSENCRYPT_HOST=server.nightbear.fi
+      - VIRTUAL_HOST=server.nightbear.fi
+      - VIRTUAL_PORT=3000
+    volumes:
+      - ./server-prod:/app
+    labels:
+      - send-logs-to-papertrail=true
+
   # https://github.com/gliderlabs/logspout
   logspout:
     container_name: logspout
@@ -280,6 +339,8 @@ resource "aws_route53_record" "hosting" {
   for_each = toset([
     "hosting.nightbear.fi",
     "db.nightbear.fi",
+    "server.stage.nightbear.fi",
+    "server.nightbear.fi",
   ])
 
   zone_id = aws_route53_zone.this.zone_id
