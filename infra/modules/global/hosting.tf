@@ -2,10 +2,10 @@ locals {
   hostname                 = "${var.name_prefix}-hosting"
   unattended_upgrades_file = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
   auth_username            = "nightbear"
-  auth_password            = var.http_auth_password
+  auth_password            = var.secrets.http_auth_password
   metrics_host             = "influxdb.jrw.fi"
   metrics_username         = "writer"
-  metrics_password         = var.influxdb_password_writer
+  metrics_password         = var.secrets.influxdb_password_writer
 }
 
 resource "aws_ebs_volume" "data" {
@@ -281,7 +281,7 @@ services:
     container_name: logspout
     image: gliderlabs/logspout:v3.2.11
     restart: always
-    command: syslog+tls://${var.papertrail_host_hosting}?filter.labels=send-logs-to-papertrail:true # by default, container logs aren't shipped off host, because logging costs money; add "send-logs-to-papertrail=true" label to any container to include it
+    command: syslog+tls://${var.secrets.papertrail_host_hosting}?filter.labels=send-logs-to-papertrail:true # by default, container logs aren't shipped off host, because logging costs money; add "send-logs-to-papertrail=true" label to any container to include it
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:

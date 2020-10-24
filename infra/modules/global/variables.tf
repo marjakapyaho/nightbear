@@ -7,14 +7,6 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "papertrail_host_hosting" {
-  description = "Docker hosting for all envs should log to this destination, e.g. using logspout"
-}
-
-variable "http_auth_password" {
-  description = "Password for HTTP Basic Auth"
-}
-
-variable "influxdb_password_writer" {
-  description = "Password for the InfluxDB server we write Telegraf metrics to"
+variable "secrets" {
+  type = map(string)
 }
