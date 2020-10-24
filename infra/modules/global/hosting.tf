@@ -96,14 +96,14 @@ resource "null_resource" "patches" {
       #!/bin/bash
 
       # Configure CouchDB server:
-      docker-compose exec db curl -X POST -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_cluster_setup -d '{"action":"enable_single_node","username":"${local.auth_username}","password":"${local.auth_password}","bind_address":"0.0.0.0","port":5984,"singlenode":true}'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/httpd/enable_cors -d '"true"'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/origins -d '"*"'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/credentials -d '"true"'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/headers -d '"accept, authorization, content-type, origin, referer"'
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/couch_httpd_auth/timeout -d '"31556952"' # i.e. one year
-      docker-compose exec db curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/log/level -d '"warning"'
+      docker-compose exec couchdb curl -X POST -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_cluster_setup -d '{"action":"enable_single_node","username":"${local.auth_username}","password":"${local.auth_password}","bind_address":"0.0.0.0","port":5984,"singlenode":true}'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/httpd/enable_cors -d '"true"'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/origins -d '"*"'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/credentials -d '"true"'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/cors/headers -d '"accept, authorization, content-type, origin, referer"'
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/couch_httpd_auth/timeout -d '"31556952"' # i.e. one year
+      docker-compose exec couchdb curl -X PUT -H Content-Type:application/json http://${local.auth_username}:${local.auth_password}@localhost:5984/_node/nonode@nohost/_config/log/level -d '"warning"'
     EOF
   }
 }
@@ -204,8 +204,8 @@ services:
       - /data/nginx-data:/usr/share/nginx/html
 
   # https://hub.docker.com/_/couchdb
-  db:
-    container_name: db
+  couchdb:
+    container_name: couchdb
     image: couchdb:2.3.1
     restart: always
     environment:
@@ -216,7 +216,8 @@ services:
       - VIRTUAL_HOST=db.nightbear.fi
       - VIRTUAL_PORT=5984
     volumes:
-      - /data/db:/opt/couchdb/data
+      - /data/couchdb-data:/opt/couchdb/data
+      - /data/couchdb-conf:/opt/couchdb/etc/local.d
 
   # https://github.com/marjakapyaho/nightbear
   server_stage:
@@ -228,7 +229,7 @@ services:
     expose:
       - 3000
     environment:
-      - NIGHTBEAR_DB_URL=http://db:5984/stage
+      - NIGHTBEAR_DB_URL=http://couchdb:5984/stage
       # - DEXCOM_SHARE_USERNAME=TODO
       # - DEXCOM_SHARE_PASSWORD=TODO
       - NODE_TLS_REJECT_UNAUTHORIZED=0 # TODO: Remove this once we've migrated to a more recent node (needed for Dexcom Share)
@@ -257,7 +258,7 @@ services:
     expose:
       - 3000
     environment:
-      - NIGHTBEAR_DB_URL=http://db:5984/prod
+      - NIGHTBEAR_DB_URL=http://couchdb:5984/prod
       # - DEXCOM_SHARE_USERNAME=TODO
       # - DEXCOM_SHARE_PASSWORD=TODO
       - NODE_TLS_REJECT_UNAUTHORIZED=0 # TODO: Remove this once we've migrated to a more recent node (needed for Dexcom Share)
