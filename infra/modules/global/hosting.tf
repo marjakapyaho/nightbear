@@ -20,9 +20,12 @@ resource "aws_ebs_volume" "data" {
 }
 
 module "docker_host" {
-  source = "../aws_ec2_ebs_docker_host"
+  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_ec2_ebs_docker_host#inputs
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v13.0...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_ec2_ebs_docker_host?ref=v13.0"
 
   hostname             = local.hostname
+  instance_ami         = "ami-0c4c42893066a139e" # Ubuntu 20.04 LTS (eu-west-1, amd64, hvm:ebs-ssd, 2020-09-24); see https://cloud-images.ubuntu.com/locator/ec2/
   ssh_private_key_path = "terraform.id_rsa"
   ssh_public_key_path  = "terraform.id_rsa.pub"
   root_volume_size     = 12 # GB
@@ -162,7 +165,9 @@ resource "null_resource" "telegraf_conf" {
 }
 
 module "docker_compose" {
-  source = "../docker_compose_host"
+  # Available inputs: https://github.com/futurice/terraform-utils/tree/master/docker_compose_host#inputs
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v13.0...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//docker_compose_host?ref=v13.0"
 
   public_ip       = module.docker_host.public_ip
   ssh_username    = module.docker_host.ssh_username
