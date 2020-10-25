@@ -32,4 +32,4 @@ jobs:
           host: hosting.nightbear.fi
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: cd server-prod && git pull && docker restart server-prod
+          script: cd server-prod && git fetch && git checkout $GITHUB_REF && docker restart server-prod # GITHUB_REF will be e.g. "refs/tags/v1.2.3"

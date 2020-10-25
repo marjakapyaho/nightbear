@@ -33,4 +33,4 @@ jobs:
           host: hosting.nightbear.fi
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: cd server-stage && git pull && docker restart server-stage
+          script: cd server-stage && git fetch && git checkout $GITHUB_REF && docker restart server-stage # GITHUB_REF will be "refs/heads/master"
