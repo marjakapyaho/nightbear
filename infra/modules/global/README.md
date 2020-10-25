@@ -1,5 +1,9 @@
 # Nightbear infra/global
 
+## Analyzing disk usage
+
+`apt install ncdu` and you're done.
+
 ## First time setup
 
 Due to an annoying dependency graph, you need to first:
@@ -24,6 +28,8 @@ This will leave you with an empty but configured DB server, etc.
 ## Reprovisioning hosting
 
 If the host is FUBAR, sometimes it's easiest to just throw it away and build a new one. All persistent data is on a separate EBS volume, so this should always be safe.
+
+If the host is still responsive, you can make a final backup first. Should NOT be needed, as the data volume is separate, but still.
 
 If the host is still responsive, you can make sure the EBS volume is unattached cleanly with:
 
@@ -52,7 +58,7 @@ Make a shell helper for this:
 
     function remove-and-recreate {
       terraform state rm $1
-      terraform apply -target $1
+      terraform apply -target $1 -auto-approve
     }
 
 And then proceed with:
@@ -77,6 +83,6 @@ As the saying goes, if you never try restoring your backups... you don't have ba
 
     aws s3 cp s3://nightbear-global-hosting-backup/latest.tar.gz .
     tar -xf latest.tar.gz
-    docker run -p 5984:5984 -v $(pwd)/db:/opt/couchdb/data couchdb:2.3.1
+    docker run -p 5984:5984 -v $(pwd)/backup/couchdb-data:/opt/couchdb/data couchdb:2.3.1
 
 Open up http://localhost:5984/_utils and take a look around to see if the latest data is there
