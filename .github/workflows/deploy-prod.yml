@@ -10,5 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Print GITHUB_REF for deploy debugging
-        run: echo GITHUB_REF=$GITHUB_REF
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.19'
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
+      - run: npm run web-build
+      - name: Deploy frontend
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --acl public-read --follow-symlinks --delete --cache-control no-store,must-revalidate
+        env:
+          AWS_S3_BUCKET: nightbear-prod-ui-content
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: build
+      - name: Deploy server
+        uses: appleboy/ssh-action@master
+        with:
+          host: hosting.nightbear.fi
+          username: ${{ secrets.DEPLOY_SSH_USERNAME }}
+          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          script: cd server-prod && git pull && docker restart server-prod
