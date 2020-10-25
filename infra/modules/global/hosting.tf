@@ -235,8 +235,8 @@ services:
       - 3000
     environment:
       - NIGHTBEAR_DB_URL=http://couchdb:5984/stage
-      # - DEXCOM_SHARE_USERNAME=TODO
-      # - DEXCOM_SHARE_PASSWORD=TODO
+      - DEXCOM_SHARE_USERNAME=${var.secrets.dexcom_share_username}
+      - DEXCOM_SHARE_PASSWORD=${var.secrets.dexcom_share_password}
       - NODE_TLS_REJECT_UNAUTHORIZED=0 # TODO: Remove this once we've migrated to a more recent node (needed for Dexcom Share)
       - PUSHOVER_USER=TODO
       - PUSHOVER_TOKEN=TODO
