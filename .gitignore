@@ -8,3 +8,5 @@ npm-debug.log
 /.history
 .vscode
 /build
+/infra/terraform.id_rsa
+/infra/terraform.id_rsa.pub

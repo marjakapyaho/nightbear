@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - test-deploy-stage # you can push to this branch to test the stage-deploy process, without having to iterate on master, potentially interfering with others' work
 
 jobs:
   main:
