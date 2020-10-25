@@ -4,6 +4,7 @@ import { generateUuid } from 'core/utils/id';
 import { extendLogger, Logger } from 'core/utils/logging';
 import cors from 'cors';
 import express, { Request as ExpressRequest } from 'express';
+import { isString, pickBy } from 'lodash';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
@@ -51,7 +52,7 @@ function normalizeRequest(requestId: string, req: ExpressRequest): Request {
     requestId,
     requestMethod: req.method,
     requestPath: req.path,
-    requestParams: req.query,
+    requestParams: pickBy(req.query, isString),
     requestHeaders: (req.headers ? req.headers : {}) as Headers, // without this cast, TS refuses to accept this because req.headers can be undefined (the ternary will handle that)
     requestBody: req.body,
   };

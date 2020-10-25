@@ -390,7 +390,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           }),
         )
         .then(
-          assert.fail, // expecting a failure
+          () => assert.fail(), // expecting a failure
           err => assert.match(err.message, /Couldn't load modelRef "timeline\/.*"/),
         );
     });
