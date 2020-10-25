@@ -12,12 +12,20 @@ module "router" {
   function_env_vars = {
     LAMBDA_MULTICAST_CONFIG = jsonencode({
       logLevel           = "info"
-      papertrailHost     = "TODO"
-      papertrailPort     = 0 # TODO
-      papertrailHostName = "nightbear-router"
+      papertrailHost     = split(":", var.secrets.papertrail_host_router)[0]
+      papertrailPort     = tonumber(split(":", var.secrets.papertrail_host_router)[1])
+      papertrailHostName = "nightbear-global-router"
       proxyTimeout       = 2500
       rewriteConfig = {
-        # TODO
+        "^/get-entries" = [
+          "https://server.nightbear.fi/get-entries",
+        ]
+        "^/get-watch-status" = [
+          "https://server.nightbear.fi/get-watch-status",
+        ]
+        "^/ack-latest-alarm" = [
+          "https://server.nightbear.fi/ack-latest-alarm",
+        ]
       }
       proxiedIncomingHeaders = [
         "authorization",
