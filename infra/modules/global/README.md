@@ -4,6 +4,12 @@
 
 `apt install ncdu` and you're done.
 
+## Removing old logs
+
+...from an Ubuntu Docker host:
+
+`sudo journalctl --vacuum-size=50M` (leave only the last 50 MB's worth of logs)
+
 ## First time setup
 
 Due to an annoying dependency graph, you need to first:
