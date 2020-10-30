@@ -33,11 +33,6 @@ startExpressServer(
   ['get', '/get-watch-status', getWatchStatus],
   ['post', '/upload-dexcom-entry', uploadDexcomEntry],
   ['get', '/upload-parakeet-entry', uploadParakeetEntry],
-).then(
-  port => {
-    context.log(`Server listening on ${port}`);
-  },
-  err => context.log(`Server error: ${err.message}`, err),
 );
 
 // Start running periodic tasks
