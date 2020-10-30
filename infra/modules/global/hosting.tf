@@ -21,8 +21,8 @@ resource "aws_ebs_volume" "data" {
 
 module "docker_host" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_ec2_ebs_docker_host#inputs
-  # Check for updates: https://github.com/futurice/terraform-utils/compare/v13.0...master
-  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_ec2_ebs_docker_host?ref=v13.0"
+  # Check for updates: https://github.com/futurice/terraform-utils/compare/v13.1...master
+  source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_ec2_ebs_docker_host?ref=v13.1"
 
   hostname             = local.hostname
   instance_ami         = "ami-0c4c42893066a139e" # Ubuntu 20.04 LTS (eu-west-1, amd64, hvm:ebs-ssd, 2020-09-24); see https://cloud-images.ubuntu.com/locator/ec2/
@@ -35,7 +35,7 @@ module "docker_host" {
   allow_incoming_https = true
 }
 
-resource "null_resource" "unattended_upgrades" {
+resource "null_resource" "hosting_initial_setup" {
   depends_on = [module.docker_host] # wait until other provisioners within the module have finished
 
   connection {
@@ -46,26 +46,16 @@ resource "null_resource" "unattended_upgrades" {
   }
 
   provisioner "remote-exec" {
-    inline = [<<EOF
-echo '
-Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
-Unattended-Upgrade::Remove-Unused-Dependencies "true";
-Unattended-Upgrade::Automatic-Reboot "true";
-Unattended-Upgrade::Automatic-Reboot-Time "13:00";
-' | sudo tee ${local.unattended_upgrades_file}
-EOF
+    inline = [
+      <<-EOF
+        echo '
+        Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+        Unattended-Upgrade::Remove-Unused-Dependencies "true";
+        Unattended-Upgrade::Automatic-Reboot "true";
+        Unattended-Upgrade::Automatic-Reboot-Time "13:00";
+        ' | sudo tee ${local.unattended_upgrades_file}
+      EOF
     ]
-  }
-}
-
-resource "null_resource" "patches" {
-  depends_on = [module.docker_host] # wait until other provisioners within the module have finished
-
-  connection {
-    host        = module.docker_host.public_ip
-    user        = module.docker_host.ssh_username
-    private_key = module.docker_host.ssh_private_key
-    agent       = false
   }
 
   provisioner "file" {

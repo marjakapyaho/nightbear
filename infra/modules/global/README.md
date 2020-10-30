@@ -64,15 +64,14 @@ Make a shell helper for this:
 
     function remove-and-recreate {
       terraform state rm $1
-      terraform apply -target $1 -auto-approve
+      terraform apply -auto-approve -target $1
     }
 
 And then proceed with:
 
     remove-and-recreate module.global.module.docker_host.null_resource.provisioners[0] # EBS volume attachment
-    remove-and-recreate module.global.null_resource.patches
+    remove-and-recreate module.global.null_resource.hosting_initial_setup
     remove-and-recreate module.global.null_resource.telegraf_conf
-    remove-and-recreate module.global.null_resource.unattended_upgrades
     remove-and-recreate module.global.module.docker_compose.null_resource.provisioners # Start Docker services
 
 Issue a final `terraform apply` to ensure everything is up to spec.
