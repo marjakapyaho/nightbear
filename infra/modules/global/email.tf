@@ -1,4 +1,4 @@
-module "my_email_forwarder" {
+module "email_forwarder" {
   # Available inputs: https://github.com/futurice/terraform-utils/tree/master/aws_ses_forwarder#inputs
   # Check for updates: https://github.com/futurice/terraform-utils/compare/v13.0...master
   source = "git::ssh://git@github.com/futurice/terraform-utils.git//aws_ses_forwarder?ref=v13.0"
