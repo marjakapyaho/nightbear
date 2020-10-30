@@ -3,12 +3,12 @@ import { Context } from 'core/models/api';
 import { extendLogger } from 'core/utils/logging';
 import { activateProfilesIfNeeded } from 'server/cronjobs/profile-activation';
 import { runChecks } from 'server/main/check-runner';
-import { CronjobsJournal } from 'server/cronjobs/cronjobs-journal';
 
 // Executes a SINGLE RUN of our periodic jobs.
 // Not all jobs necessarily run every time.
-export function runCronjobs(context: Context, journal: CronjobsJournal) {
+export function runCronjobs(context: Context) {
   const log = extendLogger(context.log, 'cron');
+  const journal = context.cronjobsJournal;
   const now = Date.now();
   return Promise.resolve()
     .then(() => journal.getPreviousExecutionTime())

@@ -13,7 +13,6 @@ import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
 import { runCronjobs } from 'server/cronjobs';
-import { createFilesystemJournal } from 'server/cronjobs/cronjobs-journal';
 import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 
@@ -43,8 +42,7 @@ startExpressServer(
 
 // Start running periodic tasks
 context.log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${TZ}"`);
-const journal = createFilesystemJournal('.nightbear-cronjobs-journal');
-const run = () => runCronjobs(context, journal);
+const run = () => runCronjobs(context);
 setInterval(run, 2 * MIN_IN_MS);
 run();
 

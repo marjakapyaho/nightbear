@@ -9,6 +9,7 @@ import { generateUuid } from 'core/utils/id';
 import { NO_LOGGING } from 'core/utils/logging';
 import 'mocha';
 import { NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
+import { createInMemoryJournal } from 'server/main/cronjobs-journal';
 
 export type TestSuite = (storage: () => Storage) => void;
 
@@ -64,6 +65,7 @@ export function createTestContext(storage = NO_STORAGE, timestamp = () => 150867
     storage,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,
+    cronjobsJournal: createInMemoryJournal(),
   };
 }
 

@@ -3,6 +3,7 @@ import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
 import { createLogger, Logger } from 'core/utils/logging';
 import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
+import { createFilesystemJournal, CronjobsJournal } from 'server/main/cronjobs-journal';
 
 export function createNodeContext(): Context {
   const {
@@ -28,6 +29,7 @@ export function createNodeContext(): Context {
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
         ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)
         : NO_DEXCOM_SHARE,
+    cronjobsJournal: createFilesystemJournal('.nightbear-cronjobs-journal'),
   };
 }
 
@@ -58,6 +60,7 @@ export interface Context {
   storage: Storage;
   pushover: PushoverClient;
   dexcomShare: DexcomShareClient;
+  cronjobsJournal: CronjobsJournal;
 }
 
 export type RequestHandler = (request: Request, context: Context) => Response;
