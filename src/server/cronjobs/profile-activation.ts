@@ -2,15 +2,13 @@ import { DAY_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { SavedProfile } from 'core/models/model';
 import { activateSavedProfile, is } from 'core/models/utils';
-import { extendLogger } from 'core/utils/logging';
 import { getActivationTimestamp, humanReadableShortTime } from 'core/utils/time';
 import { padStart } from 'lodash';
+import { Cronjob } from 'server/main/cronjobs';
 
 // Checks if any of the scheduled profile activations match the given time range.
 // If so, activates them.
-export function activateProfilesIfNeeded(context: Context, then: number, now: number) {
-  const _context = extendLogger(context, 'profiles');
-  const log = _context.log;
+export const profileActivation: Cronjob = (context, { then, now }) => {
   return context.storage
     .loadGlobalModels()
     .then(models => models.filter(is('SavedProfile')))
@@ -25,16 +23,16 @@ export function activateProfilesIfNeeded(context: Context, then: number, now: nu
         const atLocal = t(today);
         const match = fallsBetween(then, yesterday, now) || fallsBetween(then, today, now);
         const readableMatch = `${match ? 'DOES' : "doesn't"} fall between ${t(then)} and ${t(now)}`;
-        log(`"${profile.profileName}" set to activate at ${atLocal} (${atUtc}), ${readableMatch}`);
+        context.log(`"${profile.profileName}" set to activate at ${atLocal} (${atUtc}), ${readableMatch}`);
         return match;
       });
       if (profilesToActivate.length > 1) {
-        log('Warning: Having more than 1 profile activate on the same run is very suspicious; will skip');
+        context.log('Warning: Having more than 1 profile activate on the same run is very suspicious; will skip');
       } else if (profilesToActivate.length === 1) {
-        activateProfile(_context, profilesToActivate[0]);
+        activateProfile(context, profilesToActivate[0]);
       }
     });
-}
+};
 
 function activateProfile(context: Context, profile: SavedProfile) {
   context.log(`Activating profile "${profile.profileName}"`);

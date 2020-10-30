@@ -1,7 +1,6 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
 import { extendLogger } from 'core/utils/logging';
-import { activateProfilesIfNeeded } from 'server/cronjobs/profile-activation';
 import { runChecks } from 'server/main/check-runner';
 
 // Executes a SINGLE RUN of our periodic jobs.
@@ -15,9 +14,6 @@ export function runCronjobs(context: Context) {
     .then(then => {
       log(`Running, ${((now - then) / MIN_IN_MS).toFixed(1)} min since last run`);
       runChecks(context).catch(err => context.log(`Running checks failed (caused by\n${err}\n)`));
-      activateProfilesIfNeeded(context, then, now).catch(err =>
-        context.log(`Profiles activation failed (caused by\n${err}\n)`),
-      );
       return journal.setPreviousExecutionTime(now);
     });
 }

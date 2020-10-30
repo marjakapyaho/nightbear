@@ -1,9 +1,7 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { createNodeContext } from 'core/models/api';
 import { consoleLogStream } from 'core/utils/logging';
-import { TZ } from 'core/utils/time';
 import debug from 'debug';
-import { DateTime } from 'luxon';
 import { ackActiveAlarms } from 'server/api/ackActiveAlarms/ackActiveAlarms';
 import { calculateHba1cForDate } from 'server/api/calculateHba1c/calculateHba1c';
 import { getEntries } from 'server/api/getEntries/getEntries';
@@ -15,6 +13,8 @@ import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParake
 import { runCronjobs } from 'server/cronjobs';
 import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
+import { startRunningCronjobs } from 'server/main/cronjobs';
+import { profileActivation } from 'server/cronjobs/profile-activation';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -36,10 +36,12 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-context.log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${TZ}"`);
 const run = () => runCronjobs(context);
 setInterval(run, 2 * MIN_IN_MS);
 run();
 
 // Start experimental Dexcom Share integration
 startDexcomSharePolling(context);
+
+// Start running periodic tasks
+startRunningCronjobs(context, { profileActivation });
