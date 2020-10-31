@@ -14,7 +14,7 @@ import { runCronjobs } from 'server/cronjobs';
 import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 import { startRunningCronjobs } from 'server/main/cronjobs';
-import { profileActivation } from 'server/cronjobs/profile-activation';
+import { profiles } from 'server/cronjobs/profiles';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -44,4 +44,4 @@ run();
 startDexcomSharePolling(context);
 
 // Start running periodic tasks
-startRunningCronjobs(context, { profileActivation });
+startRunningCronjobs(context, { profiles });

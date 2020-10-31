@@ -8,7 +8,7 @@ import { Cronjob } from 'server/main/cronjobs';
 
 // Checks if any of the scheduled profile activations match the given time range.
 // If so, activates them.
-export const profileActivation: Cronjob = (context, { then, now }) => {
+export const profiles: Cronjob = (context, { then, now }) => {
   return context.storage
     .loadGlobalModels()
     .then(models => models.filter(is('SavedProfile')))
