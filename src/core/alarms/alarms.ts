@@ -14,7 +14,7 @@ const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(al
 const situationToString = (situation: Situation) => `${situation} (new)`;
 
 export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
-  const log = extendLogger(context.log, 'check');
+  const { log } = context;
 
   // If alarms are not enabled, remove all existing alarms and exit
   if (!activeProfile.alarmsEnabled) {
@@ -77,7 +77,7 @@ function handleAlarmsToKeep(
   activeProfile: ActiveProfile,
   context: Context,
 ): Promise<Array<Alarm | null>> {
-  const log = extendLogger(context.log, 'check');
+  const { log } = context;
 
   return Promise.all(
     alarms.map(alarm => {

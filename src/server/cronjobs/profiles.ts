@@ -9,6 +9,7 @@ import { Cronjob } from 'server/main/cronjobs';
 // Checks if any of the scheduled profile activations match the given time range.
 // If so, activates them.
 export const profiles: Cronjob = (context, { then, now }) => {
+  const { log } = context;
   return context.storage
     .loadGlobalModels()
     .then(models => models.filter(is('SavedProfile')))
@@ -23,11 +24,11 @@ export const profiles: Cronjob = (context, { then, now }) => {
         const atLocal = t(today);
         const match = fallsBetween(then, yesterday, now) || fallsBetween(then, today, now);
         const readableMatch = `${match ? 'DOES' : "doesn't"} fall between ${t(then)} and ${t(now)}`;
-        context.log(`"${profile.profileName}" set to activate at ${atLocal} (${atUtc}), ${readableMatch}`);
+        log(`"${profile.profileName}" set to activate at ${atLocal} (${atUtc}), ${readableMatch}`);
         return match;
       });
       if (profilesToActivate.length > 1) {
-        context.log('Warning: Having more than 1 profile activate on the same run is very suspicious; will skip');
+        log('Warning: Having more than 1 profile activate on the same run is very suspicious; will skip');
       } else if (profilesToActivate.length === 1) {
         activateProfile(context, profilesToActivate[0]);
       }
@@ -35,11 +36,12 @@ export const profiles: Cronjob = (context, { then, now }) => {
 };
 
 function activateProfile(context: Context, profile: SavedProfile) {
-  context.log(`Activating profile "${profile.profileName}"`);
+  const { log } = context;
+  log(`Activating profile "${profile.profileName}"`);
   const activation = activateSavedProfile(profile, context.timestamp());
   return context.storage.saveModel(activation).then(
-    () => context.log(`Activated profile "${profile.profileName}"`),
-    err => context.log(`Activating profile "${profile.profileName}" failed`, err),
+    () => log(`Activated profile "${profile.profileName}"`),
+    err => log(`Activating profile "${profile.profileName}" failed`, err),
   );
 }
 

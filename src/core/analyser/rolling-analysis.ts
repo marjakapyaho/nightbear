@@ -6,7 +6,7 @@ import { TypeOfArray } from 'core/types/utils';
 import { first, flatten, groupBy, range, values } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
-import { ALARM_FETCH_RANGE, ANALYSIS_RANGE } from 'server/main/check-runner';
+import { ANALYSIS_RANGE, ALARM_FETCH_RANGE } from 'server/cronjobs/checks';
 
 export const BUCKET_SIZE = 5 * MIN_IN_MS; // this determines the granularity of the rolling analysis - i.e. run analyser every 5 minutes
 export const PRE_MARGIN = ANALYSIS_RANGE; // how much history we want to make available to the analyser per each bucket

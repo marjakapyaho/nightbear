@@ -1,4 +1,3 @@
-import { MIN_IN_MS } from 'core/calculations/calculations';
 import { createNodeContext } from 'core/models/api';
 import { consoleLogStream } from 'core/utils/logging';
 import debug from 'debug';
@@ -10,11 +9,11 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { runCronjobs } from 'server/cronjobs';
 import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 import { startRunningCronjobs } from 'server/main/cronjobs';
 import { profiles } from 'server/cronjobs/profiles';
+import { checks } from 'server/cronjobs/checks';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -36,12 +35,7 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-const run = () => runCronjobs(context);
-setInterval(run, 2 * MIN_IN_MS);
-run();
+startRunningCronjobs(context, { profiles, checks });
 
 // Start experimental Dexcom Share integration
 startDexcomSharePolling(context);
-
-// Start running periodic tasks
-startRunningCronjobs(context, { profiles });

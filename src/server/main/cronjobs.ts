@@ -7,7 +7,8 @@ import { kebabCase } from 'lodash';
 
 const CRONJOBS_EVERY_MINUTES = 2;
 
-export type Cronjob = (context: Context, executionTimestamps: { then: number; now: number }) => Promise<unknown>;
+// Note that the type T is mostly a convenience for testing
+export type Cronjob<T = unknown> = (context: Context, executionTimestamps: { then: number; now: number }) => Promise<T>;
 
 export function startRunningCronjobs(context: Context, cronjobs: { [name: string]: Cronjob }) {
   const log = extendLogger(context.log, 'cron');
@@ -22,7 +23,7 @@ export function startRunningCronjobs(context: Context, cronjobs: { [name: string
           (memo, key) =>
             memo
               .then(() => cronjobs[key](extendLogger(context, kebabCase(key)), { then, now }))
-              .catch(err => context.log(`Cronjob execution failed (caused by\n${err}\n)`)),
+              .catch(err => context.log(`Cronjob "${key}" execution failed (caused by\n${err}\n)`)),
           Promise.resolve<unknown>(null),
         );
       })
