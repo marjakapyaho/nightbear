@@ -40,7 +40,7 @@ export function startRunningCronjobs(context: Context, cronjobs: { [name: string
         return context.storage.saveModel(getDefaultJournalContent());
       })
       .then(journal => {
-        log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames);
+        log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '));
         return jobNames.reduce(
           (memo, key) =>
             memo.then(journal =>

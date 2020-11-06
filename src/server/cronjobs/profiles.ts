@@ -38,6 +38,8 @@ export const profiles: Cronjob = (context, journal) => {
             log('Having more than 1 profile activate on the same run is very suspicious; will skip');
           } else if (profilesToActivate.length === 1) {
             activateProfile(context, profilesToActivate[0]);
+          } else {
+            log(`None of the ${profiles.length} profiles need activation`);
           }
         });
     })
