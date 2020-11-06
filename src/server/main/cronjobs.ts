@@ -62,7 +62,7 @@ export function startRunningCronjobs(context: Context, cronjobs: { [name: string
   run();
 }
 
-function getDefaultJournalContent(): CronjobsJournal {
+export function getDefaultJournalContent(): CronjobsJournal {
   return {
     modelType: 'CronjobsJournal',
     modelUuid: generateUuid(),

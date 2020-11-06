@@ -9,7 +9,8 @@ import {
   eraseModelUuid,
 } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
-import { checks } from 'server/cronjobs/checks';
+import { checks, ALARM_FETCH_RANGE } from 'server/cronjobs/checks';
+import { getDefaultJournalContent } from 'server/main/cronjobs';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;
@@ -112,11 +113,13 @@ describe('server/main/check-runner', () => {
         .then(() => context.storage.saveModel(activeProfile('day', timestamp)))
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => context.storage.saveModel(mockDexcomSensorEntry))
-        .then(() => checks(context, { then: timestamp - 15 * MIN_IN_MS, now: timestamp }))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
         .then(alarms => assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHigh.map(eraseModelUuid)))
         .then(() => context.storage.saveModel(mockDeviceStatus))
         .then(() => (timestamp += 15 * MIN_IN_MS))
-        .then(() => checks(context, { then: timestamp - 15 * MIN_IN_MS, now: timestamp }))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
         .then(alarms =>
           assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHighAndBattery.map(eraseModelUuid)),
         );

@@ -6,7 +6,6 @@ import { generateUuid } from 'core/utils/id';
 import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
 import { isNotNull } from 'server/utils/types';
 import { objectKeys } from 'web/utils/types';
-import { extendLogger } from 'core/utils/logging';
 
 const INITIAL_ALARM_LEVEL = 1;
 

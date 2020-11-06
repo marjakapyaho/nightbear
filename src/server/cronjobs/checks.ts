@@ -5,14 +5,13 @@ import { getMergedEntriesFeed } from 'core/entries/entries';
 import { first, map, identity } from 'lodash';
 import { onlyActive } from 'server/utils/data';
 import { Cronjob } from 'server/main/cronjobs';
-import { Alarm } from 'core/models/model';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
-export const checks: Cronjob<Alarm[]> = context => {
+export const checks: Cronjob = (context, _journal) => {
   const { log } = context;
-  log('--- Started runChecks() ---');
+  log('--- Started checks ---');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -38,7 +37,6 @@ export const checks: Cronjob<Alarm[]> = context => {
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
-      return alarms;
     });
   });
 };
