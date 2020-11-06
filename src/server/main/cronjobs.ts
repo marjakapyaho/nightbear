@@ -10,7 +10,10 @@ import { CronjobsJournal } from 'core/models/model';
 
 const CRONJOBS_EVERY_MINUTES = 1;
 
-export type Cronjob = (context: Context, journal: CronjobsJournal) => Promise<Partial<CronjobsJournal> | void> | void;
+export type Cronjob = (
+  context: Context,
+  journal: CronjobsJournal,
+) => Partial<CronjobsJournal> | Promise<Partial<CronjobsJournal> | void> | void;
 
 /**
  * The process of running Cronjobs goes like this:
