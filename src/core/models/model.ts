@@ -25,7 +25,8 @@ export type Model =
   | Carbs
   | Alarm
   | SavedProfile
-  | ActiveProfile;
+  | ActiveProfile
+  | CronjobsJournal;
 
 type _Model<T> = Readonly<{
   modelType: T;
@@ -228,4 +229,11 @@ export type SavedProfile = _Model<'SavedProfile'> &
       hours: number;
       minutes: number;
     }>;
+  }>;
+
+export type CronjobsJournal = _Model<'CronjobsJournal'> &
+  Readonly<{
+    previousExecutionTimestamp: number | null;
+    dexcomShareSessionId: string | null;
+    dexcomShareLoginAttemptTimestamp: number | null;
   }>;
