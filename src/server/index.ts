@@ -9,7 +9,7 @@ import { getServerStatus } from 'server/api/getServerStatus/getServerStatus';
 import { getWatchStatus } from 'server/api/getWatchStatus/getWatchStatus';
 import { uploadDexcomEntry } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
 import { uploadParakeetEntry } from 'server/api/uploadParakeetEntry/uploadParakeetEntry';
-import { startDexcomSharePolling } from 'server/cronjobs/dexcom-share';
+import { dexcomShare } from 'server/cronjobs/dexcom-share';
 import { startExpressServer } from 'server/main/express';
 import { startRunningCronjobs } from 'server/main/cronjobs';
 import { profiles } from 'server/cronjobs/profiles';
@@ -35,7 +35,8 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-startRunningCronjobs(context, { profiles, checks });
-
-// Start experimental Dexcom Share integration
-startDexcomSharePolling(context);
+startRunningCronjobs(context, {
+  dexcomShare,
+  profiles,
+  checks,
+});
