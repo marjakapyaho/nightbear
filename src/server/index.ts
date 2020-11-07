@@ -36,7 +36,7 @@ startExpressServer(
 
 // Start running periodic tasks
 startRunningCronjobs(context, {
-  dexcomShare,
+  dexcomShare, // run this before checks()
   profiles,
-  checks,
+  checks, // run this after dexcomShare()
 });
