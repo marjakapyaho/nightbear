@@ -4,7 +4,8 @@ import { hasBloodGlucose } from 'server/utils/data';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'web/utils/config';
 import { setOneDecimal } from 'web/utils/helpers';
 
-export const MIN_IN_MS = 60 * 1000;
+export const SEC_IN_MS = 1000;
+export const MIN_IN_MS = 60 * SEC_IN_MS;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const DAY_IN_MS = 24 * HOUR_IN_MS;
 export const MONTH_IN_MS = 31 * DAY_IN_MS;

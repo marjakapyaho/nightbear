@@ -336,6 +336,7 @@ export function getStorageKey(model: Model): string {
         throw new Error(`Can't generate storage key for given ${model.modelType}: it doesn't have a timestamp set`);
       }
     case 'SavedProfile':
+    case 'CronjobsJournal':
       return `${PREFIX_GLOBAL}/${model.modelType}/${model.modelUuid}`;
     default:
       return assertExhausted(model);

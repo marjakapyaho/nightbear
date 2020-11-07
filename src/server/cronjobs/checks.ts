@@ -2,17 +2,16 @@ import { runAlarmChecks } from 'core/alarms/alarms';
 import { runAnalysis } from 'core/analyser/analyser';
 import { HOUR_IN_MS } from 'core/calculations/calculations';
 import { getMergedEntriesFeed } from 'core/entries/entries';
-import { Context } from 'core/models/api';
 import { first, map, identity } from 'lodash';
-import { extendLogger } from 'core/utils/logging';
 import { onlyActive } from 'server/utils/data';
+import { Cronjob } from 'server/main/cronjobs';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
-export function runChecks(context: Context) {
-  const log = extendLogger(context.log, 'check');
-  log('--- Started runChecks() ---');
+export const checks: Cronjob = (context, _journal) => {
+  const { log } = context;
+  log('--- Started checks ---');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getMergedEntriesFeed(context, ANALYSIS_RANGE),
@@ -38,7 +37,6 @@ export function runChecks(context: Context) {
           .map(alarm => alarm.situationType)
           .join(', ')}`,
       );
-      return alarms;
     });
   });
-}
+};

@@ -36,7 +36,13 @@ export function createDexcomShareClient(username: string, password: string, logg
             },
           },
         )
-        .then(res => res.data)
+        .then(res => {
+          if (res.data === '00000000-0000-0000-0000-000000000000') {
+            throw new Error(`DexcomShareClient login request failed due to invalid credentials`);
+          } else {
+            return res.data;
+          }
+        })
         .catch((err: AxiosError) => {
           if (err.isAxiosError)
             log('Login request failed:\n%O', pick(err.response, 'data', 'status', 'statusText', 'headers'));

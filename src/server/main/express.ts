@@ -38,6 +38,7 @@ export function startExpressServer(context: Context, ...handlers: RequestHandler
     const server = app.listen(context.httpPort, () => {
       const address = server.address();
       if (address && typeof address !== 'string') {
+        log(`Server listening on ${address.port}`);
         resolve(address.port);
       } else {
         reject(new Error('Could not determine assigned port'));

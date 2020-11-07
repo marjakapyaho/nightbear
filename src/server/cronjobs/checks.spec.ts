@@ -1,7 +1,6 @@
 import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'core/models/model';
 import 'mocha';
-import { runChecks } from 'server/main/check-runner';
 import {
   activeProfile,
   assertEqualWithoutMeta,
@@ -10,6 +9,8 @@ import {
   eraseModelUuid,
 } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
+import { checks, ALARM_FETCH_RANGE } from 'server/cronjobs/checks';
+import { getDefaultJournalContent } from 'server/main/cronjobs';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;
@@ -105,18 +106,20 @@ describe('server/main/check-runner', () => {
   ];
 
   withStorage(createTestStorage => {
-    it('runChecks', () => {
+    it('checks', () => {
       let timestamp = timestampNow;
       const context = createTestContext(createTestStorage(), () => timestamp);
       return Promise.resolve()
         .then(() => context.storage.saveModel(activeProfile('day', timestamp)))
         .then(() => context.storage.saveModel(mockDexcomCalibration))
         .then(() => context.storage.saveModel(mockDexcomSensorEntry))
-        .then(() => runChecks(context))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
         .then(alarms => assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHigh.map(eraseModelUuid)))
         .then(() => context.storage.saveModel(mockDeviceStatus))
         .then(() => (timestamp += 15 * MIN_IN_MS))
-        .then(() => runChecks(context))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
         .then(alarms =>
           assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHighAndBattery.map(eraseModelUuid)),
         );
