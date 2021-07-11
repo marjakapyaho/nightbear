@@ -241,8 +241,6 @@ services:
       - VIRTUAL_PORT=3000
     volumes:
       - ./server-stage:/app
-    labels:
-      - send-logs-to-papertrail=true
 
   # https://github.com/marjakapyaho/nightbear
   server_prod:
@@ -269,19 +267,6 @@ services:
       - VIRTUAL_PORT=3000
     volumes:
       - ./server-prod:/app
-    labels:
-      - send-logs-to-papertrail=true
-
-  # https://github.com/gliderlabs/logspout
-  logspout:
-    container_name: logspout
-    image: gliderlabs/logspout:v3.2.11
-    restart: always
-    command: syslog+tls://${var.secrets.papertrail_host_hosting}?filter.labels=send-logs-to-papertrail:true # by default, container logs aren't shipped off host, because logging costs money; add "send-logs-to-papertrail=true" label to any container to include it
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - SYSLOG_HOSTNAME=${module.docker_host.hostname}
 
   # https://hub.docker.com/_/telegraf
   telegraf:
@@ -325,8 +310,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # allow Docker commands from within the container
       - /data:/backup:ro # mount the data path into the container, so it gets backed up
-    labels:
-      - send-logs-to-papertrail=true
 
   # https://github.com/grafana/loki/releases
   promtail:
