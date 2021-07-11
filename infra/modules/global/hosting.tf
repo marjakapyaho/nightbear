@@ -326,6 +326,18 @@ services:
     labels:
       - send-logs-to-papertrail=true
 
+  # https://github.com/grafana/loki/releases
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.2.1
+    restart: always
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yml:ro
+      - ./promtail-data/:/tmp/promtail
+      - /var/log:/var/log:ro
+      - /run/log:/run/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+
 EOF
 }
 
