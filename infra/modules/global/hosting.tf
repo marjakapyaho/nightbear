@@ -80,6 +80,8 @@ resource "null_resource" "hosting_initial_setup" {
       # Check out the latest tag (hopefully a release) as the prod codebase:
       "git clone https://github.com/marjakapyaho/nightbear.git server-prod",
       "cd server-prod && git checkout $(git describe --tags | cut -d - -f 1)"
+
+      # TODO: { "log-driver": "journald" } → /etc/docker/daemon.json
     ]
   }
 
