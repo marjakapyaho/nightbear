@@ -31,50 +31,13 @@ When the infra is up, you need to finish by SSH'ing over to the host:
 
 This will leave you with an empty but configured DB server, etc.
 
-## Reprovisioning hosting
+## Reprovisioning
 
 If the host is FUBAR, sometimes it's easiest to just throw it away and build a new one. All persistent data is on a separate EBS volume, so this should always be safe.
 
-If the host is still responsive, you can make a final backup first. Should NOT be needed, as the data volume is separate, but still.
+This assumes the host is already in a non-responsive state, meaning Terraform providers for e.g. Grafana & InfluxDB won't be able to talk to services running on the host.
 
-If the host is still responsive, you can make sure the EBS volume is unattached cleanly with:
-
-    ssh -i terraform.id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@hosting.nightbear.fi sudo poweroff
-
-Wait a few minutes to make doubly sure.
-
-Taint and recreate the host:
-
-    terraform taint module.global.module.docker_host.aws_instance.this
-    terraform apply -target module.global.module.docker_host.aws_instance.this
-
-If needed, you can immediately SSH over with:
-
-    ssh -i terraform.id_rsa ubuntu@$(terraform state show -no-color module.global.module.docker_host.aws_instance.this | grep ' public_ip ' | cut -d '"' -f 2)
-
-This also works between any of the subsequent steps, if manual intervention (e.g. restoring from backups) is needed.
-
-Next, check which provisioners exist for the host:
-
-    terraform state list | grep module.global | grep null_resource
-
-These need to be re-run manually, and (mostly) in the correct order.
-
-Make a shell helper for this:
-
-    function remove-and-recreate {
-      terraform state rm $1
-      terraform apply -auto-approve -target $1
-    }
-
-And then proceed with:
-
-    remove-and-recreate module.global.module.docker_host.null_resource.provisioners[0] # EBS volume attachment
-    remove-and-recreate module.global.null_resource.hosting_initial_setup
-    remove-and-recreate module.global.null_resource.telegraf_conf
-    remove-and-recreate module.global.module.docker_compose.null_resource.provisioners # Start Docker services
-
-Issue a final `terraform apply` to ensure everything is up to spec.
+This process is now fully automated with `./reprovision.sh`.
 
 ## Logging
 
