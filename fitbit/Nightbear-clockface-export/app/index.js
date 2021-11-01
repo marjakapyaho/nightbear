@@ -1,7 +1,7 @@
 import clock from "clock";
 import document from "document";
 import { inbox } from "file-transfer";
-import fs from "fs";
+import { readFileSync } from "fs";
 import { preferences } from "user-settings";
 import * as util from "../common/utils";
 import { vibration } from "haptics";
@@ -37,7 +37,7 @@ inbox.onnewfile = () => {
     fileName = inbox.nextFile()
     if (fileName) {
       console.log('APP: received API data')
-      const data = fs.readFileSync(fileName, "cbor")
+      const data = readFileSync(fileName, "cbor")
       timeSinceCounter = Date.now()
       bloodSugarArray = data.bloodSugarArray
       situationStatus = data.status
@@ -87,7 +87,7 @@ function updateTimeSince() {
 function updateStatus() {
   let alarmType = ''
   if (situationStatus && situationStatus.alarms && situationStatus.alarms.length) {
-    alarmType = situationStatus.alarms[0].type
+    alarmType = situationStatus.alarms[0].situationType
     startVibration()
   }
   else {
@@ -122,38 +122,38 @@ function drawGraph(bloodSugars) {
   try {
     let elements = document.getElementsByClassName("dot");
     elements.forEach(function(element, index) {
-    let sugar = bloodSugars[index] && bloodSugars[index].s
-    let insulin = bloodSugars[index] && bloodSugars[index].i
-    let carbs = bloodSugars[index] && bloodSugars[index].c
-    let isRaw = bloodSugars[index] && bloodSugars[index].r
+      let sugar = bloodSugars[index] && bloodSugars[index].s
+      let insulin = bloodSugars[index] && bloodSugars[index].i
+      let carbs = bloodSugars[index] && bloodSugars[index].c
+      let isRaw = bloodSugars[index] && bloodSugars[index].r
 
-    element.cx = 10 + 8 * index
-    element.r = 2 // reset element size
-    
-    if (sugar) {
-      element.cy = 320 - 10 * parseFloat(sugar)
-      element.style.fill = getFillColor(sugar)
-    }
-    else {
-      element.style.fill = util.GREY
-    }
-    
-    if (isRaw) {
-      element.style.fill = 'white'
-    }
-    
-    if (insulin) {
-      element.r = 8
-      element.style.fill = util.RED
-      element.layer = 1000
-    }
+      element.cx = 18 + 9 * index
+      element.r = 2 // reset element size
 
-    if (carbs) {
-      element.r = 8
-      element.style.fill = util.YELLOW
-      element.layer = 1000
-    }
-  });
+      if (sugar) {
+        element.cy = 320 - 10 * parseFloat(sugar)
+        element.style.fill = getFillColor(sugar)
+      }
+      else {
+        element.style.fill = util.GREY
+      }
+
+      if (isRaw) {
+        element.style.fill = 'white'
+      }
+
+      if (insulin) {
+        element.r = 8
+        element.style.fill = util.RED
+        element.layer = 1000
+      }
+
+      if (carbs) {
+        element.r = 8
+        element.style.fill = util.YELLOW
+        element.layer = 1000
+      }
+    });
   }
   catch(error) {
     console.error(error)
@@ -175,12 +175,12 @@ function getFillColor(sugar) {
 }
 
 function getStatusForUI(status) {
-  if (status === 'low') { return 'LOW' }
-  if (status === 'high') { return 'HIGH' }
-  if (status === 'falling') { return 'FALLING' }
-  if (status === 'rising') { return 'RISING' }
-  if (status === 'battery') { return 'BATTERY' }
-  if (status === 'persistent_high') { return 'P. HIGH' }
-  if (status === 'outdated') { return 'OUTDATED' }
+  if (status === 'LOW') { return 'LOW' }
+  if (status === 'HIGH') { return 'HIGH' }
+  if (status === 'FALLING') { return 'FALLING' }
+  if (status === 'RISING') { return 'RISING' }
+  if (status === 'BATTERY') { return 'BATTERY' }
+  if (status === 'PERSISTENT_HIGH') { return 'P. HIGH' }
+  if (status === 'OUTDATED') { return 'OUTDATED' }
   else { return ''}
 }

@@ -3,17 +3,17 @@
 }
 
 #timeSince {
-  font-size: 28;
+  font-size: 26;
   font-family: System-Regular;
   text-length: 32;
   text-anchor: start;
-  x: 5%;
+  x: 14%;
   y: 30;
   fill: white;
 }
 
 #clock {
-  font-size: 28;
+  font-size: 30;
   font-family: System-Regular;
   text-length: 32;
   text-anchor: middle;
@@ -27,7 +27,7 @@
   font-family: System-Regular;
   text-length: 32;
   text-anchor: end;
-  x: 95%;
+  x: 85%;
   y: 25;
   fill: white;
 }
@@ -38,7 +38,7 @@
   text-length: 32;
   text-anchor: middle;
   x: 50%;
-  y: 38%;
+  y: 39%;
   fill: white;
 }
 
@@ -54,5 +54,4 @@
   r: 2;
   cx: 0;
   cy: 0;
-  fill: black;
 }

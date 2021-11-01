@@ -1,4 +1,7 @@
 {
+  "devDependencies": {
+    "@fitbit/sdk": "6.0"
+  },
   "fitbit": {
     "appUUID": "1c1973a8-1776-482d-a04c-636339dd50b8",
     "appType": "clockface",
@@ -10,16 +13,13 @@
       "access_internet"
     ],
     "buildTargets": [
-      "meson"
+      "atlas"
     ],
     "i18n": {
-      "en": {
+      "en-US": {
         "name": "Nightbear"
       }
     },
     "defaultLanguage": "en-US"
-  },
-  "devDependencies": {
-    "@fitbit/sdk": "~3.1.0"
   }
 }

@@ -1,5 +1,5 @@
-const API_GET_STATUS = 'https://router.nightbear.fi/get-watch-status';
-const API_GET_ENTRIES = 'https://router.nightbear.fi/get-entries';
+const API_GET_STATUS = 'https://router.nightbear.fi/get-watch-status'
+const API_GET_ENTRIES = 'https://router.nightbear.fi/get-entries'
 
 export function NightbearApi() {
   console.log('API: created NightbearApi')

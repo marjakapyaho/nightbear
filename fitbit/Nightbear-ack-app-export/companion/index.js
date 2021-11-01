@@ -1,6 +1,6 @@
 import * as messaging from "messaging";
 
-const API_ACK_ALARM = 'https://router.nightbear.fi/ack-latest-alarm';
+const API_ACK_ALARM = 'https://router.nightbear.fi/ack-latest-alarm'
 
 messaging.peerSocket.onmessage = function(evt) {
   if (evt.data.ack) {
@@ -17,7 +17,14 @@ messaging.peerSocket.onmessage = function(evt) {
 
 function ackAlarm() {
   return new Promise(function(resolve, reject) {
-    fetch(API_ACK_ALARM, { method: 'POST', body: 'dummy' }).then(function(response) {
+    fetch(API_ACK_ALARM, { 
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ acknowledged_by: 'fitbit' })
+    }).then(function(response) {
       return response;
     }).then(function(response) {
       resolve(response);
