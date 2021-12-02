@@ -79,9 +79,21 @@ resource "null_resource" "hosting_initial_setup" {
 
       # Check out the latest tag (hopefully a release) as the prod codebase:
       "git clone https://github.com/marjakapyaho/nightbear.git server-prod",
-      "cd server-prod && git checkout $(git describe --tags | cut -d - -f 1)"
+      "cd server-prod && git checkout $(git describe --tags | cut -d - -f 1)",
 
-      # TODO: { "log-driver": "journald" } → /etc/docker/daemon.json
+      <<-EOF
+        # Set Docker to log to journald by default
+        echo '{ "log-driver": "journald" }' \
+          | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+
+        # Keep journal sizes under control
+        # https://wiki.archlinux.org/index.php/Systemd/Journal#Journal_size_limit
+        sudo mkdir -p /etc/systemd/journald.conf.d
+        echo '[Journal]\nSystemMaxUse=100M' \
+          | sudo tee /etc/systemd/journald.conf.d/00-journal-size.conf
+        sudo service systemd-journald restart
+      EOF
     ]
   }
 
