@@ -1,6 +1,6 @@
 import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from 'core/calculations/calculations';
-import { AnalyserEntry, SensorEntry } from 'core/models/model';
-import { reduce, slice, sum } from 'lodash';
+import { AnalyserEntry, Insulin, SensorEntry } from 'core/models/model';
+import { reduce, slice, sum, find } from 'lodash';
 
 export function parseAnalyserEntries(entries: SensorEntry[]): AnalyserEntry[] {
   const analyserEntries: AnalyserEntry[] = entries
@@ -93,4 +93,12 @@ function makeWindow(noiseArray: number[]) {
     const end = Math.min(entries.length, index + noise + 1);
     return slice(entries, start, end);
   };
+}
+
+export function checkThatThereIsNoCorrectionInsulin(
+  insulins: Insulin[],
+  currentTimestamp: number,
+  highCorrectionSuppressionWindow: number,
+) {
+  return !find(insulins, insulin => insulin.timestamp > currentTimestamp - highCorrectionSuppressionWindow * MIN_IN_MS);
 }

@@ -1,4 +1,4 @@
-import { parseAnalyserEntries } from 'core/analyser/analyser-utils';
+import { parseAnalyserEntries, checkThatThereIsNoCorrectionInsulin } from 'core/analyser/analyser-utils';
 import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 import {
   ActiveProfile,
@@ -100,7 +100,7 @@ export function runAnalysis(
 
   state = {
     ...state,
-    RISING: detectRising(state, activeProfile, latestEntry),
+    RISING: detectRising(state, activeProfile, latestEntry, insulin, currentTimestamp),
   };
 
   state = {
@@ -210,11 +210,10 @@ function detectHigh(
       alarm.situationType === 'BAD_HIGH',
   );
   const correctionIfAlreadyHigh = find(onlyActive(alarms), { situationType: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
-  const thereIsNoCorrectionInsulin = !find(
+  const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(
     insulins,
-    insulin =>
-      insulin.timestamp >
-      currentTimestamp - activeProfile.analyserSettings.HIGH_CORRECTION_SUPPRESSION_WINDOW * MIN_IN_MS,
+    currentTimestamp,
+    activeProfile.analyserSettings.HIGH_CORRECTION_SUPPRESSION_WINDOW,
   );
   return (
     notCurrentlyBadHigh &&
@@ -228,10 +227,22 @@ function detectBadHigh(activeProfile: ActiveProfile, latestEntry: AnalyserEntry)
   return latestEntry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_BAD;
 }
 
-function detectRising(state: State, activeProfile: ActiveProfile, entry: AnalyserEntry) {
+function detectRising(
+  state: State,
+  activeProfile: ActiveProfile,
+  entry: AnalyserEntry,
+  insulins: Insulin[],
+  currentTimestamp: number,
+) {
+  const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(
+    insulins,
+    currentTimestamp,
+    activeProfile.analyserSettings.HIGH_CORRECTION_SUPPRESSION_WINDOW,
+  );
   return (
     !state.BAD_HIGH &&
     !state.HIGH &&
+    thereIsNoCorrectionInsulin &&
     entry.bloodGlucose > activeProfile.analyserSettings.HIGH_LEVEL_REL &&
     !!entry.slope &&
     entry.slope > slopeLimits.MEDIUM

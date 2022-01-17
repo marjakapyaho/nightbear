@@ -307,7 +307,7 @@ describe('utils/analyser', () => {
     );
   });
 
-  it('does not detect high if there is recent insulin (detects rising instead)', () => {
+  it('does not detect high or rising if there is recent insulin', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
@@ -318,10 +318,7 @@ describe('utils/analyser', () => {
         deviceStatus,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        RISING: true,
-      },
+      DEFAULT_STATE,
     );
   });
 
