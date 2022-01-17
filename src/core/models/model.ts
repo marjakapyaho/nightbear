@@ -1,6 +1,6 @@
 import { ModelVersion } from 'core/models/migrations';
 
-export const MODEL_VERSION: ModelVersion = 2;
+export const MODEL_VERSION: ModelVersion = 3;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
@@ -204,6 +204,7 @@ type _Profile = Readonly<{
     HIGH_LEVEL_BAD: number;
     ALARM_RETRY: number; // seconds, min in Pushover 30
     ALARM_EXPIRE: number; // seconds, max in Pushover 10800
+    HIGH_CORRECTION_SUPPRESSION_WINDOW: number; // minutes
   }>;
   alarmSettings: Readonly<
     {

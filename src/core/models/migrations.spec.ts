@@ -83,6 +83,7 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_ABS: 8,
           HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
+          HIGH_CORRECTION_SUPPRESSION_WINDOW: 135, // NEW 17.1.2022
         },
         alarmSettings: {
           OUTDATED: {
@@ -205,6 +206,7 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_ABS: 8,
           HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
+          HIGH_CORRECTION_SUPPRESSION_WINDOW: 135, // NEW 17.1.2022
         },
         alarmSettings: {
           OUTDATED: {

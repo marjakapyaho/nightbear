@@ -29,6 +29,7 @@ function getProfile(profileName: string): SavedProfile {
       HIGH_LEVEL_ABS: 0,
       HIGH_LEVEL_BAD: 0,
       ALARM_RETRY: 0,
+      HIGH_CORRECTION_SUPPRESSION_WINDOW: 0,
     },
     alarmSettings: {
       OUTDATED: {

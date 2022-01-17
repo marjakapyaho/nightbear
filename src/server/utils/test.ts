@@ -126,6 +126,7 @@ export function activeProfile(profileName: string, timestamp: number, isEnabled:
       HIGH_LEVEL_ABS: 15,
       HIGH_LEVEL_BAD: 18,
       ALARM_RETRY: 2,
+      HIGH_CORRECTION_SUPPRESSION_WINDOW: 135,
     },
     alarmSettings: {
       OUTDATED: {
