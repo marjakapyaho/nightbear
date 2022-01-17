@@ -40,7 +40,7 @@ export function recentInsulin(currentTimestamp: number): Insulin[] {
     {
       modelType: 'Insulin',
       modelUuid: generateUuid(),
-      timestamp: currentTimestamp - 80 * MIN_IN_MS,
+      timestamp: currentTimestamp,
       amount: 3,
       insulinType: 'fiasp',
     },

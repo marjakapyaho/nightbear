@@ -18,6 +18,7 @@ import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'core/analyser/t
 import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'core/analyser/test-data/bad-low-to-low';
 import { entriesHighFluctuations } from 'core/analyser/test-data/high-fluctuations';
 import { entriesLowFluctuations } from 'core/analyser/test-data/low-fluctuations';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -312,7 +313,7 @@ describe('utils/analyser', () => {
         currentTimestamp,
         activeProfile('night', currentTimestamp),
         entriesHigh(currentTimestamp),
-        recentInsulin(currentTimestamp),
+        recentInsulin(currentTimestamp - 80 * MIN_IN_MS),
         carbs,
         deviceStatus,
         alarms,
@@ -320,6 +321,24 @@ describe('utils/analyser', () => {
       {
         ...DEFAULT_STATE,
         RISING: true,
+      },
+    );
+  });
+
+  it('detects high when suppression window is over', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('night', currentTimestamp),
+        entriesHigh(currentTimestamp),
+        recentInsulin(currentTimestamp - 140 * MIN_IN_MS),
+        carbs,
+        deviceStatus,
+        alarms,
+      ),
+      {
+        ...DEFAULT_STATE,
+        HIGH: true,
       },
     );
   });
