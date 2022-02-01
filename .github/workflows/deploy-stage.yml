@@ -33,4 +33,11 @@ jobs:
           host: hosting.nightbear.fi
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: set -x && cd server-stage && git fetch && git checkout ${{ github.ref }} && docker restart server-stage # github.ref will be e.g. "refs/heads/master"
+          script: |
+            set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+            set -x # print our commands back for easier debugging
+            cd server-stage
+            git fetch
+            git checkout ${{ github.ref }} # github.ref will be e.g. "refs/heads/master"
+            echo "$(echo ${{ github.ref }} | cut -d / -f 3) ($(git rev-parse --short HEAD))" > .nightbear-deploy-version
+            docker restart server-stage
