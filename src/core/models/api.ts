@@ -3,6 +3,7 @@ import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
 import { createLogger, Logger } from 'core/utils/logging';
 import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
+import { readFileSync } from 'fs';
 
 export function createNodeContext(): Context {
   const {
@@ -18,6 +19,7 @@ export function createNodeContext(): Context {
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
   const log = createLogger();
+  log(`Starting Nightbear version ${getDeployedVersion()}`);
   return {
     httpPort: 3000,
     timestamp: Date.now,
@@ -67,4 +69,12 @@ export function createResponse(responseBody: object | string = ''): Response {
     responseStatus: 200,
     responseBody,
   });
+}
+
+function getDeployedVersion() {
+  try {
+    return readFileSync('.nightbear-deploy-version');
+  } catch (err) {
+    return '(local dev)';
+  }
 }

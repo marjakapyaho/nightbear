@@ -34,10 +34,7 @@ jobs:
           username: ${{ secrets.DEPLOY_SSH_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           script: |
-            set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
-            set -x # print our commands back for easier debugging
-            cd server-stage
-            git fetch
-            git checkout ${{ github.ref }} # github.ref will be e.g. "refs/heads/master"
-            echo "$(echo ${{ github.ref }} | cut -d / -f 3) ($(git rev-parse --short HEAD))" > .nightbear-deploy-version
+            set -xeuo pipefail # print our commands back; exit on error; treat unset variables as errors; exit on errors in piped commands
+            cd server-stage && git fetch && git checkout origin/master
+            echo "$(echo ${{ github.ref }} | cut -d / -f 3) (rev $(git rev-parse --short HEAD), deployed $(date --iso-8601=seconds))" > .nightbear-deploy-version # github.ref will be e.g. "refs/heads/master"
             docker restart server-stage
