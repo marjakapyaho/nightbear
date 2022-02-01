@@ -71,7 +71,7 @@ export function createResponse(responseBody: object | string = ''): Response {
   });
 }
 
-function getDeployedVersion() {
+export function getDeployedVersion() {
   try {
     return readFileSync('.nightbear-deploy-version');
   } catch (err) {
