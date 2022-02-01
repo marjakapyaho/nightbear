@@ -35,5 +35,5 @@ jobs:
           script: |
             set -xeuo pipefail # print our commands back; exit on error; treat unset variables as errors; exit on errors in piped commands
             cd server-prod && git fetch && git checkout ${{ github.ref }}
-            echo "$(echo ${{ github.ref }} | cut -d / -f 3) (rev $(git rev-parse --short HEAD), deployed $(date --iso-8601=seconds))" > .nightbear-deploy-version # github.ref will be e.g. "refs/tags/v1.2.3"
+            echo "$(echo ${{ github.ref }} | cut -d / -f 3) ($(git rev-parse --short HEAD) deployed $(date --iso-8601=seconds))" > .nightbear-deploy-version # github.ref will be e.g. "refs/tags/v1.2.3"
             docker restart server-prod
