@@ -6,13 +6,13 @@ import TimelineModelTable from 'web/ui/components/timelineModelTable/TimelineMod
 import TimeRangeSelector from 'web/ui/components/timeRangeSelector/TimeRangeSelector';
 import Timestamp from 'web/ui/components/timestamp/Timestamp';
 import 'web/ui/screens/timelineDebugScreen/TimelineDebugScreen.scss';
-import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
+import { useReduxActions, useReduxState } from 'web/utils/react';
 import { useEffect } from 'react';
+import React from 'react';
 
 type Props = {};
 
 export default (() => {
-  const { React } = useCssNs('TimelineDebugScreen');
   const navigationState = useReduxState(s => s.navigation);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
@@ -25,7 +25,7 @@ export default (() => {
   if (navigationState.selectedScreen !== 'TimelineDebugScreen') return null; // this screen can only be rendered if it's been selected in state
 
   return (
-    <div className="this">
+    <div className="nb-TimelineDebugScreen">
       <button
         onClick={() =>
           actions.TIMELINE_FILTERS_CHANGED(

@@ -1,4 +1,4 @@
-import { useCssNs } from 'web/utils/react';
+import React from 'react';
 
 const options = [
   ['1 hour', 1000 * 60 * 60 * 1],
@@ -24,10 +24,8 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs('TimeRangeSelector');
-
   return (
-    <div className="this">
+    <div className="nb-TimeRangeSelector">
       <select value={props.value} onChange={event => props.onChange(parseInt(event.target.value, 10))}>
         {typeof props.value !== 'undefined' && !options.find(([, v]) => v === props.value) && (
           <option value={props.value}>custom</option>

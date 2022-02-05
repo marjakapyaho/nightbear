@@ -1,9 +1,4 @@
 .nb-App {
   display: flex;
   flex-direction: column;
-
-  &-screenContainer {
-    flex: 1;
-    overflow: auto; // if the screen overflows its container, let it scroll
-  }
 }

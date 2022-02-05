@@ -17,7 +17,7 @@ export default (props => {
   );
 
   return (
-    <div className="this">
+    <div>
       {bgLines.map(bg => (
         <div
           key={bg}

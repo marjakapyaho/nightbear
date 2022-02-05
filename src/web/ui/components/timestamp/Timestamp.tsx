@@ -1,7 +1,7 @@
 import { DAY_IN_MS, HOUR_IN_MS } from 'core/calculations/calculations';
 import { DateTime, Duration } from 'luxon';
+import React from 'react';
 import { useEffect, useState } from 'react';
-import { useCssNs } from 'web/utils/react';
 
 const LIVE_FORMAT_AGE_LIMIT = HOUR_IN_MS;
 const FULL_FORMAT_AGE_LIMIT = DAY_IN_MS * 0.5;
@@ -9,7 +9,6 @@ const FULL_FORMAT_AGE_LIMIT = DAY_IN_MS * 0.5;
 type Props = { ts: number; live?: boolean };
 
 export default (props => {
-  const { React } = useCssNs('Timestamp');
   const [formattedTs, setFormattedTs] = useState(getFormattedTs(props.ts));
 
   const fullFormattedTs = DateTime.fromMillis(props.ts).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS);
@@ -21,7 +20,7 @@ export default (props => {
   }, [props.ts, props.live]);
 
   return (
-    <span className="this" title={fullFormattedTs}>
+    <span className="nb-Timestamp" title={fullFormattedTs}>
       {formattedTs}
     </span>
   );

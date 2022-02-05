@@ -7,8 +7,8 @@
   ],
   "license": "AGPL",
   "engines": {
-    "node": "12.19.0",
-    "npm": "6.14.8"
+    "node": "16.13.2",
+    "npm": "8.1.2"
   },
   "scripts": {
     "\n==================== GLOBAL HOOKS ====================": "",
@@ -65,7 +65,6 @@
     "cli-progress": "^2.1.0",
     "concurrently": "^3.5.1",
     "cors": "^2.8.4",
-    "css-ns": "^1.2.2",
     "debug": "^4.1.1",
     "emotion": "^10.0.27",
     "express": "^4.16.2",
@@ -73,7 +72,6 @@
     "lodash": "^4.17.15",
     "luxon": "^1.3.0",
     "mocha": "^4.0.1",
-    "node-sass": "^4.13.0",
     "pouchdb": "7.2.2",
     "pouchdb-adapter-memory": "7.2.2",
     "pouchdb-find": "7.2.2",
@@ -86,9 +84,10 @@
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.3.0",
+    "react-scripts": "^5.0.0",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
+    "sass": "^1.49.7",
     "scroll-into-view": "^1.14.1",
     "ts-node": "^3.3.0",
     "typescript": "^3.7.4"
