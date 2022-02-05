@@ -16,4 +16,5 @@
 })(Element);
 
 // All files must be modules when the '--isolatedModules' flag is provided ts(1208)
+// eslint-disable-next-line import/no-anonymous-default-export
 export default null;
