@@ -1,8 +1,8 @@
 import { range } from 'lodash';
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import scrollIntoView from 'scroll-into-view';
 import 'web/ui/components/scrollNumberSelector/ScrollNumberSelector.scss';
-import { useCssNs } from 'web/utils/react';
 
 type Props = {
   value?: number;
@@ -16,7 +16,6 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs('ScrollNumberSelector');
   const selectedEl = useRef<HTMLDivElement | null>(null);
   const animSpeed = useRef(0); // for the first render, scroll instantly, and only after, start the smooth behaviour
   useEffect(() => {
@@ -32,11 +31,10 @@ export default (props => {
   const options = range(props.min, props.max + props.step, props.step);
 
   return (
-    <div className="this" style={{ background: props.color }}>
+    <div className="nb-ScrollNumberSelector" style={{ background: props.color }}>
       {options.map((val, i) => (
         <div
           key={i}
-          className={props.value === val ? 'selected' : ''}
           style={{ background: props.value === val ? 'white' : '', color: props.value === val ? props.color : '' }}
           ref={val === props.value || (props.value === undefined && val === props.centerOn) ? selectedEl : null}
           onClick={() => props.onChange(val)}

@@ -9,15 +9,15 @@ import { NavigationState } from 'web/modules/navigation/state';
 import ScrollNumberSelector from 'web/ui/components/scrollNumberSelector/ScrollNumberSelector';
 import Timeline from 'web/ui/components/timeline/Timeline';
 import 'web/ui/screens/bgGraphScreen/BgGraphScreen.scss';
-import { useCssNs, useReduxActions, useReduxState } from 'web/utils/react';
+import { useReduxActions, useReduxState } from 'web/utils/react';
 import { nbBg, nbCarbs, nbInsulin } from 'web/utils/colors';
 import StatusBar from 'web/ui/components/statusBar/StatusBar';
 import { useEffect } from 'react';
+import React from 'react';
 
 type Props = {};
 
 export default (() => {
-  const { React } = useCssNs('BgGraphScreen');
   const configState = useReduxState(s => s.config);
   const navigationState = useReduxState(s => s.navigation);
   const dataState = useReduxState(s => s.data);
@@ -66,9 +66,9 @@ export default (() => {
   }
 
   return (
-    <div className="this">
+    <div className="nb-BgGraphScreen">
       <StatusBar />
-      <div className="top" style={{ height: timelineConfig.outerHeight }}>
+      <div className="nb-BgGraphScreen-top" style={{ height: timelineConfig.outerHeight }}>
         {dataState.status === 'READY' && (
           <Timeline
             timelineConfig={timelineConfig}
@@ -90,7 +90,7 @@ export default (() => {
         {dataState.status === 'FETCHING' && <pre>Loading...</pre>}
         {dataState.status === 'ERROR' && <pre>Error: {dataState.errorMessage}</pre>}
       </div>
-      <div className="bottom">
+      <div className="nb-BgGraphScreen-bottom">
         <ScrollNumberSelector
           value={is('Carbs')(modelBeingEdited) ? modelBeingEdited.amount || undefined : undefined}
           onChange={createChangeHandler(

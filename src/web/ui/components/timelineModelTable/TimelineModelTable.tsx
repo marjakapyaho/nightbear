@@ -1,22 +1,20 @@
 import { TimelineModel } from 'core/models/model';
 import { get, reverse, sortBy } from 'lodash';
+import React from 'react';
 import 'web/ui/components/timelineModelTable/TimelineModelTable.scss';
 import Timestamp from 'web/ui/components/timestamp/Timestamp';
-import { useCssNs } from 'web/utils/react';
 
 type Props = {
   models: TimelineModel[];
 };
 
 export default (props => {
-  const { React } = useCssNs('TimelineModelTable');
-
   if (props.models.length === 0) {
-    return <div className="this">(no data to show)</div>;
+    return <div className="nb-TimelineModelTable">(no data to show)</div>;
   } else {
     const columns = Object.keys(props.models.reduce((memo, next) => ({ ...memo, ...next }), {}));
     return (
-      <div className="this">
+      <div className="nb-TimelineModelTable">
         <table>
           <thead>
             <tr>{renderThs(columns)}</tr>

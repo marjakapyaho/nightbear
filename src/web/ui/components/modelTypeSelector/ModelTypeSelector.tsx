@@ -1,8 +1,8 @@
 import { TimelineModelType } from 'core/models/model';
 import { first } from 'lodash';
+import React from 'react';
 import { isNotNull } from 'server/utils/types';
 import { TIMELINE_MODEL_TYPES } from 'web/modules/navigation/state';
-import { useCssNs } from 'web/utils/react';
 
 type Props = {
   multiple?: boolean;
@@ -11,10 +11,8 @@ type Props = {
 };
 
 export default (props => {
-  const { React } = useCssNs('ModelTypeSelector');
-
   return (
-    <div className="this">
+    <div className="nb-ModelTypeSelector">
       <select
         style={{ height: 200 }}
         multiple={props.multiple}
