@@ -17,12 +17,24 @@ export const configMiddleware: ReduxMiddleware = store => {
     const prevConfig = JSON.parse(localStorage.getItem(LOCALSTORAGE_CONFIG_KEY) || '{}');
     store.dispatch(actions.CONFIG_UPDATED(prevConfig));
     if (!store.getState().config.remoteDbUrl) {
-      // If there's no DB URL set, prompt the user for it, otherwise the app is kinda useless
-      store.dispatch(actions.CONFIG_UPDATED({ remoteDbUrl: prompt('Enter DB URL:') || '' }));
+      // If there's no DB URL set, prompt the user for the password needed to construct it
+      const password = prompt('Enter password:');
+      store.dispatch(
+        actions.CONFIG_UPDATED({
+          remoteDbUrl: password ? `https://nightbear:${password}@db.nightbear.fi/prod` : '',
+        }),
+      );
     }
     if (!store.getState().config.nightbearApiUrl) {
-      // If there's no API URL set, prompt the user for it, otherwise the app is kinda useless
-      store.dispatch(actions.CONFIG_UPDATED({ nightbearApiUrl: prompt('Enter API URL:') || '' }));
+      // If there's no API URL set, infer one from the hostname
+      store.dispatch(
+        actions.CONFIG_UPDATED({
+          nightbearApiUrl:
+            window.location.host === 'nightbear.fi'
+              ? 'https://server.nightbear.fi/'
+              : 'https://server.stage.nightbear.fi/',
+        }),
+      );
     }
   }
 
