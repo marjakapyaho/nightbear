@@ -19,11 +19,16 @@ export const configMiddleware: ReduxMiddleware = store => {
     if (!store.getState().config.remoteDbUrl) {
       // If there's no DB URL set, prompt the user for the password needed to construct it
       const password = prompt('Enter password:');
-      store.dispatch(
-        actions.CONFIG_UPDATED({
-          remoteDbUrl: password ? `https://nightbear:${password}@db.nightbear.fi/prod` : '',
-        }),
-      );
+      if (password) {
+        store.dispatch(
+          actions.CONFIG_UPDATED({
+            remoteDbUrl:
+              window.location.host === 'nightbear.fi'
+                ? `https://nightbear:${password}@db.nightbear.fi/prod`
+                : `https://nightbear:${password}@db.nightbear.jrw.fi/stage`,
+          }),
+        );
+      }
     }
     if (!store.getState().config.nightbearApiUrl) {
       // If there's no API URL set, infer one from the hostname
