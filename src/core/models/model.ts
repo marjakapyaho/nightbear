@@ -173,6 +173,7 @@ const defaultState = {
   HIGH: false,
   BAD_HIGH: false,
   PERSISTENT_HIGH: false,
+  BASAL_OVERDUE: false,
 };
 
 export const DEFAULT_STATE: State = defaultState;
@@ -212,6 +213,7 @@ type _Profile = Readonly<{
     ALARM_RETRY: number; // seconds, min in Pushover 30
     ALARM_EXPIRE: number; // seconds, max in Pushover 10800
     HIGH_CORRECTION_SUPPRESSION_WINDOW: number; // minutes
+    BASAL_TARGET_TIME: string; // e.g. "12:34" (in UTC)
   }>;
   alarmSettings: Readonly<
     {
