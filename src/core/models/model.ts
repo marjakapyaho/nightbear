@@ -22,6 +22,7 @@ export type Model =
   | Hba1c
   | MeterEntry
   | Insulin
+  | BasalInsulin
   | Carbs
   | Alarm
   | SavedProfile
@@ -146,6 +147,12 @@ export type Insulin = _Model<'Insulin'> &
     timestamp: number;
     amount: number;
     insulinType: string;
+  }>;
+
+export type BasalInsulin = _Model<'BasalInsulin'> &
+  Readonly<{
+    timestamp: number;
+    amount: number;
   }>;
 
 export type Carbs = _Model<'Carbs'> &
