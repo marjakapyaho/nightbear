@@ -84,6 +84,7 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
           HIGH_CORRECTION_SUPPRESSION_WINDOW: 135, // NEW 17.1.2022
+          BASAL_TARGET_TIME: '09:00', // NEW 30.3.2022
         },
         alarmSettings: {
           OUTDATED: {
@@ -127,6 +128,11 @@ describe('core/models/migrations', () => {
           COMPRESSION_LOW: {
             escalationAfterMinutes: [10, 20, 20],
             snoozeMinutes: 60,
+          },
+          // NEW 30.3.2022
+          BASAL_OVERDUE: {
+            escalationAfterMinutes: [60, 60, 60],
+            snoozeMinutes: 30,
           },
         },
         pushoverLevels: [],
@@ -207,6 +213,7 @@ describe('core/models/migrations', () => {
           HIGH_LEVEL_BAD: 15, // NEW IN THIS MODEL VERSION
           ALARM_RETRY: 30,
           HIGH_CORRECTION_SUPPRESSION_WINDOW: 135, // NEW 17.1.2022
+          BASAL_TARGET_TIME: '09:00', // NEW 30.3.2022
         },
         alarmSettings: {
           OUTDATED: {
@@ -250,6 +257,11 @@ describe('core/models/migrations', () => {
           COMPRESSION_LOW: {
             escalationAfterMinutes: [10, 20, 20],
             snoozeMinutes: 60,
+          },
+          // NEW 30.3.2022
+          BASAL_OVERDUE: {
+            escalationAfterMinutes: [60, 60, 60],
+            snoozeMinutes: 30,
           },
         },
         pushoverLevels: [],

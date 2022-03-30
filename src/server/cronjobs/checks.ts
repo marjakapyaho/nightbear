@@ -19,14 +19,25 @@ export const checks: Cronjob = (context, _journal) => {
     context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
     context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),
-  ]).then(([latestActiveProfile, sensorEntries, insulin, carbs, latestDeviceStatus, alarms]) => {
+    context.storage.loadLatestTimelineModels('BasalInsulin', 1),
+  ]).then(([latestActiveProfile, sensorEntries, insulin, carbs, latestDeviceStatus, alarms, latestBasal]) => {
     const activeProfile = first(latestActiveProfile);
     const deviceStatus = first(latestDeviceStatus);
+    const basal = first(latestBasal);
 
     if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
     log(`1. Using profile: ${activeProfile?.profileName}`);
-    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, carbs, deviceStatus, alarms);
+    const state = runAnalysis(
+      context.timestamp(),
+      activeProfile,
+      sensorEntries,
+      insulin,
+      carbs,
+      deviceStatus,
+      alarms,
+      basal,
+    );
 
     const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
     log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));

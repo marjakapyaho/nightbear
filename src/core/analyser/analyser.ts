@@ -36,7 +36,7 @@ export function runAnalysis(
   carbs: Carbs[],
   deviceStatus: DeviceStatus | undefined,
   alarms: Alarm[],
-  basalInsulin: BasalInsulin,
+  basalInsulin: BasalInsulin | undefined,
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries)
@@ -297,7 +297,12 @@ function detectPersistentHigh(
   return haveWideEnoughWindow && haveEnoughDataPoints && !hasCounterConditions;
 }
 
-function detectBasalOverdue(activeProfile: ActiveProfile, basalInsulin: BasalInsulin, currentTimestamp: number) {
+function detectBasalOverdue(
+  activeProfile: ActiveProfile,
+  basalInsulin: BasalInsulin | undefined,
+  currentTimestamp: number,
+) {
   // if current time > BASAL_TARGET_TIME && time since basal > 20 hours
   // OR: time since basal > 24 h
+  return false; // TODO
 }
