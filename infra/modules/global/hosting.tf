@@ -3,9 +3,6 @@ locals {
   unattended_upgrades_file = "/etc/apt/apt.conf.d/51unattended-upgrades-custom"
   auth_username            = "nightbear"
   auth_password            = var.secrets.http_auth_password
-  metrics_host             = "influxdb.jrw.fi"
-  metrics_username         = "writer"
-  metrics_password         = var.secrets.influxdb_password_writer
 }
 
 resource "aws_ebs_volume" "data" {
@@ -124,9 +121,10 @@ locals {
       flush_jitter = "3s" # Jitter the flush interval by a random amount. This is primarily to avoid large write spikes for users running a large number of telegraf instances.
 
     [[outputs.influxdb]]
-      urls = ["https://${local.metrics_host}"] # The full HTTP or UDP URL for your InfluxDB instance.
-      username = "${local.metrics_username}"
-      password = "${local.metrics_password}"
+      urls = ["https://metrics-ingest.jrw.fi"]
+      username = "writer"
+      password = "${var.secrets.metrics_ingest_password_writer}"
+      name_prefix = "telegraf_"
 
     [[inputs.disk]]
       ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"] # Ignore FS types that probably aren't very interesting
@@ -283,7 +281,7 @@ services:
   # https://hub.docker.com/_/telegraf
   telegraf:
     container_name: telegraf
-    image: telegraf:1.13.4
+    image: telegraf:1.20.2 # when considering to upgrade, see: https://github.com/influxdata/telegraf/issues/10031#issuecomment-960246056
     restart: always
     hostname: ${module.docker_host.hostname}
     environment:
@@ -291,16 +289,14 @@ services:
       - HOST_ETC=/hostfs/etc
       - HOST_PROC=/hostfs/proc
       - HOST_SYS=/hostfs/sys
+      - HOST_VAR=/hostfs/var
+      - HOST_RUN=/hostfs/run
       - HOST_MOUNT_PREFIX=/hostfs
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # From https://github.com/influxdata/telegraf/blob/master/docs/FAQ.md
       - /:/hostfs:ro
-      - /etc:/hostfs/etc:ro
-      - /proc:/hostfs/proc:ro
-      - /sys:/hostfs/sys:ro
-      - /var/run/utmp:/var/run/utmp:ro
 
   # https://github.com/futurice/docker-volume-backup
   backup:
