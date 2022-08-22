@@ -311,10 +311,10 @@ services:
       - AWS_ACCESS_KEY_ID=${aws_iam_access_key.backup.id}
       - AWS_SECRET_ACCESS_KEY=${aws_iam_access_key.backup.secret}
       - AWS_DEFAULT_REGION=${data.aws_region.this.name}
-      - INFLUXDB_URL=https://${local.metrics_host}
-      - INFLUXDB_DB=misc
-      - INFLUXDB_CREDENTIALS=${local.metrics_username}:${local.metrics_password}
-      - INFLUXDB_MEASUREMENT=docker_host_backups
+      - INFLUXDB_URL=https://metrics-ingest.jrw.fi
+      - INFLUXDB_DB=misc # note: not needed with Postgres anymore, I think
+      - INFLUXDB_CREDENTIALS=writer:${var.secrets.metrics_ingest_password_writer}
+      - INFLUXDB_MEASUREMENT=misc_docker_host_backups
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # allow Docker commands from within the container
       - /data:/backup:ro # mount the data path into the container, so it gets backed up
