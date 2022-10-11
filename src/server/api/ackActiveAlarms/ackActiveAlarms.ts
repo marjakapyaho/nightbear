@@ -4,7 +4,7 @@ import { Context, createResponse, Request, Response } from 'core/models/api';
 import { getAlarmState } from 'core/models/utils';
 import { first } from 'lodash';
 import { extendLogger } from 'core/utils/logging';
-import { NIGHT_PROFILE_NAME, WATCH_NAME } from 'core/models/const';
+import { NIGHT_PROFILE_NAME, NO_WAKE_UPS_PROFILE_NAME, WATCH_NAME } from 'core/models/const';
 
 export function ackActiveAlarms(request: Request, context: Context): Response {
   const log = extendLogger(context.log, 'check');
@@ -22,7 +22,10 @@ export function ackActiveAlarms(request: Request, context: Context): Response {
     }
 
     // Disable watch ack at night
-    if (activeProfile.profileName === NIGHT_PROFILE_NAME && ackedBy === WATCH_NAME) {
+    if (
+      (activeProfile.profileName === NIGHT_PROFILE_NAME || activeProfile.profileName === NO_WAKE_UPS_PROFILE_NAME) &&
+      ackedBy === WATCH_NAME
+    ) {
       context.log(`Ack cancelled (profile: ${activeProfile.profileName}, source: ${ackedBy})`);
       return createResponse();
     }
