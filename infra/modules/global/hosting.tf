@@ -231,7 +231,7 @@ services:
   # https://github.com/marjakapyaho/nightbear
   server_stage:
     container_name: server-stage
-    image: node:16.13.2
+    image: node:18.16.1
     working_dir: /app
     command: bash -c 'npm install && npm run server-start'
     restart: always
@@ -257,7 +257,7 @@ services:
   # https://github.com/marjakapyaho/nightbear
   server_prod:
     container_name: server-prod
-    image: node:16.13.2
+    image: node:18.16.1
     working_dir: /app
     command: bash -c 'npm install && npm run server-start'
     restart: always
