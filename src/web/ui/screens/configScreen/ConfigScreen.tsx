@@ -4,13 +4,9 @@ import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time'
 import { css } from '@emotion/css';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
-import { Checkbox } from 'pretty-checkbox-react';
-import { fontColor } from 'web/utils/colors';
-import { fontSize, pagePadding } from 'web/utils/config';
+import { pagePadding } from 'web/utils/config';
 
 type Props = {};
-
-const checkboxStyles = { display: 'block', marginBottom: 20, color: fontColor, fontSize: fontSize };
 
 const styles = {
   profile: css({
@@ -18,11 +14,32 @@ const styles = {
     background: 'whitesmoke',
     cursor: 'pointer',
     marginBottom: 10,
+    borderRadius: '6px',
+    display: 'flex',
+    alignItems: 'center',
+    border: '1px solid #eeeeee',
+  }),
+  activates: css({
+    flex: 1,
+    textAlign: 'right',
+    fontSize: '13px',
+  }),
+  heading: css({
+    fontSize: '16px',
+  }),
+  button: css({
+    border: '1px solid rgb(239 211 75)',
+    background: '#ffe358',
+    color: '#887f59',
+    fontWeight: 600,
+    fontSize: '16px',
+    padding: '20px',
+    borderRadius: '6px',
+    width: '100%',
   }),
 };
 
 export default (() => {
-  const configState = useReduxState(s => s.config);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
@@ -35,51 +52,39 @@ export default (() => {
         padding: pagePadding,
       }}
     >
-      <Checkbox
-        style={checkboxStyles}
-        className="p-curve"
-        state={configState.autoRefreshData}
-        onChange={actions.AUTO_REFRESH_TOGGLED}
-      >
-        Auto-refresh timeline data
-      </Checkbox>
-      <Checkbox
-        style={checkboxStyles}
-        className="p-curve"
-        state={configState.zoomedInTimeline}
-        onChange={actions.ZOOMED_IN_TIMELINE_TOGGLED}
-      >
-        Zoomed in timeline
-      </Checkbox>
       <div
         style={{
-          paddingTop: 20,
+          paddingTop: 0,
         }}
       >
-        <h1>Misc</h1>
+        <h1 className={styles.heading}>Ack alarm</h1>
         <div>
-          <button onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>Ack latest alarm</button>
+          <button className={styles.button} onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>
+            ACK ALARM
+          </button>
         </div>
       </div>
 
       <div
         style={{
-          paddingTop: 20,
+          paddingTop: 30,
         }}
       >
-        <h1>Profiles</h1>
+        <h1 className={styles.heading}>Profiles</h1>
         <div>
           {profiles.map(profile => (
             <div
               key={profile.modelUuid}
               className={styles.profile}
               style={
-                profile.profileName === activeProfile?.profileName ? { background: '#7a7a7a', color: 'white' } : {}
+                profile.profileName === activeProfile?.profileName
+                  ? { background: '#7a7a7a', color: 'whitesmoke', border: '1px solid #7a7a7a' }
+                  : {}
               }
               onClick={() => actions.PROFILE_ACTIVATED(profile, Date.now())}
             >
-              {profile.profileName}
-              {profile.activatedAtUtc && <span>&nbsp;(activates {getAutoActTime(profile)})</span>}
+              {profile.profileName.toUpperCase()}
+              {profile.activatedAtUtc && <span className={styles.activates}>Activated {getAutoActTime(profile)}</span>}
             </div>
           ))}
         </div>
