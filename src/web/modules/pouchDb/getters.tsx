@@ -4,9 +4,7 @@ import { assertNumber, objectKeys } from 'web/utils/types';
 
 export type SummaryDbStatus = PouchDbStatus | 'REPLICATION_INITIAL' | 'REPLICATION_CATCHUP';
 
-export function getSummaryDbStatus(
-  state: PouchDbState,
-): {
+export function getSummaryDbStatus(state: PouchDbState): {
   summaryStatus: SummaryDbStatus;
   summaryProgress: number | null;
   summaryLastChangedAt: number;

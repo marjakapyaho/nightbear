@@ -1,5 +1,5 @@
 import { Insulin } from 'core/models/model';
-import { css, cx } from 'emotion';
+import { css, cx } from '@emotion/css';
 import React from 'react';
 import TimeAgo from 'web/ui/components/timeAgo/TimeAgo';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';

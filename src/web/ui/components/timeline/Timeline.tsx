@@ -1,7 +1,7 @@
 import { RollingAnalysisResults } from 'core/analyser/rolling-analysis';
 import { ActiveProfile, Carbs, Insulin, MeterEntry, SensorEntry } from 'core/models/model';
 import { isSameModel, lastModel } from 'core/models/utils';
-import { css, cx } from 'emotion';
+import { css, cx } from '@emotion/css';
 import React, { useEffect, useRef } from 'react';
 import TimelineGraphBg from 'web/ui/components/timeline/TimelineGraphBg';
 import TimelineMarkerBg from 'web/ui/components/timeline/TimelineMarkerBg';

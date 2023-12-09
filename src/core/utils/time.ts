@@ -5,16 +5,12 @@ export const TZ = 'Europe/Helsinki';
 
 // @example "12:34"
 export function humanReadableShortTime(msUtc: number = Date.now()) {
-  return DateTime.fromMillis(msUtc)
-    .setZone(TZ)
-    .toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+  return DateTime.fromMillis(msUtc).setZone(TZ).toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 }
 
 // @example "2020-01-31 12:34:56"
 export function humanReadableLongTime(msUtc: number = Date.now()) {
-  return DateTime.fromMillis(msUtc)
-    .setZone(TZ)
-    .toFormat('yyyy-MM-dd HH:mm:ss'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+  return DateTime.fromMillis(msUtc).setZone(TZ).toFormat('yyyy-MM-dd HH:mm:ss'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
 }
 
 // Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.

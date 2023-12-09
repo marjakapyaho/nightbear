@@ -206,14 +206,12 @@ type _Profile = Readonly<{
     ALARM_EXPIRE: number; // seconds, max in Pushover 10800
     HIGH_CORRECTION_SUPPRESSION_WINDOW: number; // minutes
   }>;
-  alarmSettings: Readonly<
-    {
-      [S in Situation]: Readonly<{
-        escalationAfterMinutes: number[];
-        snoozeMinutes: number;
-      }>;
-    }
-  >;
+  alarmSettings: Readonly<{
+    [S in Situation]: Readonly<{
+      escalationAfterMinutes: number[];
+      snoozeMinutes: number;
+    }>;
+  }>;
   pushoverLevels: string[];
 }>;
 

@@ -1,5 +1,5 @@
 import { HOUR_IN_MS } from 'core/calculations/calculations';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { range } from 'lodash';
 import { DateTime } from 'luxon';
 import React, { Fragment } from 'react';
@@ -47,7 +47,8 @@ export default (props => {
               color: fontColorLight,
             }}
           >
-            {DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
+            {
+              DateTime.fromMillis(ts).toFormat('HH:mm') // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
             }
           </span>
         </div>

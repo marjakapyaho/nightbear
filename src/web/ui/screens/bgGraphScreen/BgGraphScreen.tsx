@@ -186,7 +186,7 @@ function createChangeHandler<T extends TimelineModel>(
       actions.MODEL_UPDATED_BY_USER(
         modelCreateCallback(
           ('timelineCursorAt' in state ? state.timelineCursorAt : null) || // if there's a cursor, place the new Model there
-          (isTimelineModel(modelBeingEdited) && modelBeingEdited.timestamp) || // if not, but a Model of another type is selected, place the new Model at the same timestamp
+            (isTimelineModel(modelBeingEdited) && modelBeingEdited.timestamp) || // if not, but a Model of another type is selected, place the new Model at the same timestamp
             Date.now(), // if nothing else, create at the current wall clock time
           newValue,
         ),

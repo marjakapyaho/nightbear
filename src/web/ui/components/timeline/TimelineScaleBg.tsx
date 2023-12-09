@@ -1,4 +1,4 @@
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { range } from 'lodash';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig } from 'web/ui/components/timeline/utils';

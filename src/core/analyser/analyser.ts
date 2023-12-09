@@ -37,10 +37,7 @@ export function runAnalysis(
   alarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
-  const latestEntry = chain(entries)
-    .sortBy('timestamp')
-    .last()
-    .value();
+  const latestEntry = chain(entries).sortBy('timestamp').last().value();
   let state = DEFAULT_STATE;
 
   if (deviceStatus) {
@@ -179,10 +176,7 @@ function detectCompressionLow(
   const noRecentInsulin = !insulin.length;
   const isNight = activeProfile.profileName === 'night';
   const entriesToCheck = 4;
-  const lastEntries = chain(entries)
-    .sortBy('timestamp')
-    .slice(-entriesToCheck)
-    .value();
+  const lastEntries = chain(entries).sortBy('timestamp').slice(-entriesToCheck).value();
   const lastEntriesAreFresh =
     lastEntries.length === entriesToCheck && lastEntries[0].timestamp > currentTimestamp - 30 * MIN_IN_MS;
 
@@ -256,10 +250,7 @@ function detectPersistentHigh(
   currentTimestamp: number,
 ) {
   const relevantTimeWindow = filter(entries, entry => entry.timestamp >= currentTimestamp - ANALYSIS_TIME_WINDOW_MS);
-  const firstEntry = chain(relevantTimeWindow)
-    .sortBy('timestamp')
-    .first()
-    .value();
+  const firstEntry = chain(relevantTimeWindow).sortBy('timestamp').first().value();
   if (!firstEntry) {
     return false;
   } // TODO: this is for lodash

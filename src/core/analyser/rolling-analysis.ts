@@ -131,11 +131,9 @@ type RollingAnalysisRawResult = [
 
 // Chops the given amount of time into "buckets"; for each, the analyser can be ran independently
 function getRollingAnalysisBuckets(timelineRange: number, timelineRangeEnd: number): RollingAnalysisBucket[] {
-  return range(
-    timelineRangeEnd - timelineRange + BUCKET_SIZE,
-    timelineRangeEnd + BUCKET_SIZE,
-    BUCKET_SIZE,
-  ).map(startTs => [startTs - PRE_MARGIN, startTs - BUCKET_SIZE, startTs]);
+  return range(timelineRangeEnd - timelineRange + BUCKET_SIZE, timelineRangeEnd + BUCKET_SIZE, BUCKET_SIZE).map(
+    startTs => [startTs - PRE_MARGIN, startTs - BUCKET_SIZE, startTs],
+  );
 }
 
 type RollingAnalysisBucket = [

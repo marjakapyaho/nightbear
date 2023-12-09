@@ -1,5 +1,5 @@
 import { MeterEntry, SensorEntry } from 'core/models/model';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import React from 'react';
 import { bgToTop, ExtendedTimelineConfig, tsToLeft } from 'web/ui/components/timeline/utils';
 import { nbGood, nbHigh, nbLow } from 'web/utils/colors';

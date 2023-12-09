@@ -39,117 +39,115 @@ export function uploadDexcomEntry(request: Request, context: Context): Response 
   const logCtx = `with device "${requestObject.device}"`;
 
   return Promise.resolve()
-    .then(
-      (): Promise<Model | Model[] | null> => {
-        // Handle Dexcom Uploader DeviceStatus:
-        if (requestObject.hasOwnProperty('uploaderBattery')) {
-          const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
-          return context.storage.saveModel(dexcomStatus);
-        }
+    .then((): Promise<Model | Model[] | null> => {
+      // Handle Dexcom Uploader DeviceStatus:
+      if (requestObject.hasOwnProperty('uploaderBattery')) {
+        const dexcomStatus: DeviceStatus = parseDexcomStatus(requestObject, timestamp);
+        return context.storage.saveModel(dexcomStatus);
+      }
 
-        // Handle Dexcom-generated MeterEntry's:
-        if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
-          const timestamp = parseInt(requestObject.date, 10);
-          return Promise.resolve()
-            .then(() => context.storage.loadTimelineModels(['MeterEntry'], 0, timestamp)) // see if we can find a MeterEntry that already exists with this exact timestamp
-            .then(entries => first(entries))
-            .then(existingEntry => {
-              if (existingEntry) {
-                // already exists in the DB -> no need to do anything!
-                log(`${logCtx}: MeterEntry already exists in DB`);
-                return Promise.resolve(null);
-              }
-              return context.storage.saveModel(parseMeterEntry(requestObject)); // we didn't find the entry yet -> create it
-            });
-        }
+      // Handle Dexcom-generated MeterEntry's:
+      if (requestObject.type === ENTRY_TYPES.METER_ENTRY) {
+        const timestamp = parseInt(requestObject.date, 10);
+        return Promise.resolve()
+          .then(() => context.storage.loadTimelineModels(['MeterEntry'], 0, timestamp)) // see if we can find a MeterEntry that already exists with this exact timestamp
+          .then(entries => first(entries))
+          .then(existingEntry => {
+            if (existingEntry) {
+              // already exists in the DB -> no need to do anything!
+              log(`${logCtx}: MeterEntry already exists in DB`);
+              return Promise.resolve(null);
+            }
+            return context.storage.saveModel(parseMeterEntry(requestObject)); // we didn't find the entry yet -> create it
+          });
+      }
 
-        // Handle Dexcom calibrations:
-        if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
-          const timestamp = parseInt(requestObject.date, 10);
-          return Promise.resolve()
-            .then(() => context.storage.loadTimelineModels(['DexcomCalibration'], 0, timestamp)) // see if we can find a DexcomCalibration that already exists with this exact timestamp
-            .then(cals => first(cals))
-            .then(existingCal => {
-              if (existingCal) {
-                // already exists in the DB -> no need to do anything!
-                log(`${logCtx}: DexcomCalibration already exists in DB`);
-                return Promise.resolve(null);
-              }
-              const range = CAL_PAIRING.BEFORE + CAL_PAIRING.AFTER;
-              const rangeEnd = timestamp + CAL_PAIRING.AFTER;
-              return Promise.resolve()
-                .then(() => context.storage.loadTimelineModels(['MeterEntry'], range, rangeEnd))
-                .then(entries => entries.filter(entry => entry.source === 'dexcom'))
-                .then(entries => {
-                  if (entries.length === 0) {
-                    // TODO: Retry until it's found..?
-                    log(`${logCtx}: Didn't find a MeterEntry to link with -> ignoring`);
-                    return Promise.resolve(null);
-                  }
-                  if (entries.length > 1) {
-                    log(`${logCtx}: Found more than 1 MeterEntry to link with -> very suspicious -> ignoring`);
-                    return Promise.resolve(null);
-                  }
-                  const newCal = {
-                    ...parseDexcomCalibration(requestObject),
-                    meterEntries: entries.map(getModelRef), // store a reference to the MeterEntry that was received at the same time from the Dexcom uploader
-                  };
-                  return context.storage.saveModel(newCal);
-                });
-            });
-        }
+      // Handle Dexcom calibrations:
+      if (requestObject.type === ENTRY_TYPES.CALIBRATION) {
+        const timestamp = parseInt(requestObject.date, 10);
+        return Promise.resolve()
+          .then(() => context.storage.loadTimelineModels(['DexcomCalibration'], 0, timestamp)) // see if we can find a DexcomCalibration that already exists with this exact timestamp
+          .then(cals => first(cals))
+          .then(existingCal => {
+            if (existingCal) {
+              // already exists in the DB -> no need to do anything!
+              log(`${logCtx}: DexcomCalibration already exists in DB`);
+              return Promise.resolve(null);
+            }
+            const range = CAL_PAIRING.BEFORE + CAL_PAIRING.AFTER;
+            const rangeEnd = timestamp + CAL_PAIRING.AFTER;
+            return Promise.resolve()
+              .then(() => context.storage.loadTimelineModels(['MeterEntry'], range, rangeEnd))
+              .then(entries => entries.filter(entry => entry.source === 'dexcom'))
+              .then(entries => {
+                if (entries.length === 0) {
+                  // TODO: Retry until it's found..?
+                  log(`${logCtx}: Didn't find a MeterEntry to link with -> ignoring`);
+                  return Promise.resolve(null);
+                }
+                if (entries.length > 1) {
+                  log(`${logCtx}: Found more than 1 MeterEntry to link with -> very suspicious -> ignoring`);
+                  return Promise.resolve(null);
+                }
+                const newCal = {
+                  ...parseDexcomCalibration(requestObject),
+                  meterEntries: entries.map(getModelRef), // store a reference to the MeterEntry that was received at the same time from the Dexcom uploader
+                };
+                return context.storage.saveModel(newCal);
+              });
+          });
+      }
 
-        // Handle Dexcom SensorEntry's:
-        if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
-          return Promise.resolve()
-            .then(() => context.storage.loadLatestTimelineModel('DexcomCalibration'))
-            .then(cal => {
-              if (!cal) {
-                log(`${logCtx}: Didn't find a DexcomCalibration -> ignoring`);
-                return Promise.resolve(null);
-              }
-              if (cal.slope === null) {
-                log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
-                return Promise.resolve(null);
-              }
-              const newEntries = parseDexcomEntry(requestObject, cal);
-              return context.storage.saveModels(newEntries);
-            });
-        }
+      // Handle Dexcom SensorEntry's:
+      if (requestObject.type === ENTRY_TYPES.BG_ENTRY) {
+        return Promise.resolve()
+          .then(() => context.storage.loadLatestTimelineModel('DexcomCalibration'))
+          .then(cal => {
+            if (!cal) {
+              log(`${logCtx}: Didn't find a DexcomCalibration -> ignoring`);
+              return Promise.resolve(null);
+            }
+            if (cal.slope === null) {
+              log(`${logCtx}: Didn't find a DexcomCalibration with a slope -> very suspicious -> ignoring`);
+              return Promise.resolve(null);
+            }
+            const newEntries = parseDexcomEntry(requestObject, cal);
+            return context.storage.saveModels(newEntries);
+          });
+      }
 
-        // Handle Dexcom G6 upload from xDrip+
-        if ((requestObject.device || '').match(/^xDrip-Dexcom/)) {
-          const timestamp = parseInt(requestObject.date, 10);
-          return Promise.resolve()
-            .then(() => context.storage.loadTimelineModels(['DexcomG6SensorEntry'], 0, timestamp)) // see if we can find an entry of the same type that already exists with this exact timestamp
-            .then(entries => first(entries))
-            .then(existingEntry => {
-              if (existingEntry) {
-                // already exists in the DB -> no need to do anything!
-                log(`${logCtx}: ${existingEntry.modelType} already exists in DB`);
-                return Promise.resolve(null);
-              } else {
-                // we didn't find the entry yet -> create it
-                return context.storage.saveModel({
-                  modelType: 'DexcomG6SensorEntry',
-                  modelUuid: generateUuid(),
-                  timestamp: requestObject.date,
-                  bloodGlucose: changeBloodGlucoseUnitToMmoll(requestObject.sgv),
-                  direction: requestObject.direction,
-                });
-              }
-            });
-        }
+      // Handle Dexcom G6 upload from xDrip+
+      if ((requestObject.device || '').match(/^xDrip-Dexcom/)) {
+        const timestamp = parseInt(requestObject.date, 10);
+        return Promise.resolve()
+          .then(() => context.storage.loadTimelineModels(['DexcomG6SensorEntry'], 0, timestamp)) // see if we can find an entry of the same type that already exists with this exact timestamp
+          .then(entries => first(entries))
+          .then(existingEntry => {
+            if (existingEntry) {
+              // already exists in the DB -> no need to do anything!
+              log(`${logCtx}: ${existingEntry.modelType} already exists in DB`);
+              return Promise.resolve(null);
+            } else {
+              // we didn't find the entry yet -> create it
+              return context.storage.saveModel({
+                modelType: 'DexcomG6SensorEntry',
+                modelUuid: generateUuid(),
+                timestamp: requestObject.date,
+                bloodGlucose: changeBloodGlucoseUnitToMmoll(requestObject.sgv),
+                direction: requestObject.direction,
+              });
+            }
+          });
+      }
 
-        // Handle phone status upload from xDrip+
-        if ((requestObject.device || '').match(/^HMD/)) {
-          const xdripStatus: DeviceStatus = parseXdripStatus(requestObject, timestamp);
-          return context.storage.saveModel(xdripStatus);
-        }
+      // Handle phone status upload from xDrip+
+      if ((requestObject.device || '').match(/^HMD/)) {
+        const xdripStatus: DeviceStatus = parseXdripStatus(requestObject, timestamp);
+        return context.storage.saveModel(xdripStatus);
+      }
 
-        throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
-      },
-    )
+      throw new Error(`Unknown Dexcom entry type "${requestObject.type}"`);
+    })
     .then((model: Model | Model[] | null) => {
       if (!model) log(`${logCtx} => null`);
       else if (isModel(model)) log(`${logCtx} => "${model.modelType}"`);

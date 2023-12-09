@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash';
 import { applyMiddleware, createStore as reduxCreateStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import { ReduxAction } from 'web/modules/actions';
 import { middleware } from 'web/modules/middleware';
 import { rootReducer } from 'web/modules/reducer';
@@ -25,7 +25,7 @@ export type ActionUnionFrom<T extends ActionCreatorMap> = valueof<{ [P in keyof 
 
 // Simple wrapper around Redux's standard createStore(), which standardizes middleware & enhancer setup
 export function createStore(initialState?: ReduxState): ReduxStore {
-  return reduxCreateStore(rootReducer, initialState, composeWithDevTools(applyMiddleware(...middleware)));
+  return reduxCreateStore(rootReducer, initialState, composeWithDevTools(applyMiddleware(...(middleware as any)))); // TODO: fix this
 }
 
 // Returning this from a middleware function effectively makes it no-op.
@@ -49,12 +49,8 @@ export function actionsWithType<T extends ActionCreatorMap>(map: T): ActionCreat
 // The main use case being triggering actions/side-effects in response to Store state changing.
 export function createChangeObserver(store: ReduxStore, next: ReduxDispatch) {
   const selectors: Array<(state: ReduxState) => any> = [];
-  const handlers: Array<(
-    newSelection: any,
-    oldSelection: any,
-    newState: ReduxState,
-    oldState: ReduxState,
-  ) => void> = [];
+  const handlers: Array<(newSelection: any, oldSelection: any, newState: ReduxState, oldState: ReduxState) => void> =
+    [];
   return {
     add<T>(
       selector: (state: ReduxState) => T,

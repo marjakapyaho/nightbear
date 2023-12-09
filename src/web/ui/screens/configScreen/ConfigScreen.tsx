@@ -1,7 +1,7 @@
 import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
 import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import React from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { Checkbox } from 'pretty-checkbox-react';

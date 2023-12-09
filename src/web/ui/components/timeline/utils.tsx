@@ -1,5 +1,5 @@
 import { HOUR_IN_MS, roundTo1Decimals } from 'core/calculations/calculations';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { borderColor, fontColor } from 'web/utils/colors';
 import { fontSize } from 'web/utils/config';
 

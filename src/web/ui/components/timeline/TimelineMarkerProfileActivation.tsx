@@ -1,5 +1,5 @@
 import { ActiveProfile } from 'core/models/model';
-import { css, cx } from 'emotion';
+import { css, cx } from '@emotion/css';
 import React from 'react';
 import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'web/ui/components/timeline/utils';
 import { borderColor } from 'web/utils/colors';

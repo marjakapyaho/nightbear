@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { getEntriesFeed } from 'web/modules/data/getters';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { pagePadding, reallyHighLimit, reallyLowLimit } from 'web/utils/config';
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 import { borderColorLight, fontColorExtraLight, nbGood, nbHigh, nbLow, fontColor } from 'web/utils/colors';
 import { is } from 'core/models/utils';
 import {

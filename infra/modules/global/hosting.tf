@@ -238,7 +238,7 @@ services:
     expose:
       - 3000
     environment:
-      - NIGHTBEAR_DB_URL=https://nightbear:${var.secrets.http_auth_password}@db.nightbear.jrw.fi/stage
+      - NIGHTBEAR_DB_URL=https://nightbear:${var.secrets.http_auth_password}@db.nightbear.fi/stage
       - DEXCOM_SHARE_USERNAME=${var.secrets.dexcom_share_username}
       - DEXCOM_SHARE_PASSWORD=${var.secrets.dexcom_share_password}
       - PUSHOVER_USER=TODO

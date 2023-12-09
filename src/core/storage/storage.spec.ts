@@ -59,7 +59,7 @@ export function storageTestSuite(createTestStorage: () => Storage) {
           assert.equal(err.saveSucceededForModels.length, 0);
           // Check that failure is reported:
           assert.equal(err.saveFailedForModels.length, 1);
-          const [failedModel, reason] = first(err.saveFailedForModels) || [];
+          const [failedModel, reason] = (err.saveFailedForModels || [])[0];
           if (is('SavedProfile')(failedModel)) {
             assert.equal(failedModel.profileName, MODEL_2.profileName);
           } else {

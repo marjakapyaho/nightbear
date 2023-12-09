@@ -25,7 +25,7 @@ export const configMiddleware: ReduxMiddleware = store => {
             remoteDbUrl:
               window.location.host === 'nightbear.fi'
                 ? `https://nightbear:${password}@db.nightbear.fi/prod`
-                : `https://nightbear:${password}@db.nightbear.jrw.fi/stage`,
+                : `https://nightbear:${password}@db.nightbear.fi/stage`,
           }),
         );
       }
