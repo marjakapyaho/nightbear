@@ -1,0 +1,57 @@
+.background {
+  viewport-fill: black;
+}
+
+#timeSince {
+  font-size: 26;
+  font-family: System-Regular;
+  text-length: 32;
+  text-anchor: start;
+  x: 14%;
+  y: 30;
+  fill: white;
+}
+
+#clock {
+  font-size: 30;
+  font-family: System-Regular;
+  text-length: 32;
+  text-anchor: middle;
+  x: 50%;
+  y: 30;
+  fill: white;
+}
+
+#alarm {
+  font-size: 20;
+  font-family: System-Regular;
+  text-length: 32;
+  text-anchor: end;
+  x: 85%;
+  y: 25;
+  fill: white;
+}
+
+#bloodSugar {
+  font-size: 80;
+  font-family: System-Regular;
+  text-length: 32;
+  text-anchor: middle;
+  x: 50%;
+  y: 39%;
+  fill: white;
+}
+
+#graph {
+  width: 100%; 
+  height: 50%; 
+  x: 0; 
+  y: 50%; 
+  fill: #1d1d1d;
+}
+
+.dot {
+  r: 2;
+  cx: 0;
+  cy: 0;
+}
