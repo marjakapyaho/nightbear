@@ -64,29 +64,7 @@ export default (() => {
         padding: pagePadding,
       }}
     >
-      <div
-        style={{
-          paddingTop: 0,
-        }}
-      >
-        <h1 className={styles.heading}>Ack alarm</h1>
-        <div>
-          <button
-            className={styles.button}
-            style={showSuccess ? { background: '#91b85c', color: 'white', border: '1px solid #91b85c' } : {}}
-            onClick={() => actions.ACK_LATEST_ALARM_STARTED()}
-            disabled={showSuccess}
-          >
-            {showSuccess ? 'SUCCESS' : 'ACK ALARM'}
-          </button>
-        </div>
-      </div>
-
-      <div
-        style={{
-          paddingTop: 30,
-        }}
-      >
+      <div>
         <h1 className={styles.heading}>Profiles</h1>
         <div>
           {profiles.map(profile => (
@@ -104,6 +82,27 @@ export default (() => {
               {profile.activatedAtUtc && <span className={styles.activates}>Activated {getAutoActTime(profile)}</span>}
             </div>
           ))}
+        </div>
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 40,
+          left: 30,
+          right: 30,
+        }}
+      >
+        <div>
+          <div>
+            <button
+              className={styles.button}
+              style={showSuccess ? { background: '#91b85c', color: 'white', border: '1px solid #91b85c' } : {}}
+              onClick={() => actions.ACK_LATEST_ALARM_STARTED()}
+              disabled={showSuccess}
+            >
+              {showSuccess ? 'SUCCESS' : 'ACK ALARM'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
