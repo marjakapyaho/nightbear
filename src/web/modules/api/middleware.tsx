@@ -14,9 +14,6 @@ export const apiMiddleware: ReduxMiddleware = store => {
             err => store.dispatch(actions.ACK_LATEST_ALARM_FAILED(err)),
           );
       }
-      if (action.type === actions.ACK_LATEST_ALARM_SUCCEEDED.type) {
-        alert("Successfully ack'ed latest alarm");
-      }
       if (action.type === actions.ACK_LATEST_ALARM_FAILED.type) {
         alert(`Couldn't ack latest alarm: ${action.err}`);
       }

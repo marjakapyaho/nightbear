@@ -2,9 +2,10 @@ import { SavedProfile } from 'core/models/model';
 import { is, lastModel } from 'core/models/utils';
 import { humanReadableShortTime, getActivationTimestamp } from 'core/utils/time';
 import { css } from '@emotion/css';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useReduxActions, useReduxState } from 'web/utils/react';
 import { pagePadding } from 'web/utils/config';
+import { SEC_IN_MS } from 'core/calculations/calculations';
 
 type Props = {};
 
@@ -36,15 +37,26 @@ const styles = {
     padding: '20px',
     borderRadius: '6px',
     width: '100%',
+    cursor: 'pointer',
   }),
 };
 
 export default (() => {
+  const configState = useReduxState(s => s.config);
   const dataState = useReduxState(s => s.data);
   const actions = useReduxActions();
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const profiles = dataState.globalModels.filter(is('SavedProfile')).filter(profile => profile.profileName !== 'OFF');
   const activeProfile = dataState.timelineModels.filter(is('ActiveProfile')).find(lastModel);
+
+  useEffect(() => {
+    if (Date.now() - configState.ackLatestAlarmSucceededAt < SEC_IN_MS) {
+      setShowSuccess(true);
+    }
+    setTimeout(() => setShowSuccess(false), SEC_IN_MS);
+  }, [configState.ackLatestAlarmSucceededAt]);
 
   return (
     <div
@@ -59,8 +71,13 @@ export default (() => {
       >
         <h1 className={styles.heading}>Ack alarm</h1>
         <div>
-          <button className={styles.button} onClick={() => actions.ACK_LATEST_ALARM_STARTED()}>
-            ACK ALARM
+          <button
+            className={styles.button}
+            style={showSuccess ? { background: '#91b85c', color: 'white', border: '1px solid #91b85c' } : {}}
+            onClick={() => actions.ACK_LATEST_ALARM_STARTED()}
+            disabled={showSuccess}
+          >
+            {showSuccess ? 'SUCCESS' : 'ACK ALARM'}
           </button>
         </div>
       </div>

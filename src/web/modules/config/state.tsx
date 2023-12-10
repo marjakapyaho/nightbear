@@ -5,6 +5,7 @@ export type ConfigState = Readonly<{
   autoRefreshData: boolean;
   zoomedInTimeline: boolean;
   timelineResetTimeout: number;
+  ackLatestAlarmSucceededAt: number;
 }>;
 
 export const configInitState: ConfigState = {
@@ -14,4 +15,5 @@ export const configInitState: ConfigState = {
   autoRefreshData: true,
   zoomedInTimeline: false,
   timelineResetTimeout: 1000 * 30,
+  ackLatestAlarmSucceededAt: 0,
 };
