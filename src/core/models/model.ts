@@ -1,6 +1,6 @@
 import { ModelVersion } from 'core/models/migrations';
 
-export const MODEL_VERSION: ModelVersion = 3;
+export const MODEL_VERSION: ModelVersion = 4;
 
 export type ModelType = Model['modelType'];
 export type ModelOfType<T extends ModelType> = Extract<Model, { modelType: T }>;
@@ -22,6 +22,7 @@ export type Model =
   | Hba1c
   | MeterEntry
   | Insulin
+  | BasalInsulin
   | Carbs
   | Alarm
   | SavedProfile
@@ -148,6 +149,12 @@ export type Insulin = _Model<'Insulin'> &
     insulinType: string;
   }>;
 
+export type BasalInsulin = _Model<'BasalInsulin'> &
+  Readonly<{
+    timestamp: number;
+    amount: number;
+  }>;
+
 export type Carbs = _Model<'Carbs'> &
   Readonly<{
     timestamp: number;
@@ -166,6 +173,7 @@ const defaultState = {
   HIGH: false,
   BAD_HIGH: false,
   PERSISTENT_HIGH: false,
+  BASAL_OVERDUE: false,
 };
 
 export const DEFAULT_STATE: State = defaultState;
@@ -205,6 +213,7 @@ type _Profile = Readonly<{
     ALARM_RETRY: number; // seconds, min in Pushover 30
     ALARM_EXPIRE: number; // seconds, max in Pushover 10800
     HIGH_CORRECTION_SUPPRESSION_WINDOW: number; // minutes
+    BASAL_TARGET_TIME: string; // e.g. "12:34" (in UTC)
   }>;
   alarmSettings: Readonly<{
     [S in Situation]: Readonly<{

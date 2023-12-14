@@ -327,6 +327,7 @@ export function getStorageKey(model: Model): string {
     case 'DeviceStatus':
     case 'MeterEntry':
     case 'Insulin':
+    case 'BasalInsulin':
     case 'Carbs':
     case 'Hba1c':
     case 'ActiveProfile':

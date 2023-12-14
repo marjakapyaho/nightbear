@@ -8,7 +8,7 @@ import { entriesNoSituation } from 'core/analyser/test-data/no-situation';
 import { entriesOutdated } from 'core/analyser/test-data/outdated';
 import { entriesPersistentHigh } from 'core/analyser/test-data/persistent-high';
 import { entriesRising } from 'core/analyser/test-data/rising';
-import { Alarm, Carbs, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
+import { Alarm, BasalInsulin, Carbs, DEFAULT_STATE, DeviceStatus, Insulin } from 'core/models/model';
 import 'mocha';
 import { activeProfile } from 'server/utils/test';
 import { generateUuid } from 'core/utils/id';
@@ -18,7 +18,7 @@ import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'core/analyser/t
 import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'core/analyser/test-data/bad-low-to-low';
 import { entriesHighFluctuations } from 'core/analyser/test-data/high-fluctuations';
 import { entriesLowFluctuations } from 'core/analyser/test-data/low-fluctuations';
-import { MIN_IN_MS } from 'core/calculations/calculations';
+import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -36,6 +36,13 @@ describe('utils/analyser', () => {
     geolocation: null,
   };
 
+  const basal: BasalInsulin = {
+    modelType: 'BasalInsulin',
+    modelUuid: generateUuid(),
+    amount: 24,
+    timestamp: currentTimestamp - HOUR_IN_MS * 3,
+  };
+
   // Assertions
   it('detects no situation', () => {
     assert.deepEqual(
@@ -47,6 +54,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       DEFAULT_STATE,
     );
@@ -71,6 +79,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatusBattery,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -89,6 +98,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -107,6 +117,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -125,6 +136,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -143,6 +155,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -161,6 +174,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -179,6 +193,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -197,6 +212,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -215,6 +231,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -233,6 +250,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -251,6 +269,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarmsWithInactiveBadHigh(currentTimestamp),
+        basal,
       ),
       DEFAULT_STATE,
     );
@@ -266,6 +285,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarmsWithInactiveBadLow(currentTimestamp),
+        basal,
       ),
       DEFAULT_STATE,
     );
@@ -281,6 +301,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -299,6 +320,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -317,6 +339,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       DEFAULT_STATE,
     );
@@ -332,6 +355,7 @@ describe('utils/analyser', () => {
         carbs,
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
@@ -350,11 +374,28 @@ describe('utils/analyser', () => {
         recentCarbs(currentTimestamp),
         deviceStatus,
         alarms,
+        basal,
       ),
       {
         ...DEFAULT_STATE,
         FALLING: false,
       },
+    );
+  });
+
+  it('does not detect overdue basal if there is no basal given', () => {
+    assert.deepEqual(
+      runAnalysis(
+        currentTimestamp,
+        activeProfile('day', currentTimestamp),
+        entriesNoSituation(currentTimestamp),
+        insulin,
+        carbs,
+        deviceStatus,
+        alarms,
+        undefined,
+      ),
+      DEFAULT_STATE,
     );
   });
 });

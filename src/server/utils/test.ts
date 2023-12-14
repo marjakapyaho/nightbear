@@ -127,6 +127,7 @@ export function activeProfile(profileName: string, timestamp: number, isEnabled:
       HIGH_LEVEL_BAD: 18,
       ALARM_RETRY: 2,
       HIGH_CORRECTION_SUPPRESSION_WINDOW: 135,
+      BASAL_TARGET_TIME: '09:00',
     },
     alarmSettings: {
       OUTDATED: {
@@ -168,6 +169,10 @@ export function activeProfile(profileName: string, timestamp: number, isEnabled:
       COMPRESSION_LOW: {
         escalationAfterMinutes: [10, 20, 20],
         snoozeMinutes: 60,
+      },
+      BASAL_OVERDUE: {
+        escalationAfterMinutes: [60, 60, 60],
+        snoozeMinutes: 30,
       },
     },
     pushoverLevels: [],
