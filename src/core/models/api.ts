@@ -22,7 +22,7 @@ export function createNodeContext(): Context {
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
   const log = createLogger();
   const config = {
-    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 60,
+    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // default to a pretty conservative 3 hours
   };
   log(`Starting Nightbear version ${getDeployedVersion()}`);
   log(`Loaded config is: ${map(config, (val, key) => [key, val].join('=')).join(', ')}`);
