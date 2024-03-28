@@ -3,7 +3,7 @@ import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
 import { createLogger, Logger } from 'core/utils/logging';
 import { readFileSync } from 'fs';
-import { isFinite } from 'lodash';
+import { isFinite, map } from 'lodash';
 import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
 
 export function createNodeContext(): Context {
@@ -21,7 +21,11 @@ export function createNodeContext(): Context {
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
   const log = createLogger();
+  const config = {
+    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // default to a pretty conservative 3 hours
+  };
   log(`Starting Nightbear version ${getDeployedVersion()}`);
+  log(`Loaded config is: ${map(config, (val, key) => [key, val].join('=')).join(', ')}`);
   return {
     httpPort: 3000,
     timestamp: Date.now,
@@ -32,9 +36,7 @@ export function createNodeContext(): Context {
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
         ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)
         : NO_DEXCOM_SHARE,
-    config: {
-      DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 60,
-    },
+    config,
   };
 }
 
