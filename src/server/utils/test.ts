@@ -64,6 +64,9 @@ export function createTestContext(storage = NO_STORAGE, timestamp = () => 150867
     storage,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,
+    config: {
+      DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: 60,
+    },
   };
 }
 
