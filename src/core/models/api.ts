@@ -83,7 +83,7 @@ export function createResponse(responseBody: object | string = ''): Response {
 
 export function getDeployedVersion() {
   try {
-    return readFileSync('.nightbear-deploy-version');
+    return readFileSync('.nightbear-deploy-version').toString().trim();
   } catch (err) {
     return '(local dev)';
   }
