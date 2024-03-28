@@ -2,8 +2,9 @@ import { createPushoverClient, PushoverClient } from 'core/alarms/pushover-clien
 import { createCouchDbStorage } from 'core/storage/couchDbStorage';
 import { Storage } from 'core/storage/storage';
 import { createLogger, Logger } from 'core/utils/logging';
-import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
 import { readFileSync } from 'fs';
+import { isFinite } from 'lodash';
+import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'server/share/dexcom-share-client';
 
 export function createNodeContext(): Context {
   const {
@@ -13,6 +14,7 @@ export function createNodeContext(): Context {
     PUSHOVER_CALLBACK,
     DEXCOM_SHARE_USERNAME,
     DEXCOM_SHARE_PASSWORD,
+    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
   } = process.env;
   if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
@@ -30,6 +32,9 @@ export function createNodeContext(): Context {
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
         ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)
         : NO_DEXCOM_SHARE,
+    config: {
+      DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 60,
+    },
   };
 }
 
@@ -60,6 +65,9 @@ export interface Context {
   storage: Storage;
   pushover: PushoverClient;
   dexcomShare: DexcomShareClient;
+  config: {
+    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: number;
+  };
 }
 
 export type RequestHandler = (request: Request, context: Context) => Response;
@@ -77,4 +85,9 @@ export function getDeployedVersion() {
   } catch (err) {
     return '(local dev)';
   }
+}
+
+function parseNumber(num?: string) {
+  const parsed = parseInt(String(num));
+  return isFinite(parsed) ? parsed : undefined;
 }

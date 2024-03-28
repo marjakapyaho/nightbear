@@ -1,17 +1,18 @@
-import { HOUR_IN_MS, MIN_IN_MS } from 'core/calculations/calculations';
+import { MIN_IN_MS } from 'core/calculations/calculations';
 import { Context } from 'core/models/api';
-import { DexcomG6ShareEntry, CronjobsJournal } from 'core/models/model';
-import { first, isArray } from 'lodash';
-import { parseDexcomG6ShareEntryFromRequest } from 'server/share/dexcom-share-utils';
-import { Cronjob } from 'server/main/cronjobs';
+import { CronjobsJournal, DexcomG6ShareEntry } from 'core/models/model';
 import { humanReadableLongTime } from 'core/utils/time';
+import { first, isArray } from 'lodash';
+import { Cronjob } from 'server/main/cronjobs';
 import { DexcomShareBgResponse } from 'server/share/dexcom-share-client';
+import { parseDexcomG6ShareEntryFromRequest } from 'server/share/dexcom-share-utils';
 
 export const dexcomShare: Cronjob = (context, journal) => {
-  const { log, dexcomShare, storage } = context;
+  const { log, dexcomShare, storage, config } = context;
   const { dexcomShareSessionId, dexcomShareLoginAttemptTimestamp } = journal;
+  const mins = config.DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES;
   const loginAttemptAllowed =
-    !dexcomShareLoginAttemptTimestamp || Date.now() - dexcomShareLoginAttemptTimestamp > HOUR_IN_MS;
+    !dexcomShareLoginAttemptTimestamp || Date.now() - dexcomShareLoginAttemptTimestamp > MIN_IN_MS * mins;
   return Promise.resolve().then(() => {
     if (dexcomShareSessionId) {
       return Promise.resolve()
@@ -57,7 +58,7 @@ export const dexcomShare: Cronjob = (context, journal) => {
         const readableTime = dexcomShareLoginAttemptTimestamp
           ? humanReadableLongTime(dexcomShareLoginAttemptTimestamp)
           : 'n/a';
-        log(`No session, will NOT attempt login, last attempt was at ${readableTime}, too soon`);
+        log(`No session, will NOT attempt login, last attempt was at ${readableTime}, too soon (under ${mins} min)`);
       }
     }
   });
