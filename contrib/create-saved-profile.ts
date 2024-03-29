@@ -1,6 +1,6 @@
-import { SavedProfile } from 'core/models/model';
-import { generateUuid } from 'core/utils/id';
-import { createCouchDbStorage } from 'core/storage/couchDbStorage';
+import { SavedProfile } from 'shared/models/model';
+import { generateUuid } from 'shared/utils/id';
+import { createCouchDbStorage } from 'shared/storage/couchDbStorage';
 
 const storage = createCouchDbStorage(process.env.NIGHTBEAR_DB_URL || '');
 

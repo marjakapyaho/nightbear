@@ -1,5 +1,5 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'core/calculations/calculations';
+import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'shared/calculations/calculations';
 import {
   Alarm,
   Carbs,
@@ -13,14 +13,14 @@ import {
   Model,
   ParakeetSensorEntry,
   SavedProfile,
-} from 'core/models/model';
-import { first, is } from 'core/models/utils';
-import { createCouchDbStorage, getModelRef } from 'core/storage/couchDbStorage';
-import { generateUuid } from 'core/utils/id';
-import PouchDB from 'core/storage/PouchDb';
+} from 'shared/models/model';
+import { first, is } from 'shared/models/utils';
+import { createCouchDbStorage, getModelRef } from 'shared/storage/couchDbStorage';
+import { generateUuid } from 'shared/utils/id';
+import PouchDB from 'shared/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
-import { CAL_PAIRING } from 'server/api/uploadDexcomEntry/uploadDexcomEntry';
-import { isNotNull } from 'server/utils/types';
+import { CAL_PAIRING } from 'backend/api/uploadDexcomEntry/uploadDexcomEntry';
+import { isNotNull } from 'backend/utils/types';
 import { inspect } from 'util';
 
 const BATCH_SIZE = 500; // @50 ~200000 docs takes ~30 min, @500 ~7 min

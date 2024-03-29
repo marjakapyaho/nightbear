@@ -1,0 +1,60 @@
+.config {
+  padding: 30px;
+
+  .profilesHeading {
+    font-size: 16px;
+  }
+
+  .profile {
+    padding: 20px;
+    background: whitesmoke;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #eeeeee;
+
+    &.active {
+      background: #7a7a7a;
+      color: whitesmoke;
+      border: 1px solid #7a7a7a;
+    }
+
+    .activates {
+      flex: 1;
+      text-align: right;
+      font-size: 13px;
+    }
+  }
+
+  .buttonWrapper {
+    position: absolute;
+    bottom: 40px;
+    left: 30px;
+    right: 30px;
+
+    .button {
+      border: 1px solid rgb(239 211 75);
+      background: #ffe358;
+      color: #887f59;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 20px;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+
+      &.success {
+        border: 1px solid #91b85c;
+        background: #91b85c;
+        color: white;
+      }
+    }
+  }
+}
+
+
+
+
+

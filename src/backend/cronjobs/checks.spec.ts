@@ -1,0 +1,128 @@
+import { MIN_IN_MS } from 'shared/calculations/calculations';
+import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'shared/models/model';
+import 'mocha';
+import {
+  activeProfile,
+  assertEqualWithoutMeta,
+  createTestContext,
+  withStorage,
+  eraseModelUuid,
+} from 'backend/utils/test';
+import { generateUuid } from 'shared/utils/id';
+import { checks, ALARM_FETCH_RANGE } from 'backend/cronjobs/checks';
+import { getDefaultJournalContent } from 'backend/main/cronjobs';
+
+describe('server/main/check-runner', () => {
+  const timestampNow = 1508672249758;
+
+  // Mock models
+  const mockDexcomCalibration: DexcomCalibration = {
+    modelType: 'DexcomCalibration',
+    modelUuid: generateUuid(),
+    timestamp: timestampNow - 20 * MIN_IN_MS,
+    meterEntries: [],
+    isInitialCalibration: false,
+    slope: 828.3002146147081,
+    intercept: 30000,
+    scale: 0.9980735302684531,
+  };
+
+  const mockDexcomSensorEntry: DexcomSensorEntry = {
+    modelType: 'DexcomSensorEntry',
+    modelUuid: generateUuid(),
+    timestamp: timestampNow - 3 * MIN_IN_MS,
+    bloodGlucose: 16,
+    signalStrength: 168,
+    noiseLevel: 1,
+  };
+
+  const mockDeviceStatus: DeviceStatus = {
+    modelType: 'DeviceStatus',
+    modelUuid: generateUuid(),
+    deviceName: 'dexcom-uploader',
+    timestamp: timestampNow - 10 * MIN_IN_MS,
+    batteryLevel: 5,
+    geolocation: null,
+  };
+
+  const alarmsArrayWithHigh: Alarm[] = [
+    {
+      modelType: 'Alarm',
+      modelUuid: generateUuid(),
+      timestamp: timestampNow,
+      situationType: 'HIGH',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
+    },
+  ];
+
+  const alarmsArrayWithHighAndBattery: Alarm[] = [
+    {
+      modelType: 'Alarm',
+      modelUuid: generateUuid(),
+      timestamp: timestampNow,
+      situationType: 'HIGH',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+        {
+          alarmLevel: 2,
+          validAfterTimestamp: timestampNow,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
+    },
+    {
+      modelType: 'Alarm',
+      modelUuid: generateUuid(),
+      timestamp: timestampNow + 15 * MIN_IN_MS,
+      situationType: 'BATTERY',
+      isActive: true,
+      deactivationTimestamp: null,
+      alarmStates: [
+        {
+          alarmLevel: 1,
+          validAfterTimestamp: timestampNow + 15 * MIN_IN_MS,
+          ackedBy: null,
+          pushoverReceipts: [],
+        },
+      ],
+    },
+  ];
+
+  withStorage(createTestStorage => {
+    it('checks', () => {
+      let timestamp = timestampNow;
+      const context = createTestContext(createTestStorage(), () => timestamp);
+      return Promise.resolve()
+        .then(() => context.storage.saveModel(activeProfile('day', timestamp)))
+        .then(() => context.storage.saveModel(mockDexcomCalibration))
+        .then(() => context.storage.saveModel(mockDexcomSensorEntry))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
+        .then(alarms => assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHigh.map(eraseModelUuid)))
+        .then(() => context.storage.saveModel(mockDeviceStatus))
+        .then(() => (timestamp += 15 * MIN_IN_MS))
+        .then(() => checks(context, getDefaultJournalContent()))
+        .then(() => context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()))
+        .then(alarms =>
+          assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHighAndBattery.map(eraseModelUuid)),
+        );
+    });
+  });
+});

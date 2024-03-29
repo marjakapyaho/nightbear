@@ -20,7 +20,9 @@
     "noEmit": true,
     "jsx": "react",
     "downlevelIteration": true,
-    "typeRoots": ["src/core/types"]
+    "typeRoots": [
+      "src/shared/types"
+    ]
   },
   "include": [
     "src"

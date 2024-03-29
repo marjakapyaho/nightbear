@@ -1,0 +1,42 @@
+import { runAlarmChecks } from 'shared/alarms/alarms';
+import { runAnalysis } from 'shared/analyser/analyser';
+import { HOUR_IN_MS } from 'shared/calculations/calculations';
+import { getMergedEntriesFeed } from 'shared/entries/entries';
+import { first, map, identity } from 'lodash';
+import { onlyActive } from 'backend/utils/data';
+import { Cronjob } from 'backend/main/cronjobs';
+
+export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
+export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
+
+export const checks: Cronjob = (context, _journal) => {
+  const { log } = context;
+  log('--- Started checks ---');
+  return Promise.all([
+    context.storage.loadLatestTimelineModels('ActiveProfile', 1),
+    getMergedEntriesFeed(context, ANALYSIS_RANGE),
+    context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
+    context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
+    context.storage.loadLatestTimelineModels('DeviceStatus', 1),
+    context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),
+  ]).then(([latestActiveProfile, sensorEntries, insulin, carbs, latestDeviceStatus, alarms]) => {
+    const activeProfile = first(latestActiveProfile);
+    const deviceStatus = first(latestDeviceStatus);
+
+    if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
+
+    log(`1. Using profile: ${activeProfile?.profileName}`);
+    const state = runAnalysis(context.timestamp(), activeProfile, sensorEntries, insulin, carbs, deviceStatus, alarms);
+
+    const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
+    log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
+
+    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {
+      log(
+        `There were changes in ${alarms.length} alarms with types: ${alarms
+          .map(alarm => alarm.situationType)
+          .join(', ')}`,
+      );
+    });
+  });
+};
