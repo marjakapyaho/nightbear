@@ -1,4 +1,4 @@
-import { DAY_IN_MS, HOUR_IN_MS } from 'shared/calculations/calculations';
+import { DAY_IN_MS } from 'shared/calculations/calculations';
 import { isSameModel } from 'shared/models/utils';
 import { assertExhausted } from 'backend/utils/types';
 import { actions, ReduxAction } from 'frontend/data/actions';
@@ -19,21 +19,12 @@ export function navigationReducer(
   switch (action.type) {
     case actions.UI_NAVIGATED.type:
       switch (action.newScreen) {
-        case 'BgGraphScreen':
+        case 'BgGraph':
           return getNavigationInitState();
-        case 'TimelineDebugScreen':
+        case 'Stats':
           return {
             ...state,
-            selectedScreen: 'TimelineDebugScreen',
-            selectedModelTypes: [],
-            timelineRange: 12 * HOUR_IN_MS,
-            timelineRangeEnd: Date.now(),
-            modelUuidBeingEdited: null,
-          };
-        case 'StatsScreen':
-          return {
-            ...state,
-            selectedScreen: 'StatsScreen',
+            selectedScreen: 'Stats',
             selectedModelTypes: TIMELINE_MODEL_TYPES,
             timelineRange: 7 * DAY_IN_MS,
             timelineRangeEnd: Date.now(),
@@ -55,7 +46,7 @@ export function navigationReducer(
         timelineRangeEnd: rangeEnd,
       };
     case actions.MODEL_SELECTED_FOR_EDITING.type:
-      if (state.selectedScreen !== 'BgGraphScreen') return state; // not in a relevant screen -> ignore
+      if (state.selectedScreen !== 'BgGraph') return state; // not in a relevant screen -> ignore
       let modelUuidBeingEdited = null;
       if (action.model && !isSameModel(getModelByUuid(rootState.data, state.modelUuidBeingEdited), action.model)) {
         modelUuidBeingEdited = action.model.modelUuid;
@@ -66,21 +57,21 @@ export function navigationReducer(
         timelineCursorAt: null, // clear a possible previous cursor when starting edit
       };
     case actions.TIMELINE_CURSOR_UPDATED.type:
-      if (state.selectedScreen !== 'BgGraphScreen') return state; // not in a relevant screen -> ignore
+      if (state.selectedScreen !== 'BgGraph') return state; // not in a relevant screen -> ignore
       return {
         ...state,
         modelUuidBeingEdited: null, // clear a possible previous edit when placing cursor
         timelineCursorAt: state.modelUuidBeingEdited ? null : action.timestamp, // if we were just editing a Model, clear the cursor instead of setting it
       };
     case actions.MODEL_UPDATED_BY_USER.type:
-      if (state.selectedScreen !== 'BgGraphScreen') return state; // not in a relevant screen -> ignore
+      if (state.selectedScreen !== 'BgGraph') return state; // not in a relevant screen -> ignore
       return {
         ...state,
         modelUuidBeingEdited: action.model.modelUuid, // keep whatever we just edited selected for further edits
         timelineCursorAt: null, // clear the cursor if it existed (as it does before creating a new model)
       };
     case actions.MODEL_DELETED_BY_USER.type:
-      if (state.selectedScreen !== 'BgGraphScreen') return state; // not in a relevant screen -> ignore
+      if (state.selectedScreen !== 'BgGraph') return state; // not in a relevant screen -> ignore
       return {
         ...state,
         modelUuidBeingEdited: null,

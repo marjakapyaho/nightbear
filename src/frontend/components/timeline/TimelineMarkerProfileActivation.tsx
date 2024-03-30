@@ -1,32 +1,20 @@
 import { ActiveProfile } from 'shared/models/model';
-import { css, cx } from '@emotion/css';
 import React from 'react';
-import { ExtendedTimelineConfig, markerStyles, tsToLeft } from 'frontend/components/timeline/utils';
-import { borderColor } from 'frontend/utils/colors';
+import { ExtendedTimelineConfig, tsToLeft } from 'frontend/components/timeline/timelineUtils';
+import styles from './Timeline.module.scss';
 
 type Props = {
   timelineConfig: ExtendedTimelineConfig;
   model: ActiveProfile;
 };
 
-const styles = {
-  ...markerStyles,
-  verticalLine: cx(
-    markerStyles.verticalLine,
-    css({
-      width: 0,
-      borderLeft: `3px dotted ${borderColor}`,
-    }),
-  ),
-};
-
-export default (props => {
+export const TimelineMarkerProfileActivation = ({ timelineConfig, model }: Props) => {
   return (
-    <div className={styles.root} style={{ left: tsToLeft(props.timelineConfig, props.model.timestamp) }}>
-      <div className={styles.verticalLine} />
+    <div className={styles.timelineMarker} style={{ left: tsToLeft(timelineConfig, model.timestamp) }}>
+      <div className={`${styles.verticalLine} ${styles.profile}`} />
       <div className={styles.centeringWrapper}>
-        <span className={styles.textLabel}>{props.model.profileName.toUpperCase()}</span>
+        <span className={styles.textLabel}>{model.profileName.toUpperCase()}</span>
       </div>
     </div>
   );
-}) as React.FC<Props>;
+};

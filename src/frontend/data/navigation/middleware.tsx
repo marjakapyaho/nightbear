@@ -12,7 +12,7 @@ export const navigationMiddleware: ReduxMiddleware = store => {
     const observer = createChangeObserver(store, next);
     observer.add(
       ({ navigation, data }) => {
-        if (navigation.selectedScreen !== 'BgGraphScreen') return undefined;
+        if (navigation.selectedScreen !== 'BgGraph') return undefined;
         return [
           navigation.timelineCursorAt, // cursor position changes reset the timer
           getModelByUuid(data, navigation.modelUuidBeingEdited), // changes in model being edited reset the timer
@@ -29,7 +29,7 @@ export const navigationMiddleware: ReduxMiddleware = store => {
   function updateTimelineRangeEnd() {
     const state = store.getState();
     if (!state.config.autoRefreshData) return;
-    if (state.navigation.selectedScreen !== 'BgGraphScreen') return;
+    if (state.navigation.selectedScreen !== 'BgGraph') return;
     store.dispatch(
       actions.TIMELINE_FILTERS_CHANGED(
         state.navigation.timelineRange,

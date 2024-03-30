@@ -24,7 +24,7 @@ export type NavigationState = Readonly<
       selectedScreen: 'Config';
     }
   | {
-      selectedScreen: 'BgGraphScreen';
+      selectedScreen: 'BgGraph';
       timelineRange: number;
       timelineRangeEnd: number;
       selectedModelTypes: TimelineModelType[];
@@ -32,14 +32,7 @@ export type NavigationState = Readonly<
       timelineCursorAt: number | null;
     }
   | {
-      selectedScreen: 'TimelineDebugScreen';
-      timelineRange: number;
-      timelineRangeEnd: number;
-      selectedModelTypes: TimelineModelType[];
-      modelUuidBeingEdited: string | null;
-    }
-  | {
-      selectedScreen: 'StatsScreen';
+      selectedScreen: 'Stats';
       timelineRange: number;
       timelineRangeEnd: number;
       selectedModelTypes: TimelineModelType[];
@@ -50,7 +43,7 @@ export const navigationInitState: NavigationState = getNavigationInitState();
 
 export function getNavigationInitState() {
   return {
-    selectedScreen: 'BgGraphScreen' as const,
+    selectedScreen: 'BgGraph' as const,
     timelineRange: 28 * HOUR_IN_MS,
     timelineRangeEnd: Date.now(), // TODO: Having the initial state depend on Date.now() is slightly unorthodox; figure out a better way when we have more time
     selectedModelTypes: TIMELINE_MODEL_TYPES,

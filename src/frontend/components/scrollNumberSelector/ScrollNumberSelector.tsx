@@ -2,7 +2,7 @@ import { range } from 'lodash';
 import React from 'react';
 import { useEffect, useRef } from 'react';
 import scrollIntoView from 'scroll-into-view';
-import 'frontend/components/scrollNumberSelector/ScrollNumberSelector.scss';
+import styles from './ScrollNumberSelector.module.scss';
 
 type Props = {
   value?: number;
@@ -15,7 +15,7 @@ type Props = {
   color: string;
 };
 
-export default (props => {
+export const ScrollNumberSelector = ({ value, onChange, min, max, step, centerOn, decimals, color }: Props) => {
   const selectedEl = useRef<HTMLDivElement | null>(null);
   const animSpeed = useRef(0); // for the first render, scroll instantly, and only after, start the smooth behaviour
   useEffect(() => {
@@ -26,22 +26,22 @@ export default (props => {
     // So let's just give up and do it in JS ¯\_(ツ)_/¯
     scrollIntoView(selectedEl.current, { time: animSpeed.current });
     if (!animSpeed.current) animSpeed.current = 250;
-  }, [props.value]); // note that even though we actually use selectedEl in this effect, it's mutable -> can't use with useEffect(); but props.value is a good enough proxy!
+  }, [value]); // note that even though we actually use selectedEl in this effect, it's mutable -> can't use with useEffect(); but value is a good enough proxy!
 
-  const options = range(props.min, props.max + props.step, props.step);
+  const options = range(min, max + step, step);
 
   return (
-    <div className="nb-ScrollNumberSelector" style={{ background: props.color }}>
+    <div className={styles.nbScrollNumberSelector} style={{ background: color }}>
       {options.map((val, i) => (
         <div
           key={i}
-          style={{ background: props.value === val ? 'white' : '', color: props.value === val ? props.color : '' }}
-          ref={val === props.value || (props.value === undefined && val === props.centerOn) ? selectedEl : null}
-          onClick={() => props.onChange(val)}
+          style={{ background: value === val ? 'white' : '', color: value === val ? color : '' }}
+          ref={val === value || (value === undefined && val === centerOn) ? selectedEl : null}
+          onClick={() => onChange(val)}
         >
-          {val.toFixed(props.decimals)}
+          {val.toFixed(decimals)}
         </div>
       ))}
     </div>
   );
-}) as React.FC<Props>;
+};

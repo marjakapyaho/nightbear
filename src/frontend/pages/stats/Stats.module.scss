@@ -1,0 +1,68 @@
+$nbHigh: #f8cc6f;
+$nbLow: #ee5a36;
+$nbGood: #54c87e;
+
+.stats {
+  overflow-y: scroll;
+
+  .statLine {
+    padding: 30px;
+    border-bottom: 8px solid #eee;
+    align-items: center;
+    display: flex;
+
+    .title {
+      display: block;
+      font-size: 18px;
+    }
+
+    .subTitle {
+      display: block;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .figure {
+      font-size: 50px;
+      margin-left: 25px;
+      margin-right: 50px;
+    }
+  }
+
+  .statBalls {
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+
+    .stat {
+      background: whitesmoke;
+      border-radius: 100%;
+      width: 90px;
+      height: 90px;
+      text-align: center;
+      padding-top: 14px;
+      font-size: 8px;
+      text-transform: uppercase;
+      color: white;
+
+      &.good {
+        background: $nbGood;
+      }
+
+      &.high {
+        background: $nbHigh;
+      }
+
+      &.low {
+        background: $nbLow;
+      }
+
+      .statStrong {
+        display: block;
+        margin-top: 10px;
+        font-size: 24px;
+        text-transform: none;
+      }
+    }
+  }
+}

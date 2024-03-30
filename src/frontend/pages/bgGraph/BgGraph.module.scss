@@ -1,22 +1,21 @@
-.nb-BgGraphScreen {
+.bgGraph {
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  &-top {
-    > *,
-    > .nb-BgGraph {
+  .bgGraphTop {
+    > * {
       height: 100%;
     }
   }
 
-  &-bottom {
+  .graphBottom {
     flex: 1;
     display: flex;
     flex-direction: row;
     height: 0; // the bottom panel needs a height so its children can overflow-scroll normally
 
-    > .nb-ScrollNumberSelector {
+    > div {
       flex: 1;
     }
   }
