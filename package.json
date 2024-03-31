@@ -33,9 +33,12 @@
     "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/",
     "\n==================== UTILS ====================": "",
     "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'",
-    "migrate": "node-pg-migrate --database-url-var DATABASE_URL --migrations-table migrations --migration-file-language sql --migrations-dir src/backend/migrations"
+    "migrate": "node-pg-migrate --database-url-var DATABASE_URL --migrations-table migrations --migration-file-language sql --migrations-dir src/backend/migrations",
+    "generate": "pgtyped -c pgtyped-config.json"
   },
   "dependencies": {
+    "@pgtyped/cli": "2.3.0",
+    "@pgtyped/runtime": "2.3.0",
     "@tanstack/react-query": "^5.28.9",
     "@testing-library/jest-dom": "6.1.5",
     "@testing-library/react": "14.1.2",
@@ -70,6 +73,7 @@
     "luxon": "1.28.1",
     "mocha": "10.2.0",
     "node-pg-migrate": "6.2.2",
+    "pg": "8.11.4",
     "pouchdb": "8.0.1",
     "pouchdb-adapter-memory": "8.0.1",
     "pouchdb-find": "8.0.1",
