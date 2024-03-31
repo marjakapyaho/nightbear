@@ -1,4 +1,5 @@
 import * as bloodGlucoseEntries from 'backend/features/bloodGlucoseEntries/db.queries';
+import * as cronjobsJournal from 'backend/features/cronjobsJournal/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -7,6 +8,7 @@ import { Client, Pool, types } from 'pg';
  */
 const dbModules = {
   bloodGlucoseEntries,
+  cronjobsJournal,
 };
 
 /**
