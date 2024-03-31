@@ -1,14 +1,16 @@
+import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'backend/share/dexcom-share-client';
+import { createDbClient, DbClient } from 'backend/utils/db';
+import { readFileSync } from 'fs';
+import { isFinite, map } from 'lodash';
 import { createPushoverClient, PushoverClient } from 'shared/alarms/pushover-client';
 import { createCouchDbStorage } from 'shared/storage/couchDbStorage';
 import { Storage } from 'shared/storage/storage';
 import { createLogger, Logger } from 'shared/utils/logging';
-import { readFileSync } from 'fs';
-import { isFinite, map } from 'lodash';
-import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'backend/share/dexcom-share-client';
 
 export function createNodeContext(): Context {
   const {
     NIGHTBEAR_DB_URL,
+    DATABASE_URL,
     PUSHOVER_USER,
     PUSHOVER_TOKEN,
     PUSHOVER_CALLBACK,
@@ -17,6 +19,7 @@ export function createNodeContext(): Context {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
   } = process.env;
   if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
+  if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
@@ -31,6 +34,7 @@ export function createNodeContext(): Context {
     timestamp: Date.now,
     log,
     storage: createCouchDbStorage(NIGHTBEAR_DB_URL),
+    db: createDbClient(DATABASE_URL),
     pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
     dexcomShare:
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
@@ -65,6 +69,7 @@ export interface Context {
   timestamp: () => number;
   log: Logger;
   storage: Storage;
+  db: DbClient;
   pushover: PushoverClient;
   dexcomShare: DexcomShareClient;
   config: {

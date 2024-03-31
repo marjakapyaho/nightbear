@@ -14,10 +14,12 @@ const dbModules = {
  */
 types.setTypeParser(types.builtins.NUMERIC, value => parseFloat(value));
 
+export type DbClient = ReturnType<typeof createDbClient>;
+
 /**
  * Creates a Postgres wrapper for talking to the database.
  */
-export function createDb(connectionString: string) {
+export function createDbClient(connectionString: string) {
   return wrapQueries(dbModules, new Pool({ connectionString }));
 }
 

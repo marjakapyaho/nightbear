@@ -1,15 +1,15 @@
-import { createDb } from 'backend/utils/db';
+import { createTestContext } from 'backend/utils/test';
 import { assert } from 'chai';
 import _ from 'lodash';
 import 'mocha';
 import { UUID_REGEX } from 'shared/utils/id';
 
 describe('features/bloodGlucoseEntries/db', () => {
-  const db = createDb(String(process.env.DATABASE_URL));
+  const context = createTestContext();
 
   describe('insert', () => {
     it('works', async () => {
-      const res = await db.bloodGlucoseEntries.create({
+      const res = await context.db.bloodGlucoseEntries.create({
         type: 'MANUAL',
         bloodGlucose: 11.1,
       });

@@ -1,12 +1,13 @@
+import { NO_DEXCOM_SHARE } from 'backend/share/dexcom-share-client';
+import { createDbClient } from 'backend/utils/db';
+import 'mocha';
 import { NO_PUSHOVER } from 'shared/alarms/pushoverClient';
+import PouchDB from 'shared/storage/PouchDb';
 import { Context, Request } from 'shared/storage/api';
 import { createCouchDbStorage } from 'shared/storage/couchDbStorage';
-import PouchDB from 'shared/storage/PouchDb';
 import { NO_STORAGE, Storage } from 'shared/storage/storage';
 import { generateUuid } from 'shared/utils/id';
 import { NO_LOGGING } from 'shared/utils/logging';
-import 'mocha';
-import { NO_DEXCOM_SHARE } from 'backend/share/dexcom-share-client';
 
 export type TestSuite = (storage: () => Storage) => void;
 
@@ -55,11 +56,15 @@ export function createTestRequest(): Request {
 }
 
 export function createTestContext(storage = NO_STORAGE, timestamp = () => 1508672249758): Context {
+  const { DATABASE_URL } = process.env;
+  if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
+  if (!DATABASE_URL.match('test')) throw new Error(`DATABASE_URL being used in tests doesn't look like a test URL`);
   return {
     httpPort: 80,
     timestamp,
     log: NO_LOGGING,
     storage,
+    db: createDbClient(DATABASE_URL),
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,
     config: {
