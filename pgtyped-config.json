@@ -7,5 +7,8 @@
     }
   ],
   "srcDir": "./src/backend/features",
-  "camelCaseColumnNames": true
+  "camelCaseColumnNames": true,
+  "typesOverrides": {
+    "numeric": "number"
+  }
 }
