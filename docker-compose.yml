@@ -1,0 +1,14 @@
+version: '3'
+services:
+  nightbear_test_db:
+    image: postgres:16
+    container_name: nightbear-test-db
+    restart: always
+    environment:
+      - POSTGRES_USER=nightbear
+      - POSTGRES_DB=nightbear_test
+      - POSTGRES_PASSWORD=nightbear
+    ports:
+      - '15432:5432'
+    volumes:
+      - .:/app # this lets us exchange data easily with COPY

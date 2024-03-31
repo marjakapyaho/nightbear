@@ -32,7 +32,8 @@
     "web-build": "npm run lint-node && react-scripts build",
     "web-deploy": "npm run web-build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/",
     "\n==================== UTILS ====================": "",
-    "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
+    "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'",
+    "migrate": "node-pg-migrate --database-url-var DATABASE_URL --migrations-table migrations --migration-file-language sql --migrations-dir src/backend/migrations"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.28.9",
@@ -68,6 +69,7 @@
     "lodash": "4.17.21",
     "luxon": "1.28.1",
     "mocha": "10.2.0",
+    "node-pg-migrate": "6.2.2",
     "pouchdb": "8.0.1",
     "pouchdb-adapter-memory": "8.0.1",
     "pouchdb-find": "8.0.1",
