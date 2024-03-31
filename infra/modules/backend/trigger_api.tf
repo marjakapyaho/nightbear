@@ -11,7 +11,7 @@ resource "aws_apigatewayv2_stage" "this" {
   auto_deploy = true
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.lambda_api.arn
+    destination_arn = aws_cloudwatch_log_group.api.arn
 
     format = jsonencode({
       requestId               = "$context.requestId"
@@ -44,7 +44,7 @@ resource "aws_apigatewayv2_route" "this" {
 }
 
 # Allow API Gateway to invoke our Lambda function
-resource "aws_lambda_permission" "this" {
+resource "aws_lambda_permission" "api" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this.function_name
   principal     = "apigateway.amazonaws.com"
