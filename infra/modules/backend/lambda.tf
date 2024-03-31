@@ -1,5 +1,5 @@
 # IAM role that allows Lambda to access resources in our AWS account
-resource "aws_iam_role" "lambda" {
+resource "aws_iam_role" "this" {
   name = "${var.name_prefix}-lambda"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_role" "lambda" {
 
 # AWS managed policy which provides write permissions to CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "lambda_exec" {
-  role       = aws_iam_role.lambda.name
+  role       = aws_iam_role.this.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -32,19 +32,19 @@ data "aws_security_group" "default" {
 
 # Provides minimum permissions for a Lambda function to execute while accessing a resource within a VPC
 resource "aws_iam_role_policy_attachment" "lambda_vpc" {
-  role       = aws_iam_role.lambda.name
+  role       = aws_iam_role.this.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 # Creates our actual function
-resource "aws_lambda_function" "lambda" {
+resource "aws_lambda_function" "this" {
   function_name    = var.name_prefix
-  s3_bucket        = aws_s3_bucket.lambda.id
-  s3_key           = aws_s3_object.lambda.key
+  s3_bucket        = aws_s3_bucket.this.id
+  s3_key           = aws_s3_object.this.key
   runtime          = "nodejs20.x"
   handler          = "${local.file}.handler"
-  source_code_hash = data.archive_file.lambda.output_base64sha256
-  role             = aws_iam_role.lambda.arn
+  source_code_hash = data.archive_file.this.output_base64sha256
+  role             = aws_iam_role.this.arn
 
   vpc_config {
     security_group_ids = [data.aws_security_group.default.id]
@@ -52,8 +52,8 @@ resource "aws_lambda_function" "lambda" {
   }
 }
 
-# Create a group for logs
-resource "aws_cloudwatch_log_group" "lambda" {
-  name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
+# Adjust log retention (the group will be created regardless)
+resource "aws_cloudwatch_log_group" "function" {
+  name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
   retention_in_days = 7
 }
