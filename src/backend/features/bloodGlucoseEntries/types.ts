@@ -1,3 +1,3 @@
-import { IGetBloodGlucoseEntriesResult } from 'backend/features/bloodGlucoseEntries/db.queries';
+import { ICreateResult } from 'backend/features/bloodGlucoseEntries/db.queries';
 
-export type BloodGlucoseEntry = IGetBloodGlucoseEntriesResult;
+export type BloodGlucoseEntry = ICreateResult;

@@ -10,14 +10,14 @@ describe('features/bloodGlucoseEntries/db', () => {
   describe('insert', () => {
     it('works', async () => {
       const res = await db.bloodGlucoseEntries.create({
-        type: 'From test',
+        type: 'MANUAL',
         bloodGlucose: 11.1,
       });
 
       assert.equal(res.length, 1);
       assert.match(res[0].id, UUID_REGEX);
       assert.isTrue(_.isDate(res[0].timestamp));
-      assert.equal(res[0].type, 'From test');
+      assert.equal(res[0].type, 'MANUAL');
       assert.equal(res[0].bloodGlucose, 11.1);
     });
   });

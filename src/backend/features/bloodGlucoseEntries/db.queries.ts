@@ -1,10 +1,12 @@
 /** Types generated for queries found in "src/backend/features/bloodGlucoseEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
+export type blood_glucose_entry_type = 'DEXCOM_G6_SHARE' | 'MANUAL';
+
 /** 'Create' parameters type */
 export interface ICreateParams {
   bloodGlucose: number;
-  type: string;
+  type: blood_glucose_entry_type;
 }
 
 /** 'Create' return type */
@@ -12,7 +14,7 @@ export interface ICreateResult {
   bloodGlucose: number;
   id: string;
   timestamp: Date;
-  type: string;
+  type: blood_glucose_entry_type;
 }
 
 /** 'Create' query type */
