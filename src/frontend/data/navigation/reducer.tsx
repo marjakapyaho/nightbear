@@ -26,7 +26,7 @@ export function navigationReducer(
             ...state,
             selectedScreen: 'Stats',
             selectedModelTypes: TIMELINE_MODEL_TYPES,
-            timelineRange: 7 * DAY_IN_MS,
+            timelineRange: 30 * DAY_IN_MS,
             timelineRangeEnd: Date.now(),
           };
         case 'Config':

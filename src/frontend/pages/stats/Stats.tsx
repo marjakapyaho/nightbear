@@ -32,7 +32,7 @@ export const Stats = () => {
   const timeHigh = calculateTimeHigh(bgModels) || '';
   const hba1c = setOneDecimal(calculateHba1c(bgModels)) || '';
 
-  const daysToShow = 30;
+  const daysToShow = 60;
   const dailyInsulins = calculateDailyAmounts(insulins, daysToShow).map(val => ({
     timestamp: val.timestamp,
     val: val.total,
@@ -66,7 +66,6 @@ export const Stats = () => {
       </div>
 
       <StatGraph label="Insulins" points={dailyInsulins} daysToShow={daysToShow} valMin={0} valMax={40} valStep={5} />
-
       <StatGraph label="Carbs" points={dailyCarbs} daysToShow={daysToShow} valMin={50} valMax={300} valStep={50} />
 
       <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgModels)} color={nbGood} />

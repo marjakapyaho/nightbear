@@ -8,11 +8,11 @@ type Props = {
   config: GraphConfig;
 };
 
-export const GraphVerticalScale = ({ config }: Props) => {
+export const GraphScaleVertical = ({ config }: Props) => {
   const graphLines = range(config.valMin, config.valMax + config.valStep, config.valStep);
 
   return (
-    <div className={styles.graphScale}>
+    <div className={styles.graphScaleVertical}>
       {config.showTarget && (
         <div
           className={styles.targetArea}
@@ -25,7 +25,7 @@ export const GraphVerticalScale = ({ config }: Props) => {
       )}
 
       <div
-        className={styles.bgAxis}
+        className={styles.verticalAxis}
         style={{
           bottom: config.paddingBottom,
           width: config.paddingRight,
@@ -34,7 +34,7 @@ export const GraphVerticalScale = ({ config }: Props) => {
         {graphLines.map(val => (
           <div
             key={val}
-            className={styles.bgLabel}
+            className={styles.valueLabel}
             style={{
               top: valToTop(config, val) - 4, // Number is dependent on font size and makes label placement nicer
               opacity: val % 2 === 0 ? 1 : 0,

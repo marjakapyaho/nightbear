@@ -18,7 +18,6 @@ import { createChangeObserver, ReduxDispatch, ReduxMiddleware } from 'frontend/u
 export const LOCAL_DB_NAME = 'nightbear_web_ui';
 export const LOCAL_DB_CHANGES_BUFFER = 500;
 export const DB_REPLICATION_BATCH_SIZE = 250;
-export const MODELS_FETCH_DEBOUNCE = 100;
 
 const LOCAL_REPLICATION_ENABLED = false;
 const LOCAL_REPLICATION_RANGE = 'month'; // one of [ 'year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond' ] (https://moment.github.io/luxon/docs/class/src/datetime.js~DateTime.html#instance-method-startOf)

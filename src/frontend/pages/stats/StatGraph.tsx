@@ -30,6 +30,7 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }
     showTarget: false,
     showCurrentValue: false,
     timeFormat: 'dd',
+    showEveryNthTimeLabel: 3,
   };
 
   return (

@@ -1,17 +1,40 @@
 .scrollableGraph {
   position: relative; // a lot of children are positioned according to this root element
-  overflow: hidden; // if anything pokes out; hide it; scrolling is implemented using a separate element
+  overflow: hidden; // if anything pokes out, hide it, scrolling is implemented using a separate element
 
-  .baseLayerCss {
+  .graphScaleVertical {
+    .targetArea {
+      position: absolute;
+      height: 74px;
+      background: #f3f9f2;
+      z-index: -1;
+    }
+
+    .verticalAxis {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      pointer-events: none;
+
+      .valueLabel {
+        position: absolute;
+        left: 0;
+        right: 0;
+        font-size: 10px;
+        color: #aaa;
+        text-align: right;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .scrollingLayer {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-  }
-
-  .scrollingLayerCss {
-    @extend .baseLayerCss;
     overflow-x: scroll;
     overflow-y: hidden;
 
@@ -20,137 +43,111 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .scrollingCutoffCss {
+  .scrollingCutoff {
     overflow: hidden;
     position: relative;
-  }
 
-  .svgCss {
-    position: relative;
-    display: block;
-    z-index: 10;
-  }
-
-  .latestVal {
-    position: absolute;
-    font-size: 20px;
-    z-index: 100;
-    pointer-events: none;
-  }
-}
-
-.graph {
-  stroke: #ccc;
-  stroke-width: 1;
-  fill: none;
-}
-
-.graphPoint {
-  stroke: white;
-  stroke-width: 1;
-}
-
-.graphScaleTime {
-  position: absolute;
-  border-left: 1px solid #eee;
-  top: 0;
-  display: flex;
-  align-items: flex-end; // i.e. bottom-align the text
-  pointer-events: none;
-  z-index: -1;
-  bottom: 30px;
-
-  .graphScaleHour {
-    position: absolute;
-    bottom: -30px;
-    padding-bottom: 7px;
-    padding-top: 4px;
-    background: white;
-    font-size: 14px;
-    color: #999;
-  }
-}
-
-.graphScale {
-  .targetArea {
-    position: absolute;
-    height: 74px;
-    background: #f3f9f2;
-    z-index: -1;
-  }
-
-  .bgAxis {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 10;
-    pointer-events: none;
-
-    .bgLabel {
+    .graphMarker {
       position: absolute;
-      left: 0;
-      right: 0;
-      font-size: 10px;
-      color: #aaa;
-      text-align: right;
+      top: 0;
+      bottom: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .verticalLine {
+        position: absolute;
+        top: 32px;
+        width: 1px;
+        bottom: 27px;
+        z-index: -1;
+        border-left: 1px dashed transparent;
+
+        &.hasData {
+          border-color: #bbb;
+        }
+      }
+
+      .textLabel {
+        white-space: nowrap;
+        margin-top: 5px;
+        border: 1px solid transparent;
+        border-radius: 15px;
+        background: none;
+        font-size: 14px;
+        padding: 4px 8px;
+        color: #777;
+
+        &.selected {
+          position: relative;
+          border: 1px solid #bbb;
+          border-radius: 15px;
+          background: white;
+        }
+      }
+
+      .numberBubble {
+        background: gray;
+        width: 38px;
+        height: 38px;
+        border-radius: 100%;
+        border: 1px solid white;
+        font-size: 14px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .svgGraph {
+      position: relative;
+      display: block;
+      z-index: 10;
+
+      .graphLine {
+        stroke: #ccc;
+        stroke-width: 1;
+        fill: none;
+      }
+
+      .graphPoint {
+        stroke: white;
+        stroke-width: 1;
+      }
+
+      .graphPointClickArea {
+        fill: transparent;
+      }
+    }
+
+    .graphHorizontalScaleItem {
+      position: absolute;
+      border-left: 1px solid #eee;
+      top: 0;
+      display: flex;
+      align-items: flex-end; // i.e. bottom-align the text
+      pointer-events: none;
+      z-index: -1;
+      bottom: 30px;
+
+      .graphScaleTime {
+        position: absolute;
+        bottom: -30px;
+        padding-bottom: 7px;
+        padding-top: 4px;
+        background: white;
+        font-size: 14px;
+        color: #999;
+      }
+    }
+
+    .latestVal {
+      position: absolute;
+      font-size: 20px;
+      z-index: 100;
       pointer-events: none;
     }
-  }
-}
-
-$WIDTH_CLICKABLE: 20px;
-
-.graphMarker {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .verticalLine {
-    position: absolute;
-    top: 32px;
-    width: 1px;
-    bottom: 27px;
-    z-index: -1;
-    border-left: 1px dashed transparent;
-
-    &.hasData {
-      border-color: #bbb;
-    }
-  }
-
-  .textLabel {
-    white-space: nowrap;
-    margin-top: 5px;
-    border: 1px solid transparent;
-    border-radius: 15px;
-    background: none;
-    font-size: 14px;
-    padding: 4px 8px;
-    color: #777;
-
-    &.selected {
-      position: relative;
-      border: 1px solid #bbb;
-      border-radius: 15px;
-      background: white;
-    }
-  }
-
-  .numberBubble {
-    $BUBBLE_SIZE: 38px;
-    background: gray;
-    width: $BUBBLE_SIZE;
-    height: $BUBBLE_SIZE;
-    border-radius: 100%;
-    border: 1px solid white;
-    font-size: 14px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }

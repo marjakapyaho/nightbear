@@ -12,6 +12,7 @@ type Props = {
 
 export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) => {
   const hasData = point.valTop || point.valBottom;
+
   return (
     <div
       className={styles.graphMarker}
@@ -27,12 +28,11 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
         style={{ left: config.pixelsPerTimeStep / 2, borderLeft: isSelected ? `1px solid #bbb` : undefined }}
       />
 
-      {hasData ||
-        (isSelected && (
-          <span className={`${styles.textLabel} ${isSelected && styles.selected}`}>
-            <TimeAgo ts={point.timestamp} />
-          </span>
-        ))}
+      {(hasData || isSelected) && (
+        <span className={`${styles.textLabel} ${isSelected && styles.selected}`}>
+          <TimeAgo ts={point.timestamp} />
+        </span>
+      )}
 
       {point.valTop && (
         <div
