@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import { getEntriesFeed } from 'frontend/data/data/getters';
 import { useReduxActions, useReduxState } from 'frontend/utils/react';
 import { reallyHighLimit, reallyLowLimit } from 'frontend/utils/config';
-import { nbGood, nbHigh, nbLow, fontColor } from 'frontend/utils/colors';
+import { nbCarbs, nbGood, nbHigh, nbInsulin, nbLow } from 'frontend/utils/colors';
 import { is } from 'shared/models/utils';
 import {
   calculateHba1c,
-  calculateInsulinPerDay,
   countSituations,
   calculateTimeHigh,
   calculateTimeInRange,
@@ -16,6 +15,8 @@ import {
 import { setOneDecimal } from 'frontend/utils/helpers';
 import styles from './Stats.module.scss';
 import { StatLine } from 'frontend/pages/stats/StatLine';
+import { StatGraph } from 'frontend/pages/stats/StatGraph';
+import { calculateDailyAmounts } from 'frontend/pages/stats/statsUtils';
 
 export const Stats = () => {
   const dataState = useReduxState(s => s.data);
@@ -24,12 +25,24 @@ export const Stats = () => {
 
   const bgModels = getEntriesFeed(dataState);
   const insulins = dataState.timelineModels.filter(is('Insulin'));
+  const carbs = dataState.timelineModels.filter(is('Carbs'));
 
   const timeInRange = calculateTimeInRange(bgModels) || '';
   const timeLow = calculateTimeLow(bgModels) || '';
   const timeHigh = calculateTimeHigh(bgModels) || '';
   const hba1c = setOneDecimal(calculateHba1c(bgModels)) || '';
-  const totalInsulin = calculateInsulinPerDay(insulins);
+
+  const daysToShow = 30;
+  const dailyInsulins = calculateDailyAmounts(insulins, daysToShow).map(val => ({
+    timestamp: val.timestamp,
+    val: val.total,
+    color: nbInsulin,
+  }));
+  const dailyCarbs = calculateDailyAmounts(carbs, daysToShow).map(val => ({
+    timestamp: val.timestamp,
+    val: val.total,
+    color: nbCarbs,
+  }));
 
   useEffect(() => {
     actions.UI_NAVIGATED('Stats');
@@ -52,6 +65,10 @@ export const Stats = () => {
         </div>
       </div>
 
+      <StatGraph label="Insulins" points={dailyInsulins} daysToShow={daysToShow} valMin={0} valMax={40} valStep={5} />
+
+      <StatGraph label="Carbs" points={dailyCarbs} daysToShow={daysToShow} valMin={50} valMax={300} valStep={50} />
+
       <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgModels)} color={nbGood} />
       <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color={nbGood} />
       <StatLine title="LOW" subtitle="below 3.7" figure={countSituations(bgModels, 3.7, true)} color={nbLow} />
@@ -67,7 +84,6 @@ export const Stats = () => {
         figure={countSituations(bgModels, reallyHighLimit, false)}
         color={nbHigh}
       />
-      <StatLine title="Insulin" subtitle="Units per day" figure={totalInsulin} color={fontColor} />
     </div>
   );
 };

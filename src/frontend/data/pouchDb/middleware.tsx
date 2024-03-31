@@ -111,10 +111,10 @@ export const pouchDbMiddleware: ReduxMiddleware = store => {
         .then(models => flatten(models))
         .then((models): Promise<TimelineModel[]> => {
           if (models.find(is('ActiveProfile'))) {
-            console.log(`Results already contain at least one ActiveProfile -> no need to fetch more`);
+            // Results already contain at least one ActiveProfile -> no need to fetch more
             return Promise.resolve(models);
           } else {
-            console.log(`ActiveProfile not found in results -> need to fetch one`);
+            // ActiveProfile not found in results -> need to fetch one
             return Promise.resolve()
               .then(() =>
                 activeStorage

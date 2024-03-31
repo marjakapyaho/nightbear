@@ -8,7 +8,7 @@ import { nbBg, nbCarbs, nbInsulin } from 'frontend/utils/colors';
 import { StatusBar } from 'frontend/components/statusBar/StatusBar';
 import { useEffect } from 'react';
 import React from 'react';
-import { createChangeHandler, getRollingAnalysisResults } from './bgGraphUtils';
+import { createChangeHandler /*getRollingAnalysisResults*/ } from './bgGraphUtils';
 import styles from './BgGraph.module.scss';
 
 export const BgGraph = () => {
@@ -29,7 +29,7 @@ export const BgGraph = () => {
   const bgModels = getEntriesFeed(dataState);
   const activeProfiles = dataState.timelineModels.filter(is('ActiveProfile'));
 
-  const rollingAnalysisResults = getRollingAnalysisResults(
+  /*  const rollingAnalysisResults = getRollingAnalysisResults(
     configState,
     dataState,
     navigationState,
@@ -37,8 +37,7 @@ export const BgGraph = () => {
     activeProfiles,
     timelineRange,
     timelineRangeEnd,
-  );
-  console.log({ rollingAnalysisResults });
+  );*/
 
   const timelineConfig = {
     timelineRange,

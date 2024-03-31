@@ -4,10 +4,25 @@ $nbGood: #54c87e;
 
 .stats {
   overflow-y: scroll;
+  background: #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .statGraph {
+    z-index: 1000;
+    background: white;
+    padding: 30px;
+
+    .graphHeading {
+      font-size: 20px;
+      padding-bottom: 15px;
+    }
+  }
 
   .statLine {
+    background: white;
     padding: 30px;
-    border-bottom: 8px solid #eee;
     align-items: center;
     display: flex;
 
@@ -30,6 +45,7 @@ $nbGood: #54c87e;
   }
 
   .statBalls {
+    background: white;
     padding: 30px;
     display: flex;
     justify-content: space-between;

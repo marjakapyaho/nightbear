@@ -41,13 +41,11 @@ export function dataReducer(state: DataState = dataInitState, action: ReduxActio
     case actions.DB_EMITTED_CHANGES.type:
       try {
         const newModels = action.changes.map(change => reviveCouchDbRowIntoModel(change.doc));
-        console.log('Got new models', newModels);
         return {
           ...state,
           timelineModels: state.timelineModels.map(existingModel => {
             const replacement = newModels.find(isSameModel.bind(null, existingModel));
             if (replacement && isTimelineModel(replacement)) {
-              console.log('Found replacement:', replacement);
               return replacement;
             } else {
               return existingModel;

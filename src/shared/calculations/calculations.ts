@@ -1,4 +1,4 @@
-import { Insulin, SensorEntry } from 'shared/models/model';
+import { SensorEntry } from 'shared/models/model';
 import { reduce } from 'lodash';
 import { hasBloodGlucose } from 'backend/utils/data';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'frontend/utils/config';
@@ -123,8 +123,4 @@ export function countSituations(bgModels: SensorEntry[], limit: number, low: boo
 export function getBgAverage(bgModels: SensorEntry[]) {
   const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
   return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
-}
-
-export function calculateInsulinPerDay(insulins: Insulin[]) {
-  return Math.round(insulins.reduce((sum, value) => sum + value.amount, 0) / 7);
 }

@@ -13,11 +13,9 @@ import {
   roundTo2Decimals,
   timestampIsUnderMaxAge,
   getBgAverage,
-  calculateInsulinPerDay,
 } from 'shared/calculations/calculations';
 import { sensorEntries1, sensorEntries2 } from 'shared/calculations/test-data/sensor-entries';
 import 'mocha';
-import { insulins } from 'shared/calculations/test-data/insulins';
 
 describe('shared/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
@@ -119,9 +117,5 @@ describe('shared/calculations', () => {
   it('getBgAverage', () => {
     assert.deepEqual(getBgAverage(sensorEntries1), '6.9');
     assert.deepEqual(getBgAverage(sensorEntries2), '12.0');
-  });
-
-  it('calculateInsulinPerDay', () => {
-    assert.deepEqual(calculateInsulinPerDay(insulins), 3);
   });
 });
