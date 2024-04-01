@@ -6,7 +6,7 @@ import styles from './ScrollNumberSelector.module.scss';
 
 type Props = {
   value?: number;
-  onChange: (newRange: number) => void;
+  onChange: (newVal: number) => void;
   min: number;
   max: number;
   step: number;

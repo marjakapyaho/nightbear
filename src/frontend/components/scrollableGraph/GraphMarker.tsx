@@ -34,22 +34,8 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
         </span>
       )}
 
-      {point.valTop && (
-        <div
-          className={styles.numberBubble}
-          style={{ background: point.valTopColor, marginTop: 0.01 * config.innerHeight }}
-        >
-          {point.val}
-        </div>
-      )}
-      {point.valBottom && (
-        <div
-          className={styles.numberBubble}
-          style={{ background: point.valBottomColor, marginTop: 0.65 * config.innerHeight }}
-        >
-          {point.val}
-        </div>
-      )}
+      {point.valTop && <div className={styles.numberBubbleTop}>{point.valTop}</div>}
+      {point.valBottom && <div className={styles.numberBubbleBottom}>{point.valBottom}</div>}
     </div>
   );
 };

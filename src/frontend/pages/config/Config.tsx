@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useReduxActions, useReduxState } from 'frontend/utils/react';
-import { SEC_IN_MS } from 'shared/calculations/calculations';
+import React from 'react';
 import styles from './Config.module.scss';
-import { getActiveProfile, getAutoActTime, getProfiles, isProfileActive } from './configUtils';
+
+type Profile = {
+  id: string;
+  name: string;
+  activatedAt?: number;
+};
 
 export const Config = () => {
-  const configState = useReduxState(s => s.config);
-  const dataState = useReduxState(s => s.data);
-  const actions = useReduxActions();
-  const profiles = getProfiles(dataState);
-  const activeProfile = getActiveProfile(dataState);
-
-  const [showSuccess, setShowSuccess] = useState(false);
-
-  useEffect(() => {
-    if (Date.now() - configState.ackLatestAlarmSucceededAt < SEC_IN_MS) {
-      setShowSuccess(true);
-    }
-    setTimeout(() => setShowSuccess(false), SEC_IN_MS);
-  }, [configState.ackLatestAlarmSucceededAt]);
+  const profiles: Profile[] = [{ id: '1234', name: 'Day' }];
+  const activeProfile: Profile | null = { id: '1234', name: 'Day', activatedAt: Date.now() };
+  const ackedAlarm = false;
 
   return (
     <div className={styles.config}>
@@ -26,22 +18,22 @@ export const Config = () => {
       <div>
         {profiles.map(profile => (
           <div
-            key={profile.modelUuid}
-            className={`${styles.profile} ${isProfileActive(profile, activeProfile) ? styles.active : ''}`}
-            onClick={() => actions.PROFILE_ACTIVATED(profile, Date.now())}
+            key={profile.id}
+            className={`${styles.profile} ${profile.id === activeProfile?.id ? styles.active : ''}`}
+            onClick={() => console.log('Activate profile')}
           >
-            {profile.profileName.toUpperCase()}
-            {profile.activatedAtUtc && <span className={styles.activates}>Activated {getAutoActTime(profile)}</span>}
+            {profile.name.toUpperCase()}
+            {profile.activatedAt && <span className={styles.activates}>Activated {profile.activatedAt}</span>}
           </div>
         ))}
       </div>
       <div className={styles.buttonWrapper}>
         <button
-          className={`${styles.button} ${showSuccess ? styles.success : ''}`}
-          onClick={() => actions.ACK_LATEST_ALARM_STARTED()}
-          disabled={showSuccess}
+          className={`${styles.button} ${ackedAlarm ? styles.success : ''}`}
+          onClick={() => console.log('Ack alarm')}
+          disabled={ackedAlarm}
         >
-          {showSuccess ? 'SUCCESS' : 'ACK ALARM'}
+          {ackedAlarm ? 'SUCCESS' : 'ACK ALARM'}
         </button>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { timestampIsUnderMaxAge } from 'shared/calculations/calculations';
 import { setOneDecimal } from 'frontend/utils/helpers';
 
 type Props = {
-  latestPoint: Point;
+  latestPoint: Point | null;
   config: GraphConfig;
 };
 

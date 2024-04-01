@@ -1,14 +1,13 @@
-import { SensorEntry } from 'shared/models/model';
 import { reduce } from 'lodash';
 import { hasBloodGlucose } from 'backend/utils/data';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'frontend/utils/config';
 import { setOneDecimal } from 'frontend/utils/helpers';
+import { BloodGlucoseEntry } from 'shared/mocks/timelineEntries';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
 export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const DAY_IN_MS = 24 * HOUR_IN_MS;
-export const MONTH_IN_MS = 31 * DAY_IN_MS;
 export const TIME_LIMIT_FOR_SLOPE = 15 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
 
@@ -61,7 +60,7 @@ export function timestampIsUnderMaxAge(
   return timestampToCheck > currentTimestamp - maxAgeInMs;
 }
 
-export function calculateHba1c(entries: SensorEntry[]) {
+export function calculateHba1c(entries: BloodGlucoseEntry[]) {
   const numericEntries = entries.filter(hasBloodGlucose);
   const sumOfEntries = reduce(
     numericEntries,
@@ -77,7 +76,7 @@ export function calculateHba1c(entries: SensorEntry[]) {
   return (avgGlucose + 46.7) / 28.7 - 0.6;
 }
 
-export function calculateTimeInRange(bgModels: SensorEntry[]) {
+export function calculateTimeInRange(bgModels: BloodGlucoseEntry[]) {
   const totalCount = bgModels.length;
   const goodCount = bgModels.filter(
     model =>
@@ -87,14 +86,14 @@ export function calculateTimeInRange(bgModels: SensorEntry[]) {
   return Math.round((goodCount / totalCount) * 100);
 }
 
-export function calculateTimeLow(bgModels: SensorEntry[]) {
+export function calculateTimeLow(bgModels: BloodGlucoseEntry[]) {
   const totalCount = bgModels.length;
   const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < timeInRangeLowLimit).length;
 
   return Math.round((goodCount / totalCount) * 100);
 }
 
-export function calculateTimeHigh(bgModels: SensorEntry[]) {
+export function calculateTimeHigh(bgModels: BloodGlucoseEntry[]) {
   const totalCount = bgModels.length;
   const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > timeInRangeHighLimit).length;
 
@@ -102,7 +101,7 @@ export function calculateTimeHigh(bgModels: SensorEntry[]) {
 }
 
 // Note: if there is e.g. 10 entries over limit in a row, it's categorized as one single occurrence of situation
-export function countSituations(bgModels: SensorEntry[], limit: number, low: boolean) {
+export function countSituations(bgModels: BloodGlucoseEntry[], limit: number, low: boolean) {
   let counter = 0;
   let incidentBeingRecorded: boolean;
 
@@ -120,7 +119,7 @@ export function countSituations(bgModels: SensorEntry[], limit: number, low: boo
   return counter;
 }
 
-export function getBgAverage(bgModels: SensorEntry[]) {
+export function getBgAverage(bgModels: BloodGlucoseEntry[]) {
   const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
   return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
 }

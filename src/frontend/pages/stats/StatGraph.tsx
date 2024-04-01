@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DAY_IN_MS } from 'shared/calculations/calculations';
 import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableGraph';
 import styles from './Stats.module.scss';
@@ -14,6 +14,8 @@ type Props = {
 };
 
 export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }: Props) => {
+  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+
   const baseConfig: BaseGraphConfig = {
     timelineRange: daysToShow * DAY_IN_MS,
     timelineRangeEnd: Date.now(),
@@ -26,6 +28,7 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }
     valMax,
     valStep,
     timeStep: DAY_IN_MS,
+    dataTimeStep: DAY_IN_MS,
     pixelsPerTimeStep: 9,
     showTarget: false,
     showCurrentValue: false,
@@ -36,7 +39,12 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }
   return (
     <div className={styles.statGraph}>
       <div className={styles.graphHeading}>{label}</div>
-      <ScrollableGraph graphPoints={points} baseConfig={baseConfig} />
+      <ScrollableGraph
+        graphPoints={points}
+        selectedPoint={selectedPoint}
+        setSelectedPoint={setSelectedPoint}
+        baseConfig={baseConfig}
+      />
     </div>
   );
 };

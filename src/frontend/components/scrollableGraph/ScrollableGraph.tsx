@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { Point, BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils';
 import { GraphScaleVertical } from 'frontend/components/scrollableGraph/GraphScaleVertical';
@@ -10,13 +10,15 @@ import { GraphSvg } from 'frontend/components/scrollableGraph/GraphSvg';
 type Props = {
   graphPoints: Point[];
   baseConfig: BaseGraphConfig;
+  selectedPoint: Point | null;
+  setSelectedPoint: (point: Point | null) => void;
 };
 
-export const ScrollableGraph = ({ graphPoints, baseConfig }: Props) => {
+export const ScrollableGraph = ({ graphPoints, selectedPoint, setSelectedPoint, baseConfig }: Props) => {
   const scrollingRef = useRef<HTMLDivElement | null>(null);
   const config = getGraphConfig(baseConfig);
   const { innerWidth, outerHeight } = config;
-  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+  const latestPoint = graphPoints.length ? graphPoints[graphPoints.length - 1] : null;
 
   // Scroll right on mount
   useEffect(() => {
@@ -45,7 +47,7 @@ export const ScrollableGraph = ({ graphPoints, baseConfig }: Props) => {
             config={config}
           />
           <GraphScaleHorizontal config={config} />
-          <GraphLatestValue latestPoint={graphPoints[0]} config={config} />
+          <GraphLatestValue latestPoint={latestPoint} config={config} />
         </div>
       </div>
     </div>

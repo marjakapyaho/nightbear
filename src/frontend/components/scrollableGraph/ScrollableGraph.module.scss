@@ -87,7 +87,7 @@
         }
       }
 
-      .numberBubble {
+      %bubbleBase {
         background: gray;
         width: 38px;
         height: 38px;
@@ -98,6 +98,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .numberBubbleTop {
+        @extend %bubbleBase;
+        background: #ee776e;
+      }
+
+      .numberBubbleBottom {
+        @extend %bubbleBase;
+        background: #9ad5b3;
+        position: absolute;
+        bottom: 27px;
       }
     }
 

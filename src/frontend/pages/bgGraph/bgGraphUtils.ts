@@ -1,62 +1,65 @@
-import { ActiveProfile, Model, SensorEntry, TimelineModel } from 'shared/models/model';
-import { NavigationState } from 'frontend/data/navigation/state';
-import { ReduxActions } from 'frontend/data/actions';
-import { isTimelineModel, lastModel } from 'shared/models/utils';
-import { isEqual } from 'lodash';
-import { BUCKET_SIZE, performRollingAnalysis } from 'shared/analyser/rolling-analysis';
-import { ConfigState } from 'frontend/data/config/state';
-import { DataState } from 'frontend/data/data/state';
+import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
+import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
+import { TimelineEntries } from 'shared/mocks/timelineEntries';
+import { highLimit, lowLimit } from 'frontend/utils/config';
+import { nbGood, nbHigh, nbLow } from 'frontend/utils/colors';
 
-export const createChangeHandler = <T extends TimelineModel>(
-  state: NavigationState,
-  actions: ReduxActions,
-  modelBeingEdited: Model | null,
-  isModelOfCorrectType: (model: unknown) => boolean,
-  modelCreateCallback: (timestamp: number, newValue: number) => T,
-  modelUpdateCallback: (newValue: number) => Partial<T>,
-) => {
-  return (newValue: number) => {
-    if (isModelOfCorrectType(modelBeingEdited)) {
-      // Update an existing Model
-      if (!isTimelineModel(modelBeingEdited)) return; // currently, we only support editing of TimelineModel's, even though the type of modelBeingEdited is wider, for call-time convenience
-      const updatedModel = { ...modelBeingEdited, ...modelUpdateCallback(newValue) };
-      if (isEqual(modelBeingEdited, updatedModel)) {
-        actions.MODEL_DELETED_BY_USER(modelBeingEdited); // same value selected again -> clear value -> delete model
-      } else {
-        actions.MODEL_UPDATED_BY_USER(updatedModel); // perform the update
-      }
-    } else {
-      // Create new Model
-      actions.MODEL_UPDATED_BY_USER(
-        modelCreateCallback(
-          ('timelineCursorAt' in state ? state.timelineCursorAt : null) || // if there's a cursor, place the new Model there
-            (isTimelineModel(modelBeingEdited) && modelBeingEdited.timestamp) || // if not, but a Model of another type is selected, place the new Model at the same timestamp
-            Date.now(), // if nothing else, create at the current wall clock time
-          newValue,
-        ),
-      );
-    }
-  };
+export const getFillColor = (bgSensor: number, bgMeter?: number) => {
+  if (bgMeter) {
+    return '#828282';
+  }
+  if (bgSensor > highLimit) {
+    return nbHigh;
+  }
+  if (bgSensor < lowLimit) {
+    return nbLow;
+  }
+  return nbGood;
 };
 
-const getAlignedRangeEnd = (bgModels: SensorEntry[], timelineRangeEnd: number) => {
-  const latestBgModel = bgModels.find(lastModel);
-  return latestBgModel ? latestBgModel.timestamp + BUCKET_SIZE / 2 : timelineRangeEnd;
+const isTimestampWithinFiveMinutes = (timestampToCheck: number, baseTimestamp: number) => {
+  const timeToCheckInMillis = 2.5 * MIN_IN_MS;
+  const upperLimit = baseTimestamp + timeToCheckInMillis;
+  const lowerLimit = baseTimestamp - timeToCheckInMillis;
+
+  // Upper limit is inclusive
+  return timestampToCheck > lowerLimit && timestampToCheck <= upperLimit;
 };
 
-export const getRollingAnalysisResults = (
-  configState: ConfigState,
-  dataState: DataState,
-  navigationState: NavigationState,
-  bgModels: SensorEntry[],
-  activeProfiles: ActiveProfile[],
-  timelineRange: number,
-  timelineRangeEnd: number,
-) =>
-  configState.showRollingAnalysis && dataState.status === 'READY' && navigationState.selectedScreen === 'BgGraph'
-    ? performRollingAnalysis(
-        (bgModels as Model[]).concat(activeProfiles),
-        navigationState.timelineCursorAt ? BUCKET_SIZE : timelineRange, // if there's a cursor placed, run the analysis ONLY at that point in time; this makes debugging the analyser a lot simpler
-        navigationState.timelineCursorAt || getAlignedRangeEnd(bgModels, timelineRangeEnd),
-      )
-    : undefined;
+export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries): Point[] => {
+  const { bloodGlucoseEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
+  return bloodGlucoseEntries.map(entry => {
+    const insulin = insulinEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
+    const meterEntry = meterEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
+    const carb = carbEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
+
+    return {
+      timestamp: entry.timestamp,
+      val: meterEntry?.bloodGlucose || entry.bloodGlucose,
+      color: getFillColor(entry.bloodGlucose, meterEntry?.bloodGlucose),
+      valTop: insulin?.amount,
+      valMiddle: meterEntry?.bloodGlucose,
+      valBottom: carb?.amount,
+    };
+  });
+};
+
+export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
+  timelineRange: 2 * DAY_IN_MS,
+  timelineRangeEnd: Date.now(),
+  paddingTop: 10,
+  paddingBottom: 40,
+  paddingLeft: 0,
+  paddingRight: 30,
+  outerHeight: 330,
+  valMin: 0,
+  valMax: 20,
+  valStep: 1,
+  timeStep: HOUR_IN_MS,
+  dataTimeStep: 5 * MIN_IN_MS,
+  pixelsPerTimeStep: 100,
+  showTarget: true,
+  showCurrentValue: true,
+  timeFormat: 'hh:MM',
+  showEveryNthTimeLabel: 1,
+});

@@ -12,7 +12,7 @@ type Props = {
 
 export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) => {
   const { val, timestamp } = point;
-  const pointWidth = config.pixelsPerTimeStep;
+  const pointWidth = config.dataTimeStep * config.pixelsPerMs;
 
   return (
     <>

@@ -12,7 +12,8 @@ export type BaseGraphConfig = {
   valMin: number; // Lowest value to show on the scale lines
   valMax: number; // Highest value to show on the scale lines
   valStep: number; // How often to draw a value line
-  timeStep: number; // Step unit for timescale (e.g. HOUR_IN_MILLIS, DAY_IN_MILLIS)
+  timeStep: number; // Step unit for timescale labels (e.g. HOUR_IN_MILLIS, DAY_IN_MILLIS)
+  dataTimeStep: number; // Step unit for timescale data (e.g. HOUR_IN_MILLIS, DAY_IN_MILLIS)
   pixelsPerTimeStep: number; // One step of timeline data takes this many pixels of horizontal space
   timeFormat: string; // Format for timescale labels
   showEveryNthTimeLabel: number; // Only show every n:th time label
@@ -32,9 +33,8 @@ export type Point = {
   val: number | null;
   color: string;
   valTop?: number;
-  valTopColor?: string;
+  valMiddle?: number;
   valBottom?: number;
-  valBottomColor?: string;
 };
 
 export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {

@@ -1,14 +1,14 @@
-import { Carbs, Insulin } from 'shared/models/model';
 import { DAY_IN_MS } from 'shared/calculations/calculations';
 import { fill, groupBy } from 'lodash';
 import { DateTime } from 'luxon';
+import { CarbEntry, InsulinEntry } from 'shared/mocks/timelineEntries';
 
 const getDateInIsoFormat = (timestamp: number) => DateTime.fromMillis(timestamp).toISODate();
 
-const getTotal = (dailyAmounts: (Carbs | Insulin)[]) =>
+const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
   dailyAmounts.reduce((prev, current) => prev + current.amount, 0);
 
-export const calculateDailyAmounts = (entries: (Carbs | Insulin)[], days: number) => {
+export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], days: number) => {
   const now = Date.now();
 
   const dayArray = fill(Array(days), null).map((_val, i) => ({

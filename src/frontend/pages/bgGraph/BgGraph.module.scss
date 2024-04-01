@@ -1,22 +1,17 @@
 .bgGraph {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%; // Needed for scroll number selectors
 
-  .bgGraphTop {
-    > * {
-      height: 100%;
-    }
+  .error,
+  .loading {
+    padding: 30px;
   }
 
   .graphBottom {
     flex: 1;
-    display: flex;
-    flex-direction: row;
-    height: 0; // the bottom panel needs a height so its children can overflow-scroll normally
-
-    > div {
-      flex: 1;
-    }
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: 0; // Needed for scroll number selectors
   }
 }

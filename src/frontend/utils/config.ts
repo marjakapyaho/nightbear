@@ -6,7 +6,3 @@ export const reallyLowLimit = 3.0; // From research
 export const reallyHighLimit = 13.9; // From research
 
 export const fontSize = 14;
-export const fontSizeSmall = 12;
-export const fontSizeExtraSmall = 10;
-
-export const pagePadding = 30;

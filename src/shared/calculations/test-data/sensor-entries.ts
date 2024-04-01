@@ -1,123 +1,68 @@
 import { MIN_IN_MS } from 'shared/calculations/calculations';
 import { SensorEntry } from 'shared/models/model';
 import { generateUuid } from 'shared/utils/id';
+import { BloodGlucoseEntry } from 'shared/mocks/timelineEntries';
 
 const currentTimestamp = 1508672249758;
 
-export const sensorEntries1: SensorEntry[] = [
+export const sensorEntries1: BloodGlucoseEntry[] = [
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 35 * MIN_IN_MS,
     bloodGlucose: 6,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 30 * MIN_IN_MS,
     bloodGlucose: 6,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 25 * MIN_IN_MS,
     bloodGlucose: 6,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 20 * MIN_IN_MS,
     bloodGlucose: 8,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 15 * MIN_IN_MS,
     bloodGlucose: 7,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 10 * MIN_IN_MS,
     bloodGlucose: 7,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 5 * MIN_IN_MS,
     bloodGlucose: 8,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
 ];
 
-export const sensorEntries2: SensorEntry[] = [
+export const sensorEntries2: BloodGlucoseEntry[] = [
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 35 * MIN_IN_MS,
     bloodGlucose: 14,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 30 * MIN_IN_MS,
     bloodGlucose: 11,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 25 * MIN_IN_MS,
     bloodGlucose: 11.5,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 20 * MIN_IN_MS,
     bloodGlucose: 12.5,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 15 * MIN_IN_MS,
     bloodGlucose: 13.1,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 10 * MIN_IN_MS,
     bloodGlucose: 12,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
   {
-    modelType: 'DexcomSensorEntry',
-    modelUuid: generateUuid(),
     timestamp: currentTimestamp - 5 * MIN_IN_MS,
     bloodGlucose: 10,
-    signalStrength: 1,
-    noiseLevel: 1,
   },
 ];
