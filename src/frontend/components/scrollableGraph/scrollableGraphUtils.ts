@@ -19,6 +19,7 @@ export type BaseGraphConfig = {
   showEveryNthTimeLabel: number; // Only show every n:th time label
   showTarget: boolean; // Show target area (used for blood glucose)
   showCurrentValue: boolean; // Show current value (used for blood glucose)
+  decimals: number; // Decimals for values
 };
 
 export type GraphConfig = BaseGraphConfig & {

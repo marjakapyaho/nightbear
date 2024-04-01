@@ -1,11 +1,9 @@
 import { MIN_IN_MS } from 'shared/calculations/calculations';
-import { SensorEntry } from 'shared/models/model';
-import { generateUuid } from 'shared/utils/id';
-import { BloodGlucoseEntry } from 'shared/mocks/timelineEntries';
+import { SensorEntry } from 'shared/types/timelineEntries';
 
 const currentTimestamp = 1508672249758;
 
-export const sensorEntries1: BloodGlucoseEntry[] = [
+export const sensorEntries1: SensorEntry[] = [
   {
     timestamp: currentTimestamp - 35 * MIN_IN_MS,
     bloodGlucose: 6,
@@ -36,7 +34,7 @@ export const sensorEntries1: BloodGlucoseEntry[] = [
   },
 ];
 
-export const sensorEntries2: BloodGlucoseEntry[] = [
+export const sensorEntries2: SensorEntry[] = [
   {
     timestamp: currentTimestamp - 35 * MIN_IN_MS,
     bloodGlucose: 14,

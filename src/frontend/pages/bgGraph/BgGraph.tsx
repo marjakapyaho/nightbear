@@ -11,16 +11,15 @@ import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEnt
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
-  const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } = useTimelineEntries(
-    Date.now() - baseConfig.timelineRange,
-  );
+  const startMs = Date.now() - baseConfig.timelineRange;
+  const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } = useTimelineEntries(startMs);
   const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries);
-
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+  const latestPoint = graphPoints.length ? graphPoints[0] : null;
 
   return (
     <div className={styles.bgGraph}>
-      <StatusBar graphPoint={graphPoints.length ? graphPoints[graphPoints.length - 1] : null} />
+      <StatusBar graphPoint={latestPoint} />
 
       <div style={{ height: baseConfig.outerHeight }}>
         {isSuccess && (

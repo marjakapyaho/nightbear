@@ -11,9 +11,10 @@ type Props = {
   valMin: number;
   valMax: number;
   valStep: number;
+  decimals: number;
 };
 
-export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }: Props) => {
+export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep, decimals }: Props) => {
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
 
   const baseConfig: BaseGraphConfig = {
@@ -31,9 +32,10 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep }
     dataTimeStep: DAY_IN_MS,
     pixelsPerTimeStep: 9,
     showTarget: false,
-    showCurrentValue: false,
+    showCurrentValue: true,
     timeFormat: 'dd',
     showEveryNthTimeLabel: 3,
+    decimals,
   };
 
   return (

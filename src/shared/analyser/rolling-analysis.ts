@@ -2,7 +2,7 @@ import { runAnalysis } from 'shared/analyser/analyser';
 import { MIN_IN_MS } from 'shared/calculations/calculations';
 import { DEFAULT_STATE, Model, Situation, State, TimelineModel } from 'shared/models/model';
 import { firstModel, is, lastModel } from 'shared/models/utils';
-import { TypeOfArray } from 'shared/types/utils';
+import { TypeOfArray } from 'shared/utils/types';
 import { first, flatten, groupBy, range, values } from 'lodash';
 import { isNotNull } from 'backend/utils/types';
 import { objectKeys } from 'frontend/utils/types';

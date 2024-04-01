@@ -1,8 +1,9 @@
-import { reduce } from 'lodash';
+import { fill, groupBy, reduce } from 'lodash';
 import { hasBloodGlucose } from 'backend/utils/data';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'frontend/utils/config';
 import { setOneDecimal } from 'frontend/utils/helpers';
-import { BloodGlucoseEntry } from 'shared/mocks/timelineEntries';
+import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { DateTime } from 'luxon';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -12,55 +13,55 @@ export const TIME_LIMIT_FOR_SLOPE = 15 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
 
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
-export function changeBloodGlucoseUnitToMmoll(glucoseInMgdl: number): number {
+export const changeBloodGlucoseUnitToMmoll = (glucoseInMgdl: number): number => {
   return Math.round((glucoseInMgdl / 18) * 10) / 10;
-}
+};
 
 // Conversion from mmol/L to mg/dL
-export function changeBloodGlucoseUnitToMgdl(glucoseInMmoll: number): number {
+export const changeBloodGlucoseUnitToMgdl = (glucoseInMmoll: number): number => {
   const numeric = Math.floor(10 * glucoseInMmoll) / 10;
   return Math.round(18 * numeric);
-}
+};
 
 // Calculates actual blood glucose in mmol/L
-export function calculateRaw(unfiltered: number, slope: number, intercept: number, scale = 1): number | null {
+export const calculateRaw = (unfiltered: number, slope: number, intercept: number, scale = 1): number | null => {
   if (unfiltered !== 0 && slope !== 0 && scale !== 0) {
     const raw = (scale * (unfiltered - intercept)) / slope;
     return changeBloodGlucoseUnitToMmoll(raw);
   }
 
   return null;
-}
+};
 
 // Is Dexcom entry valid
-export function isDexcomEntryValid(noise: number, sgv: number): boolean {
+export const isDexcomEntryValid = (noise: number, sgv: number): boolean => {
   return noise < NOISE_LEVEL_LIMIT && sgv > 40;
-}
+};
 
 // Rounds a number to 0 decimals
-export function roundTo0Decimals(num: number) {
+export const roundTo0Decimals = (num: number) => {
   return Math.round(num);
-}
+};
 
 // Rounds a number to 1 decimal; for contexts where more precision is a nuisance when debugging
-export function roundTo1Decimals(num: number) {
+export const roundTo1Decimals = (num: number) => {
   return Math.round(num * 10) / 10;
-}
+};
 
-export function roundTo2Decimals(num: number) {
+export const roundTo2Decimals = (num: number) => {
   return Math.round(num * 100) / 100;
-}
+};
 
-export function timestampIsUnderMaxAge(
+export const timestampIsUnderMaxAge = (
   currentTimestamp: number,
   timestampToCheck: number,
   maxAgeInMinutes: number,
-): boolean {
+): boolean => {
   const maxAgeInMs = maxAgeInMinutes * MIN_IN_MS;
   return timestampToCheck > currentTimestamp - maxAgeInMs;
-}
+};
 
-export function calculateHba1c(entries: BloodGlucoseEntry[]) {
+export const calculateHba1c = (entries: SensorEntry[]) => {
   const numericEntries = entries.filter(hasBloodGlucose);
   const sumOfEntries = reduce(
     numericEntries,
@@ -74,39 +75,43 @@ export function calculateHba1c(entries: BloodGlucoseEntry[]) {
 
   // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
   return (avgGlucose + 46.7) / 28.7 - 0.6;
-}
+};
 
-export function calculateTimeInRange(bgModels: BloodGlucoseEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(
-    model =>
-      model.bloodGlucose && model.bloodGlucose >= timeInRangeLowLimit && model.bloodGlucose <= timeInRangeHighLimit,
+export const calculateTimeInRange = (sensorEntries: SensorEntry[]) => {
+  const totalCount = sensorEntries.length;
+  const goodCount = sensorEntries.filter(
+    entry =>
+      entry.bloodGlucose && entry.bloodGlucose >= timeInRangeLowLimit && entry.bloodGlucose <= timeInRangeHighLimit,
   ).length;
 
   return Math.round((goodCount / totalCount) * 100);
-}
+};
 
-export function calculateTimeLow(bgModels: BloodGlucoseEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose < timeInRangeLowLimit).length;
-
-  return Math.round((goodCount / totalCount) * 100);
-}
-
-export function calculateTimeHigh(bgModels: BloodGlucoseEntry[]) {
-  const totalCount = bgModels.length;
-  const goodCount = bgModels.filter(model => model.bloodGlucose && model.bloodGlucose > timeInRangeHighLimit).length;
+export const calculateTimeLow = (sensorEntries: SensorEntry[]) => {
+  const totalCount = sensorEntries.length;
+  const goodCount = sensorEntries.filter(
+    entry => entry.bloodGlucose && entry.bloodGlucose < timeInRangeLowLimit,
+  ).length;
 
   return Math.round((goodCount / totalCount) * 100);
-}
+};
+
+export const calculateTimeHigh = (sensorEntries: SensorEntry[]) => {
+  const totalCount = sensorEntries.length;
+  const goodCount = sensorEntries.filter(
+    entry => entry.bloodGlucose && entry.bloodGlucose > timeInRangeHighLimit,
+  ).length;
+
+  return Math.round((goodCount / totalCount) * 100);
+};
 
 // Note: if there is e.g. 10 entries over limit in a row, it's categorized as one single occurrence of situation
-export function countSituations(bgModels: BloodGlucoseEntry[], limit: number, low: boolean) {
+export const countSituations = (sensorEntries: SensorEntry[], limit: number, low: boolean) => {
   let counter = 0;
   let incidentBeingRecorded: boolean;
 
-  bgModels.forEach(model => {
-    if (model.bloodGlucose && (low ? model.bloodGlucose < limit : model.bloodGlucose > limit)) {
+  sensorEntries.forEach(entry => {
+    if (entry.bloodGlucose && (low ? entry.bloodGlucose < limit : entry.bloodGlucose > limit)) {
       if (!incidentBeingRecorded) {
         counter++;
         incidentBeingRecorded = true;
@@ -117,9 +122,49 @@ export function countSituations(bgModels: BloodGlucoseEntry[], limit: number, lo
   });
 
   return counter;
-}
+};
 
-export function getBgAverage(bgModels: BloodGlucoseEntry[]) {
-  const modelsWithBgs = bgModels.filter(model => model.bloodGlucose);
-  return setOneDecimal(modelsWithBgs.reduce((sum, model) => sum + (model.bloodGlucose || 0), 0) / modelsWithBgs.length);
-}
+export const getBgAverage = (sensorEntries: SensorEntry[]) => {
+  const entriesWithBgs = sensorEntries.filter(entry => entry.bloodGlucose);
+  return setOneDecimal(
+    entriesWithBgs.reduce((sum, entry) => sum + (entry.bloodGlucose || 0), 0) / entriesWithBgs.length,
+  );
+};
+
+const getDateInIsoFormat = (timestamp: number) => DateTime.fromMillis(timestamp).toISODate();
+
+const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
+  dailyAmounts.reduce((prev, current) => prev + current.amount, 0);
+
+const getDailyAverage = (dailySensorEntries: SensorEntry[]) =>
+  dailySensorEntries.length
+    ? dailySensorEntries.reduce((prev, current) => prev + current.bloodGlucose, 0) / dailySensorEntries.length
+    : 0;
+
+export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], days: number) => {
+  const now = Date.now();
+
+  const dayArray = fill(Array(days), null).map((_val, i) => ({
+    date: getDateInIsoFormat(now - DAY_IN_MS * i),
+    total: null,
+  }));
+  const groupedEntries = groupBy(entries, entry => getDateInIsoFormat(entry.timestamp));
+  return dayArray.map(day => ({
+    timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
+    total: day.date && groupedEntries[day.date] ? getTotal(groupedEntries[day.date]) : null,
+  }));
+};
+
+export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number) => {
+  const now = Date.now();
+
+  const dayArray = fill(Array(days), null).map((_val, i) => ({
+    date: getDateInIsoFormat(now - DAY_IN_MS * i),
+    average: null,
+  }));
+  const groupedEntries = groupBy(entries, entry => getDateInIsoFormat(entry.timestamp));
+  return dayArray.map(day => ({
+    timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
+    average: day.date && groupedEntries[day.date] ? getDailyAverage(groupedEntries[day.date]) : null,
+  }));
+};

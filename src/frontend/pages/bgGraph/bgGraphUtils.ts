@@ -1,6 +1,6 @@
 import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
-import { TimelineEntries } from 'shared/mocks/timelineEntries';
+import { TimelineEntries } from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'frontend/utils/config';
 import { nbGood, nbHigh, nbLow } from 'frontend/utils/colors';
 
@@ -27,8 +27,8 @@ const isTimestampWithinFiveMinutes = (timestampToCheck: number, baseTimestamp: n
 };
 
 export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries): Point[] => {
-  const { bloodGlucoseEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
-  return bloodGlucoseEntries.map(entry => {
+  const { sensorEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
+  return sensorEntries.map(entry => {
     const insulin = insulinEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
     const meterEntry = meterEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
     const carb = carbEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
@@ -62,4 +62,5 @@ export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
   showCurrentValue: true,
   timeFormat: 'hh:MM',
   showEveryNthTimeLabel: 1,
+  decimals: 1,
 });

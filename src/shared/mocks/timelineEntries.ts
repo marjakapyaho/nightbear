@@ -1,33 +1,7 @@
 import { MIN_IN_MS } from 'shared/calculations/calculations';
+import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 
-export type BloodGlucoseEntry = {
-  timestamp: number;
-  bloodGlucose: number;
-};
-
-export type InsulinEntry = {
-  timestamp: number;
-  amount: number;
-};
-
-export type CarbEntry = {
-  timestamp: number;
-  amount: number;
-};
-
-export type MeterEntry = {
-  timestamp: number;
-  bloodGlucose: number;
-};
-
-export type TimelineEntries = {
-  bloodGlucoseEntries: BloodGlucoseEntry[];
-  insulinEntries: InsulinEntry[];
-  carbEntries: CarbEntry[];
-  meterEntries: MeterEntry[];
-};
-
-export const mockBloodGlucoseEntries: BloodGlucoseEntry[] = [
+export const mockSensorEntries: SensorEntry[] = [
   {
     timestamp: Date.now(),
     bloodGlucose: 5.5,
@@ -54,7 +28,15 @@ export const mockBloodGlucoseEntries: BloodGlucoseEntry[] = [
   },
   {
     timestamp: Date.now() - 30 * MIN_IN_MS,
-    bloodGlucose: 4.0,
+    bloodGlucose: 3.8,
+  },
+  {
+    timestamp: Date.now() - 35 * MIN_IN_MS,
+    bloodGlucose: 4.3,
+  },
+  {
+    timestamp: Date.now() - 40 * MIN_IN_MS,
+    bloodGlucose: 4.6,
   },
 ];
 
@@ -79,12 +61,12 @@ export const mockCarbEntries: CarbEntry[] = [
 export const mockMeterEntries: MeterEntry[] = [
   {
     timestamp: Date.now(),
-    bloodGlucose: 8.0,
+    bloodGlucose: 6.5,
   },
 ];
 
 export const mockTimelineEntries = {
-  bloodGlucoseEntries: mockBloodGlucoseEntries,
+  sensorEntries: mockSensorEntries,
   insulinEntries: mockInsulinEntries,
   carbEntries: mockCarbEntries,
   meterEntries: mockMeterEntries,

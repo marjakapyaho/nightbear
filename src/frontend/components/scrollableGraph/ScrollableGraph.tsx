@@ -18,7 +18,7 @@ export const ScrollableGraph = ({ graphPoints, selectedPoint, setSelectedPoint, 
   const scrollingRef = useRef<HTMLDivElement | null>(null);
   const config = getGraphConfig(baseConfig);
   const { innerWidth, outerHeight } = config;
-  const latestPoint = graphPoints.length ? graphPoints[graphPoints.length - 1] : null;
+  const latestPoint = graphPoints.length ? graphPoints[0] : null;
 
   // Scroll right on mount
   useEffect(() => {

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
 import { timestampIsUnderMaxAge } from 'shared/calculations/calculations';
-import { setOneDecimal } from 'frontend/utils/helpers';
+import { setDecimals } from 'frontend/utils/helpers';
 
 type Props = {
   latestPoint: Point | null;
@@ -12,16 +12,17 @@ type Props = {
 export const GraphLatestValue = ({ latestPoint, config }: Props) => {
   return (
     latestPoint &&
+    latestPoint.val &&
     config.showCurrentValue && (
       <span
         className={styles.latestVal}
         style={{
-          top: valToTop(config, latestPoint.val || 6) - 35,
-          left: tsToLeft(config, latestPoint.timestamp) - 13,
+          top: valToTop(config, latestPoint.val) - 30, // Magic numbers to position 38px width element
+          left: tsToLeft(config, latestPoint.timestamp) - 18, // Magic numbers to position 38px width element
           color: timestampIsUnderMaxAge(Date.now(), latestPoint.timestamp, 8) ? '#555' : '#aaa',
         }}
       >
-        {setOneDecimal(latestPoint.val)}
+        {setDecimals(latestPoint.val, config.decimals)}
       </span>
     )
   );

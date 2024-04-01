@@ -13,9 +13,12 @@ import {
   roundTo2Decimals,
   timestampIsUnderMaxAge,
   getBgAverage,
+  calculateDailyAverageBgs,
+  calculateDailyAmounts,
 } from 'shared/calculations/calculations';
 import { sensorEntries1, sensorEntries2 } from 'shared/calculations/test-data/sensor-entries';
 import 'mocha';
+import { mockCarbEntries, mockSensorEntries } from 'shared/mocks/timelineEntries';
 
 describe('shared/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
@@ -117,5 +120,15 @@ describe('shared/calculations', () => {
   it('getBgAverage', () => {
     assert.deepEqual(getBgAverage(sensorEntries1), '6.9');
     assert.deepEqual(getBgAverage(sensorEntries2), '12.0');
+  });
+
+  // TODO
+  it('calculateDailyAmounts', () => {
+    assert.deepEqual(calculateDailyAmounts(mockCarbEntries, 2), []);
+  });
+
+  // TODO
+  it('calculateDailyAverageBgs', () => {
+    assert.deepEqual(calculateDailyAverageBgs(mockSensorEntries, 2), []);
   });
 });
