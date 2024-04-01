@@ -36,3 +36,32 @@ startRunningCronjobs(context, {
   profiles,
   checks, // run this after dexcomShare()
 });
+
+export async function handleLambdaEvent(
+  event:
+    | {
+        source: 'aws.events';
+        'detail-type': 'Scheduled Event';
+      }
+    | {
+        path: string; // e.g. "/nightbear-stage-backend"
+        httpMethod: string; // e.g. "GET", "POST"
+        headers: Record<string, string>; // note: there's also multiValueHeaders if ever needed
+        multiValueHeaders: Record<string, string[]>;
+        queryStringParameters: Record<string, string>; // note: there's also multiValueQueryStringParameters if ever needed
+        body: string; // e.g. stringified JSON
+      },
+) {
+  if ('source' in event && event['detail-type'] === 'Scheduled Event') {
+    console.log('Handling cron');
+  } else if ('httpMethod' in event) {
+    console.log('Handling request');
+    return {
+      statusCode: 200,
+      headers: {},
+      body: 'OK',
+    };
+  } else {
+    throw new Error(`Trying to handle unknown Lambda event type`);
+  }
+}

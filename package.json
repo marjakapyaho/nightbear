@@ -27,6 +27,7 @@
     "fix-eslint": "eslint --fix $(npm run --silent list-ts)",
     "\n==================== SERVER ====================": "",
     "server-start": "npm run lint-node && npm run ts-node src/backend/index.ts",
+    "server-build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
     "\n==================== WEB ====================": "",
     "web-start": "npm run lint-node && BROWSER=none react-scripts start",
     "web-build": "npm run lint-node && react-scripts build",
@@ -36,6 +37,24 @@
     "migrate": "node-pg-migrate --database-url-var DATABASE_URL --migrations-table migrations --migration-file-language sql --migrations-dir src/backend/migrations",
     "generate": "pgtyped -c pgtyped-config.json"
   },
+  "lambdaDependencies": [
+    "@pgtyped/runtime",
+    "axios",
+    "body-parser",
+    "check-node-version",
+    "cors",
+    "debug",
+    "express",
+    "lodash",
+    "luxon",
+    "pg",
+    "pouchdb-adapter-memory",
+    "pouchdb-find",
+    "pouchdb",
+    "pushover-notifications",
+    "ts-node",
+    "typescript"
+  ],
   "dependencies": {
     "@pgtyped/cli": "2.3.0",
     "@pgtyped/runtime": "2.3.0",

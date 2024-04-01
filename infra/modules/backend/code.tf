@@ -1,5 +1,6 @@
 locals {
-  file = "code"
+  file    = "code"
+  handler = "handleLambdaEvent"
 }
 
 # Create a zip file with placeholder code, so we have something to create the Lambda with
