@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+
+cd infra
+source .envrc
+DATABASE_URL="$(terraform output -json | jq -r .global_db.value.connection_string.stage)" npm run migrate up
