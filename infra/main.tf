@@ -5,8 +5,9 @@ module "global_db" {
 }
 
 module "stage_backend" {
-  source      = "./modules/backend"
-  name_prefix = "${var.name_prefix}-stage-backend"
-  secrets     = var.secrets
-  subnet_ids  = module.global_db.subnet_ids
+  source               = "./modules/backend"
+  name_prefix          = "${var.name_prefix}-stage-backend"
+  secrets              = var.secrets
+  subnet_ids           = module.global_db.subnet_ids
+  db_connection_string = module.global_db.connection_string.stage
 }

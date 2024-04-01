@@ -55,7 +55,8 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      NODE_PATH = "." # so that node can resolve module paths like "shared/utils/logging" during runtime
+      NODE_PATH    = "."                      # so that node can resolve module paths like "shared/utils/logging" during runtime
+      DATABASE_URL = var.db_connection_string # where can we reach our DB
     }
   }
 }

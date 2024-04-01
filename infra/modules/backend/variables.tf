@@ -7,3 +7,7 @@ variable "secrets" {
 variable "subnet_ids" {
   type = set(string)
 }
+
+variable "db_connection_string" {
+  type = string
+}

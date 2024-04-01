@@ -1,3 +1,8 @@
+locals {
+  username     = "nightbear"
+  environments = ["stage", "prod"]
+}
+
 # We'll be using the default VPC for the DB
 data "aws_vpc" "default" {
   default = true
@@ -9,6 +14,12 @@ data "aws_subnets" "default" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
+}
+
+# Figure out the default security group for the default VPC
+data "aws_security_group" "default" {
+  vpc_id = data.aws_vpc.default.id
+  name   = "default"
 }
 
 # Collection of subnets that the RDS instance can be provisioned in
@@ -33,6 +44,15 @@ resource "aws_vpc_security_group_ingress_rule" "dev_access" {
   to_port     = 5432
 }
 
+# Allow access to anyone within the same VPC
+resource "aws_vpc_security_group_ingress_rule" "lambda_access" {
+  security_group_id            = aws_security_group.this.id
+  ip_protocol                  = "tcp"
+  from_port                    = 5432
+  to_port                      = 5432
+  referenced_security_group_id = data.aws_security_group.default.id
+}
+
 # Main DB instance
 resource "aws_db_instance" "this" {
   identifier                            = var.name_prefix
@@ -40,7 +60,7 @@ resource "aws_db_instance" "this" {
   instance_class                        = "db.t3.micro" # included in free tier
   engine                                = "postgres"
   engine_version                        = "16.2"
-  username                              = "nightbear"
+  username                              = local.username
   password                              = var.secrets.database_password
   allow_major_version_upgrade           = false
   auto_minor_version_upgrade            = true
