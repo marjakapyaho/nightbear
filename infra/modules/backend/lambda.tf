@@ -53,10 +53,15 @@ resource "aws_lambda_function" "this" {
     subnet_ids         = var.subnet_ids
   }
 
+  logging_config {
+    log_format = "JSON" # enable JSON logging (see https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html for format examples)
+  }
+
   environment {
     variables = {
       NODE_PATH    = "."                      # so that node can resolve module paths like "shared/utils/logging" during runtime
       DATABASE_URL = var.db_connection_string # where can we reach our DB
+      DEBUG        = "nightbear*"             # turn on logging for the "nightbear" namespace (see https://www.npmjs.com/package/debug)
     }
   }
 }
