@@ -1,14 +1,11 @@
-import { Context } from 'shared/storage/api';
-import { TZ } from 'shared/utils/time';
-import { DateTime } from 'luxon';
-import { MIN_IN_MS, SEC_IN_MS } from 'shared/calculations/calculations';
-import { extendLogger } from 'shared/utils/logging';
+import { CronjobsJournal } from 'backend/features/cronjobsJournal/types';
 import { kebabCase } from 'lodash';
-import { is } from 'shared/models/utils';
+import { DateTime } from 'luxon';
+import { SEC_IN_MS } from 'shared/calculations/calculations';
+import { Context } from 'shared/storage/api';
 import { generateUuid } from 'shared/utils/id';
-import { CronjobsJournal } from 'shared/models/model';
-
-const CRONJOBS_EVERY_MINUTES = 1;
+import { extendLogger } from 'shared/utils/logging';
+import { TZ } from 'shared/utils/time';
 
 export type Cronjob = (
   context: Context,
@@ -25,44 +22,32 @@ export type Cronjob = (
  * 1. When each function has been invoked, we persist the resulting CronjobsJournal model to the DB
  * 1. We're done
  */
-export function startRunningCronjobs(context: Context, cronjobs: { [name: string]: Cronjob }) {
+export async function runCronJobs(context: Context, cronjobs: { [name: string]: Cronjob }) {
   const log = extendLogger(context.log, 'cron');
+  const now = Date.now();
   const jobNames = Object.keys(cronjobs);
+
   log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${TZ}"`);
-  const run = () => {
-    const now = Date.now();
-    return Promise.resolve()
-      .then(() => context.storage.loadGlobalModels()) // TODO: Support loading by key, and not everything every time
-      .then(models => models.filter(is('CronjobsJournal')))
-      .then(([journal]) => {
-        if (journal) return journal;
-        log(`Looks like cronjobs have never run, setting up cronjobs journal`);
-        return context.storage.saveModel(getDefaultJournalContent());
-      })
-      .then(journal => {
-        log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '));
-        return jobNames.reduce(
-          (memo, key) =>
-            memo.then(journal =>
-              Promise.resolve()
-                .then(() => cronjobs[key](extendLogger(context, kebabCase(key)), journal))
-                .then(journalUpdates => ({ ...journal, ...journalUpdates })) // if a job provided updates to the journal, merge those in
-                .catch(err => {
-                  context.log(`Cronjob "${key}" execution failed (caused by\n${err}\n)`);
-                  return journal;
-                }),
-            ),
-          Promise.resolve(journal), // start with the journal loaded from the DB
-        );
-      })
-      .then(updatedJournal => context.storage.saveModel(updatedJournal)) // persist updated journal into DB for the next run
-      .then(() => log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`));
-  };
-  setInterval(run, CRONJOBS_EVERY_MINUTES * MIN_IN_MS);
-  run();
+  log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '));
+
+  let [journal] = await context.db.cronjobsJournal.load();
+
+  for (const jobName of jobNames) {
+    try {
+      const logger = extendLogger(context, kebabCase(jobName));
+      const journalUpdates = await cronjobs[jobName](logger, journal);
+      journal = { ...journal, ...journalUpdates }; // if a job provided updates to the journal, merge those in
+    } catch (err) {
+      context.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`);
+    }
+  }
+
+  await context.db.cronjobsJournal.update({ ...journal, previousExecutionAt: new Date() }); // persist updated journal into DB for the next run
+
+  log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`);
 }
 
-export function getDefaultJournalContent(): CronjobsJournal {
+export function getDefaultJournalContent(): unknown /* TODO: Replace with new type */ {
   return {
     modelType: 'CronjobsJournal',
     modelUuid: generateUuid(),

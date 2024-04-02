@@ -2,9 +2,8 @@ import { createDexcomShareClient, DexcomShareClient, NO_DEXCOM_SHARE } from 'bac
 import { createDbClient, DbClient } from 'backend/utils/db';
 import { readFileSync } from 'fs';
 import { isFinite, map } from 'lodash';
-import { createPushoverClient, PushoverClient } from 'shared/alarms/pushover-client';
-import { createCouchDbStorage } from 'shared/storage/couchDbStorage';
-import { Storage } from 'shared/storage/storage';
+import { NO_PUSHOVER, PushoverClient } from 'shared/alarms/pushover-client';
+import { NO_STORAGE, Storage } from 'shared/storage/storage';
 import { createLogger, Logger } from 'shared/utils/logging';
 
 export function createNodeContext(): Context {
@@ -18,11 +17,11 @@ export function createNodeContext(): Context {
     DEXCOM_SHARE_PASSWORD,
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
   } = process.env;
-  if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
+  // if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
   if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
-  if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
-  if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
-  if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
+  // if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
+  // if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
+  // if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
   const log = createLogger();
   const config = {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // default to a pretty conservative 3 hours
@@ -33,9 +32,9 @@ export function createNodeContext(): Context {
     httpPort: 3000,
     timestamp: Date.now,
     log,
-    storage: createCouchDbStorage(NIGHTBEAR_DB_URL),
+    storage: NO_STORAGE,
     db: createDbClient(DATABASE_URL),
-    pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
+    pushover: NO_PUSHOVER,
     dexcomShare:
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
         ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)

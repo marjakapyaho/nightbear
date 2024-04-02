@@ -54,12 +54,15 @@ export async function handleLambdaEvent(
 ) {
   if ('source' in event && event['detail-type'] === 'Scheduled Event') {
     console.log('Handling cron');
+    await runCronJobs(context, {
+      helloWorld,
+    });
   } else if ('httpMethod' in event) {
     console.log('Handling request');
     return {
       statusCode: 200,
       headers: {},
-      body: 'OK',
+      body: JSON.stringify(await context.db.cronjobsJournal.load()),
     };
   } else {
     throw new Error(`Trying to handle unknown Lambda event type`);
