@@ -1,20 +1,19 @@
 import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
 import { TimelineEntries } from 'shared/types/timelineEntries';
-import { highLimit, lowLimit } from 'frontend/utils/config';
-import { nbGood, nbHigh, nbLow } from 'frontend/utils/colors';
+import { highLimit, lowLimit } from 'shared/utils/config';
 
 export const getFillColor = (bgSensor: number, bgMeter?: number) => {
   if (bgMeter) {
     return '#828282';
   }
   if (bgSensor > highLimit) {
-    return nbHigh;
+    return '#F8CC6F';
   }
   if (bgSensor < lowLimit) {
-    return nbLow;
+    return '#ee5a36';
   }
-  return nbGood;
+  return '#54c87e';
 };
 
 const isTimestampWithinFiveMinutes = (timestampToCheck: number, baseTimestamp: number) => {

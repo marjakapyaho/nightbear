@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Stats } from 'frontend/pages/stats/Stats';
 import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from './utils/queryClient';
+import { queryClient } from 'frontend/data/queryClient';
 
 type Props = {};
 

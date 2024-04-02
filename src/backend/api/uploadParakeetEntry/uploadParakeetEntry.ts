@@ -1,5 +1,5 @@
 import { calculateRaw } from 'shared/calculations/calculations';
-import { Context, createResponse, Request, Response } from 'shared/models/api';
+import { Context, createResponse, Request, Response } from 'shared/storage/api';
 import { DeviceStatus, DexcomCalibration, ParakeetSensorEntry } from 'shared/models/model';
 import { find } from 'lodash';
 import { generateUuid } from 'shared/utils/id';

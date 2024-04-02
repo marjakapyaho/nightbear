@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { callFetch } from 'frontend/utils/fetch';
+import { callFetch } from 'frontend/data/fetch';
 import { TimelineEntries } from 'shared/types/timelineEntries';
 import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';

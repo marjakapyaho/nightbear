@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { MIN_IN_MS } from 'shared/calculations/calculations';
-import { Request } from 'shared/models/api';
+import { Request } from 'shared/storage/api';
 import {
   DeviceStatus,
   DexcomCalibration,

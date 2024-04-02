@@ -1,5 +1,5 @@
 import { DAY_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
-import { Context } from 'shared/models/api';
+import { Context } from 'shared/storage/api';
 import { SavedProfile } from 'shared/models/model';
 import { activateSavedProfile, is } from 'shared/models/utils';
 import { getActivationTimestamp, humanReadableShortTime } from 'shared/utils/time';

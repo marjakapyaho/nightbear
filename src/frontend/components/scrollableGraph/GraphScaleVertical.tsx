@@ -1,6 +1,6 @@
 import { range } from 'lodash';
 import React from 'react';
-import { highLimit } from 'frontend/utils/config';
+import { highLimit } from 'shared/utils/config';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, valToTop } from './scrollableGraphUtils';
 

@@ -1,18 +1,11 @@
-import { parseAnalyserEntries, checkThatThereIsNoCorrectionInsulin } from 'shared/analyser/analyser-utils';
+import { parseAnalyserEntries, checkThatThereIsNoCorrectionInsulin } from 'shared/analyser/analyserUtils';
 import { HOUR_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
-import {
-  ActiveProfile,
-  Alarm,
-  AnalyserEntry,
-  Carbs,
-  DEFAULT_STATE,
-  DeviceStatus,
-  Insulin,
-  SensorEntry,
-  State,
-} from 'shared/models/model';
 import { chain, filter, find, some } from 'lodash';
-import { onlyActive } from 'backend/utils/data';
+import { onlyActive } from 'shared/utils/alarms';
+import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { AnalyserEntry, DEFAULT_STATE, State } from 'shared/types/analyser';
+import { ActiveProfile } from 'shared/types/profiles';
+import { Alarm } from 'shared/types/alarms';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 1;
@@ -31,21 +24,13 @@ export function runAnalysis(
   currentTimestamp: number,
   activeProfile: ActiveProfile,
   sensorEntries: SensorEntry[],
-  insulin: Insulin[],
-  carbs: Carbs[],
-  deviceStatus: DeviceStatus | undefined,
+  insulin: InsulinEntry[],
+  carbs: CarbEntry[],
   alarms: Alarm[],
 ): State {
   const entries: AnalyserEntry[] = parseAnalyserEntries(sensorEntries);
   const latestEntry = chain(entries).sortBy('timestamp').last().value();
   let state = DEFAULT_STATE;
-
-  if (deviceStatus) {
-    state = {
-      ...state,
-      BATTERY: detectBattery(activeProfile, deviceStatus),
-    };
-  }
 
   if (!latestEntry) {
     return state;
@@ -108,10 +93,6 @@ export function runAnalysis(
   return state;
 }
 
-function detectBattery(activeProfile: ActiveProfile, deviceStatus: DeviceStatus) {
-  return deviceStatus.batteryLevel < activeProfile.analyserSettings.BATTERY_LIMIT;
-}
-
 function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, currentTimestamp: number) {
   if (latestEntry) {
     return currentTimestamp - latestEntry.timestamp > activeProfile.analyserSettings.TIME_SINCE_BG_LIMIT * MIN_IN_MS;
@@ -125,7 +106,7 @@ function detectLow(
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
   alarms: Alarm[],
-  carbs: Carbs[],
+  carbs: CarbEntry[],
   currentTimestamp: number,
 ) {
   const notCurrentlyBadLow = !state.BAD_LOW;
@@ -170,7 +151,7 @@ function detectCompressionLow(
   state: State,
   activeProfile: ActiveProfile,
   entries: AnalyserEntry[],
-  insulin: Insulin[],
+  insulin: InsulinEntry[],
   currentTimestamp: number,
 ) {
   const noRecentInsulin = !insulin.length;
@@ -193,7 +174,7 @@ function detectHigh(
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
   alarms: Alarm[],
-  insulins: Insulin[],
+  insulins: InsulinEntry[],
   currentTimestamp: number,
 ): boolean {
   const notCurrentlyBadHigh = !state.BAD_HIGH;
@@ -225,7 +206,7 @@ function detectRising(
   state: State,
   activeProfile: ActiveProfile,
   entry: AnalyserEntry,
-  insulins: Insulin[],
+  insulins: InsulinEntry[],
   currentTimestamp: number,
 ) {
   const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(

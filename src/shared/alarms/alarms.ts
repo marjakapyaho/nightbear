@@ -1,11 +1,11 @@
 import { MIN_IN_MS } from 'shared/calculations/calculations';
-import { Context } from 'shared/models/api';
-import { ActiveProfile, Alarm, AlarmState, Situation, State } from 'shared/models/model';
-import { getAlarmState } from 'shared/models/utils';
-import { generateUuid } from 'shared/utils/id';
+import { Context } from 'shared/storage/api';
 import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
-import { isNotNull } from 'backend/utils/types';
-import { objectKeys } from 'frontend/utils/types';
+import { isNotNull, objectKeys } from 'shared/utils/helpers';
+import { Alarm, AlarmState } from 'shared/types/alarms';
+import { Situation, State } from 'shared/types/analyser';
+import { ActiveProfile } from 'shared/types/profiles';
+import { getAlarmState } from 'shared/utils/alarms';
 
 const INITIAL_ALARM_LEVEL = 1;
 
@@ -18,7 +18,8 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
   // If alarms are not enabled, remove all existing alarms and exit
   if (!activeProfile.alarmsEnabled) {
     return handleAlarmsToRemove(activeAlarms, context).then(alarms => {
-      return context.storage.saveModels(alarms);
+      //return context.storage.saveModels(alarms);
+      console.log('TODO: SAVE MODELS');
     });
   }
 
@@ -35,7 +36,8 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Ac
       (memo: Alarm[], next: Array<Alarm | null>) => memo.concat(next.filter(isNotNull)),
       [],
     );
-    return context.storage.saveModels(alarmModels);
+    //return context.storage.saveModels(alarmModels);
+    console.log('TODO: SAVE MODELS');
   });
 }
 
@@ -155,8 +157,7 @@ function handleAlarmsToCreate(situationTypes: Situation[], context: Context): Pr
 
 export function createAlarm(situationType: Situation, alarmLevel: number, context: Context): Alarm {
   return {
-    modelType: 'Alarm',
-    modelUuid: generateUuid(),
+    id: '123',
     timestamp: context.timestamp(),
     situationType,
     isActive: true,

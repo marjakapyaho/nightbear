@@ -1,4 +1,4 @@
-import { Context } from 'shared/models/api';
+import { Context } from 'shared/storage/api';
 import { humanReadableShortTime } from 'shared/utils/time';
 import debug, { Debugger } from 'debug';
 import { noop } from 'lodash';

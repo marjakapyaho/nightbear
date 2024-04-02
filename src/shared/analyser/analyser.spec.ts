@@ -1,40 +1,32 @@
 import { assert } from 'chai';
 import { runAnalysis } from 'shared/analyser/analyser';
-import { entriesCompressionLow } from 'shared/analyser/test-data/compression-low';
-import { entriesFalling } from 'shared/analyser/test-data/falling';
-import { entriesHigh, recentInsulin } from 'shared/analyser/test-data/high';
-import { entriesLow, recentCarbs } from 'shared/analyser/test-data/low';
-import { entriesNoSituation } from 'shared/analyser/test-data/no-situation';
-import { entriesOutdated } from 'shared/analyser/test-data/outdated';
-import { entriesPersistentHigh } from 'shared/analyser/test-data/persistent-high';
-import { entriesRising } from 'shared/analyser/test-data/rising';
-import { Alarm, Carbs, DEFAULT_STATE, DeviceStatus, Insulin } from 'shared/models/model';
+import { entriesCompressionLow } from 'shared/analyser/testData/compression-low';
+import { entriesFalling } from 'shared/analyser/testData/falling';
+import { entriesHigh, recentInsulin } from 'shared/analyser/testData/high';
+import { entriesLow, recentCarbs } from 'shared/analyser/testData/low';
+import { entriesNoSituation } from 'shared/analyser/testData/no-situation';
+import { entriesOutdated } from 'shared/analyser/testData/outdated';
+import { entriesPersistentHigh } from 'shared/analyser/testData/persistent-high';
+import { entriesRising } from 'shared/analyser/testData/rising';
 import 'mocha';
 import { activeProfile } from 'backend/utils/test';
-import { generateUuid } from 'shared/utils/id';
-import { entriesBadLow } from 'shared/analyser/test-data/bad-low';
-import { entriesBadHigh } from 'shared/analyser/test-data/bad-high';
-import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'shared/analyser/test-data/bad-high-to-high';
-import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'shared/analyser/test-data/bad-low-to-low';
-import { entriesHighFluctuations } from 'shared/analyser/test-data/high-fluctuations';
-import { entriesLowFluctuations } from 'shared/analyser/test-data/low-fluctuations';
+import { entriesBadLow } from 'shared/analyser/testData/bad-low';
+import { entriesBadHigh } from 'shared/analyser/testData/bad-high';
+import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'shared/analyser/testData/bad-high-to-high';
+import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'shared/analyser/testData/bad-low-to-low';
+import { entriesHighFluctuations } from 'shared/analyser/testData/high-fluctuations';
+import { entriesLowFluctuations } from 'shared/analyser/testData/low-fluctuations';
 import { MIN_IN_MS } from 'shared/calculations/calculations';
+import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
+import { Alarm } from 'shared/types/alarms';
+import { DEFAULT_STATE } from 'shared/types/analyser';
 
 describe('utils/analyser', () => {
   // Mock objects
   const currentTimestamp = 1508672249758;
-  const insulin: Insulin[] = [];
-  const carbs: Carbs[] = [];
+  const insulin: InsulinEntry[] = [];
+  const carbs: CarbEntry[] = [];
   const alarms: Alarm[] = [];
-
-  const deviceStatus: DeviceStatus = {
-    modelType: 'DeviceStatus',
-    modelUuid: generateUuid(),
-    deviceName: 'dexcom-uploader',
-    timestamp: currentTimestamp,
-    batteryLevel: 70,
-    geolocation: null,
-  };
 
   // Assertions
   it('detects no situation', () => {
@@ -45,37 +37,9 @@ describe('utils/analyser', () => {
         entriesNoSituation(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       DEFAULT_STATE,
-    );
-  });
-
-  it('detects battery', () => {
-    const deviceStatusBattery: DeviceStatus = {
-      modelType: 'DeviceStatus',
-      modelUuid: generateUuid(),
-      deviceName: 'dexcom-uploader',
-      timestamp: currentTimestamp,
-      batteryLevel: 10,
-      geolocation: null,
-    };
-
-    assert.deepEqual(
-      runAnalysis(
-        currentTimestamp,
-        activeProfile('day', currentTimestamp),
-        entriesNoSituation(currentTimestamp),
-        insulin,
-        carbs,
-        deviceStatusBattery,
-        alarms,
-      ),
-      {
-        ...DEFAULT_STATE,
-        BATTERY: true,
-      },
     );
   });
 
@@ -87,7 +51,6 @@ describe('utils/analyser', () => {
         entriesOutdated(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -105,7 +68,6 @@ describe('utils/analyser', () => {
         entriesLow(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -123,7 +85,6 @@ describe('utils/analyser', () => {
         entriesBadLow(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -141,7 +102,6 @@ describe('utils/analyser', () => {
         entriesFalling(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -159,7 +119,6 @@ describe('utils/analyser', () => {
         entriesCompressionLow(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -177,7 +136,6 @@ describe('utils/analyser', () => {
         entriesHigh(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
         alarms,
       ),
       {
@@ -195,7 +153,7 @@ describe('utils/analyser', () => {
         entriesBadHigh(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -213,7 +171,7 @@ describe('utils/analyser', () => {
         entriesRising(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -231,7 +189,7 @@ describe('utils/analyser', () => {
         entriesPersistentHigh(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -249,7 +207,7 @@ describe('utils/analyser', () => {
         entriesBadHighToHigh(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarmsWithInactiveBadHigh(currentTimestamp),
       ),
       DEFAULT_STATE,
@@ -264,7 +222,7 @@ describe('utils/analyser', () => {
         entriesBadLowToLow(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarmsWithInactiveBadLow(currentTimestamp),
       ),
       DEFAULT_STATE,
@@ -279,7 +237,7 @@ describe('utils/analyser', () => {
         entriesHighFluctuations(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -297,7 +255,7 @@ describe('utils/analyser', () => {
         entriesLowFluctuations(currentTimestamp),
         insulin,
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -315,7 +273,7 @@ describe('utils/analyser', () => {
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 80 * MIN_IN_MS),
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       DEFAULT_STATE,
@@ -330,7 +288,7 @@ describe('utils/analyser', () => {
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 140 * MIN_IN_MS),
         carbs,
-        deviceStatus,
+
         alarms,
       ),
       {
@@ -348,7 +306,7 @@ describe('utils/analyser', () => {
         entriesLow(currentTimestamp),
         insulin,
         recentCarbs(currentTimestamp),
-        deviceStatus,
+
         alarms,
       ),
       {

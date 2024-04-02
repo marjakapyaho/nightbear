@@ -1,6 +1,5 @@
 import React from 'react';
-import { reallyHighLimit, reallyLowLimit } from 'frontend/utils/config';
-import { fontColor, nbCarbs, nbGood, nbHigh, nbInsulin, nbLow } from 'frontend/utils/colors';
+import { reallyHighLimit, reallyLowLimit } from 'shared/utils/config';
 import {
   calculateHba1c,
   countSituations,
@@ -11,8 +10,8 @@ import {
   DAY_IN_MS,
   calculateDailyAmounts,
   calculateDailyAverageBgs,
+  setOneDecimal,
 } from 'shared/calculations/calculations';
-import { setOneDecimal } from 'frontend/utils/helpers';
 import styles from './Stats.module.scss';
 import { StatLine } from 'frontend/pages/stats/StatLine';
 import { StatGraph } from 'frontend/pages/stats/StatGraph';
@@ -37,17 +36,17 @@ export const Stats = () => {
   const dailyInsulins = calculateDailyAmounts(insulinEntries, daysToShow).map(val => ({
     timestamp: val.timestamp,
     val: val.total,
-    color: nbInsulin,
+    color: '#EE776E',
   }));
   const dailyCarbs = calculateDailyAmounts(carbEntries, daysToShow).map(val => ({
     timestamp: val.timestamp,
     val: val.total,
-    color: nbCarbs,
+    color: '#9AD5B3',
   }));
   const dailyAverageBgs = calculateDailyAverageBgs(bgEntries, daysToShow).map(val => ({
     timestamp: val.timestamp,
     val: val.average,
-    color: fontColor,
+    color: '#777',
   }));
 
   return (
@@ -92,20 +91,20 @@ export const Stats = () => {
         decimals={0}
       />
 
-      <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgEntries)} color={nbGood} />
-      <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color={nbGood} />
-      <StatLine title="LOW" subtitle="below 3.7" figure={countSituations(bgEntries, 3.7, true)} color={nbLow} />
+      <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgEntries)} color="#54c87e" />
+      <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color="#54c87e" />
+      <StatLine title="LOW" subtitle="below 3.7" figure={countSituations(bgEntries, 3.7, true)} color="#ee5a36" />
       <StatLine
         title="LOW"
         subtitle="below 3.0"
         figure={countSituations(bgEntries, reallyLowLimit, true)}
-        color={nbLow}
+        color="#ee5a36"
       />
       <StatLine
         title="HIGH"
         subtitle={`over ${reallyHighLimit}`}
         figure={countSituations(bgEntries, reallyHighLimit, false)}
-        color={nbHigh}
+        color="#F8CC6F"
       />
     </div>
   );

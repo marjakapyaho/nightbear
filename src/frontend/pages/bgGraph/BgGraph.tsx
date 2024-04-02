@@ -1,5 +1,4 @@
 import { ScrollNumberSelector } from 'frontend/components/scrollNumberSelector/ScrollNumberSelector';
-import { nbBg, nbCarbs, nbInsulin } from 'frontend/utils/colors';
 import { StatusBar } from 'frontend/components/statusBar/StatusBar';
 import { useState } from 'react';
 import React from 'react';
@@ -48,7 +47,7 @@ export const BgGraph = () => {
           max={100}
           step={5}
           centerOn={40}
-          color={nbCarbs}
+          color="#9ad5b3"
         />
         <ScrollNumberSelector
           value={selectedPoint?.valMiddle || undefined}
@@ -64,7 +63,7 @@ export const BgGraph = () => {
           step={0.5}
           centerOn={8}
           decimals={1}
-          color={nbBg}
+          color="#F8CC6F"
         />
         <ScrollNumberSelector
           value={selectedPoint?.valTop}
@@ -79,7 +78,7 @@ export const BgGraph = () => {
           max={20}
           step={1}
           centerOn={5}
-          color={nbInsulin}
+          color="#ee776e"
         />
       </div>
     </div>

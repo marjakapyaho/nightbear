@@ -1,4 +1,4 @@
-import { Context, createResponse, Request, Response, getDeployedVersion } from 'shared/models/api';
+import { Context, createResponse, Request, Response, getDeployedVersion } from 'shared/storage/api';
 
 export function getServerStatus(request: Request, context: Context): Response {
   return createResponse({

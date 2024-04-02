@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { callFetch } from 'frontend/utils/fetch';
+import { callFetch } from 'frontend/data/fetch';
 import { Profile } from 'shared/types/profiles';
 import { mockProfiles } from 'shared/mocks/profiles';
 

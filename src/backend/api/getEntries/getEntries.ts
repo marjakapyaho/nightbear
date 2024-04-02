@@ -1,6 +1,6 @@
 import { HOUR_IN_MS } from 'shared/calculations/calculations';
 import { getMergedEntriesFeed } from 'shared/entries/entries';
-import { Context, createResponse, Request, Response } from 'shared/models/api';
+import { Context, createResponse, Request, Response } from 'shared/storage/api';
 import { TimelineModel } from 'shared/models/model';
 import { is } from 'shared/models/utils';
 import { chain, union } from 'lodash';

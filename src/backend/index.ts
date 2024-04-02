@@ -1,4 +1,4 @@
-import { createNodeContext } from 'shared/models/api';
+import { createNodeContext } from 'shared/storage/api';
 import { consoleLogStream } from 'shared/utils/logging';
 import debug from 'debug';
 import { ackActiveAlarms } from 'backend/api/ackActiveAlarms/ackActiveAlarms';

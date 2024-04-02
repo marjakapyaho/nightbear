@@ -1,5 +1,5 @@
 import { MIN_IN_MS } from 'shared/calculations/calculations';
-import { Context } from 'shared/models/api';
+import { Context } from 'shared/storage/api';
 import { CronjobsJournal, DexcomG6ShareEntry } from 'shared/models/model';
 import { humanReadableLongTime } from 'shared/utils/time';
 import { first, isArray } from 'lodash';

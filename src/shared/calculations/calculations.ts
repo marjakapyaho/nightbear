@@ -1,7 +1,5 @@
 import { fill, groupBy, reduce } from 'lodash';
-import { hasBloodGlucose } from 'backend/utils/data';
-import { timeInRangeHighLimit, timeInRangeLowLimit } from 'frontend/utils/config';
-import { setOneDecimal } from 'frontend/utils/helpers';
+import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { DateTime } from 'luxon';
 
@@ -11,6 +9,10 @@ export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const DAY_IN_MS = 24 * HOUR_IN_MS;
 export const TIME_LIMIT_FOR_SLOPE = 15 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
+
+export type SensorEntryWithBg = SensorEntry & { bloodGlucose: number };
+
+export const hasBloodGlucose = (e: SensorEntry): e is SensorEntryWithBg => !!e.bloodGlucose;
 
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export const changeBloodGlucoseUnitToMmoll = (glucoseInMgdl: number): number => {
@@ -37,6 +39,14 @@ export const calculateRaw = (unfiltered: number, slope: number, intercept: numbe
 export const isDexcomEntryValid = (noise: number, sgv: number): boolean => {
   return noise < NOISE_LEVEL_LIMIT && sgv > 40;
 };
+
+export function setOneDecimal(num: number | null): string {
+  return num ? (Math.round(num * 10) / 10).toFixed(1) : '';
+}
+
+export function setDecimals(num: number | null, decimals: number): string {
+  return num ? num.toFixed(decimals) : '';
+}
 
 // Rounds a number to 0 decimals
 export const roundTo0Decimals = (num: number) => {

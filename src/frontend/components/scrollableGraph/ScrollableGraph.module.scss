@@ -1,3 +1,5 @@
+@import '../../styles/common.scss';
+
 .scrollableGraph {
   position: relative; // a lot of children are positioned according to this root element
   overflow: hidden; // if anything pokes out, hide it, scrolling is implemented using a separate element
@@ -102,12 +104,12 @@
 
       .numberBubbleTop {
         @extend %bubbleBase;
-        background: #ee776e;
+        background: $nbInsulin;
       }
 
       .numberBubbleBottom {
         @extend %bubbleBase;
-        background: #9ad5b3;
+        background: $nbCarbs;
         position: absolute;
         bottom: 27px;
       }

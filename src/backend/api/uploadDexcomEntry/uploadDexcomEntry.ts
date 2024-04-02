@@ -4,7 +4,7 @@ import {
   isDexcomEntryValid,
   MIN_IN_MS,
 } from 'shared/calculations/calculations';
-import { Context, createResponse, Request, Response } from 'shared/models/api';
+import { Context, createResponse, Request, Response } from 'shared/storage/api';
 import {
   DeviceStatus,
   DexcomCalibration,

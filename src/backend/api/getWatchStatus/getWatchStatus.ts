@@ -1,4 +1,4 @@
-import { Context, createResponse, Request, Response } from 'shared/models/api';
+import { Context, createResponse, Request, Response } from 'shared/storage/api';
 import { first } from 'lodash';
 import { getAlarmState } from 'shared/models/utils';
 

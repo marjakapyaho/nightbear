@@ -1,10 +1,10 @@
 import { alarmWithUpdatedState } from 'shared/alarms/alarms';
 import { MIN_IN_MS } from 'shared/calculations/calculations';
-import { Context, createResponse, Request, Response } from 'shared/models/api';
+import { Context, createResponse, Request, Response } from 'shared/storage/api';
 import { getAlarmState } from 'shared/models/utils';
 import { first } from 'lodash';
 import { extendLogger } from 'shared/utils/logging';
-import { NIGHT_PROFILE_NAME, NO_WAKE_UPS_PROFILE_NAME, WATCH_NAME } from 'shared/models/const';
+import { NIGHT_PROFILE_NAME, NO_WAKE_UPS_PROFILE_NAME, WATCH_NAME } from 'shared/utils/const';
 
 export function ackActiveAlarms(request: Request, context: Context): Response {
   const log = extendLogger(context.log, 'check');

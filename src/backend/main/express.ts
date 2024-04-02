@@ -1,5 +1,5 @@
 import * as bodyParser from 'body-parser';
-import { Context, Headers, Request, RequestHandler } from 'shared/models/api';
+import { Context, Headers, Request, RequestHandler } from 'shared/storage/api';
 import { generateUuid } from 'shared/utils/id';
 import { extendLogger, Logger } from 'shared/utils/logging';
 import cors from 'cors';

@@ -1,8 +1,7 @@
 import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
-import { timestampIsUnderMaxAge } from 'shared/calculations/calculations';
-import { setDecimals } from 'frontend/utils/helpers';
+import { timestampIsUnderMaxAge, setDecimals } from 'shared/calculations/calculations';
 
 type Props = {
   latestPoint: Point | null;

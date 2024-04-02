@@ -3,7 +3,7 @@ import { runAnalysis } from 'shared/analyser/analyser';
 import { HOUR_IN_MS } from 'shared/calculations/calculations';
 import { getMergedEntriesFeed } from 'shared/entries/entries';
 import { first, map, identity } from 'lodash';
-import { onlyActive } from 'backend/utils/data';
+import { onlyActive } from 'shared/utils/alarms';
 import { Cronjob } from 'backend/main/cronjobs';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
