@@ -13,7 +13,6 @@
   "scripts": {
     "\n==================== GLOBAL HOOKS ====================": "",
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
-    "prepush": "npm run lint && npm test",
     "\n==================== GLOBAL QA ====================": "",
     "test": "NODE_PATH=src TS_NODE_PROJECT=tsconfig.mocha.json mocha --require ts-node/register --require $(find src -name PouchDb.mocha.ts) $(npm run --silent list-tests)",
     "lint": "concurrently npm:lint-node npm:lint-tsc npm:lint-eslint npm:lint-prettier",
@@ -66,7 +65,6 @@
     "cors": "2.8.5",
     "debug": "4.3.4",
     "express": "4.19.2",
-    "husky": "8.0.3",
     "lodash": "4.17.21",
     "luxon": "1.28.1",
     "mocha": "10.2.0",
