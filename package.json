@@ -13,7 +13,6 @@
   "scripts": {
     "\n==================== GLOBAL HOOKS ====================": "",
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
-    "precommit": "npm run lint && npm test",
     "prepush": "npm run lint && npm test",
     "\n==================== GLOBAL QA ====================": "",
     "test": "NODE_PATH=src TS_NODE_PROJECT=tsconfig.mocha.json mocha --require ts-node/register --require $(find src -name PouchDb.mocha.ts) $(npm run --silent list-tests)",

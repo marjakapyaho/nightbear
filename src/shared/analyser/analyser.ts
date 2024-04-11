@@ -32,16 +32,13 @@ export function runAnalysis(
   const latestEntry = chain(entries).sortBy('timestamp').last().value();
   let state = DEFAULT_STATE;
 
-  if (!latestEntry) {
-    return state;
-  }
-
+  // Must be first, checks also if we even have latestEntry
   state = {
     ...state,
     OUTDATED: detectOutdated(activeProfile, latestEntry, currentTimestamp),
   };
 
-  if (state.OUTDATED || !latestEntry.bloodGlucose) {
+  if (state.OUTDATED) {
     return state;
   }
 
@@ -94,7 +91,7 @@ export function runAnalysis(
 }
 
 function detectOutdated(activeProfile: ActiveProfile, latestEntry: AnalyserEntry, currentTimestamp: number) {
-  if (latestEntry) {
+  if (latestEntry && latestEntry.bloodGlucose) {
     return currentTimestamp - latestEntry.timestamp > activeProfile.analyserSettings.TIME_SINCE_BG_LIMIT * MIN_IN_MS;
   } else {
     return true;
