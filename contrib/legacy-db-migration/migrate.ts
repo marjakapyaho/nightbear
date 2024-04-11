@@ -1,5 +1,5 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'shared/calculations/calculations';
+import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'src/shared/utils/calculations';
 import {
   Alarm,
   Carbs,
@@ -19,7 +19,7 @@ import { createCouchDbStorage, getModelRef } from 'shared/storage/couchDbStorage
 import { generateUuid } from 'shared/utils/id';
 import PouchDB from 'shared/storage/PouchDb';
 import { chunk, flatten } from 'lodash';
-import { CAL_PAIRING } from 'backend/api/uploadDexcomEntry/uploadDexcomEntry';
+import { CAL_PAIRING } from '../../api_old/uploadDexcomEntry/uploadDexcomEntry';
 import { isNotNull } from 'backend/utils/types';
 import { inspect } from 'util';
 

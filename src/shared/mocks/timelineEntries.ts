@@ -1,4 +1,4 @@
-import { MIN_IN_MS } from 'shared/calculations/calculations';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 
 export const mockSensorEntries: SensorEntry[] = [

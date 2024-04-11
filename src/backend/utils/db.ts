@@ -1,5 +1,5 @@
-import * as bloodGlucoseEntries from 'backend/features/bloodGlucoseEntries/db.queries';
-import * as cronjobsJournal from 'backend/features/cronjobsJournal/db.queries';
+import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
+import * as cronjobsJournal from 'backend/db/cronjobsJournal/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -7,7 +7,7 @@ import { Client, Pool, types } from 'pg';
  * All DB modules need to be listed here to become accessible via the DB wrapper.
  */
 const dbModules = {
-  bloodGlucoseEntries,
+  sensorEntries,
   cronjobsJournal,
 };
 
@@ -49,6 +49,5 @@ async function performQuery(
   pool: Pool,
 ) {
   const res = await query.run(args, pool);
-  const camelCased = res.map(row => _.mapKeys(row, (_val, key) => _.camelCase(key)));
-  return camelCased;
+  return res.map(row => _.mapKeys(row, (_val, key) => _.camelCase(key)));
 }

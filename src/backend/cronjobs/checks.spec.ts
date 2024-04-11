@@ -1,4 +1,4 @@
-import { MIN_IN_MS } from 'shared/calculations/calculations';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 import { Alarm, DeviceStatus, DexcomCalibration, DexcomSensorEntry } from 'shared/models/model';
 import 'mocha';
 import {
@@ -10,7 +10,7 @@ import {
 } from 'backend/utils/test';
 import { generateUuid } from 'shared/utils/id';
 import { checks, ALARM_FETCH_RANGE } from 'backend/cronjobs/checks';
-import { getDefaultJournalContent } from 'backend/main/cronjobs';
+import { getDefaultJournalContent } from 'backend/utils/cronjobs';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;

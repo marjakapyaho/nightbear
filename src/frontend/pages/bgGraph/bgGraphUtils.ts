@@ -1,5 +1,5 @@
 import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
-import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/calculations/calculations';
+import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import { TimelineEntries } from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'shared/utils/config';
 

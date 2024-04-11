@@ -1,4 +1,4 @@
-import { DAY_IN_MS, HOUR_IN_MS } from 'shared/calculations/calculations';
+import { DAY_IN_MS, HOUR_IN_MS } from 'shared/utils/calculations';
 import { DateTime, Duration } from 'luxon';
 
 const LIVE_FORMAT_AGE_LIMIT = HOUR_IN_MS;

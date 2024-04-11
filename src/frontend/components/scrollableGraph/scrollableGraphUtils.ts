@@ -1,4 +1,4 @@
-import { roundTo1Decimals } from 'shared/calculations/calculations';
+import { roundTo1Decimals } from 'shared/utils/calculations';
 import { isNotNull } from 'backend/utils/types';
 
 export type BaseGraphConfig = {

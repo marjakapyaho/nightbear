@@ -1,4 +1,4 @@
-import { roundTo0Decimals, roundTo1Decimals } from 'shared/calculations/calculations';
+import { roundTo0Decimals, roundTo1Decimals } from 'shared/utils/calculations';
 import { Duration } from 'luxon';
 
 // @example "15 min"

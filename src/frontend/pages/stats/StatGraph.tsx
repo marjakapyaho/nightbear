@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DAY_IN_MS } from 'shared/calculations/calculations';
+import { DAY_IN_MS } from 'shared/utils/calculations';
 import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableGraph';
 import styles from './Stats.module.scss';
 import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';

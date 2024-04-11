@@ -1,10 +1,10 @@
-import { runAlarmChecks } from 'shared/alarms/alarms';
-import { runAnalysis } from 'shared/analyser/analyser';
-import { HOUR_IN_MS } from 'shared/calculations/calculations';
+import { runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
+import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
+import { HOUR_IN_MS } from 'shared/utils/calculations';
 import { getMergedEntriesFeed } from 'shared/entries/entries';
 import { first, map, identity } from 'lodash';
 import { onlyActive } from 'shared/utils/alarms';
-import { Cronjob } from 'backend/main/cronjobs';
+import { Cronjob } from 'backend/utils/cronjobs';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;

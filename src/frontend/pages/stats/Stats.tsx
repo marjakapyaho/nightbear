@@ -11,7 +11,7 @@ import {
   calculateDailyAmounts,
   calculateDailyAverageBgs,
   setOneDecimal,
-} from 'shared/calculations/calculations';
+} from 'shared/utils/calculations';
 import styles from './Stats.module.scss';
 import { StatLine } from 'frontend/pages/stats/StatLine';
 import { StatGraph } from 'frontend/pages/stats/StatGraph';
