@@ -1,4 +1,4 @@
 /* @name create */
-INSERT INTO blood_glucose_entries (type, blood_glucose)
-VALUES (:type!, :bloodGlucose!)
+INSERT INTO blood_glucose_entries (blood_glucose, type)
+VALUES (:bloodGlucose!, :type!)
 RETURNING *;

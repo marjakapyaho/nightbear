@@ -1,20 +1,22 @@
-export type BloodGlucoseEntryType = 'DEXCOM_G6_SHARE' | 'MANUAL';
+export type SensorEntryType = 'DEXCOM_G6_SHARE';
+export type InsulinEntryType = 'FAST' | 'LONG';
 
 export type SensorEntry = {
-  id: string;
   timestamp: Date;
   bloodGlucose: number;
-  type: BloodGlucoseEntryType;
+  type: SensorEntryType;
 };
 
 export type InsulinEntry = {
   timestamp: number;
   amount: number;
+  type: InsulinEntryType;
 };
 
 export type CarbEntry = {
   timestamp: number;
   amount: number;
+  speedFactor: number;
 };
 
 export type MeterEntry = {
