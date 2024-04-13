@@ -45,7 +45,7 @@ resource "aws_lambda_function" "this" {
 
   vpc_config {
     security_group_ids = [data.aws_security_group.default.id]
-    subnet_ids         = var.network.subnet_ids
+    subnet_ids         = var.network.subnet_ids.private
   }
 
   logging_config {

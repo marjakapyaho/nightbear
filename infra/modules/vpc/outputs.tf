@@ -3,5 +3,12 @@ output "vpc_id" {
 }
 
 output "subnet_ids" {
-  value = aws_subnet.this[*].id
+  value = {
+    private = aws_subnet.private[*].id
+    public  = aws_subnet.public[*].id
+  }
+}
+
+output "cidr_block" {
+  value = aws_vpc.this.cidr_block
 }
