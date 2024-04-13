@@ -1,17 +1,12 @@
-import { createNodeContext } from 'shared/storage/api';
 import { consoleLogStream } from 'shared/utils/logging';
 import debug from 'debug';
-import { ackActiveAlarms } from '../../api_old/ackActiveAlarms/ackActiveAlarms';
-import { getEntries } from '../../api_old/getEntries/getEntries';
-import { getServerStatus } from '../../api_old/getServerStatus/getServerStatus';
-import { getWatchStatus } from '../../api_old/getWatchStatus/getWatchStatus';
-import { uploadDexcomEntry } from '../../api_old/uploadDexcomEntry/uploadDexcomEntry';
-import { uploadParakeetEntry } from '../../api_old/uploadParakeetEntry/uploadParakeetEntry';
 import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
 import { startExpressServer } from 'backend/utils/express';
-import { startRunningCronjobs } from 'backend/utils/cronjobs';
+import { runCronJobs, startRunningCronjobs } from 'backend/utils/cronjobs';
 import { profiles } from 'backend/cronjobs/profiles/profiles';
 import { checks } from 'backend/cronjobs/checks';
+import { temp } from 'backend/cronjobs/temp';
+import { createNodeContext } from './utils/api';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -55,7 +50,7 @@ export async function handleLambdaEvent(
   if ('source' in event && event['detail-type'] === 'Scheduled Event') {
     console.log('Handling cron');
     await runCronJobs(context, {
-      helloWorld,
+      temp,
     });
   } else if ('httpMethod' in event) {
     console.log('Handling request');

@@ -1,39 +1,53 @@
-import { Situation } from './analyser';
+export type AnalyserSettings = {
+  id: string;
+  highLevelRel: number;
+  highLevelAbs: number;
+  highLevelBad: number;
+  lowLevelRel: number;
+  lowLevelAbs: number;
+  lowLevelBad: number;
+  timeSinceBgMinutes: number;
+  highCorrectionSuppressionMinutes: number;
+};
+
+export type SituationSettings = {
+  id: string;
+  escalationAfterMinutes: number;
+  snoozeMinutes: number;
+};
+
+export type AlarmSettings = {
+  id: string;
+  outdated: SituationSettings;
+  falling: SituationSettings;
+  rising: SituationSettings;
+  low: SituationSettings;
+  badLow: SituationSettings;
+  compressionLow: SituationSettings;
+  high: SituationSettings;
+  badHigh: SituationSettings;
+  persistentHigh: SituationSettings;
+};
+
+export type PushoverLevel = {
+  id: string;
+  name: string;
+};
 
 export type Profile = {
   id: string;
-  activatedAt?: number;
   profileName: string;
+  isActive: boolean;
   alarmsEnabled: boolean;
-  analyserSettings: {
-    HIGH_LEVEL_REL: number;
-    TIME_SINCE_BG_LIMIT: number; // minutes
-    BATTERY_LIMIT: number;
-    LOW_LEVEL_BAD: number;
-    LOW_LEVEL_ABS: number;
-    LOW_LEVEL_REL: number;
-    HIGH_LEVEL_ABS: number;
-    HIGH_LEVEL_BAD: number;
-    ALARM_RETRY: number; // seconds, min in Pushover 30
-    ALARM_EXPIRE: number; // seconds, max in Pushover 10800
-    HIGH_CORRECTION_SUPPRESSION_WINDOW: number; // minutes
-  };
-  alarmSettings: {
-    [S in Situation]: {
-      escalationAfterMinutes: number[];
-      snoozeMinutes: number;
-    };
-  };
-  pushoverLevels: string[];
+  analyserSettings: AnalyserSettings;
+  alarmSettings: AlarmSettings;
+  pushoverLevels: PushoverLevel[];
 };
 
-export type ActiveProfile = Profile & {
-  timestamp: number;
-};
-
-export type SavedProfile = Profile & {
-  activatedAtUtc?: {
-    hours: number;
-    minutes: number;
-  };
+export type ProfileActivation = {
+  id: string;
+  profileName: string;
+  activatedAt: number;
+  repeatTimeInLocalTimezone?: string;
+  deactivatedAt?: number;
 };

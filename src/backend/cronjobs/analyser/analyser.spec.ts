@@ -9,7 +9,6 @@ import { entriesOutdated } from 'backend/cronjobs/analyser/testData/outdated';
 import { entriesPersistentHigh } from 'backend/cronjobs/analyser/testData/persistent-high';
 import { entriesRising } from 'backend/cronjobs/analyser/testData/rising';
 import 'mocha';
-import { activeProfile } from 'backend/utils/test';
 import { entriesBadLow } from 'backend/cronjobs/analyser/testData/bad-low';
 import { entriesBadHigh } from 'backend/cronjobs/analyser/testData/bad-high';
 import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'backend/cronjobs/analyser/testData/bad-high-to-high';
@@ -19,7 +18,13 @@ import { entriesLowFluctuations } from 'backend/cronjobs/analyser/testData/low-f
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { Alarm } from 'shared/types/alarms';
-import { DEFAULT_STATE } from 'shared/types/analyser';
+import { DEFAULT_STATE } from 'shared/utils/analyser';
+import { mockProfiles } from 'shared/mocks/profiles';
+
+const getMockActiveProfile = (profileName: string) => ({
+  ...mockProfiles[0],
+  profileName,
+});
 
 describe('utils/analyser', () => {
   // Mock objects
@@ -33,7 +38,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('day'),
         entriesNoSituation(currentTimestamp),
         insulin,
         carbs,
@@ -47,7 +52,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('day'),
         entriesOutdated(currentTimestamp),
         insulin,
         carbs,
@@ -62,14 +67,7 @@ describe('utils/analyser', () => {
 
   it('detects low', () => {
     assert.deepEqual(
-      runAnalysis(
-        currentTimestamp,
-        activeProfile('day', currentTimestamp),
-        entriesLow(currentTimestamp),
-        insulin,
-        carbs,
-        alarms,
-      ),
+      runAnalysis(currentTimestamp, getMockActiveProfile('day'), entriesLow(currentTimestamp), insulin, carbs, alarms),
       {
         ...DEFAULT_STATE,
         LOW: true,
@@ -81,7 +79,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('day'),
         entriesBadLow(currentTimestamp),
         insulin,
         carbs,
@@ -98,7 +96,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('day'),
         entriesFalling(currentTimestamp),
         insulin,
         carbs,
@@ -115,7 +113,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesCompressionLow(currentTimestamp),
         insulin,
         carbs,
@@ -132,7 +130,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesHigh(currentTimestamp),
         insulin,
         carbs,
@@ -149,7 +147,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesBadHigh(currentTimestamp),
         insulin,
         carbs,
@@ -167,7 +165,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('day', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesRising(currentTimestamp),
         insulin,
         carbs,
@@ -185,7 +183,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesPersistentHigh(currentTimestamp),
         insulin,
         carbs,
@@ -203,7 +201,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesBadHighToHigh(currentTimestamp),
         insulin,
         carbs,
@@ -218,7 +216,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesBadLowToLow(currentTimestamp),
         insulin,
         carbs,
@@ -233,7 +231,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesHighFluctuations(currentTimestamp),
         insulin,
         carbs,
@@ -251,7 +249,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesLowFluctuations(currentTimestamp),
         insulin,
         carbs,
@@ -269,7 +267,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 80 * MIN_IN_MS),
         carbs,
@@ -284,7 +282,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 140 * MIN_IN_MS),
         carbs,
@@ -302,7 +300,7 @@ describe('utils/analyser', () => {
     assert.deepEqual(
       runAnalysis(
         currentTimestamp,
-        activeProfile('night', currentTimestamp),
+        getMockActiveProfile('night'),
         entriesLow(currentTimestamp),
         insulin,
         recentCarbs(currentTimestamp),

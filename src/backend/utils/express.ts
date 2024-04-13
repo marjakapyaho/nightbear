@@ -1,10 +1,10 @@
 import * as bodyParser from 'body-parser';
-import { Context, Headers, Request, RequestHandler } from 'shared/storage/api';
 import { generateUuid } from 'shared/utils/id';
 import { extendLogger, Logger } from 'shared/utils/logging';
 import cors from 'cors';
 import express, { Request as ExpressRequest } from 'express';
 import { isString, pickBy } from 'lodash';
+import { Context, RequestHandler, Request, Headers } from './api';
 
 export type HttpMethod = 'get' | 'post';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];

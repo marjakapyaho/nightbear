@@ -12,7 +12,7 @@ CREATE TABLE analyser_settings (
     lowLevelAbs NUMERIC(3, 1) NOT NULL,
     lowLevelBad NUMERIC(3, 1) NOT NULL,
     timeSinceBgMinutes INTEGER NOT NULL,
-    highCorrectionSuppressionMinutes INTEGER NOT NULL,
+    highCorrectionSuppressionMinutes INTEGER NOT NULL
 );
 
 CREATE TABLE situation_settings (
@@ -23,38 +23,37 @@ CREATE TABLE situation_settings (
 
 CREATE TABLE alarm_settings (
     id UUID PRIMARY KEY,
-    outdated UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    falling UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    rising UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    low UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    badLow UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    compressionLow UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    high UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-    badHigh UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
+    outdated UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    falling UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    rising UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    low UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    badLow UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    compressionLow UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    high UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
+    badHigh UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
     persistentHigh UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-);
-
-CREATE TABLE pushover_targets (
-    id UUID PRIMARY KEY,
-    name TEXT NOT NULL
-);
-
-CREATE TABLE pushover_levels (
-    id UUID PRIMARY KEY,
-    level1 UUID NOT NULL REFERENCES pushover_targets(id) ON DELETE CASCADE,
-    level2 UUID NOT NULL REFERENCES pushover_targets(id) ON DELETE CASCADE,
-    level3 UUID NOT NULL REFERENCES pushover_targets(id) ON DELETE CASCADE,
-    level4 UUID NOT NULL REFERENCES pushover_targets(id) ON DELETE CASCADE,
-    level5 UUID NOT NULL REFERENCES pushover_targets(id) ON DELETE CASCADE,
 );
 
 CREATE TABLE profile_templates (
     id UUID PRIMARY KEY,
     profileName TEXT,
     alarmsEnabled BOOLEAN NOT NULL DEFAULT true,
-    analyserSettings UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE,
-    alarmSettings UUID NOT NULL REFERENCES alarm_settings(id) ON DELETE CASCADE,
-    pushoverLevels UUID NOT NULL REFERENCES pushover_levels(id) ON DELETE CASCADE
+    analyserSettingsId UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE,
+    alarmSettingsId UUID NOT NULL REFERENCES alarm_settings(id) ON DELETE CASCADE
+);
+
+CREATE TABLE pushover_levels (
+    id UUID PRIMARY KEY,
+    profileTemplateId: UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE profiles_activations (
+   id UUID PRIMARY KEY,
+   profileTemplateId UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
+   activatedAt TIMESTAMPTZ NOT NULL,
+   repeatTimeInLocalTimezone TEXT,
+   deactivatedAt TIMESTAMPTZ
 );
 
 CREATE TYPE situation AS ENUM ('OUTDATED', 'FALLING', 'RISING', 'LOW', 'BAD_LOW', 'COMPRESSION_LOW', 'HIGH', 'BAD_HIGH', 'PERSISTENT_HIGH');
@@ -64,7 +63,7 @@ CREATE TABLE alarms (
    timestamp TIMESTAMPTZ NOT NULL,
    situation situation NOT NULL,
    isActive BOOLEAN NOT NULL DEFAULT true,
-   deactivationTimestamp TIMESTAMPTZ,
+   deactivatedAt TIMESTAMPTZ
 );
 
 CREATE TABLE alarm_states (
@@ -72,7 +71,7 @@ CREATE TABLE alarm_states (
     alarmId UUID NOT NULL REFERENCES alarms(id) ON DELETE CASCADE,
     alarmLevel INTEGER NOT NULL,
     validAfterTimestamp TIMESTAMPTZ NOT NULL,
-    ackedBy TEXT,
+    ackedBy TEXT
 );
 
 CREATE TABLE pushover_receipts (

@@ -1,7 +1,7 @@
-import { Context } from 'shared/storage/api';
 import { humanReadableShortTime } from 'shared/utils/time';
 import debug, { Debugger } from 'debug';
 import { noop } from 'lodash';
+import { Context } from 'backend/utils/api';
 
 // We expose only a subset of the full 'debug' API
 export interface Logger {

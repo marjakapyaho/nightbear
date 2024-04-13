@@ -44,10 +44,12 @@ export const mockInsulinEntries: InsulinEntry[] = [
   {
     timestamp: Date.now(),
     amount: 7,
+    type: 'FAST',
   },
   {
     timestamp: Date.now() - 30 * MIN_IN_MS,
     amount: 1,
+    type: 'FAST',
   },
 ];
 
@@ -55,6 +57,7 @@ export const mockCarbEntries: CarbEntry[] = [
   {
     timestamp: Date.now(),
     amount: 40,
+    speedFactor: 1,
   },
 ];
 

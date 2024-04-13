@@ -5,20 +5,16 @@ export type AnalyserEntry = {
   rawSlope: number | null;
 };
 
-const defaultState = {
-  OUTDATED: false,
-  FALLING: false,
-  RISING: false,
-  LOW: false,
-  BAD_LOW: false,
-  COMPRESSION_LOW: false,
-  HIGH: false,
-  BAD_HIGH: false,
-  PERSISTENT_HIGH: false,
+export type State = {
+  OUTDATED: boolean;
+  FALLING: boolean;
+  RISING: boolean;
+  LOW: boolean;
+  BAD_LOW: boolean;
+  COMPRESSION_LOW: boolean;
+  HIGH: boolean;
+  BAD_HIGH: boolean;
+  PERSISTENT_HIGH: boolean;
 };
-
-export const DEFAULT_STATE: State = defaultState;
-
-export type State = Readonly<typeof defaultState>;
 
 export type Situation = keyof State;

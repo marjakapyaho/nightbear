@@ -2,10 +2,10 @@ import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
 import { SEC_IN_MS } from 'shared/utils/calculations';
-import { Context } from 'shared/storage/api';
 import { generateUuid } from 'shared/utils/id';
 import { extendLogger } from 'shared/utils/logging';
 import { TZ } from 'shared/utils/time';
+import { Context } from './api';
 
 export type Cronjob = (
   context: Context,
@@ -22,7 +22,7 @@ export type Cronjob = (
  * 1. When each function has been invoked, we persist the resulting CronjobsJournal model to the DB
  * 1. We're done
  */
-export async function runCronJobs(context: Context, cronjobs: { [name: string]: Cronjob }) {
+export const runCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
   const log = extendLogger(context.log, 'cron');
   const now = Date.now();
   const jobNames = Object.keys(cronjobs);
@@ -45,7 +45,7 @@ export async function runCronJobs(context: Context, cronjobs: { [name: string]: 
   await context.db.cronjobsJournal.update({ ...journal, previousExecutionAt: new Date() }); // persist updated journal into DB for the next run
 
   log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`);
-}
+};
 
 export function getDefaultJournalContent(): unknown /* TODO: Replace with new type */ {
   return {
