@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+
+DATABASE_URL="postgres://nightbear:nightbear@localhost:15432/nightbear_test" npm run migrate up

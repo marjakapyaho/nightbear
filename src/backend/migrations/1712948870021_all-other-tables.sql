@@ -44,7 +44,7 @@ CREATE TABLE profile_templates (
 
 CREATE TABLE pushover_levels (
     id UUID PRIMARY KEY,
-    profileTemplateId: UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
+    profileTemplateId UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
     name TEXT NOT NULL
 );
 
