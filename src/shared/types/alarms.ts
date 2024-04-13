@@ -1,7 +1,6 @@
 import { Situation } from './analyser';
 
 export type AlarmState = {
-  id: string;
   alarmLevel: number;
   validAfterTimestamp: number;
   ackedBy: string | null;

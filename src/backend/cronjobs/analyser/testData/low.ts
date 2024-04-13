@@ -27,6 +27,7 @@ export function recentCarbs(currentTimestamp: number): CarbEntry[] {
     {
       timestamp: currentTimestamp - 15 * MIN_IN_MS,
       amount: 30,
+      speedFactor: 1,
     },
   ];
 }

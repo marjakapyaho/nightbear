@@ -19,21 +19,14 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { Alarm } from 'shared/types/alarms';
 import { DEFAULT_STATE } from 'shared/utils/analyser';
-import { mockProfiles } from 'shared/mocks/profiles';
-
-const getMockActiveProfile = (profileName: string) => ({
-  ...mockProfiles[0],
-  profileName,
-});
+import { getMockActiveProfile } from 'backend/utils/test';
 
 describe('utils/analyser', () => {
-  // Mock objects
   const currentTimestamp = 1508672249758;
   const insulin: InsulinEntry[] = [];
   const carbs: CarbEntry[] = [];
   const alarms: Alarm[] = [];
 
-  // Assertions
   it('detects no situation', () => {
     assert.deepEqual(
       runAnalysis(

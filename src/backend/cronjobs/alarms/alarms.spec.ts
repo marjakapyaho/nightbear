@@ -3,16 +3,15 @@ import { detectAlarmActions, runAlarmChecks } from 'backend/cronjobs/alarms/alar
 import { getMockActiveAlarms, getMockAlarm } from 'backend/cronjobs/alarms/testData/mockActiveAlarms';
 import { getMockState } from 'backend/cronjobs/alarms/testData/mockState';
 import 'mocha';
-import { activeProfile, createTestContext, eraseModelUuid } from 'backend/utils/test';
+import { createTestContext, getMockActiveProfile } from 'backend/utils/test';
 
 const currentTimestamp = 1508672249758;
 
-// TODO: fix these
-/*describe('shared/alarms', () => {
+describe('shared/alarms', () => {
   function eraseUuids(x: ReturnType<typeof detectAlarmActions>): ReturnType<typeof detectAlarmActions> {
     return {
-      alarmsToRemove: x.alarmsToRemove.map(eraseModelUuid),
-      alarmsToKeep: x.alarmsToKeep.map(eraseModelUuid),
+      alarmsToRemove: x.alarmsToRemove,
+      alarmsToKeep: x.alarmsToKeep,
       alarmsToCreate: x.alarmsToCreate,
     };
   }
@@ -72,9 +71,8 @@ const currentTimestamp = 1508672249758;
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms =>
-        assert.deepEqual(alarms.map(eraseModelUuid), [eraseModelUuid(getMockAlarm(currentTimestamp, 'FALLING'))]),
+    return runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms).then(alarms =>
+      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]),
     );
   });
 
@@ -83,8 +81,8 @@ const currentTimestamp = 1508672249758;
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'FALLING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms => assert.deepEqual(alarms, []),
+    return runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms).then(alarms =>
+      assert.deepEqual(alarms, []),
     );
   });
 
@@ -93,11 +91,8 @@ const currentTimestamp = 1508672249758;
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithNoSituation, activeProfile('day', currentTimestamp), activeAlarms).then(
-      alarms =>
-        assert.deepEqual(alarms.map(eraseModelUuid), [
-          eraseModelUuid(getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)),
-        ]),
+    return runAlarmChecks(context, stateWithNoSituation, getMockActiveProfile('day'), activeAlarms).then(alarms =>
+      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]),
     );
   });
 
@@ -106,11 +101,8 @@ const currentTimestamp = 1508672249758;
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'LOW');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithLow, activeProfile('day', currentTimestamp, false), activeAlarms).then(
-      alarms =>
-        assert.deepEqual(alarms.map(eraseModelUuid), [
-          eraseModelUuid(getMockAlarm(currentTimestamp, 'LOW', false, currentTimestamp)),
-        ]),
+    return runAlarmChecks(context, stateWithLow, getMockActiveProfile('day', false), activeAlarms).then(alarms =>
+      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'LOW', false, currentTimestamp)]),
     );
   });
-});*/
+});

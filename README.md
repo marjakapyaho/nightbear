@@ -7,3 +7,9 @@ Nightbear repository includes code for:
 * Fitbit clockface and alarm app
 * React UI
 * Pebble watchface and alarm app (deprecated)
+
+Start test db
+```
+docker-compose up -d
+./contrib/migrate/test
+```

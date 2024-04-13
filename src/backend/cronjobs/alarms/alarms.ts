@@ -3,16 +3,16 @@ import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
 import { isNotNull, objectKeys } from 'shared/utils/helpers';
 import { Alarm, AlarmState } from 'shared/types/alarms';
 import { Situation, State } from 'shared/types/analyser';
-import { ActiveProfile } from 'shared/types/profiles';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
+import { Profile } from 'shared/types/profiles';
 
 const INITIAL_ALARM_LEVEL = 1;
 
 const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(alarm.alarmStates)?.alarmLevel})`;
 const situationToString = (situation: Situation) => `${situation} (new)`;
 
-export function runAlarmChecks(context: Context, state: State, activeProfile: ActiveProfile, activeAlarms: Alarm[]) {
+export function runAlarmChecks(context: Context, state: State, activeProfile: Profile, activeAlarms: Alarm[]) {
   const { log } = context;
 
   // If alarms are not enabled, remove all existing alarms and exit
@@ -73,11 +73,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   return Promise.resolve(modelsToSave);
 }
 
-function handleAlarmsToKeep(
-  alarms: Alarm[],
-  activeProfile: ActiveProfile,
-  context: Context,
-): Promise<Array<Alarm | null>> {
+function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Context): Promise<Array<Alarm | null>> {
   const { log } = context;
 
   return Promise.all(
@@ -97,12 +93,16 @@ function handleAlarmsToKeep(
       }
 
       const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
-      const levelUpTimes = activeProfile.alarmSettings[alarm.situationType].escalationAfterMinutes;
+      // TODO: fix this
+      // @ts-ignore
+      const levelUpTimes = activeProfile.alarmSettings[alarm.situationType.toLowerCase()].escalationAfterMinutes;
+      // TODO: fix this
+      // @ts-ignore
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
         findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
       const pushoverLevels = activeProfile.pushoverLevels;
-      const pushoverRecipient = pushoverLevels[neededLevel - 2] || 'none';
+      const pushoverRecipient = pushoverLevels[neededLevel - 2].name || 'none'; // TODO: error handling
 
       const nextTimeMilestone = accumulatedTimes.find(time => time >= hasBeenValidFor) || max(accumulatedTimes) || '?';
       logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
@@ -161,7 +161,7 @@ export function createAlarm(situationType: Situation, alarmLevel: number, contex
     timestamp: context.timestamp(),
     situationType,
     isActive: true,
-    deactivationTimestamp: null,
+    deactivatedAt: null,
     alarmStates: [
       {
         alarmLevel,

@@ -27,6 +27,7 @@ export function recentInsulin(currentTimestamp: number): InsulinEntry[] {
     {
       timestamp: currentTimestamp,
       amount: 3,
+      type: 'FAST',
     },
   ];
 }

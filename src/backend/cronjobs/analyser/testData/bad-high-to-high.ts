@@ -1,5 +1,4 @@
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { generateUuid } from 'shared/utils/id';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { Alarm } from 'shared/types/alarms';
 
@@ -31,7 +30,7 @@ export function alarmsWithInactiveBadHigh(currentTimestamp: number): Alarm[] {
       timestamp: currentTimestamp - 40 * MIN_IN_MS,
       situationType: 'BAD_HIGH',
       isActive: false,
-      deactivationTimestamp: currentTimestamp - 15 * MIN_IN_MS,
+      deactivatedAt: currentTimestamp - 15 * MIN_IN_MS,
       alarmStates: [
         {
           alarmLevel: 1,

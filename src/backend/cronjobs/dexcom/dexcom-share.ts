@@ -1,11 +1,12 @@
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { Context } from 'shared/storage/api';
-import { CronjobsJournal, DexcomG6ShareEntry } from 'shared/models/model';
 import { humanReadableLongTime } from 'shared/utils/time';
 import { first, isArray } from 'lodash';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { DexcomShareBgResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
 import { parseDexcomG6ShareEntryFromRequest } from 'backend/cronjobs/dexcom/dexcom-share-utils';
+import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
+import { Context } from 'backend/utils/api';
+import { DexcomG6ShareEntry } from 'shared/types/dexcom';
 
 export const dexcomShare: Cronjob = (context, journal) => {
   const { log, dexcomShare, storage, config } = context;
@@ -72,6 +73,7 @@ function parseIncomingBg(res: DexcomShareBgResponse[]) {
   return parseDexcomG6ShareEntryFromRequest(val);
 }
 
+// TODO: fix this
 function saveIncomingBg(context: Context, model: DexcomG6ShareEntry) {
   const { log, storage } = context;
   const desc = `BG ${model.bloodGlucose}, trend ${model.trend}, timestamp ${humanReadableLongTime(model.timestamp)}`;
@@ -81,7 +83,7 @@ function saveIncomingBg(context: Context, model: DexcomG6ShareEntry) {
     .then(existingEntry => {
       if (existingEntry) {
         // Already exists in the DB -> no need to do anything!
-        log(`This ${existingEntry.modelType} already exists: ${desc}`);
+        log(`This ${existingEntry.id} already exists: ${desc}`);
       } else {
         // We didn't find the entry yet -> create it
         return storage.saveModel(model);

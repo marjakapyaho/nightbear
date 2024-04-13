@@ -1,20 +1,22 @@
 import { runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
-import { getMergedEntriesFeed } from 'shared/entries/entries';
 import { first, map, identity } from 'lodash';
 import { onlyActive } from 'shared/utils/alarms';
 import { Cronjob } from 'backend/utils/cronjobs';
+import { getTimelineEntries } from 'backend/api/timelineEntries/handler';
+import { Context } from 'backend/utils/api';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
-export const checks: Cronjob = (context, _journal) => {
+// TODO: fix these
+/*export const checks: Cronjob = (context: Context, _journal) => {
   const { log } = context;
   log('--- Started checks ---');
   return Promise.all([
     context.storage.loadLatestTimelineModels('ActiveProfile', 1),
-    getMergedEntriesFeed(context, ANALYSIS_RANGE),
+    getTimelineEntries(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadLatestTimelineModels('DeviceStatus', 1),
@@ -39,4 +41,4 @@ export const checks: Cronjob = (context, _journal) => {
       );
     });
   });
-};
+};*/
