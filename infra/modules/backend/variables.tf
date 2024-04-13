@@ -4,9 +4,7 @@ variable "secrets" {
   type = map(string)
 }
 
-variable "subnet_ids" {
-  type = set(string)
-}
+variable "network" {}
 
 variable "db_connection_string" {
   type = string

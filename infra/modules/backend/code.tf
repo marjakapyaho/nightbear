@@ -9,7 +9,7 @@ data "archive_file" "this" {
   output_path             = "${path.module}/${local.file}.zip"
   source_content_filename = "${local.file}.js"
   source_content          = <<-EOF
-    module.exports.handler = async () => {
+    module.exports.${local.handler} = async () => {
       return {
         statusCode: 200,
         headers: {},

@@ -19,14 +19,9 @@ resource "aws_iam_role_policy_attachment" "lambda_exec" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# We'll be using the default VPC for this
-data "aws_vpc" "default" {
-  default = true
-}
-
-# No need for custom rules → use the default security group for the default VPC
+# No need for custom rules → use the default security group for the VPC
 data "aws_security_group" "default" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = var.network.vpc_id
   name   = "default"
 }
 
@@ -50,7 +45,7 @@ resource "aws_lambda_function" "this" {
 
   vpc_config {
     security_group_ids = [data.aws_security_group.default.id]
-    subnet_ids         = var.subnet_ids
+    subnet_ids         = var.network.subnet_ids
   }
 
   logging_config {
