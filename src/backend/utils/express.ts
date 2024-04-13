@@ -6,7 +6,7 @@ import express, { Request as ExpressRequest } from 'express';
 import { isString, pickBy } from 'lodash';
 import { Context, RequestHandler, Request, Headers } from './api';
 
-export type HttpMethod = 'get' | 'post';
+export type HttpMethod = 'get' | 'post' | 'put';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
 
 export function startExpressServer(context: Context, ...handlers: RequestHandlerTuple[]): Promise<number> {

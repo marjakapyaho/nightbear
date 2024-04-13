@@ -27,6 +27,8 @@ export type ResponsePayload = {
   responseBody: object | string;
 };
 
+export type Response = Promise<ResponsePayload>;
+
 export type Context = {
   httpPort: number;
   timestamp: () => number;

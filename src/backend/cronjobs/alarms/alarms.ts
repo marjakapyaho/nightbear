@@ -5,6 +5,7 @@ import { Alarm, AlarmState } from 'shared/types/alarms';
 import { Situation, State } from 'shared/types/analyser';
 import { ActiveProfile } from 'shared/types/profiles';
 import { getAlarmState } from 'shared/utils/alarms';
+import { Context } from 'backend/utils/api';
 
 const INITIAL_ALARM_LEVEL = 1;
 

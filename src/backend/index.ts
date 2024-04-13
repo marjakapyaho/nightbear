@@ -2,11 +2,14 @@ import { consoleLogStream } from 'shared/utils/logging';
 import debug from 'debug';
 import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
 import { startExpressServer } from 'backend/utils/express';
-import { runCronJobs, startRunningCronjobs } from 'backend/utils/cronjobs';
+import { runCronJobs } from 'backend/utils/cronjobs';
 import { profiles } from 'backend/cronjobs/profiles/profiles';
 import { checks } from 'backend/cronjobs/checks';
 import { temp } from 'backend/cronjobs/temp';
 import { createNodeContext } from './utils/api';
+import { ackAlarm, getAlarms } from 'backend/api/alarms/handler';
+import { createProfile, getActiveProfile, getProfiles } from './api/profiles/handler';
+import { getTimelineEntries, updateTimelineEntries } from './api/timelineEntries/handler';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -17,16 +20,17 @@ const context = createNodeContext();
 // Start serving API requests
 startExpressServer(
   context,
-  ['post', '/ack-latest-alarm', ackActiveAlarms],
-  ['get', '/get-entries', getEntries],
-  ['get', '/get-server-status', getServerStatus],
-  ['get', '/get-watch-status', getWatchStatus],
-  ['post', '/upload-dexcom-entry', uploadDexcomEntry],
-  ['get', '/upload-parakeet-entry', uploadParakeetEntry],
+  ['get', '/get-alarms', getAlarms],
+  ['put', '/ack-alarm', ackAlarm],
+  ['get', '/get-active-profile', getActiveProfile],
+  ['get', '/get-profiles', getProfiles],
+  ['post', '/create-profile', createProfile],
+  ['get', '/get-timeline-entries', getTimelineEntries],
+  ['put', '/update-timeline-entries', updateTimelineEntries],
 );
 
 // Start running periodic tasks
-startRunningCronjobs(context, {
+runCronJobs(context, {
   dexcomShare, // run this before checks()
   profiles,
   checks, // run this after dexcomShare()
