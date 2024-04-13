@@ -9,7 +9,8 @@ import { parseDexcomG6ShareEntryFromRequest } from 'backend/cronjobs/dexcom/dexc
 
 export const dexcomShare: Cronjob = (context, journal) => {
   const { log, dexcomShare, storage, config } = context;
-  const { dexcomShareSessionId, dexcomShareLoginAttemptTimestamp } = journal;
+  const { dexcomShareSessionId, dexcomShareLoginAttemptAt } = journal;
+  const dexcomShareLoginAttemptTimestamp = dexcomShareLoginAttemptAt?.getTime();
   const mins = config.DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES;
   const loginAttemptAllowed =
     !dexcomShareLoginAttemptTimestamp || Date.now() - dexcomShareLoginAttemptTimestamp > MIN_IN_MS * mins;

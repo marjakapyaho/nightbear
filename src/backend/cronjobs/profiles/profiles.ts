@@ -10,7 +10,7 @@ export const profiles: Cronjob = (context, journal) => {
   const now = Date.now();
   return Promise.resolve()
     .then(() => {
-      const then = journal.previousExecutionTimestamp;
+      const then = journal.previousExecutionAt?.getTime();
       if (!then) return; // we don't know when we last ran -> let's try again on the next run
       const sinceMin = (now - then) / MIN_IN_MS;
       if (sinceMin > 5) log(`${sinceMin.toFixed(1)} min since last profile activation check, suspicious`);
@@ -40,7 +40,7 @@ export const profiles: Cronjob = (context, journal) => {
           }
         });
     })
-    .then(() => ({ previousExecutionTimestamp: now })); // store the timestamp of this run into the CronjobsJournal
+    .then(() => ({ previousExecutionAt: new Date(now) })); // store the timestamp of this run into the CronjobsJournal
 };
 
 function activateProfile(context: Context, profile: SavedProfile) {
