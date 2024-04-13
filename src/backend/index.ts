@@ -8,7 +8,7 @@ import { checks } from 'backend/cronjobs/checks';
 import { temp } from 'backend/cronjobs/temp';
 import { createNodeContext } from './utils/api';
 import { ackAlarm, getAlarms } from 'backend/api/alarms/handler';
-import { createProfile, getActiveProfile, getProfiles } from './api/profiles/handler';
+import { createProfile, getProfiles } from './api/profiles/handler';
 import { getTimelineEntries, updateTimelineEntries } from './api/timelineEntries/handler';
 
 // Direct log output to where we want it
@@ -22,7 +22,6 @@ startExpressServer(
   context,
   ['get', '/get-alarms', getAlarms],
   ['put', '/ack-alarm', ackAlarm],
-  ['get', '/get-active-profile', getActiveProfile],
   ['get', '/get-profiles', getProfiles],
   ['post', '/create-profile', createProfile],
   ['get', '/get-timeline-entries', getTimelineEntries],

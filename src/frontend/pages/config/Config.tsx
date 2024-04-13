@@ -2,12 +2,10 @@ import React from 'react';
 import styles from './Config.module.scss';
 import { useProfiles } from 'frontend/data/profiles/useProfiles';
 import { useAlarms } from 'frontend/data/alarms/useAlarms';
-import { DateTime } from 'luxon';
 
 export const Config = () => {
-  const { profiles, activateProfile } = useProfiles();
+  const { profiles, activeProfile, activateProfile } = useProfiles();
   const { alarms, ackAlarm } = useAlarms();
-  const activeProfile = profiles.find(profile => Boolean(profile.activatedAt));
 
   return (
     <div className={styles.config}>
@@ -19,12 +17,7 @@ export const Config = () => {
             className={`${styles.profile} ${profile.id === activeProfile?.id ? styles.active : ''}`}
             onClick={() => activateProfile(profile)}
           >
-            {profile.name.toUpperCase()}
-            {profile.activatedAt && (
-              <span className={styles.activates}>
-                Activated {DateTime.fromMillis(profile.activatedAt).toFormat('HH:mm')}
-              </span>
-            )}
+            {profile.profileName.toUpperCase()}
           </div>
         ))}
       </div>
@@ -32,10 +25,7 @@ export const Config = () => {
         <h1 className={styles.heading}>Active alarms</h1>
         {alarms.map(alarm => (
           <button key={alarm.id} className={styles.alarm} onClick={() => ackAlarm(alarm)}>
-            {alarm.type.toUpperCase()}
-            {alarm.createdAt && (
-              <span className={styles.created}>Created {DateTime.fromMillis(alarm.createdAt).toFormat('HH:mm')}</span>
-            )}
+            {alarm.situationType.toUpperCase()}
           </button>
         ))}
       </div>
