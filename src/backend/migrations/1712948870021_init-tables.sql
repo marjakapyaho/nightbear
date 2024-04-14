@@ -10,7 +10,7 @@ CREATE TABLE cronjobs_journal (
 
 INSERT INTO cronjobs_journal DEFAULT VALUES;
 
-CREATE TABLE blood_glucose_entries (
+CREATE TABLE sensor_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   type TEXT NOT NULL,
