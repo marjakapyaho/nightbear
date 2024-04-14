@@ -1,18 +1,12 @@
-/* @name createSensorEntry */
+/* @name create */
 INSERT INTO sensor_entries (blood_glucose, type)
 VALUES (:bloodGlucose!, :type!)
 RETURNING *;
 
-/*
-  @name getSensorEntries
-  @param range -> (
-    from!,
-    to!
-  )
-*/
+/* @name byTimestamp */
 SELECT
-    timestamp,
-    blood_glucose as "bloodGlucose",
-    type
+  timestamp,
+  blood_glucose,
+  type
 FROM sensor_entries
-WHERE timestamp >= :from AND timestamp <= :to;
+WHERE timestamp >= :from! AND timestamp <= :to!;

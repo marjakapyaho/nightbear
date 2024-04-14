@@ -6,7 +6,7 @@
       "emitTemplate": "{{dir}}/{{name}}.queries.ts"
     }
   ],
-  "srcDir": "./src/backend/features",
+  "srcDir": "./src/backend/db",
   "camelCaseColumnNames": true,
   "typesOverrides": {
     "numeric": "number"

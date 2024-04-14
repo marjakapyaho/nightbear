@@ -1,12 +1,14 @@
-/** Types generated for queries found in "src/backend/features/sensorEntries/db.sql" */
+/** Types generated for queries found in "src/backend/db/sensorEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type blood_glucose_entry_type = 'DEXCOM_G6_SHARE' | 'MANUAL';
+export type sensor_entry_type = 'DEXCOM_G6_SHARE';
+
+export type DateOrString = Date | string;
 
 /** 'Create' parameters type */
 export interface ICreateParams {
   bloodGlucose: number;
-  type: blood_glucose_entry_type;
+  type: sensor_entry_type;
 }
 
 /** 'Create' return type */
@@ -14,7 +16,7 @@ export interface ICreateResult {
   bloodGlucose: number;
   id: string;
   timestamp: Date;
-  type: blood_glucose_entry_type;
+  type: sensor_entry_type;
 }
 
 /** 'Create' query type */
@@ -23,21 +25,51 @@ export interface ICreateQuery {
   result: ICreateResult;
 }
 
-const createIR: any = {
-  usedParamSet: { type: true, bloodGlucose: true },
-  params: [
-    { name: 'type', required: true, transform: { type: 'scalar' }, locs: [{ a: 64, b: 69 }] },
-    { name: 'bloodGlucose', required: true, transform: { type: 'scalar' }, locs: [{ a: 72, b: 85 }] },
-  ],
-  statement: 'INSERT INTO blood_glucose_entries (type, blood_glucose)\nVALUES (:type!, :bloodGlucose!)\nRETURNING *',
-};
+const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":70}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":78}]}],"statement":"INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO blood_glucose_entries (type, blood_glucose)
- * VALUES (:type!, :bloodGlucose!)
+ * INSERT INTO sensor_entries (blood_glucose, type)
+ * VALUES (:bloodGlucose!, :type!)
  * RETURNING *
  * ```
  */
-export const create = new PreparedQuery<ICreateParams, ICreateResult>(createIR);
+export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
+
+
+/** 'ByTimestamp' parameters type */
+export interface IByTimestampParams {
+  from: DateOrString;
+  to: DateOrString;
+}
+
+/** 'ByTimestamp' return type */
+export interface IByTimestampResult {
+  bloodGlucose: number;
+  timestamp: Date;
+  type: sensor_entry_type;
+}
+
+/** 'ByTimestamp' query type */
+export interface IByTimestampQuery {
+  params: IByTimestampParams;
+  result: IByTimestampResult;
+}
+
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":83,"b":88}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":110}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose,\n  type\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   timestamp,
+ *   blood_glucose,
+ *   type
+ * FROM sensor_entries
+ * WHERE timestamp >= :from! AND timestamp <= :to!
+ * ```
+ */
+export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
+
+

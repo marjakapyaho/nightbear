@@ -5,6 +5,7 @@ services:
     container_name: nightbear-test-db
     restart: always
     environment:
+      # Needs to match src/backend/utils/test.ts
       - POSTGRES_USER=nightbear
       - POSTGRES_DB=nightbear_test
       - POSTGRES_PASSWORD=nightbear

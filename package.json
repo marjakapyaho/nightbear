@@ -14,7 +14,7 @@
     "\n==================== GLOBAL HOOKS ====================": "",
     "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "\n==================== GLOBAL QA ====================": "",
-    "test": "NODE_PATH=src TS_NODE_PROJECT=tsconfig.mocha.json mocha --require ts-node/register --require $(find src -name PouchDb.mocha.ts) $(npm run --silent list-tests)",
+    "test": "vitest",
     "lint": "concurrently npm:lint-node npm:lint-tsc npm:lint-eslint npm:lint-prettier",
     "lint-node": "check-node-version --package",
     "lint-tsc": "tsc --project . --noEmit",
@@ -127,5 +127,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "vitest": "^1.5.0"
   }
 }
