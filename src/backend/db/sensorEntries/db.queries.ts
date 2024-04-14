@@ -25,7 +25,14 @@ export interface ICreateQuery {
   result: ICreateResult;
 }
 
-const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":70}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":78}]}],"statement":"INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *"};
+const createIR: any = {
+  usedParamSet: { bloodGlucose: true, type: true },
+  params: [
+    { name: 'bloodGlucose', required: true, transform: { type: 'scalar' }, locs: [{ a: 57, b: 70 }] },
+    { name: 'type', required: true, transform: { type: 'scalar' }, locs: [{ a: 73, b: 78 }] },
+  ],
+  statement: 'INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *',
+};
 
 /**
  * Query generated from SQL:
@@ -35,8 +42,7 @@ const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params"
  * RETURNING *
  * ```
  */
-export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
-
+export const create = new PreparedQuery<ICreateParams, ICreateResult>(createIR);
 
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
@@ -57,7 +63,15 @@ export interface IByTimestampQuery {
   result: IByTimestampResult;
 }
 
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":83,"b":88}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":110}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose,\n  type\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+const byTimestampIR: any = {
+  usedParamSet: { from: true, to: true },
+  params: [
+    { name: 'from', required: true, transform: { type: 'scalar' }, locs: [{ a: 83, b: 88 }] },
+    { name: 'to', required: true, transform: { type: 'scalar' }, locs: [{ a: 107, b: 110 }] },
+  ],
+  statement:
+    'SELECT\n  timestamp,\n  blood_glucose,\n  type\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!',
+};
 
 /**
  * Query generated from SQL:
@@ -70,6 +84,4 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
  * WHERE timestamp >= :from! AND timestamp <= :to!
  * ```
  */
-export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
-
-
+export const byTimestamp = new PreparedQuery<IByTimestampParams, IByTimestampResult>(byTimestampIR);
