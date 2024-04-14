@@ -1,7 +1,7 @@
 /* @name createCarbEntry */
 INSERT INTO carb_entries (
   amount,
-  speedFactor
+  speed_factor
 )
 VALUES (
   :amount!,

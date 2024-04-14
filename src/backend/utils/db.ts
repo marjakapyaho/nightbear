@@ -1,4 +1,5 @@
 import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
+import * as alarms from 'backend/db/alarms/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -7,6 +8,7 @@ import { Client, Pool, types } from 'pg';
  */
 const dbModules = {
   sensorEntries,
+  alarms
 };
 
 /**

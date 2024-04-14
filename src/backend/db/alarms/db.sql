@@ -2,8 +2,8 @@
 INSERT INTO alarms (
   timestamp,
   situation,
-  isActive,
-  deactivatedAt
+  is_active,
+  deactivated_at
 )
 VALUES (
   :timestamp!,
@@ -15,10 +15,10 @@ RETURNING *;
 
 /* @name createAlarmState */
 INSERT INTO alarm_states (
-  alarmId,
-  alarmLevel,
-  validAfterTimestamp,
-  ackedBy
+  alarm_Id,
+  alarm_level,
+  valid_after_timestamp,
+  acked_by
 )
 VALUES (
  :alarmId!,
@@ -30,7 +30,7 @@ RETURNING *;
 
 /* @name createPushoverReceipt */
 INSERT INTO pushover_receipts (
-  alarmStateId,
+  alarm_state_id,
   receipt
 )
 VALUES (

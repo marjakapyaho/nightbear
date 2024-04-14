@@ -1,14 +1,12 @@
 /** Types generated for queries found in "src/backend/db/sensorEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type sensor_entry_type = 'DEXCOM_G6_SHARE';
-
 export type DateOrString = Date | string;
 
 /** 'Create' parameters type */
 export interface ICreateParams {
   bloodGlucose: number;
-  type: sensor_entry_type;
+  type: string;
 }
 
 /** 'Create' return type */
@@ -16,7 +14,7 @@ export interface ICreateResult {
   bloodGlucose: number;
   id: string;
   timestamp: Date;
-  type: sensor_entry_type;
+  type: string;
 }
 
 /** 'Create' query type */
@@ -25,14 +23,7 @@ export interface ICreateQuery {
   result: ICreateResult;
 }
 
-const createIR: any = {
-  usedParamSet: { bloodGlucose: true, type: true },
-  params: [
-    { name: 'bloodGlucose', required: true, transform: { type: 'scalar' }, locs: [{ a: 57, b: 70 }] },
-    { name: 'type', required: true, transform: { type: 'scalar' }, locs: [{ a: 73, b: 78 }] },
-  ],
-  statement: 'INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *',
-};
+const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":70}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":78}]}],"statement":"INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -42,7 +33,8 @@ const createIR: any = {
  * RETURNING *
  * ```
  */
-export const create = new PreparedQuery<ICreateParams, ICreateResult>(createIR);
+export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
+
 
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
@@ -54,7 +46,7 @@ export interface IByTimestampParams {
 export interface IByTimestampResult {
   bloodGlucose: number;
   timestamp: Date;
-  type: sensor_entry_type;
+  type: string;
 }
 
 /** 'ByTimestamp' query type */
@@ -63,15 +55,7 @@ export interface IByTimestampQuery {
   result: IByTimestampResult;
 }
 
-const byTimestampIR: any = {
-  usedParamSet: { from: true, to: true },
-  params: [
-    { name: 'from', required: true, transform: { type: 'scalar' }, locs: [{ a: 83, b: 88 }] },
-    { name: 'to', required: true, transform: { type: 'scalar' }, locs: [{ a: 107, b: 110 }] },
-  ],
-  statement:
-    'SELECT\n  timestamp,\n  blood_glucose,\n  type\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!',
-};
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":83,"b":88}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":110}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose,\n  type\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
 
 /**
  * Query generated from SQL:
@@ -84,4 +68,6 @@ const byTimestampIR: any = {
  * WHERE timestamp >= :from! AND timestamp <= :to!
  * ```
  */
-export const byTimestamp = new PreparedQuery<IByTimestampParams, IByTimestampResult>(byTimestampIR);
+export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
+
+

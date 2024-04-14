@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/features/cronjobsJournal/db.sql" */
+/** Types generated for queries found in "src/backend/db/cronjobsJournal/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 export type DateOrString = Date | string;
