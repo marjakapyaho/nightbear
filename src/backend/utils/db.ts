@@ -1,5 +1,9 @@
 import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
 import * as alarms from 'backend/db/alarms/db.queries';
+import * as profiles from 'backend/db/profiles/db.queries';
+import * as carbEntries from 'backend/db/carbEntries/db.queries';
+import * as insulinEntries from 'backend/db/insulinEntries/db.queries';
+import * as meterEntries from 'backend/db/meterEntries/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -8,7 +12,11 @@ import { Client, Pool, types } from 'pg';
  */
 const dbModules = {
   sensorEntries,
-  alarms
+  carbEntries,
+  insulinEntries,
+  meterEntries,
+  alarms,
+  profiles
 };
 
 /**

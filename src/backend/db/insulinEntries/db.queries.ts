@@ -3,26 +3,26 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 export type insulintype = 'FAST' | 'LONG';
 
-/** 'CreateInsulinEntry' parameters type */
-export interface ICreateInsulinEntryParams {
+/** 'Create' parameters type */
+export interface ICreateParams {
   amount: number;
   type: insulintype;
 }
 
-/** 'CreateInsulinEntry' return type */
-export interface ICreateInsulinEntryResult {
+/** 'Create' return type */
+export interface ICreateResult {
   amount: number;
   timestamp: Date;
   type: insulintype;
 }
 
-/** 'CreateInsulinEntry' query type */
-export interface ICreateInsulinEntryQuery {
-  params: ICreateInsulinEntryParams;
-  result: ICreateInsulinEntryResult;
+/** 'Create' query type */
+export interface ICreateQuery {
+  params: ICreateParams;
+  result: ICreateResult;
 }
 
-const createInsulinEntryIR: any = {"usedParamSet":{"amount":true,"type":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":60,"b":67}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":72,"b":77}]}],"statement":"INSERT INTO insulin_entries (\n  amount,\n  type\n)\nVALUES (\n  :amount!,\n  :type!\n)\nRETURNING *"};
+const createIR: any = {"usedParamSet":{"amount":true,"type":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":60,"b":67}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":72,"b":77}]}],"statement":"INSERT INTO insulin_entries (\n  amount,\n  type\n)\nVALUES (\n  :amount!,\n  :type!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -38,6 +38,6 @@ const createInsulinEntryIR: any = {"usedParamSet":{"amount":true,"type":true},"p
  * RETURNING *
  * ```
  */
-export const createInsulinEntry = new PreparedQuery<ICreateInsulinEntryParams,ICreateInsulinEntryResult>(createInsulinEntryIR);
+export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 

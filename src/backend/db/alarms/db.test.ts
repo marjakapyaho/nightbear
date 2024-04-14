@@ -9,13 +9,13 @@ describe('db/alarms', () => {
   describe('insert', () => {
     it('works', async () => {
       const res = await context.db.alarms.create({
-        situationType: 'LOW',
+        situation: 'LOW',
         isActive: true,
       });
 
       assert.equal(res.length, 1);
       assert.isTrue(_.isDate(res[0].timestamp));
-      assert.equal(res[0].situationType, 'LOW');
+      assert.equal(res[0].situation, 'LOW');
       assert.equal(res[0].isActive, true);
     });
   });

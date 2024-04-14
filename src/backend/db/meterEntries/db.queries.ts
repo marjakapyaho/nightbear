@@ -1,24 +1,24 @@
 /** Types generated for queries found in "src/backend/db/meterEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** 'CreateMeterEntry' parameters type */
-export interface ICreateMeterEntryParams {
+/** 'Create' parameters type */
+export interface ICreateParams {
   bloodGlucose: number;
 }
 
-/** 'CreateMeterEntry' return type */
-export interface ICreateMeterEntryResult {
+/** 'Create' return type */
+export interface ICreateResult {
   bloodGlucose: number;
   timestamp: Date;
 }
 
-/** 'CreateMeterEntry' query type */
-export interface ICreateMeterEntryQuery {
-  params: ICreateMeterEntryParams;
-  result: ICreateMeterEntryResult;
+/** 'Create' query type */
+export interface ICreateQuery {
+  params: ICreateParams;
+  result: ICreateResult;
 }
 
-const createMeterEntryIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":50,"b":63}]}],"statement":"INSERT INTO meter_entries (blood_glucose)\nVALUES (:bloodGlucose!)\nRETURNING *"};
+const createIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":50,"b":63}]}],"statement":"INSERT INTO meter_entries (blood_glucose)\nVALUES (:bloodGlucose!)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -28,6 +28,6 @@ const createMeterEntryIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[
  * RETURNING *
  * ```
  */
-export const createMeterEntry = new PreparedQuery<ICreateMeterEntryParams,ICreateMeterEntryResult>(createMeterEntryIR);
+export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 

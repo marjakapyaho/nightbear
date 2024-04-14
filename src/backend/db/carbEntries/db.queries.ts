@@ -1,26 +1,26 @@
 /** Types generated for queries found in "src/backend/db/carbEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** 'CreateCarbEntry' parameters type */
-export interface ICreateCarbEntryParams {
+/** 'Create' parameters type */
+export interface ICreateParams {
   amount: number;
   speedFactor: number;
 }
 
-/** 'CreateCarbEntry' return type */
-export interface ICreateCarbEntryResult {
+/** 'Create' return type */
+export interface ICreateResult {
   amount: number;
   speedFactor: number;
   timestamp: Date;
 }
 
-/** 'CreateCarbEntry' query type */
-export interface ICreateCarbEntryQuery {
-  params: ICreateCarbEntryParams;
-  result: ICreateCarbEntryResult;
+/** 'Create' query type */
+export interface ICreateQuery {
+  params: ICreateParams;
+  result: ICreateResult;
 }
 
-const createCarbEntryIR: any = {"usedParamSet":{"amount":true,"speedFactor":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":72}]},{"name":"speedFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":89}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  speed_factor\n)\nVALUES (\n  :amount!,\n  :speedFactor!\n)\nRETURNING *"};
+const createIR: any = {"usedParamSet":{"amount":true,"speedFactor":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":72}]},{"name":"speedFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":89}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  speed_factor\n)\nVALUES (\n  :amount!,\n  :speedFactor!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -36,6 +36,6 @@ const createCarbEntryIR: any = {"usedParamSet":{"amount":true,"speedFactor":true
  * RETURNING *
  * ```
  */
-export const createCarbEntry = new PreparedQuery<ICreateCarbEntryParams,ICreateCarbEntryResult>(createCarbEntryIR);
+export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 

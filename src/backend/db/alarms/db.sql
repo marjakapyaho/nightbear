@@ -1,12 +1,10 @@
-/* @name createAlarm */
+/* @name create */
 INSERT INTO alarms (
-  timestamp,
   situation,
   is_active,
   deactivated_at
 )
 VALUES (
-  :timestamp!,
   :situation!,
   :isActive!,
   :deactivatedAt

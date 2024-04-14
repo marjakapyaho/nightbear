@@ -1,4 +1,4 @@
-/* @name createCarbEntry */
+/* @name create */
 INSERT INTO carb_entries (
   amount,
   speed_factor

@@ -1,4 +1,4 @@
-/* @name createInsulinEntry */
+/* @name create */
 INSERT INTO insulin_entries (
   amount,
   type
