@@ -1,3 +1,5 @@
+import { Situation } from 'shared/types/analyser';
+
 export type AnalyserSettings = {
   id: string;
   highLevelRel: number;
@@ -11,22 +13,9 @@ export type AnalyserSettings = {
 };
 
 export type SituationSettings = {
-  id: string;
+  situation: Situation;
   escalationAfterMinutes: number;
   snoozeMinutes: number;
-};
-
-export type AlarmSettings = {
-  id: string;
-  outdated: SituationSettings;
-  falling: SituationSettings;
-  rising: SituationSettings;
-  low: SituationSettings;
-  badLow: SituationSettings;
-  compressionLow: SituationSettings;
-  high: SituationSettings;
-  badHigh: SituationSettings;
-  persistentHigh: SituationSettings;
 };
 
 export type PushoverLevel = {
@@ -40,7 +29,7 @@ export type Profile = {
   isActive: boolean;
   alarmsEnabled: boolean;
   analyserSettings: AnalyserSettings;
-  alarmSettings: AlarmSettings;
+  situationSettings: SituationSettings[];
   pushoverLevels: PushoverLevel[];
 };
 

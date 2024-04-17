@@ -5,15 +5,15 @@ export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' |
 
 export type DateOrString = Date | string;
 
-/** 'Create' parameters type */
-export interface ICreateParams {
+/** 'CreateAlarm' parameters type */
+export interface ICreateAlarmParams {
   deactivatedAt?: DateOrString | null | void;
   isActive: boolean;
   situation: situation;
 }
 
-/** 'Create' return type */
-export interface ICreateResult {
+/** 'CreateAlarm' return type */
+export interface ICreateAlarmResult {
   deactivatedAt: Date | null;
   id: string;
   isActive: boolean;
@@ -21,13 +21,13 @@ export interface ICreateResult {
   timestamp: Date;
 }
 
-/** 'Create' query type */
-export interface ICreateQuery {
-  params: ICreateParams;
-  result: ICreateResult;
+/** 'CreateAlarm' query type */
+export interface ICreateAlarmQuery {
+  params: ICreateAlarmParams;
+  result: ICreateAlarmResult;
 }
 
-const createIR: any = {"usedParamSet":{"situation":true,"isActive":true,"deactivatedAt":true},"params":[{"name":"situation","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":87}]},{"name":"isActive","required":true,"transform":{"type":"scalar"},"locs":[{"a":92,"b":101}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":106,"b":119}]}],"statement":"INSERT INTO alarms (\n  situation,\n  is_active,\n  deactivated_at\n)\nVALUES (\n  :situation!,\n  :isActive!,\n  :deactivatedAt\n)\nRETURNING *"};
+const createAlarmIR: any = {"usedParamSet":{"situation":true,"isActive":true,"deactivatedAt":true},"params":[{"name":"situation","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":87}]},{"name":"isActive","required":true,"transform":{"type":"scalar"},"locs":[{"a":92,"b":101}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":106,"b":119}]}],"statement":"INSERT INTO alarms (\n  situation,\n  is_active,\n  deactivated_at\n)\nVALUES (\n  :situation!,\n  :isActive!,\n  :deactivatedAt\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -45,7 +45,7 @@ const createIR: any = {"usedParamSet":{"situation":true,"isActive":true,"deactiv
  * RETURNING *
  * ```
  */
-export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
+export const createAlarm = new PreparedQuery<ICreateAlarmParams,ICreateAlarmResult>(createAlarmIR);
 
 
 /** 'CreateAlarmState' parameters type */
@@ -71,13 +71,13 @@ export interface ICreateAlarmStateQuery {
   result: ICreateAlarmStateResult;
 }
 
-const createAlarmStateIR: any = {"usedParamSet":{"alarmId":true,"alarmLevel":true,"validAfterTimestamp":true,"ackedBy":true},"params":[{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":102,"b":110}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":114,"b":125}]},{"name":"validAfterTimestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":129,"b":149}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":153,"b":160}]}],"statement":"INSERT INTO alarm_states (\n  alarm_Id,\n  alarm_level,\n  valid_after_timestamp,\n  acked_by\n)\nVALUES (\n :alarmId!,\n :alarmLevel!,\n :validAfterTimestamp!,\n :ackedBy\n)\nRETURNING *"};
+const createAlarmStateIR: any = {"usedParamSet":{"alarmId":true,"alarmLevel":true,"validAfterTimestamp":true,"ackedBy":true},"params":[{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":102,"b":110}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":114,"b":125}]},{"name":"validAfterTimestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":129,"b":149}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":153,"b":160}]}],"statement":"INSERT INTO alarm_states (\n  alarm_id,\n  alarm_level,\n  valid_after_timestamp,\n  acked_by\n)\nVALUES (\n :alarmId!,\n :alarmLevel!,\n :validAfterTimestamp!,\n :ackedBy\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO alarm_states (
- *   alarm_Id,
+ *   alarm_id,
  *   alarm_level,
  *   valid_after_timestamp,
  *   acked_by

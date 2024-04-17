@@ -1,4 +1,4 @@
-/* @name create */
+/* @name createAlarm */
 INSERT INTO alarms (
   situation,
   is_active,
@@ -13,7 +13,7 @@ RETURNING *;
 
 /* @name createAlarmState */
 INSERT INTO alarm_states (
-  alarm_Id,
+  alarm_id,
   alarm_level,
   valid_after_timestamp,
   acked_by

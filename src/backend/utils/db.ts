@@ -4,6 +4,7 @@ import * as profiles from 'backend/db/profiles/db.queries';
 import * as carbEntries from 'backend/db/carbEntries/db.queries';
 import * as insulinEntries from 'backend/db/insulinEntries/db.queries';
 import * as meterEntries from 'backend/db/meterEntries/db.queries';
+import * as cronjobsJournal from 'backend/db/cronjobsJournal/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -16,7 +17,8 @@ const dbModules = {
   insulinEntries,
   meterEntries,
   alarms,
-  profiles
+  profiles,
+  cronjobsJournal
 };
 
 /**

@@ -2,14 +2,12 @@
 INSERT INTO profile_templates (
     profile_name,
     alarms_enabled,
-    analyser_settings_id,
-    alarm_settings_id
+    analyser_settings_id
 )
 VALUES (
   :profileName!,
   :alarmsEnabled!,
-  :analyserSettingsId!,
-  :alarmSettingsId!
+  :analyserSettingsId!
 )
 RETURNING *;
 
@@ -38,37 +36,16 @@ RETURNING *;
 
 /* @name createSituationSettings */
 INSERT INTO situation_settings (
+  situation,
+  profile_template_id,
   escalation_after_minutes,
   snooze_minutes
 )
 VALUES (
-  :escalationAfterMinutes!,
-  :snoozeMinutes!
-)
-RETURNING *;
-
-/* @name createAlarmSettings */
-INSERT INTO alarm_settings (
-  outdated,
-  falling,
-  rising,
-  low,
-  badLow,
-  high,
-  bad_high,
-  persistent_high,
-  compression_low
-)
-VALUES (
-   :outdated!,
-   :falling!,
-   :rising!,
-   :low!,
-   :badLow!,
-   :high!,
-   :badHigh!,
-   :persistentHigh!,
-   :compressionLow!
+   :situation!,
+   :profileTemplateId!,
+   :escalationAfterMinutes!,
+   :snoozeMinutes!
 )
 RETURNING *;
 

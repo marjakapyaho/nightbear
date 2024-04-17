@@ -1,5 +1,4 @@
 import {
-  AlarmSettings,
   AnalyserSettings,
   Profile,
   ProfileActivation,
@@ -20,24 +19,53 @@ export const mockAnalyserSettings: AnalyserSettings = {
   highCorrectionSuppressionMinutes: 120,
 };
 
-export const mockSituationSettings: SituationSettings = {
-  id: '1',
-  escalationAfterMinutes: 10,
-  snoozeMinutes: 15,
-};
-
-export const mockAlarmSettings: AlarmSettings = {
-  id: '1',
-  outdated: mockSituationSettings,
-  falling: mockSituationSettings,
-  rising: mockSituationSettings,
-  low: mockSituationSettings,
-  badLow: mockSituationSettings,
-  compressionLow: mockSituationSettings,
-  high: mockSituationSettings,
-  badHigh: mockSituationSettings,
-  persistentHigh: mockSituationSettings,
-};
+export const mockSituationSettings: SituationSettings[] = [
+  {
+    situation: 'OUTDATED',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'FALLING',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'RISING',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'LOW',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'BAD_LOW',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'COMPRESSION_LOW',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'HIGH',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'BAD_HIGH',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  },
+  {
+    situation: 'PERSISTENT_HIGH',
+    escalationAfterMinutes: 10,
+    snoozeMinutes: 15,
+  }
+];
 
 export const mockPushoverLevels: PushoverLevel[] = [
   {
@@ -69,7 +97,7 @@ export const mockProfiles: Profile[] = [
     isActive: true,
     alarmsEnabled: true,
     analyserSettings: mockAnalyserSettings,
-    alarmSettings: mockAlarmSettings,
+    situationSettings: mockSituationSettings,
     pushoverLevels: mockPushoverLevels,
   },
   {
@@ -78,7 +106,7 @@ export const mockProfiles: Profile[] = [
     isActive: false,
     alarmsEnabled: true,
     analyserSettings: mockAnalyserSettings,
-    alarmSettings: mockAlarmSettings,
+    situationSettings: mockSituationSettings,
     pushoverLevels: mockPushoverLevels,
   },
 ];

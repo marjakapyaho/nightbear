@@ -1,10 +1,11 @@
 /** Types generated for queries found in "src/backend/db/profiles/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
+export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
+
 /** 'CreateProfileTemplate' parameters type */
 export interface ICreateProfileTemplateParams {
   alarmsEnabled: boolean;
-  alarmSettingsId: string;
   analyserSettingsId: string;
   profileName: string;
 }
@@ -12,7 +13,6 @@ export interface ICreateProfileTemplateParams {
 /** 'CreateProfileTemplate' return type */
 export interface ICreateProfileTemplateResult {
   alarmsEnabled: boolean;
-  alarmSettingsId: string;
   analyserSettingsId: string;
   id: string;
   profileName: string | null;
@@ -24,7 +24,7 @@ export interface ICreateProfileTemplateQuery {
   result: ICreateProfileTemplateResult;
 }
 
-const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true,"alarmSettingsId":true},"params":[{"name":"profileName","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":143}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":148,"b":162}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":167,"b":186}]},{"name":"alarmSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":207}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id,\n    alarm_settings_id\n)\nVALUES (\n  :profileName!,\n  :alarmsEnabled!,\n  :analyserSettingsId!,\n  :alarmSettingsId!\n)\nRETURNING *"};
+const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true},"params":[{"name":"profileName","required":true,"transform":{"type":"scalar"},"locs":[{"a":108,"b":120}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":125,"b":139}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":144,"b":163}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id\n)\nVALUES (\n  :profileName!,\n  :alarmsEnabled!,\n  :analyserSettingsId!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -32,14 +32,12 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
  * INSERT INTO profile_templates (
  *     profile_name,
  *     alarms_enabled,
- *     analyser_settings_id,
- *     alarm_settings_id
+ *     analyser_settings_id
  * )
  * VALUES (
  *   :profileName!,
  *   :alarmsEnabled!,
- *   :analyserSettingsId!,
- *   :alarmSettingsId!
+ *   :analyserSettingsId!
  * )
  * RETURNING *
  * ```
@@ -112,13 +110,16 @@ export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsP
 /** 'CreateSituationSettings' parameters type */
 export interface ICreateSituationSettingsParams {
   escalationAfterMinutes: number;
+  profileTemplateId: string;
+  situation: situation;
   snoozeMinutes: number;
 }
 
 /** 'CreateSituationSettings' return type */
 export interface ICreateSituationSettingsResult {
   escalationAfterMinutes: number;
-  id: string;
+  profileTemplateId: string;
+  situation: situation;
   snoozeMinutes: number;
 }
 
@@ -128,89 +129,27 @@ export interface ICreateSituationSettingsQuery {
   result: ICreateSituationSettingsResult;
 }
 
-const createSituationSettingsIR: any = {"usedParamSet":{"escalationAfterMinutes":true,"snoozeMinutes":true},"params":[{"name":"escalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":91,"b":114}]},{"name":"snoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":119,"b":133}]}],"statement":"INSERT INTO situation_settings (\n  escalation_after_minutes,\n  snooze_minutes\n)\nVALUES (\n  :escalationAfterMinutes!,\n  :snoozeMinutes!\n)\nRETURNING *"};
+const createSituationSettingsIR: any = {"usedParamSet":{"situation":true,"profileTemplateId":true,"escalationAfterMinutes":true,"snoozeMinutes":true},"params":[{"name":"situation","required":true,"transform":{"type":"scalar"},"locs":[{"a":128,"b":138}]},{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":144,"b":162}]},{"name":"escalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":168,"b":191}]},{"name":"snoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":197,"b":211}]}],"statement":"INSERT INTO situation_settings (\n  situation,\n  profile_template_id,\n  escalation_after_minutes,\n  snooze_minutes\n)\nVALUES (\n   :situation!,\n   :profileTemplateId!,\n   :escalationAfterMinutes!,\n   :snoozeMinutes!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO situation_settings (
+ *   situation,
+ *   profile_template_id,
  *   escalation_after_minutes,
  *   snooze_minutes
  * )
  * VALUES (
- *   :escalationAfterMinutes!,
- *   :snoozeMinutes!
+ *    :situation!,
+ *    :profileTemplateId!,
+ *    :escalationAfterMinutes!,
+ *    :snoozeMinutes!
  * )
  * RETURNING *
  * ```
  */
 export const createSituationSettings = new PreparedQuery<ICreateSituationSettingsParams,ICreateSituationSettingsResult>(createSituationSettingsIR);
-
-
-/** 'CreateAlarmSettings' parameters type */
-export interface ICreateAlarmSettingsParams {
-  badHigh: string;
-  badLow: string;
-  compressionLow: string;
-  falling: string;
-  high: string;
-  low: string;
-  outdated: string;
-  persistentHigh: string;
-  rising: string;
-}
-
-/** 'CreateAlarmSettings' return type */
-export interface ICreateAlarmSettingsResult {
-  badHigh: string;
-  badlow: string;
-  compressionLow: string;
-  falling: string;
-  high: string;
-  id: string;
-  low: string;
-  outdated: string;
-  persistentHigh: string;
-  rising: string;
-}
-
-/** 'CreateAlarmSettings' query type */
-export interface ICreateAlarmSettingsQuery {
-  params: ICreateAlarmSettingsParams;
-  result: ICreateAlarmSettingsResult;
-}
-
-const createAlarmSettingsIR: any = {"usedParamSet":{"outdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"high":true,"badHigh":true,"persistentHigh":true,"compressionLow":true},"params":[{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":150,"b":159}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":165,"b":173}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":179,"b":186}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":192,"b":196}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":202,"b":209}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":215,"b":220}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":226,"b":234}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":240,"b":255}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":261,"b":276}]}],"statement":"INSERT INTO alarm_settings (\n  outdated,\n  falling,\n  rising,\n  low,\n  badLow,\n  high,\n  bad_high,\n  persistent_high,\n  compression_low\n)\nVALUES (\n   :outdated!,\n   :falling!,\n   :rising!,\n   :low!,\n   :badLow!,\n   :high!,\n   :badHigh!,\n   :persistentHigh!,\n   :compressionLow!\n)\nRETURNING *"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO alarm_settings (
- *   outdated,
- *   falling,
- *   rising,
- *   low,
- *   badLow,
- *   high,
- *   bad_high,
- *   persistent_high,
- *   compression_low
- * )
- * VALUES (
- *    :outdated!,
- *    :falling!,
- *    :rising!,
- *    :low!,
- *    :badLow!,
- *    :high!,
- *    :badHigh!,
- *    :persistentHigh!,
- *    :compressionLow!
- * )
- * RETURNING *
- * ```
- */
-export const createAlarmSettings = new PreparedQuery<ICreateAlarmSettingsParams,ICreateAlarmSettingsResult>(createAlarmSettingsIR);
 
 
 /** 'CreatePushoverTargets' parameters type */

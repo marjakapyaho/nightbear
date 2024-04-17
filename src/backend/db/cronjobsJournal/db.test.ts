@@ -3,9 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 
 describe('features/cronjobsJournal/db', () => {
-  const {
-    db: { cronjobsJournal },
-  } = createTestContext();
+  const context = createTestContext();
 
   describe('update', () => {
     it('works', async () => {
@@ -15,13 +13,13 @@ describe('features/cronjobsJournal/db', () => {
         dexcomShareSessionId: '123-123-123',
       };
 
-      const res = await cronjobsJournal.update(row);
+      const res = await context.db.cronjobsJournal.update(row);
 
       assert.deepEqual(res, [row]);
     });
 
     it('allows nulls', async () => {
-      const [row] = await cronjobsJournal.update({
+      const [row] = await context.db.cronjobsJournal.update({
         dexcomShareSessionId: '123-123-123',
       });
 

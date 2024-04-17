@@ -29,31 +29,21 @@ CREATE TABLE analyser_settings (
   high_correction_suppression_minutes INTEGER NOT NULL
 );
 
-CREATE TABLE situation_settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  escalation_after_minutes INTEGER NOT NULL,
-  snooze_minutes INTEGER NOT NULL
-);
-
-CREATE TABLE alarm_settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  outdated UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  falling UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  rising UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  low UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  badLow UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  compression_low UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  high UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  bad_high UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  persistent_high UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE
-);
-
 CREATE TABLE profile_templates (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_name TEXT,
   alarms_enabled BOOLEAN NOT NULL DEFAULT true,
-  analyser_settings_id UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE,
-  alarm_settings_id UUID NOT NULL REFERENCES alarm_settings(id) ON DELETE CASCADE
+  analyser_settings_id UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE
+);
+
+CREATE TYPE situation AS ENUM ('OUTDATED', 'FALLING', 'RISING', 'LOW', 'BAD_LOW', 'COMPRESSION_LOW', 'HIGH', 'BAD_HIGH', 'PERSISTENT_HIGH');
+
+CREATE TABLE situation_settings (
+  situation situation NOT NULL,
+  profile_template_id UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
+  escalation_after_minutes INTEGER NOT NULL,
+  snooze_minutes INTEGER NOT NULL,
+  PRIMARY KEY(situation, profile_template_id)
 );
 
 CREATE TABLE pushover_levels (
@@ -69,8 +59,6 @@ CREATE TABLE profiles_activations (
   repeat_time_in_local_timezone TEXT,
   deactivated_at TIMESTAMPTZ
 );
-
-CREATE TYPE situation AS ENUM ('OUTDATED', 'FALLING', 'RISING', 'LOW', 'BAD_LOW', 'COMPRESSION_LOW', 'HIGH', 'BAD_HIGH', 'PERSISTENT_HIGH');
 
 CREATE TABLE alarms (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -105,10 +93,10 @@ CREATE TABLE insulin_entries (
 CREATE TABLE carb_entries (
   timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   amount INTEGER NOT NULL,
-  speed_factor INTEGER NOT NULL
+  speed_factor NUMERIC(2, 1) NOT NULL
 );
 
 CREATE TABLE meter_entries (
   timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  blood_glucose INTEGER NOT NULL
+  blood_glucose NUMERIC(3, 1) NOT NULL
 );

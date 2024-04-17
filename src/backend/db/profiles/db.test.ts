@@ -10,28 +10,22 @@ describe('db/profiles', () => {
     it('works', async () => {
       const analyserSettingsRes = await context.db.profiles.createAnalyserSettings(mockAnalyserSettings);
 
-      const alarmSettingsRes = await context.db.profiles.createAlarmSettings({
-        outdated: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        falling: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        rising: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        low: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        badLow: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        compressionLow: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        high: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        badHigh: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-        persistentHigh: (await context.db.profiles.createSituationSettings(mockSituationSettings))[0].id,
-      });
-
-      const res = await context.db.profiles.createProfileTemplate({
+      const profileTemplateRes = await context.db.profiles.createProfileTemplate({
         profileName: 'Test profile',
         alarmsEnabled: true,
         analyserSettingsId: analyserSettingsRes[0].id,
-        alarmSettingsId: alarmSettingsRes[0].id
       });
 
-      assert.equal(res.length, 1);
-      assert.equal(res[0].profileName, 'Test profile');
-      assert.equal(res[0].alarmsEnabled, true);
+      assert.equal(profileTemplateRes.length, 1);
+      assert.equal(profileTemplateRes[0].profileName, 'Test profile');
+      assert.equal(profileTemplateRes[0].alarmsEnabled, true);
+
+      const situationSettingsRes = await Promise.all(mockSituationSettings.map((settings) =>
+        context.db.profiles.createSituationSettings({ ...settings, profileTemplateId: profileTemplateRes[0].id })))
+
+      assert.equal(situationSettingsRes.length, 9);
+      assert.equal(situationSettingsRes[0][0].escalationAfterMinutes, 10);
+      assert.equal(situationSettingsRes[0][0].snoozeMinutes, 15);
     });
   });
 });
