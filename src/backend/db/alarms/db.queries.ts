@@ -48,6 +48,46 @@ const createAlarmIR: any = {"usedParamSet":{"situation":true,"isActive":true,"de
 export const createAlarm = new PreparedQuery<ICreateAlarmParams,ICreateAlarmResult>(createAlarmIR);
 
 
+/** 'CreateAlarms' parameters type */
+export interface ICreateAlarmsParams {
+  alarms: readonly ({
+    situation: situation,
+    isActive: boolean,
+    deactivatedAt: DateOrString | null | void
+  })[];
+}
+
+/** 'CreateAlarms' return type */
+export interface ICreateAlarmsResult {
+  deactivatedAt: Date | null;
+  id: string;
+  isActive: boolean;
+  situation: situation;
+  timestamp: Date;
+}
+
+/** 'CreateAlarms' query type */
+export interface ICreateAlarmsQuery {
+  params: ICreateAlarmsParams;
+  result: ICreateAlarmsResult;
+}
+
+const createAlarmsIR: any = {"usedParamSet":{"alarms":true},"params":[{"name":"alarms","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"situation","required":true},{"name":"isActive","required":true},{"name":"deactivatedAt","required":false}]},"locs":[{"a":73,"b":79}]}],"statement":"INSERT INTO alarms (\n  situation,\n  is_active,\n  deactivated_at\n) VALUES :alarms\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO alarms (
+ *   situation,
+ *   is_active,
+ *   deactivated_at
+ * ) VALUES :alarms
+ * RETURNING *
+ * ```
+ */
+export const createAlarms = new PreparedQuery<ICreateAlarmsParams,ICreateAlarmsResult>(createAlarmsIR);
+
+
 /** 'CreateAlarmState' parameters type */
 export interface ICreateAlarmStateParams {
   ackedBy?: string | null | void;

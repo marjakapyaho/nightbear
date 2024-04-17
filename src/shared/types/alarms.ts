@@ -10,7 +10,7 @@ export type AlarmState = {
 export type Alarm = {
   id: string;
   timestamp: number;
-  situationType: Situation;
+  situation: Situation;
   isActive: boolean;
   deactivatedAt: number | null;
   alarmStates: AlarmState[];

@@ -22,7 +22,7 @@ describe('server/main/check-runner', () => {
     {
       id: generateUuid(),
       timestamp: timestampNow,
-      situationType: 'HIGH',
+      situation: 'HIGH',
       isActive: true,
       deactivatedAt: null,
       alarmStates: [
@@ -40,7 +40,7 @@ describe('server/main/check-runner', () => {
     {
       id: '1',
       timestamp: timestampNow,
-      situationType: 'HIGH',
+      situation: 'HIGH',
       isActive: true,
       deactivatedAt: null,
       alarmStates: [
@@ -61,7 +61,7 @@ describe('server/main/check-runner', () => {
     {
       id: '1',
       timestamp: timestampNow + 15 * MIN_IN_MS,
-      situationType: 'OUTDATED',
+      situation: 'OUTDATED',
       isActive: true,
       deactivatedAt: null,
       alarmStates: [

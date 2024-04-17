@@ -15,11 +15,11 @@ export function createPushoverClient(user: string, token: string, callbackUrl: s
   const log = extendLogger(logger, 'pushover');
 
   return {
-    sendAlarm(situationType: Situation, recipient: string): Promise<string> {
+    sendAlarm(situation: Situation, recipient: string): Promise<string> {
       const message = {
         title: 'Nightbear alarm',
         sound: 'persistent',
-        message: situationType,
+        message: situation,
         device: recipient,
         priority: 2,
         retry: 30,

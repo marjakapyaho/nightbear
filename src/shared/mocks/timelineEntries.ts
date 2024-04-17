@@ -1,5 +1,6 @@
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { mockNow } from 'shared/mocks/dates';
 
 export const mockSensorEntries: SensorEntry[] = [
   {
@@ -55,7 +56,7 @@ export const mockInsulinEntries: InsulinEntry[] = [
 
 export const mockCarbEntries: CarbEntry[] = [
   {
-    timestamp: Date.now(),
+    timestamp: mockNow,
     amount: 40,
     speedFactor: 1,
   },

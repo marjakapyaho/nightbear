@@ -11,7 +11,7 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
     {
       id: generateUuid(),
       timestamp: currentTimestamp,
-      situationType: situation,
+      situation: situation,
       isActive: true,
       deactivationTimestamp: null,
       alarmStates: [
@@ -30,14 +30,14 @@ export function getMockAlarm(
   currentTimestamp: number,
   situation: Situation,
   isActive: boolean = true,
-  deactivationTimestamp: number | null = null,
+  deactivatedAt: number | null = null,
 ): Alarm {
   return {
     id: generateUuid(),
     timestamp: currentTimestamp,
-    situationType: situation,
+    situation: situation,
     isActive,
-    deactivationTimestamp,
+    deactivatedAt,
     alarmStates: [
       {
         alarmLevel: 1,

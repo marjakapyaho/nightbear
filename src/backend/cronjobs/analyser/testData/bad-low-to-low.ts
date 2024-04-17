@@ -29,7 +29,7 @@ export function alarmsWithInactiveBadLow(currentTimestamp: number): Alarm[] {
     {
       id: '123',
       timestamp: currentTimestamp - 40 * MIN_IN_MS,
-      situationType: 'BAD_LOW',
+      situation: 'BAD_LOW',
       isActive: false,
       deactivatedAt: currentTimestamp - 10 * MIN_IN_MS,
       alarmStates: [

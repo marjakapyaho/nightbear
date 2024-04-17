@@ -19,6 +19,7 @@ import {
 import 'mocha';
 import { mockCarbEntries, mockSensorEntries } from 'shared/mocks/timelineEntries';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { mockNow } from 'shared/mocks/dates';
 
 const currentTimestamp = 1508672249758;
 
@@ -186,13 +187,22 @@ describe('shared/calculations', () => {
     assert.deepEqual(getBgAverage(sensorEntries2), '12.0');
   });
 
-  // TODO
+  // TODO: why these timestamps?
   it('calculateDailyAmounts', () => {
-    assert.deepEqual(calculateDailyAmounts(mockCarbEntries, 2), []);
+    assert.deepEqual(calculateDailyAmounts(mockCarbEntries, 2), [
+      { timestamp: 1713312000000, total: null },
+      { timestamp: 1713225600000, total: 40 },
+    ]);
   });
 
-  // TODO
+  // TODO: why these timestamps?
   it('calculateDailyAverageBgs', () => {
-    assert.deepEqual(calculateDailyAverageBgs(mockSensorEntries, 2), []);
+    assert.deepEqual(calculateDailyAverageBgs(mockSensorEntries, 2), [
+      {
+        average: 4.655555555555555,
+        timestamp: 1713312000000,
+      },
+      { average: null, timestamp: 1713225600000 },
+    ]);
   });
 });

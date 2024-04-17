@@ -255,7 +255,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
       modelType: 'Alarm',
       modelUuid: generateUuid(),
       timestamp: ts,
-      situationType: x.type,
+      situation: x.type,
       isActive: x.status !== 'inactive',
       deactivationTimestamp: null,
       alarmStates: [

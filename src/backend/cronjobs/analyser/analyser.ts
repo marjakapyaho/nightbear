@@ -113,9 +113,9 @@ function detectLow(
     alarms,
     alarm =>
       (!alarm.deactivatedAt || alarm.deactivatedAt > currentTimestamp - BAD_LOW_QUARANTINE_WINDOW) &&
-      alarm.situationType === 'BAD_LOW',
+      alarm.situation === 'BAD_LOW',
   );
-  const correctionIfAlreadyLow = find(onlyActive(alarms), { situationType: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
+  const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
   const thereAreNoCorrectionCarbs = !find(
     carbs,
     carbs => carbs.timestamp > currentTimestamp - LOW_CORRECTION_SUPPRESSION_WINDOW,
@@ -180,9 +180,9 @@ function detectHigh(
     alarms,
     alarm =>
       (!alarm.deactivatedAt || alarm.deactivatedAt > currentTimestamp - BAD_HIGH_QUARANTINE_WINDOW) &&
-      alarm.situationType === 'BAD_HIGH',
+      alarm.situation === 'BAD_HIGH',
   );
-  const correctionIfAlreadyHigh = find(onlyActive(alarms), { situationType: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
+  const correctionIfAlreadyHigh = find(onlyActive(alarms), { situation: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;
   const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(
     insulins,
     currentTimestamp,

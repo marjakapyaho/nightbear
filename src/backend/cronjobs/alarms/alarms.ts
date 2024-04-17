@@ -9,8 +9,14 @@ import { Profile } from 'shared/types/profiles';
 
 const INITIAL_ALARM_LEVEL = 1;
 
-const alarmToString = (alarm: Alarm) => `${alarm.situationType} (level ${last(alarm.alarmStates)?.alarmLevel})`;
+const alarmToString = (alarm: Alarm) => `${alarm.situation} (level ${last(alarm.alarmStates)?.alarmLevel})`;
 const situationToString = (situation: Situation) => `${situation} (new)`;
+
+const mapTimestampsToDates = (alarms: Alarm[]) =>
+  alarms.map(alarm => ({
+    ...alarm,
+    deactivatedAt: alarm.deactivatedAt ? new Date(alarm.deactivatedAt) : null,
+  }));
 
 export function runAlarmChecks(context: Context, state: State, activeProfile: Profile, activeAlarms: Alarm[]) {
   const { log } = context;
@@ -18,8 +24,9 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Pr
   // If alarms are not enabled, remove all existing alarms and exit
   if (!activeProfile.alarmsEnabled) {
     return handleAlarmsToRemove(activeAlarms, context).then(alarms => {
-      //return context.storage.saveModels(alarms);
-      console.log('TODO: SAVE MODELS');
+      return context.db.alarms.createAlarms({
+        alarms: mapTimestampsToDates(alarms),
+      });
     });
   }
 
@@ -32,22 +39,21 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Pr
     handleAlarmsToKeep(alarmsToKeep, activeProfile, context),
     handleAlarmsToCreate(alarmsToCreate, context),
   ]).then(modelArrays => {
-    const alarmModels = modelArrays.reduce(
+    const alarms = modelArrays.reduce(
       (memo: Alarm[], next: Array<Alarm | null>) => memo.concat(next.filter(isNotNull)),
       [],
     );
-    //return context.storage.saveModels(alarmModels);
-    console.log('TODO: SAVE MODELS');
+    return context.db.alarms.createAlarms({ alarms: mapTimestampsToDates(alarms) });
   });
 }
 
 export function detectAlarmActions(state: State, activeAlarms: Alarm[]) {
-  const alarmsToRemove = filter(activeAlarms, alarm => !state[alarm.situationType]);
-  const alarmsToKeep = filter(activeAlarms, alarm => state[alarm.situationType]);
+  const alarmsToRemove = filter(activeAlarms, alarm => !state[alarm.situation]);
+  const alarmsToKeep = filter(activeAlarms, alarm => state[alarm.situation]);
   const alarmsToCreate = objectKeys(state)
     .map(situation => {
       if (!state[situation] || situation === 'COMPRESSION_LOW') return null; // COMPRESSION_LOW is treated as a special case: we don't want alarms created for it, even if the Situation exists
-      if (find(alarmsToKeep, { situationType: situation })) return null;
+      if (find(alarmsToKeep, { situation: situation })) return null;
       return situation;
     })
     .filter(isNotNull);
@@ -63,7 +69,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   const modelsToSave: Alarm[] = [];
 
   alarms.forEach(alarm => {
-    const changedAlarm = { ...alarm, isActive: false, deactivationTimestamp: context.timestamp() };
+    const changedAlarm = { ...alarm, isActive: false, deactivatedAt: context.timestamp() };
     modelsToSave.push(changedAlarm);
 
     // We're not waiting for the results of pushover acks
@@ -95,7 +101,7 @@ function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Co
       const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
       // TODO: fix this
       // @ts-ignore
-      const levelUpTimes = activeProfile.alarmSettings[alarm.situationType.toLowerCase()].escalationAfterMinutes;
+      const levelUpTimes = activeProfile.alarmSettings[alarm.situation.toLowerCase()].escalationAfterMinutes;
       // TODO: fix this
       // @ts-ignore
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
@@ -122,7 +128,7 @@ function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Co
           );
         } else {
           return context.pushover
-            .sendAlarm(alarm.situationType, pushoverRecipient)
+            .sendAlarm(alarm.situation, pushoverRecipient)
             .then((receipt: string) => {
               // only persist the level upgrade IF the alarm got sent (so we get retries)
               return Promise.resolve(
@@ -145,21 +151,21 @@ function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Co
   );
 }
 
-function handleAlarmsToCreate(situationTypes: Situation[], context: Context): Promise<Alarm[]> {
+function handleAlarmsToCreate(situations: Situation[], context: Context): Promise<Alarm[]> {
   const modelsToSave: Alarm[] = [];
 
-  situationTypes.forEach(situationType => {
-    modelsToSave.push(createAlarm(situationType, INITIAL_ALARM_LEVEL, context));
+  situations.forEach(situation => {
+    modelsToSave.push(createAlarm(situation, INITIAL_ALARM_LEVEL, context));
   });
 
   return Promise.resolve(modelsToSave);
 }
 
-export function createAlarm(situationType: Situation, alarmLevel: number, context: Context): Alarm {
+export function createAlarm(situation: Situation, alarmLevel: number, context: Context): Alarm {
   return {
     id: '123',
     timestamp: context.timestamp(),
-    situationType,
+    situation,
     isActive: true,
     deactivatedAt: null,
     alarmStates: [

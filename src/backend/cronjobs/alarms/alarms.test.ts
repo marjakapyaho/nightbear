@@ -4,18 +4,23 @@ import { getMockActiveAlarms, getMockAlarm } from 'backend/cronjobs/alarms/testD
 import { getMockState } from 'backend/cronjobs/alarms/testData/mockState';
 import 'mocha';
 import { createTestContext, getMockActiveProfile } from 'backend/utils/test';
+import { Alarm } from 'shared/types/alarms';
 
 const currentTimestamp = 1508672249758;
 
-describe('shared/alarms', () => {
-  function eraseUuids(x: ReturnType<typeof detectAlarmActions>): ReturnType<typeof detectAlarmActions> {
-    return {
-      alarmsToRemove: x.alarmsToRemove,
-      alarmsToKeep: x.alarmsToKeep,
-      alarmsToCreate: x.alarmsToCreate,
-    };
-  }
+export const removeId = (alarm: Alarm) => {
+  return { ...alarm, id: 'ERASED_ID' };
+};
 
+const eraseIds = (x: ReturnType<typeof detectAlarmActions>): ReturnType<typeof detectAlarmActions> => {
+  return {
+    alarmsToRemove: x.alarmsToRemove.map(removeId),
+    alarmsToKeep: x.alarmsToKeep.map(removeId),
+    alarmsToCreate: x.alarmsToCreate,
+  };
+};
+
+describe('cronjobs/alarms', () => {
   it('alarm actions to create', () => {
     const stateWithLow = getMockState('LOW');
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
@@ -43,8 +48,8 @@ describe('shared/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'HIGH');
 
     assert.deepEqual(
-      eraseUuids(detectAlarmActions(stateWithHigh, activeAlarms)),
-      eraseUuids({
+      eraseIds(detectAlarmActions(stateWithHigh, activeAlarms)),
+      eraseIds({
         alarmsToRemove: [],
         alarmsToKeep: [getMockAlarm(currentTimestamp, 'HIGH')],
         alarmsToCreate: [],
@@ -57,8 +62,8 @@ describe('shared/alarms', () => {
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
 
     assert.deepEqual(
-      eraseUuids(detectAlarmActions(stateWithNoSituation, activeAlarms)),
-      eraseUuids({
+      eraseIds(detectAlarmActions(stateWithNoSituation, activeAlarms)),
+      eraseIds({
         alarmsToRemove: [getMockAlarm(currentTimestamp, 'RISING')],
         alarmsToKeep: [],
         alarmsToCreate: [],

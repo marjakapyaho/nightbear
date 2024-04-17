@@ -11,6 +11,21 @@ VALUES (
 )
 RETURNING *;
 
+/*
+  @name createAlarms
+  @param alarms -> ((
+    situation!,
+    isActive!,
+    deactivatedAt
+  )...)
+*/
+INSERT INTO alarms (
+  situation,
+  is_active,
+  deactivated_at
+) VALUES :alarms
+RETURNING *;
+
 /* @name createAlarmState */
 INSERT INTO alarm_states (
   alarm_id,

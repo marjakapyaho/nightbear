@@ -13,7 +13,7 @@ export const mockAlarms: Alarm[] = [
   {
     id: '1',
     timestamp: Date.now(),
-    situationType: 'LOW',
+    situation: 'LOW',
     isActive: true,
     deactivatedAt: null,
     alarmStates: mockAlarmStates,

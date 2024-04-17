@@ -25,7 +25,7 @@ export const Config = () => {
         <h1 className={styles.heading}>Active alarms</h1>
         {alarms.map(alarm => (
           <button key={alarm.id} className={styles.alarm} onClick={() => ackAlarm(alarm)}>
-            {alarm.situationType.toUpperCase()}
+            {alarm.situation.toUpperCase()}
           </button>
         ))}
       </div>

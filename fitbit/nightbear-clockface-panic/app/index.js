@@ -86,7 +86,7 @@ function updateTimeSince() {
 function updateStatus() {
   let alarmType = '';
   if (situationStatus && situationStatus.alarms && situationStatus.alarms.length) {
-    alarmType = situationStatus.alarms[0].situationType;
+    alarmType = situationStatus.alarms[0].situation;
     startVibration();
   } else {
     stopVibration();
@@ -98,7 +98,7 @@ function updateStatus() {
 function startVibration() {
   clearInterval(vibrationTimer); // clear previous if there is one
   vibrationTimer = setInterval(
-    function(vibration) {
+    function (vibration) {
       vibration.start('ring');
     },
     5000,
@@ -123,7 +123,7 @@ function updateBloodSugarData() {
 function drawGraph(bloodSugars) {
   try {
     let elements = document.getElementsByClassName('dot');
-    elements.forEach(function(element, index) {
+    elements.forEach(function (element, index) {
       let sugar = bloodSugars[index] && bloodSugars[index].s;
       let insulin = bloodSugars[index] && bloodSugars[index].i;
       let carbs = bloodSugars[index] && bloodSugars[index].c;

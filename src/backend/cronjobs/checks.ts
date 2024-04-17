@@ -20,8 +20,8 @@ export const checks: Cronjob = (context: Context, _journal) => {
   return Promise.all([
     mockTimelineEntries,
     mockProfiles,
-    mockAlarms
-/*    context.storage.loadLatestTimelineModels('ActiveProfile', 1),
+    mockAlarms,
+    /*    context.storage.loadLatestTimelineModels('ActiveProfile', 1),
     getTimelineEntries(context, ANALYSIS_RANGE),
     context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
     context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
@@ -29,7 +29,7 @@ export const checks: Cronjob = (context: Context, _journal) => {
     context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),*/
   ]).then(([timelineEntries, profiles, alarms]) => {
     const activeProfile = getActiveProfile(profiles);
-    const { sensorEntries, insulinEntries, carbEntries, meterEntries} = timelineEntries
+    const { sensorEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
 
     if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
@@ -41,10 +41,10 @@ export const checks: Cronjob = (context: Context, _journal) => {
     log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
 
     // TODO
-/*    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {
+    /*    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {
       log(
         `There were changes in ${alarms.length} alarms with types: ${alarms
-          .map(alarm => alarm.situationType)
+          .map(alarm => alarm.situation)
           .join(', ')}`,
       );
     });*/
