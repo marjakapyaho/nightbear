@@ -2,7 +2,6 @@ import { Alarm, AlarmState } from 'shared/types/alarms';
 
 export const mockAlarmStates: AlarmState[] = [
   {
-    id: '1',
     alarmLevel: 1,
     validAfterTimestamp: Date.now(),
     ackedBy: null,
