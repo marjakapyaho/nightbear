@@ -13,7 +13,7 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
       timestamp: currentTimestamp,
       situation: situation,
       isActive: true,
-      deactivationTimestamp: null,
+      deactivatedAt: null,
       alarmStates: [
         {
           alarmLevel: 1,
