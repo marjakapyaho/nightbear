@@ -1,5 +1,5 @@
 import { roundTo1Decimals } from 'shared/utils/calculations';
-import { isNotNull } from 'backend/utils/types';
+import { isNotNull } from 'shared/utils/helpers';
 
 export type BaseGraphConfig = {
   timelineRange: number; // How many ms worth of graph data are we showing

@@ -27,8 +27,14 @@ export function getActivationTimestamp(spec: { hours: number; minutes?: number; 
 export const getTimeInMillis = (time: string | number): number =>
   typeof time === 'string' ? DateTime.fromISO(time).toMillis() : time;
 
+export const getTimeAsISOStr = (time: number | string): string =>
+  typeof time === 'string' ? time : DateTime.fromMillis(time).toUTC().toISO() || '';
+
 export const isTimeAfter = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) > getTimeInMillis(time2);
+
+export const isTimeAfterOrEqual = (time1: string | number, time2: string | number) =>
+  getTimeInMillis(time1) >= getTimeInMillis(time2);
 
 export const isTimeBeforeOrEqual = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) <= getTimeInMillis(time2);
@@ -37,3 +43,6 @@ export const getISOStrMinusMinutes = (timestamp: number, minutes: number): strin
   DateTime.fromMillis(timestamp - minutes * MIN_IN_MS)
     .toUTC()
     .toISO() || '';
+
+export const getTimeBetween = (time1: string | number, time2: string | number) =>
+  getTimeInMillis(time1) - getTimeInMillis(time2);

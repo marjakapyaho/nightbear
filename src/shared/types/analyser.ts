@@ -1,5 +1,5 @@
 export type AnalyserEntry = {
-  timestamp: number;
+  timestamp: string;
   bloodGlucose: number;
   slope: number | null;
   rawSlope: number | null;

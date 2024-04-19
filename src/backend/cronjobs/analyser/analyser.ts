@@ -7,7 +7,7 @@ import { AnalyserEntry, State } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
 import { DEFAULT_STATE } from 'shared/utils/analyser';
-import { isTimeAfter } from 'shared/utils/time';
+import { getTimeBetween, getTimeInMillis, isTimeAfter, isTimeAfterOrEqual } from 'shared/utils/time';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 1;
@@ -94,7 +94,10 @@ export function runAnalysis(
 
 function detectOutdated(activeProfile: Profile, latestEntry: AnalyserEntry, currentTimestamp: number) {
   if (latestEntry && latestEntry.bloodGlucose) {
-    return currentTimestamp - latestEntry.timestamp > activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS;
+    return isTimeAfter(
+      currentTimestamp - getTimeInMillis(latestEntry.timestamp),
+      activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS,
+    );
   } else {
     return true;
   }
@@ -157,7 +160,7 @@ function detectCompressionLow(
   const entriesToCheck = 4;
   const lastEntries = chain(entries).sortBy('timestamp').slice(-entriesToCheck).value();
   const lastEntriesAreFresh =
-    lastEntries.length === entriesToCheck && lastEntries[0].timestamp > currentTimestamp - 30 * MIN_IN_MS;
+    lastEntries.length === entriesToCheck && isTimeAfter(lastEntries[0].timestamp, currentTimestamp - 30 * MIN_IN_MS);
 
   return (
     noRecentInsulin &&
@@ -228,13 +231,15 @@ function detectPersistentHigh(
   entries: AnalyserEntry[],
   currentTimestamp: number,
 ) {
-  const relevantTimeWindow = filter(entries, entry => entry.timestamp >= currentTimestamp - ANALYSIS_TIME_WINDOW_MS);
+  const relevantTimeWindow = filter(entries, entry =>
+    isTimeAfterOrEqual(entry.timestamp, currentTimestamp - ANALYSIS_TIME_WINDOW_MS),
+  );
   const firstEntry = chain(relevantTimeWindow).sortBy('timestamp').first().value();
   if (!firstEntry) {
     return false;
   } // TODO: this is for lodash
 
-  const timeWindowLength = latestEntry.timestamp - firstEntry.timestamp;
+  const timeWindowLength = getTimeBetween(latestEntry.timestamp, firstEntry.timestamp);
 
   // We need 2.5 hours of data (with 10 min tolerance)
   const haveWideEnoughWindow = timeWindowLength > ANALYSIS_TIME_WINDOW_MS - MIN_IN_MS * 10;

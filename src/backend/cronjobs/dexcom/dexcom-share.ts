@@ -1,28 +1,28 @@
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { humanReadableLongTime } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeInMillis, humanReadableLongTime, isTimeAfter } from 'shared/utils/time';
 import { first, isArray } from 'lodash';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
 import { mapDexcomShareResponseToSensorEntry } from 'backend/cronjobs/dexcom/dexcom-share-utils';
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Context } from 'backend/utils/api';
-import { DexcomG6ShareEntry } from 'shared/types/dexcom';
 import { SensorEntry } from 'shared/types/timelineEntries';
 
 export const dexcomShare: Cronjob = (context, journal) => {
-  const { log, dexcomShare, storage, config } = context;
+  const { log, dexcomShare, config } = context;
   const { dexcomShareSessionId, dexcomShareLoginAttemptAt } = journal;
-  const dexcomShareLoginAttemptTimestamp = dexcomShareLoginAttemptAt?.getTime();
-  const mins = config.DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES;
+  const dexcomShareLoginAttemptTimestamp = dexcomShareLoginAttemptAt && getTimeInMillis(dexcomShareLoginAttemptAt);
+  const mins = config.DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES || 60;
   const loginAttemptAllowed =
-    !dexcomShareLoginAttemptTimestamp || Date.now() - dexcomShareLoginAttemptTimestamp > MIN_IN_MS * mins;
-  return Promise.resolve().then(() => {
+    !dexcomShareLoginAttemptTimestamp || isTimeAfter(Date.now() - dexcomShareLoginAttemptTimestamp, MIN_IN_MS * mins);
+  return Promise.resolve();
+  /*    .then(() => {
     if (dexcomShareSessionId) {
       return Promise.resolve()
-        .then(() => storage.loadLatestTimelineModel('DexcomG6ShareEntry'))
+        .then(() => context.db.sensorEntries.getPreviousEntry())
         .then(previousBg => {
           if (previousBg) {
-            const ageInMin = (Date.now() - previousBg.timestamp) / MIN_IN_MS;
+            const ageInMin = (Date.now() - getTimeInMillis(previousBg.timestamp)) / MIN_IN_MS;
             const ageModulo = ageInMin % 5;
             const willFetch =
               ageModulo > 0.35 && // new BG's aren't visible on Dexcom Share immediately -> give it a bit of time
@@ -34,7 +34,7 @@ export const dexcomShare: Cronjob = (context, journal) => {
           return dexcomShare.fetchBg(dexcomShareSessionId).then(
             res => {
               const model = parseIncomingBg(res);
-              const lagInMin = (Date.now() - model.timestamp) / MIN_IN_MS;
+              const lagInMin = (Date.now() - getTimeInMillis(model.timestamp)) / MIN_IN_MS;
               log(`BG lag is ${lagInMin.toFixed(1)} min (may include clock drift!)`);
               return saveIncomingBg(context, model);
             },
@@ -59,12 +59,12 @@ export const dexcomShare: Cronjob = (context, journal) => {
         );
       } else {
         const readableTime = dexcomShareLoginAttemptTimestamp
-          ? humanReadableLongTime(dexcomShareLoginAttemptTimestamp)
+          ? humanReadableLongTime(getTimeAsISOStr(dexcomShareLoginAttemptTimestamp))
           : 'n/a';
         log(`No session, will NOT attempt login, last attempt was at ${readableTime}, too soon (under ${mins} min)`);
       }
     }
-  });
+  });*/
 };
 
 function parseIncomingBg(res: DexcomShareResponse[]) {

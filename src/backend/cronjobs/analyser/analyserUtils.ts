@@ -2,6 +2,7 @@ import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from 'shared/utils/
 import { reduce, slice, sum, find } from 'lodash';
 import { InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { AnalyserEntry } from 'shared/types/analyser';
+import { getTimeBetween, isTimeAfter } from 'shared/utils/time';
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -77,7 +78,7 @@ export const parseAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] =>
     if (previousEntry && previousEntry.bloodGlucose && previousEntry.timestamp) {
       const previousBg = previousEntry.bloodGlucose;
       const previousTimestamp = previousEntry.timestamp;
-      const timeBetweenEntries = currentTimestamp - previousTimestamp;
+      const timeBetweenEntries = getTimeBetween(currentTimestamp, previousTimestamp);
 
       if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE && timeBetweenEntries > 0) {
         currentSlope = roundTo2Decimals(((currentBg - previousBg) / timeBetweenEntries) * MIN_IN_MS * 5);
@@ -101,5 +102,7 @@ export const checkThatThereIsNoCorrectionInsulin = (
   currentTimestamp: number,
   highCorrectionSuppressionWindow: number,
 ) => {
-  return !find(insulins, insulin => insulin.timestamp > currentTimestamp - highCorrectionSuppressionWindow * MIN_IN_MS);
+  return !find(insulins, insulin =>
+    isTimeAfter(insulin.timestamp, currentTimestamp - highCorrectionSuppressionWindow * MIN_IN_MS),
+  );
 };

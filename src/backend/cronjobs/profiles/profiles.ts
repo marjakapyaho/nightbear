@@ -1,7 +1,9 @@
 import { DAY_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
-import { getActivationTimestamp, humanReadableShortTime } from 'shared/utils/time';
+import { getActivationTimestamp, getTimeAsISOStr, getTimeInMillis, humanReadableShortTime } from 'shared/utils/time';
 import { padStart } from 'lodash';
 import { Cronjob } from 'backend/utils/cronjobs';
+import { Context } from 'backend/utils/api';
+import { Profile } from 'shared/types/profiles';
 
 // Checks if any of the scheduled profile activations match the given time range.
 // If so, activates them.
@@ -10,13 +12,12 @@ export const profiles: Cronjob = (context, journal) => {
   const now = Date.now();
   return Promise.resolve()
     .then(() => {
-      const then = journal.previousExecutionAt?.getTime();
+      const then = journal.previousExecutionAt && getTimeInMillis(journal.previousExecutionAt);
       if (!then) return; // we don't know when we last ran -> let's try again on the next run
       const sinceMin = (now - then) / MIN_IN_MS;
       if (sinceMin > 5) log(`${sinceMin.toFixed(1)} min since last profile activation check, suspicious`);
-      return Promise.resolve()
-        .then(() => context.storage.loadGlobalModels())
-        .then(models => models.filter(is('SavedProfile')))
+      return Promise.resolve();
+      /*        .then(() => context.db.profiles.todo())
         .then(profiles => {
           const profilesToActivate = profiles.filter(profile => {
             if (!profile.activatedAtUtc) return false; // doesn't have a schedule -> don't care
@@ -38,19 +39,19 @@ export const profiles: Cronjob = (context, journal) => {
           } else {
             log(`None of the ${profiles.length} profiles need activation`);
           }
-        });
+        });*/
     })
-    .then(() => ({ previousExecutionAt: new Date(now) })); // store the timestamp of this run into the CronjobsJournal
+    .then(() => ({ previousExecutionAt: getTimeAsISOStr(now) })); // store the timestamp of this run into the CronjobsJournal
 };
 
-function activateProfile(context: Context, profile: SavedProfile) {
+function activateProfile(context: Context, profile: Profile) {
   const { log } = context;
   log(`Activating profile "${profile.profileName}"`);
-  const activation = activateSavedProfile(profile, context.timestamp());
-  return context.storage.saveModel(activation).then(
+  /*  const activation = activateSavedProfile(profile, context.timestamp());
+  return context.db.profiles.saveProfile(activation).then(
     () => log(`Activated profile "${profile.profileName}"`),
     err => log(`Activating profile "${profile.profileName}" failed`, err),
-  );
+  );*/
 }
 
 function fallsBetween(a: number, b: number, c: number) {
