@@ -17,8 +17,8 @@ import {
   roundTo2Decimals,
   timestampIsUnderMaxAge,
 } from 'shared/utils/calculations';
-import { describe, expect, it } from 'vitest';
 import { getISOStrMinusMinutes } from 'shared/utils/time';
+import { describe, expect, it } from 'vitest';
 
 const currentTimestamp = 1508672249758;
 
@@ -34,59 +34,67 @@ export const sensorEntries1: SensorEntry[] = [
     type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 30 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 25),
     bloodGlucose: 6,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 25 * MIN_IN_MS,
-    bloodGlucose: 6,
-  },
-  {
-    timestamp: currentTimestamp - 20 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
     bloodGlucose: 8,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 15 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
     bloodGlucose: 7,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 10 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
     bloodGlucose: 7,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 5 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 5),
     bloodGlucose: 8,
+    type: 'DEXCOM_G6_SHARE',
   },
 ];
 
 export const sensorEntries2: SensorEntry[] = [
   {
-    timestamp: currentTimestamp - 35 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 35),
     bloodGlucose: 14,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 30 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 30),
     bloodGlucose: 11,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 25 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 25),
     bloodGlucose: 11.5,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 20 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
     bloodGlucose: 12.5,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 15 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
     bloodGlucose: 13.1,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 10 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
     bloodGlucose: 12,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
-    timestamp: currentTimestamp - 5 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 5),
     bloodGlucose: 10,
+    type: 'DEXCOM_G6_SHARE',
   },
 ];
 
