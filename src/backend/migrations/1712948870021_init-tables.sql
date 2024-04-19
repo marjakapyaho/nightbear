@@ -10,13 +10,6 @@ CREATE TABLE cronjobs_journal (
 
 INSERT INTO cronjobs_journal DEFAULT VALUES;
 
-CREATE TABLE sensor_entries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  type TEXT NOT NULL,
-  blood_glucose NUMERIC(3, 1) NOT NULL
-);
-
 CREATE TABLE analyser_settings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   high_level_rel NUMERIC(3, 1) NOT NULL,
@@ -82,21 +75,29 @@ CREATE TABLE pushover_receipts (
   receipt TEXT NOT NULL
 );
 
+-- Timeline entries:
+
+CREATE TABLE sensor_entries (
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
+  type TEXT NOT NULL,
+  blood_glucose NUMERIC(3, 1) NOT NULL
+);
+
 CREATE TYPE insulinType AS ENUM ('FAST', 'LONG');
 
 CREATE TABLE insulin_entries (
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
   amount INTEGER NOT NULL,
   type insulinType NOT NULL
 );
 
 CREATE TABLE carb_entries (
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
   amount INTEGER NOT NULL,
   speed_factor NUMERIC(2, 1) NOT NULL
 );
 
 CREATE TABLE meter_entries (
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP PRIMARY KEY,
   blood_glucose NUMERIC(3, 1) NOT NULL
 );
