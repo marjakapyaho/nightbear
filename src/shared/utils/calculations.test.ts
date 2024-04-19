@@ -18,13 +18,20 @@ import {
   timestampIsUnderMaxAge,
 } from 'shared/utils/calculations';
 import { describe, expect, it } from 'vitest';
+import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 const currentTimestamp = 1508672249758;
 
 export const sensorEntries1: SensorEntry[] = [
   {
-    timestamp: currentTimestamp - 35 * MIN_IN_MS,
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 35),
     bloodGlucose: 6,
+    type: 'DEXCOM_G6_SHARE',
+  },
+  {
+    timestamp: getISOStrMinusMinutes(currentTimestamp, 30),
+    bloodGlucose: 6,
+    type: 'DEXCOM_G6_SHARE',
   },
   {
     timestamp: currentTimestamp - 30 * MIN_IN_MS,

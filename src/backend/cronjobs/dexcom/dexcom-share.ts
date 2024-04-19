@@ -2,11 +2,12 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 import { humanReadableLongTime } from 'shared/utils/time';
 import { first, isArray } from 'lodash';
 import { Cronjob } from 'backend/utils/cronjobs';
-import { DexcomShareBgResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
-import { parseDexcomG6ShareEntryFromRequest } from 'backend/cronjobs/dexcom/dexcom-share-utils';
+import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
+import { mapDexcomShareResponseToSensorEntry } from 'backend/cronjobs/dexcom/dexcom-share-utils';
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Context } from 'backend/utils/api';
 import { DexcomG6ShareEntry } from 'shared/types/dexcom';
+import { SensorEntry } from 'shared/types/timelineEntries';
 
 export const dexcomShare: Cronjob = (context, journal) => {
   const { log, dexcomShare, storage, config } = context;
@@ -66,28 +67,27 @@ export const dexcomShare: Cronjob = (context, journal) => {
   });
 };
 
-function parseIncomingBg(res: DexcomShareBgResponse[]) {
+function parseIncomingBg(res: DexcomShareResponse[]) {
   if (!isArray(res)) throw new Error(`Unexpected response payload: ${typeof res}`);
   if (res.length !== 1) throw new Error(`Unexpected response length: ${res.length}`);
   const [val] = res;
-  return parseDexcomG6ShareEntryFromRequest(val);
+  return mapDexcomShareResponseToSensorEntry(val);
 }
 
-// TODO: fix this
-function saveIncomingBg(context: Context, model: DexcomG6ShareEntry) {
-  const { log, storage } = context;
-  const desc = `BG ${model.bloodGlucose}, trend ${model.trend}, timestamp ${humanReadableLongTime(model.timestamp)}`;
+const saveIncomingBg = (context: Context, entry: SensorEntry) => {
+  const { log } = context;
+  const desc = `BG ${entry.bloodGlucose}, timestamp ${humanReadableLongTime(entry.timestamp)}`;
   return Promise.resolve()
-    .then(() => storage.loadTimelineModels(['DexcomG6ShareEntry'], 0, model.timestamp)) // see if we can find an entry of the same type that already exists with this exact timestamp
+    .then(() => context.db.sensorEntries.byTimestamp({ from: entry.timestamp, to: entry.timestamp }))
     .then(entries => first(entries))
     .then(existingEntry => {
       if (existingEntry) {
         // Already exists in the DB -> no need to do anything!
-        log(`This ${existingEntry.id} already exists: ${desc}`);
+        log(`This ${existingEntry.timestamp} already exists: ${desc}`);
       } else {
         // We didn't find the entry yet -> create it
-        return storage.saveModel(model);
+        return context.db.sensorEntries.create(entry);
       }
     })
-    .then(() => log(`Saved new ${model.modelType}: ${desc}`));
-}
+    .then(() => log(`Saved new SensorEntry: ${desc}`));
+};

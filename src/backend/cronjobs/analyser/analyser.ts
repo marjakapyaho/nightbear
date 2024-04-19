@@ -7,6 +7,7 @@ import { AnalyserEntry, State } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
 import { DEFAULT_STATE } from 'shared/utils/analyser';
+import { isTimeAfter } from 'shared/utils/time';
 
 const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 1;
@@ -116,9 +117,8 @@ function detectLow(
       alarm.situation === 'BAD_LOW',
   );
   const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
-  const thereAreNoCorrectionCarbs = !find(
-    carbs,
-    carbs => carbs.timestamp > currentTimestamp - LOW_CORRECTION_SUPPRESSION_WINDOW,
+  const thereAreNoCorrectionCarbs = !find(carbs, carbs =>
+    isTimeAfter(carbs.timestamp, currentTimestamp - LOW_CORRECTION_SUPPRESSION_WINDOW),
   );
   return (
     notCurrentlyBadLow &&

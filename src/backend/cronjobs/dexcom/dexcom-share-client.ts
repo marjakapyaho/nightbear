@@ -6,7 +6,7 @@ const DEXCOM_APPLICATION_ID = 'd8665ade-9673-4e27-9ff6-92db4ce13d13';
 
 export type DexcomShareClient = ReturnType<typeof createDexcomShareClient>;
 
-export type DexcomShareBgResponse = { DT: string; ST: string; Trend: number; Value: number; WT: string };
+export type DexcomShareResponse = { DT: string; ST: string; Trend: number; Value: number; WT: string };
 
 export const NO_DEXCOM_SHARE: DexcomShareClient = {
   login: () => Promise.resolve(''),
@@ -49,7 +49,7 @@ export function createDexcomShareClient(username: string, password: string, logg
           return Promise.reject(new Error(`DexcomShareClient login request failed (caused by\n${err}\n)`));
         });
     },
-    fetchBg(sessionId: string): Promise<Array<DexcomShareBgResponse>> {
+    fetchBg(sessionId: string): Promise<Array<DexcomShareResponse>> {
       return axios
         .post(
           `https://shareous1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${sessionId}&minutes=1440&maxCount=1`,
