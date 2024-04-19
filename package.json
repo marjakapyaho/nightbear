@@ -49,12 +49,7 @@
     "lodash",
     "luxon",
     "pg",
-    "pouchdb-adapter-memory",
-    "pouchdb-find",
-    "pouchdb",
-    "pushover-notifications",
-    "ts-node",
-    "typescript"
+    "pushover-notifications"
   ],
   "dependencies": {
     "@pgtyped/cli": "2.3.0",
