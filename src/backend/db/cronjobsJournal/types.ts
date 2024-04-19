@@ -1,3 +1,3 @@
-import { IUpdateResult } from 'backend/db/cronjobsJournal/db.queries';
+import { IUpdateResult } from 'backend/db/cronjobsJournal/cronjobsJournal.queries';
 
 export type CronjobsJournal = IUpdateResult;
