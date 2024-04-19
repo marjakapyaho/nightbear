@@ -1,6 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
 import { mockNow } from 'shared/mocks/dates';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('db/alarms', () => {
   const context = createTestContext();

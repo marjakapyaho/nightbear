@@ -1,5 +1,5 @@
 import { createTestContext } from 'backend/utils/test';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('db/cronjobsJournal', () => {
   const context = createTestContext();

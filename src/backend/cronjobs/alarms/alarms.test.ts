@@ -3,6 +3,7 @@ import { getMockActiveAlarms, getMockAlarm } from 'backend/cronjobs/alarms/testD
 import { getMockState } from 'backend/cronjobs/alarms/testData/mockState';
 import { createTestContext, getMockActiveProfile } from 'backend/utils/test';
 import { Alarm } from 'shared/types/alarms';
+import { describe, expect, it } from 'vitest';
 
 const currentTimestamp = 1508672249758;
 
@@ -23,7 +24,7 @@ describe('cronjobs/alarms', () => {
     const stateWithLow = getMockState('LOW');
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
 
-    assert.deepEqual(detectAlarmActions(stateWithLow, activeAlarms), {
+    expect(detectAlarmActions(stateWithLow, activeAlarms)).toEqual({
       alarmsToRemove: [],
       alarmsToKeep: [],
       alarmsToCreate: ['LOW'],
@@ -34,7 +35,7 @@ describe('cronjobs/alarms', () => {
     const stateWithCompressionLow = getMockState('COMPRESSION_LOW');
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
 
-    assert.deepEqual(detectAlarmActions(stateWithCompressionLow, activeAlarms), {
+    expect(detectAlarmActions(stateWithCompressionLow, activeAlarms)).toEqual({
       alarmsToRemove: [],
       alarmsToKeep: [],
       alarmsToCreate: [],
@@ -45,8 +46,7 @@ describe('cronjobs/alarms', () => {
     const stateWithHigh = getMockState('HIGH');
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'HIGH');
 
-    assert.deepEqual(
-      eraseIds(detectAlarmActions(stateWithHigh, activeAlarms)),
+    expect(eraseIds(detectAlarmActions(stateWithHigh, activeAlarms))).toEqual(
       eraseIds({
         alarmsToRemove: [],
         alarmsToKeep: [getMockAlarm(currentTimestamp, 'HIGH')],
@@ -59,8 +59,7 @@ describe('cronjobs/alarms', () => {
     const stateWithNoSituation = getMockState();
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
 
-    assert.deepEqual(
-      eraseIds(detectAlarmActions(stateWithNoSituation, activeAlarms)),
+    expect(eraseIds(detectAlarmActions(stateWithNoSituation, activeAlarms))).toEqual(
       eraseIds({
         alarmsToRemove: [getMockAlarm(currentTimestamp, 'RISING')],
         alarmsToKeep: [],
@@ -69,43 +68,39 @@ describe('cronjobs/alarms', () => {
     );
   });
 
-  it('run alarm checks with one alarm to create', () => {
+  it('run alarm checks with one alarm to create', async () => {
     const stateWithFalling = getMockState('FALLING');
     const activeAlarms = getMockActiveAlarms(currentTimestamp);
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms).then(alarms =>
-      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'FALLING')]),
-    );
+    const alarms = await runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms);
+    expect(alarms).toEqual([getMockAlarm(currentTimestamp, 'FALLING')]);
   });
 
-  it('run alarm checks with one alarm to keep', () => {
+  it('run alarm checks with one alarm to keep', async () => {
     const stateWithFalling = getMockState('FALLING');
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'FALLING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms).then(alarms =>
-      assert.deepEqual(alarms, []),
-    );
+    const alarms = await runAlarmChecks(context, stateWithFalling, getMockActiveProfile('day'), activeAlarms);
+    expect(alarms).toEqual([]);
   });
 
-  it('run alarm checks with one alarm to remove', () => {
+  it('run alarm checks with one alarm to remove', async () => {
     const stateWithNoSituation = getMockState();
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'RISING');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithNoSituation, getMockActiveProfile('day'), activeAlarms).then(alarms =>
-      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]),
-    );
+    const alarms = await runAlarmChecks(context, stateWithNoSituation, getMockActiveProfile('day'), activeAlarms);
+    expect(alarms).toEqual([getMockAlarm(currentTimestamp, 'RISING', false, currentTimestamp)]);
   });
 
-  it('run alarm checks with alarms off', () => {
+  it('run alarm checks with alarms off', async () => {
     const stateWithLow = getMockState('LOW');
     const activeAlarms = getMockActiveAlarms(currentTimestamp, 'LOW');
     const context = createTestContext();
 
-    return runAlarmChecks(context, stateWithLow, getMockActiveProfile('day', false), activeAlarms).then(alarms =>
-      assert.deepEqual(alarms, [getMockAlarm(currentTimestamp, 'LOW', false, currentTimestamp)]),
-    );
+    const alarms = await runAlarmChecks(context, stateWithLow, getMockActiveProfile('day', false), activeAlarms);
+    expect(alarms).toEqual([getMockAlarm(currentTimestamp, 'LOW', false, currentTimestamp)]);
   });
 });

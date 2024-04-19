@@ -18,6 +18,7 @@ import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { MIN_IN_MS } from 'shared/utils/calculations';
+import { describe, expect, it } from 'vitest';
 
 describe('utils/analyser', () => {
   const currentTimestamp = 1508672249758;
@@ -26,7 +27,7 @@ describe('utils/analyser', () => {
   const alarms: Alarm[] = [];
 
   it('detects no situation', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('day'),
@@ -35,12 +36,11 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      DEFAULT_STATE,
-    );
+    ).toEqual(DEFAULT_STATE);
   });
 
   it('detects outdated', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('day'),
@@ -49,25 +49,23 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        OUTDATED: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      OUTDATED: true,
+    });
   });
 
   it('detects low', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(currentTimestamp, getMockActiveProfile('day'), entriesLow(currentTimestamp), insulin, carbs, alarms),
-      {
-        ...DEFAULT_STATE,
-        LOW: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      LOW: true,
+    });
   });
 
   it('detects bad low', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('day'),
@@ -76,15 +74,14 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        BAD_LOW: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      BAD_LOW: true,
+    });
   });
 
   it('detects falling', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('day'),
@@ -93,15 +90,14 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        FALLING: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      FALLING: true,
+    });
   });
 
   it('detects compression low', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
@@ -110,15 +106,14 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        COMPRESSION_LOW: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      COMPRESSION_LOW: true,
+    });
   });
 
   it('detects high', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
@@ -127,181 +122,160 @@ describe('utils/analyser', () => {
         carbs,
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        HIGH: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      HIGH: true,
+    });
   });
 
   it('detects bad high', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesBadHigh(currentTimestamp),
         insulin,
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        BAD_HIGH: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      BAD_HIGH: true,
+    });
   });
 
   it('detects rising', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesRising(currentTimestamp),
         insulin,
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        RISING: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      RISING: true,
+    });
   });
 
   it('detects persistent high', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesPersistentHigh(currentTimestamp),
         insulin,
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        PERSISTENT_HIGH: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      PERSISTENT_HIGH: true,
+    });
   });
 
   it('does not detect high when coming down from bad high', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesBadHighToHigh(currentTimestamp),
         insulin,
         carbs,
-
         alarmsWithInactiveBadHigh(currentTimestamp),
       ),
-      DEFAULT_STATE,
-    );
+    ).toEqual(DEFAULT_STATE);
   });
 
   it('does not detect low when coming up from bad low', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesBadLowToLow(currentTimestamp),
         insulin,
         carbs,
-
         alarmsWithInactiveBadLow(currentTimestamp),
       ),
-      DEFAULT_STATE,
-    );
+    ).toEqual(DEFAULT_STATE);
   });
 
   it('keeps high alarm regardless of fluctuations', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesHighFluctuations(currentTimestamp),
         insulin,
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        HIGH: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      HIGH: true,
+    });
   });
 
   it('keeps low alarm regardless of fluctuations', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesLowFluctuations(currentTimestamp),
         insulin,
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        LOW: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      LOW: true,
+    });
   });
 
   it('does not detect high or rising if there is recent insulin', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 80 * MIN_IN_MS),
         carbs,
-
         alarms,
       ),
-      DEFAULT_STATE,
-    );
+    ).toEqual(DEFAULT_STATE);
   });
 
   it('detects high when suppression window is over', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesHigh(currentTimestamp),
         recentInsulin(currentTimestamp - 140 * MIN_IN_MS),
         carbs,
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        HIGH: true,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      HIGH: true,
+    });
   });
 
   it('does not detect low if there are recent carbs', () => {
-    assert.deepEqual(
+    expect(
       runAnalysis(
         currentTimestamp,
         getMockActiveProfile('night'),
         entriesLow(currentTimestamp),
         insulin,
         recentCarbs(currentTimestamp),
-
         alarms,
       ),
-      {
-        ...DEFAULT_STATE,
-        FALLING: false,
-      },
-    );
+    ).toEqual({
+      ...DEFAULT_STATE,
+      FALLING: false,
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
 import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('db/profiles', () => {
   const context = createTestContext();

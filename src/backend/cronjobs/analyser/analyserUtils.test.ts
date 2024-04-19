@@ -2,6 +2,7 @@ import { parseAnalyserEntries } from 'backend/cronjobs/analyser/analyserUtils';
 import { AnalyserEntry } from 'shared/types/analyser';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { MIN_IN_MS } from 'shared/utils/calculations';
+import { describe, expect, it } from 'vitest';
 
 describe('utils/analyser-utils', () => {
   const currentTimestamp = 1508672249758;
@@ -64,6 +65,6 @@ describe('utils/analyser-utils', () => {
 
   // Assertions
   it('parses correct slopes for analyser entries', () => {
-    assert.deepEqual(parseAnalyserEntries(entriesBefore), entriesAfter);
+    expect(parseAnalyserEntries(entriesBefore)).toEqual(entriesAfter);
   });
 });

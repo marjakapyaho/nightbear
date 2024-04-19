@@ -1,6 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
 import { DateTime } from 'luxon';
-import { expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('db/sensorEntries', () => {
   const context = createTestContext();

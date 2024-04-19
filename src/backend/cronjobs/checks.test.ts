@@ -2,6 +2,7 @@ import { Alarm } from 'shared/types/alarms';
 import { DexcomG6ShareEntry } from 'shared/types/dexcom';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { generateUuid } from 'shared/utils/id';
+import { describe } from 'vitest';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;

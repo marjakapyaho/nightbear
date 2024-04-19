@@ -17,6 +17,7 @@ import {
   roundTo2Decimals,
   timestampIsUnderMaxAge,
 } from 'shared/utils/calculations';
+import { describe, expect, it } from 'vitest';
 
 const currentTimestamp = 1508672249758;
 
@@ -84,15 +85,15 @@ export const sensorEntries2: SensorEntry[] = [
 
 describe('shared/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
-    assert.deepEqual(changeBloodGlucoseUnitToMmoll(160), 8.9);
-    assert.deepEqual(changeBloodGlucoseUnitToMmoll(60), 3.3);
-    assert.deepEqual(changeBloodGlucoseUnitToMmoll(450), 25.0);
+    expect(changeBloodGlucoseUnitToMmoll(160)).toEqual(8.9);
+    expect(changeBloodGlucoseUnitToMmoll(60)).toEqual(3.3);
+    expect(changeBloodGlucoseUnitToMmoll(450)).toEqual(25.0);
   });
 
   it('changeBloodGlucoseUnitToMgdl', () => {
-    assert.deepEqual(changeBloodGlucoseUnitToMgdl(2.8), 50);
-    assert.deepEqual(changeBloodGlucoseUnitToMgdl(11.0), 198);
-    assert.deepEqual(changeBloodGlucoseUnitToMgdl(20.8), 374);
+    expect(changeBloodGlucoseUnitToMgdl(2.8)).toEqual(50);
+    expect(changeBloodGlucoseUnitToMgdl(11.0)).toEqual(198);
+    expect(changeBloodGlucoseUnitToMgdl(20.8)).toEqual(374);
   });
 
   it('calculateRaw', () => {
@@ -103,8 +104,7 @@ describe('shared/calculations', () => {
       scale: 0.9977203313342593,
     };
 
-    assert.deepEqual(
-      calculateRaw(testObj1.unfiltered, testObj1.slope, testObj1.intercept, testObj1.scale),
+    expect(calculateRaw(testObj1.unfiltered, testObj1.slope, testObj1.intercept, testObj1.scale)).toEqual(
       14.2, // Dexcom 14.2, old raw 13.3
     );
 
@@ -115,8 +115,7 @@ describe('shared/calculations', () => {
       scale: 1,
     };
 
-    assert.deepEqual(
-      calculateRaw(testObj2.unfiltered, testObj2.slope, testObj2.intercept, testObj2.scale),
+    expect(calculateRaw(testObj2.unfiltered, testObj2.slope, testObj2.intercept, testObj2.scale)).toEqual(
       10.2, // Dexcom 9.8, old raw 9.3
     );
 
@@ -127,66 +126,61 @@ describe('shared/calculations', () => {
       scale: 0.9977203313342593,
     };
 
-    assert.deepEqual(calculateRaw(testObj3.unfiltered, testObj3.slope, testObj3.intercept, testObj3.scale), null);
+    expect(calculateRaw(testObj3.unfiltered, testObj3.slope, testObj3.intercept, testObj3.scale)).toBeNull();
   });
 
   it('isDexcomEntryValid', () => {
-    assert.deepEqual(isDexcomEntryValid(4, 10), false); // Too much noise, too low bg
-    assert.deepEqual(isDexcomEntryValid(2, 10), false); // Too low bg
-    assert.deepEqual(isDexcomEntryValid(5, 100), false); // Too much noise
-    assert.deepEqual(isDexcomEntryValid(3, 80), true);
+    expect(isDexcomEntryValid(4, 10)).toEqual(false); // Too much noise, too low bg
+    expect(isDexcomEntryValid(2, 10)).toEqual(false); // Too low bg
+    expect(isDexcomEntryValid(5, 100)).toEqual(false); // Too much noise
+    expect(isDexcomEntryValid(3, 80)).toEqual(true);
   });
 
   it('roundTo2Decimals', () => {
-    assert.deepEqual(roundTo2Decimals(34.0879), 34.09);
-    assert.deepEqual(roundTo2Decimals(5.9999), 6.0);
-    assert.deepEqual(roundTo2Decimals(2.457), 2.46);
+    expect(roundTo2Decimals(34.0879)).toEqual(34.09);
+    expect(roundTo2Decimals(5.9999)).toEqual(6.0);
+    expect(roundTo2Decimals(2.457)).toEqual(2.46);
   });
 
   it('timestampIsUnderMaxAge', () => {
     const currentTimestamp = 1521972451237;
-    assert.deepEqual(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 10 * MIN_IN_MS, 20), true);
-    assert.deepEqual(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 30 * MIN_IN_MS, 20), false);
+    expect(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 10 * MIN_IN_MS, 20)).toEqual(true);
+    expect(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 30 * MIN_IN_MS, 20)).toEqual(false);
   });
 
   it('calculateHba1c', () => {
-    assert.deepEqual(calculateHba1c(sensorEntries1), 5.3278247884519665);
-    assert.deepEqual(calculateHba1c(sensorEntries2), 8.56326530612245);
+    expect(calculateHba1c(sensorEntries1)).toEqual(5.3278247884519665);
+    expect(calculateHba1c(sensorEntries2)).toEqual(8.56326530612245);
   });
 
   it('calculateTimeInRange', () => {
-    assert.deepEqual(calculateTimeInRange(sensorEntries1), 100);
-    assert.deepEqual(calculateTimeInRange(sensorEntries2), 14);
+    expect(calculateTimeInRange(sensorEntries1)).toEqual(100);
+    expect(calculateTimeInRange(sensorEntries2)).toEqual(14);
   });
 
   it('calculateTimeLow', () => {
-    assert.deepEqual(calculateTimeLow(sensorEntries1), 0);
-    assert.deepEqual(calculateTimeLow(sensorEntries2), 0);
+    expect(calculateTimeLow(sensorEntries1)).toEqual(0);
+    expect(calculateTimeLow(sensorEntries2)).toEqual(0);
   });
 
   it('calculateTimeHigh', () => {
-    assert.deepEqual(calculateTimeHigh(sensorEntries1), 0);
-    assert.deepEqual(calculateTimeHigh(sensorEntries2), 86);
-  });
-
-  it('calculateTimeHigh', () => {
-    assert.deepEqual(calculateTimeHigh(sensorEntries1), 0);
-    assert.deepEqual(calculateTimeHigh(sensorEntries2), 86);
+    expect(calculateTimeHigh(sensorEntries1)).toEqual(0);
+    expect(calculateTimeHigh(sensorEntries2)).toEqual(86);
   });
 
   it('countSituations', () => {
-    assert.deepEqual(countSituations(sensorEntries1, 7.5, true), 2);
-    assert.deepEqual(countSituations(sensorEntries2, 13, false), 2);
+    expect(countSituations(sensorEntries1, 7.5, true)).toEqual(2);
+    expect(countSituations(sensorEntries2, 13, false)).toEqual(2);
   });
 
   it('getBgAverage', () => {
-    assert.deepEqual(getBgAverage(sensorEntries1), '6.9');
-    assert.deepEqual(getBgAverage(sensorEntries2), '12.0');
+    expect(getBgAverage(sensorEntries1)).toEqual('6.9');
+    expect(getBgAverage(sensorEntries2)).toEqual('12.0');
   });
 
   // TODO: why these timestamps?
   it('calculateDailyAmounts', () => {
-    assert.deepEqual(calculateDailyAmounts(mockCarbEntries, 2), [
+    expect(calculateDailyAmounts(mockCarbEntries, 2)).toEqual([
       { timestamp: 1713312000000, total: null },
       { timestamp: 1713225600000, total: 40 },
     ]);
@@ -194,11 +188,8 @@ describe('shared/calculations', () => {
 
   // TODO: why these timestamps?
   it('calculateDailyAverageBgs', () => {
-    assert.deepEqual(calculateDailyAverageBgs(mockSensorEntries, 2), [
-      {
-        average: 4.655555555555555,
-        timestamp: 1713312000000,
-      },
+    expect(calculateDailyAverageBgs(mockSensorEntries, 2)).toEqual([
+      { average: 4.655555555555555, timestamp: 1713312000000 },
       { average: null, timestamp: 1713225600000 },
     ]);
   });
