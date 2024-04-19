@@ -1,11 +1,7 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
-import 'mocha';
-import { createTestContext } from 'backend/utils/test';
-import { generateUuid } from 'shared/utils/id';
-import { checks, ALARM_FETCH_RANGE } from 'backend/cronjobs/checks';
-import { getDefaultJournalContent } from 'backend/utils/cronjobs';
 import { Alarm } from 'shared/types/alarms';
 import { DexcomG6ShareEntry } from 'shared/types/dexcom';
+import { MIN_IN_MS } from 'shared/utils/calculations';
+import { generateUuid } from 'shared/utils/id';
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;

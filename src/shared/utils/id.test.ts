@@ -1,6 +1,4 @@
-import { assert } from 'chai';
-import 'mocha';
-import { generateUuid, generateShortId, UUID_REGEX } from 'shared/utils/id';
+import { UUID_REGEX, generateShortId, generateUuid } from 'shared/utils/id';
 
 const TEST_ITERATIONS = 1000;
 

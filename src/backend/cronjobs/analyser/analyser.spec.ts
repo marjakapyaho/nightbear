@@ -1,25 +1,23 @@
-import { assert } from 'chai';
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
+import { entriesBadHigh } from 'backend/cronjobs/analyser/testData/bad-high';
+import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'backend/cronjobs/analyser/testData/bad-high-to-high';
+import { entriesBadLow } from 'backend/cronjobs/analyser/testData/bad-low';
+import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'backend/cronjobs/analyser/testData/bad-low-to-low';
 import { entriesCompressionLow } from 'backend/cronjobs/analyser/testData/compression-low';
 import { entriesFalling } from 'backend/cronjobs/analyser/testData/falling';
 import { entriesHigh, recentInsulin } from 'backend/cronjobs/analyser/testData/high';
+import { entriesHighFluctuations } from 'backend/cronjobs/analyser/testData/high-fluctuations';
 import { entriesLow, recentCarbs } from 'backend/cronjobs/analyser/testData/low';
+import { entriesLowFluctuations } from 'backend/cronjobs/analyser/testData/low-fluctuations';
 import { entriesNoSituation } from 'backend/cronjobs/analyser/testData/no-situation';
 import { entriesOutdated } from 'backend/cronjobs/analyser/testData/outdated';
 import { entriesPersistentHigh } from 'backend/cronjobs/analyser/testData/persistent-high';
 import { entriesRising } from 'backend/cronjobs/analyser/testData/rising';
-import 'mocha';
-import { entriesBadLow } from 'backend/cronjobs/analyser/testData/bad-low';
-import { entriesBadHigh } from 'backend/cronjobs/analyser/testData/bad-high';
-import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'backend/cronjobs/analyser/testData/bad-high-to-high';
-import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'backend/cronjobs/analyser/testData/bad-low-to-low';
-import { entriesHighFluctuations } from 'backend/cronjobs/analyser/testData/high-fluctuations';
-import { entriesLowFluctuations } from 'backend/cronjobs/analyser/testData/low-fluctuations';
-import { MIN_IN_MS } from 'shared/utils/calculations';
-import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
-import { Alarm } from 'shared/types/alarms';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { getMockActiveProfile } from 'backend/utils/test';
+import { Alarm } from 'shared/types/alarms';
+import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
+import { DEFAULT_STATE } from 'shared/utils/analyser';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('utils/analyser', () => {
   const currentTimestamp = 1508672249758;

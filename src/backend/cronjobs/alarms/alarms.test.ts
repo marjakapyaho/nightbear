@@ -1,8 +1,6 @@
-import { assert } from 'chai';
 import { detectAlarmActions, runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { getMockActiveAlarms, getMockAlarm } from 'backend/cronjobs/alarms/testData/mockActiveAlarms';
 import { getMockState } from 'backend/cronjobs/alarms/testData/mockState';
-import 'mocha';
 import { createTestContext, getMockActiveProfile } from 'backend/utils/test';
 import { Alarm } from 'shared/types/alarms';
 

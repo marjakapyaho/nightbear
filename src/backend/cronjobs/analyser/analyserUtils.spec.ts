@@ -1,9 +1,7 @@
-import { assert } from 'chai';
 import { parseAnalyserEntries } from 'backend/cronjobs/analyser/analyserUtils';
-import { MIN_IN_MS } from 'shared/utils/calculations';
-import 'mocha';
-import { SensorEntry } from 'shared/types/timelineEntries';
 import { AnalyserEntry } from 'shared/types/analyser';
+import { SensorEntry } from 'shared/types/timelineEntries';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('utils/analyser-utils', () => {
   const currentTimestamp = 1508672249758;

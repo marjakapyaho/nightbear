@@ -1,25 +1,22 @@
-import { assert } from 'chai';
+import { mockCarbEntries, mockSensorEntries } from 'shared/mocks/timelineEntries';
+import { SensorEntry } from 'shared/types/timelineEntries';
 import {
+  MIN_IN_MS,
+  calculateDailyAmounts,
+  calculateDailyAverageBgs,
   calculateHba1c,
-  countSituations,
   calculateRaw,
   calculateTimeHigh,
   calculateTimeInRange,
   calculateTimeLow,
   changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
+  countSituations,
+  getBgAverage,
   isDexcomEntryValid,
-  MIN_IN_MS,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
-  getBgAverage,
-  calculateDailyAverageBgs,
-  calculateDailyAmounts,
 } from 'shared/utils/calculations';
-import 'mocha';
-import { mockCarbEntries, mockSensorEntries } from 'shared/mocks/timelineEntries';
-import { SensorEntry } from 'shared/types/timelineEntries';
-import { mockNow } from 'shared/mocks/dates';
 
 const currentTimestamp = 1508672249758;
 
