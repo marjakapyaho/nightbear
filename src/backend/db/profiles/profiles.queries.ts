@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/profiles/db.sql" */
+/** Types generated for queries found in "src/backend/db/profiles/profiles.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';

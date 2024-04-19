@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/meterEntries/db.sql" */
+/** Types generated for queries found in "src/backend/db/meterEntries/meterEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 /** 'Create' parameters type */

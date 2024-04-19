@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/cronjobsJournal/db.sql" */
+/** Types generated for queries found in "src/backend/db/cronjobsJournal/cronjobsJournal.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 /** 'Update' parameters type */

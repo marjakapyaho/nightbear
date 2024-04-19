@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/sensorEntries/db.sql" */
+/** Types generated for queries found in "src/backend/db/sensorEntries/sensorEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 /** 'Create' parameters type */

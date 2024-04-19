@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/insulinEntries/db.sql" */
+/** Types generated for queries found in "src/backend/db/insulinEntries/insulinEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 export type insulintype = 'FAST' | 'LONG';

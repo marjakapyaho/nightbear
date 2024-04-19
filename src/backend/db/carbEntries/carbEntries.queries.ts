@@ -1,4 +1,4 @@
-/** Types generated for queries found in "src/backend/db/carbEntries/db.sql" */
+/** Types generated for queries found in "src/backend/db/carbEntries/carbEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
 /** 'Create' parameters type */

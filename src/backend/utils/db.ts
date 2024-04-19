@@ -1,10 +1,10 @@
-import * as alarms from 'backend/db/alarms/db.queries';
-import * as carbEntries from 'backend/db/carbEntries/db.queries';
-import * as cronjobsJournal from 'backend/db/cronjobsJournal/db.queries';
-import * as insulinEntries from 'backend/db/insulinEntries/db.queries';
-import * as meterEntries from 'backend/db/meterEntries/db.queries';
-import * as profiles from 'backend/db/profiles/db.queries';
-import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
+import * as alarms from 'backend/db/alarms/alarms.queries';
+import * as carbEntries from 'backend/db/carbEntries/carbEntries.queries';
+import * as cronjobsJournal from 'backend/db/cronjobsJournal/cronjobsJournal.queries';
+import * as insulinEntries from 'backend/db/insulinEntries/insulinEntries.queries';
+import * as meterEntries from 'backend/db/meterEntries/meterEntries.queries';
+import * as profiles from 'backend/db/profiles/profiles.queries';
+import * as sensorEntries from 'backend/db/sensorEntries/sensorEntries.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
