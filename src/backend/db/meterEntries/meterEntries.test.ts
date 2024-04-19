@@ -1,6 +1,5 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
-import 'mocha';
+import { expect } from 'vitest';
 
 describe('db/meterEntries', () => {
   const context = createTestContext();
@@ -11,9 +10,9 @@ describe('db/meterEntries', () => {
         bloodGlucose: 8.5,
       });
 
-      assert.equal(res.length, 1);
-      assert.match(res[0].timestamp, /^\d+-.*T\d+.*Z$/);
-      assert.equal(res[0].bloodGlucose, 8.5);
+      expect(res).toHaveLength(1);
+      expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(res[0].bloodGlucose).toBe(8.5);
     });
   });
 });

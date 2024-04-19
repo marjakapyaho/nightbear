@@ -1,6 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
 import { DateTime } from 'luxon';
+import { expect } from 'vitest';
 
 describe('db/sensorEntries', () => {
   const context = createTestContext();
@@ -12,10 +12,10 @@ describe('db/sensorEntries', () => {
         type: 'DEXCOM_G6_SHARE',
       });
 
-      assert.equal(res.length, 1);
-      assert.match(res[0].timestamp, /^\d+-.*T\d+.*Z$/);
-      assert.equal(res[0].bloodGlucose, 5.6);
-      assert.equal(res[0].type, 'DEXCOM_G6_SHARE');
+      expect(res).toHaveLength(1);
+      expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(res[0].bloodGlucose).toBe(5.6);
+      expect(res[0].type).toBe('DEXCOM_G6_SHARE');
     });
   });
 
@@ -31,10 +31,10 @@ describe('db/sensorEntries', () => {
         to: DateTime.fromISO(sensorEntry.timestamp).plus({ millisecond: 1 }).toUTC().toISO()!,
       });
 
-      assert.equal(res.length, 1);
-      assert.equal(res[0].timestamp, sensorEntry.timestamp);
-      assert.equal(res[0].bloodGlucose, sensorEntry.bloodGlucose);
-      assert.equal(res[0].type, sensorEntry.type);
+      expect(res).toHaveLength(1);
+      expect(res[0].timestamp).toBe(sensorEntry.timestamp);
+      expect(res[0].bloodGlucose).toBe(sensorEntry.bloodGlucose);
+      expect(res[0].type).toBe(sensorEntry.type);
     });
   });
 });

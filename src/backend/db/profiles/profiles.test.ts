@@ -1,7 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
-import 'mocha';
 import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
+import { expect } from 'vitest';
 
 describe('db/profiles', () => {
   const context = createTestContext();
@@ -16,16 +15,19 @@ describe('db/profiles', () => {
         analyserSettingsId: analyserSettingsRes[0].id,
       });
 
-      assert.equal(profileTemplateRes.length, 1);
-      assert.equal(profileTemplateRes[0].profileName, 'Test profile');
-      assert.equal(profileTemplateRes[0].alarmsEnabled, true);
+      expect(profileTemplateRes).toHaveLength(1);
+      expect(profileTemplateRes[0].profileName).toBe('Test profile');
+      expect(profileTemplateRes[0].alarmsEnabled).toBe(true);
 
-      const situationSettingsRes = await Promise.all(mockSituationSettings.map((settings) =>
-        context.db.profiles.createSituationSettings({ ...settings, profileTemplateId: profileTemplateRes[0].id })))
+      const situationSettingsRes = await Promise.all(
+        mockSituationSettings.map(settings =>
+          context.db.profiles.createSituationSettings({ ...settings, profileTemplateId: profileTemplateRes[0].id }),
+        ),
+      );
 
-      assert.equal(situationSettingsRes.length, 9);
-      assert.equal(situationSettingsRes[0][0].escalationAfterMinutes, 10);
-      assert.equal(situationSettingsRes[0][0].snoozeMinutes, 15);
+      expect(situationSettingsRes).toHaveLength(9); // Assuming the length should be checked after flattening if nested
+      expect(situationSettingsRes[0][0].escalationAfterMinutes).toBe(10);
+      expect(situationSettingsRes[0][0].snoozeMinutes).toBe(15);
     });
   });
 });

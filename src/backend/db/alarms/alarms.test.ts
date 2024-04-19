@@ -1,7 +1,6 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
-import 'mocha';
 import { mockNow } from 'shared/mocks/dates';
+import { expect } from 'vitest';
 
 describe('db/alarms', () => {
   const context = createTestContext();
@@ -13,10 +12,10 @@ describe('db/alarms', () => {
         isActive: true,
       });
 
-      assert.equal(alarmRes.length, 1);
-      assert.match(alarmRes[0].timestamp, /^\d+-.*T\d+.*Z$/);
-      assert.equal(alarmRes[0].situation, 'LOW');
-      assert.equal(alarmRes[0].isActive, true);
+      expect(alarmRes).toHaveLength(1);
+      expect(alarmRes[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(alarmRes[0].situation).toBe('LOW');
+      expect(alarmRes[0].isActive).toBe(true);
 
       const alarmStateRes = await context.db.alarms.createAlarmState({
         alarmId: alarmRes[0].id,
@@ -25,10 +24,10 @@ describe('db/alarms', () => {
         ackedBy: null,
       });
 
-      assert.equal(alarmStateRes.length, 1);
-      assert.equal(alarmStateRes[0].alarmLevel, 1);
-      assert.deepEqual(alarmStateRes[0].validAfterTimestamp, new Date(mockNow).toISOString());
-      assert.equal(alarmStateRes[0].ackedBy, null);
+      expect(alarmStateRes).toHaveLength(1);
+      expect(alarmStateRes[0].alarmLevel).toBe(1);
+      expect(alarmStateRes[0].validAfterTimestamp).toEqual(new Date(mockNow).toISOString());
+      expect(alarmStateRes[0].ackedBy).toBeNull();
     });
   });
 });

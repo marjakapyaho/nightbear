@@ -1,6 +1,5 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
-import 'mocha';
+import { expect } from 'vitest';
 
 describe('db/cronjobsJournal', () => {
   const context = createTestContext();
@@ -15,7 +14,7 @@ describe('db/cronjobsJournal', () => {
 
       const res = await context.db.cronjobsJournal.update(row);
 
-      assert.deepEqual(res, [row]);
+      expect(res).toEqual([row]);
     });
 
     it('allows nulls', async () => {
@@ -23,7 +22,7 @@ describe('db/cronjobsJournal', () => {
         dexcomShareSessionId: '123-123-123',
       });
 
-      assert.isNull(row.previousExecutionAt);
+      expect(row.previousExecutionAt).toBeNull();
     });
   });
 });

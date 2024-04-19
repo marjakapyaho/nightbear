@@ -1,6 +1,5 @@
 import { createTestContext } from 'backend/utils/test';
-import { assert } from 'chai';
-import 'mocha';
+import { expect } from 'vitest';
 
 describe('db/insulinEntries', () => {
   const context = createTestContext();
@@ -12,10 +11,10 @@ describe('db/insulinEntries', () => {
         type: 'FAST',
       });
 
-      assert.equal(res.length, 1);
-      assert.match(res[0].timestamp, /^\d+-.*T\d+.*Z$/);
-      assert.equal(res[0].amount, 5);
-      assert.equal(res[0].type, 'FAST');
+      expect(res).toHaveLength(1);
+      expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(res[0].amount).toBe(5);
+      expect(res[0].type).toBe('FAST');
     });
   });
 });
