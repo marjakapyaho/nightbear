@@ -1,6 +1,5 @@
 locals {
-  username     = "nightbear"
-  environments = ["stage", "prod"]
+  username = "nightbear"
 }
 
 # Collection of subnets that the RDS instance can be provisioned in

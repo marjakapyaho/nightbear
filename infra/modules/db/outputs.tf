@@ -2,8 +2,10 @@ output "instance_endpoint" {
   value = aws_db_instance.this.endpoint
 }
 
+output "credentials" {
+  value = "${local.username}:${var.secrets.database_password}"
+}
+
 output "connection_string" {
-  value = { for env in local.environments : env =>
-    "postgres://${local.username}:${var.secrets.database_password}@${aws_db_instance.this.endpoint}/nightbear_${env}?sslmode=no-verify"
-  }
+  value = "postgres://${local.username}:${var.secrets.database_password}@${aws_db_instance.this.endpoint}/DATABASE_NAME?sslmode=no-verify"
 }

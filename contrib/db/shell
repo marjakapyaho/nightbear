@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+
+case ${1:-} in
+
+  test)
+    docker exec -it -e PGPASSWORD=nightbear nightbear-test-db psql -U nightbear -d nightbear_test
+    ;;
+
+  stage|prod)
+    # Prepare for running Terraform commands:
+    cd infra
+    source .envrc
+    export DEBUG= # the presence of this env var messes with Terraform (see https://www.npmjs.com/package/debug & https://github.com/tfutils/tfenv/issues/210)
+
+    # Make sure we stop the tunnel regardless of how the script exits:
+    cleanup() {
+      set +eu # don't fail even if tunnel_pid is unset at this point
+      kill $tunnel_pid 2> /dev/null
+      echo "Tunnel closed"
+    }
+    trap cleanup EXIT INT TERM
+
+    # Start tunnel in background:
+    tunnel_command="$(terraform output -json | jq -r .global_bastion.value.tunnel_command)"
+    $tunnel_command &
+    tunnel_pid=$!
+    echo "Tunnel opened"
+
+    # Start Postgres shell:
+    shell_command="$(terraform output -json | jq -r .global_bastion.value.local_shell_command | sed s/DATABASE_NAME/nightbear_$1/)"
+    $shell_command
+    ;;
+
+  *)
+    echo "Please provide as argument one of: test, stage, prod"
+    exit 1
+    ;;
+
+esac

@@ -5,6 +5,7 @@ locals {
   ssh_username         = "ubuntu"
   instance_type        = "t2.micro"              # included in free tier
   instance_ami         = "ami-0786f5bc3943ad52d" # Ubuntu 22.04 LTS (eu-west-1, amd64, hvm:ebs-ssd); see https://cloud-images.ubuntu.com/locator/ec2/
+  local_port           = 35432                   # local port to open that leads to the Postgres instance
 }
 
 # Create the EC2 instance
