@@ -12,7 +12,8 @@ node -p "
   const _ = require('lodash')
   JSON.stringify({
     ...p,
-    dependencies: _.pick(p.dependencies, p.lambdaDependencies)
+    dependencies: _.pick(p.dependencies, p.lambdaDependencies),
+    devDependencies: {},
   })
 " > build/package.json
 cp package-lock.json build # still want to use the correct lockfile
