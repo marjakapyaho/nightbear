@@ -9,6 +9,7 @@
   "srcDir": "./src/backend/db",
   "camelCaseColumnNames": true,
   "typesOverrides": {
-    "numeric": "number"
+    "numeric": "number",
+    "timestamptz": "string"
   }
 }

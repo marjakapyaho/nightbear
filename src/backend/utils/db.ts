@@ -1,10 +1,10 @@
-import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
 import * as alarms from 'backend/db/alarms/db.queries';
-import * as profiles from 'backend/db/profiles/db.queries';
 import * as carbEntries from 'backend/db/carbEntries/db.queries';
+import * as cronjobsJournal from 'backend/db/cronjobsJournal/db.queries';
 import * as insulinEntries from 'backend/db/insulinEntries/db.queries';
 import * as meterEntries from 'backend/db/meterEntries/db.queries';
-import * as cronjobsJournal from 'backend/db/cronjobsJournal/db.queries';
+import * as profiles from 'backend/db/profiles/db.queries';
+import * as sensorEntries from 'backend/db/sensorEntries/db.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
 
@@ -18,13 +18,14 @@ const dbModules = {
   meterEntries,
   alarms,
   profiles,
-  cronjobsJournal
+  cronjobsJournal,
 };
 
 /**
  * @see https://pgtyped.dev/docs/typing
  */
 types.setTypeParser(types.builtins.NUMERIC, value => parseFloat(value));
+types.setTypeParser(types.builtins.TIMESTAMPTZ, value => new Date(value).toISOString());
 
 export type DbClient = ReturnType<typeof createDbClient>;
 

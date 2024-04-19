@@ -1,20 +1,18 @@
 /** Types generated for queries found in "src/backend/db/cronjobsJournal/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type DateOrString = Date | string;
-
 /** 'Update' parameters type */
 export interface IUpdateParams {
-  dexcomShareLoginAttemptAt?: DateOrString | null | void;
+  dexcomShareLoginAttemptAt?: string | null | void;
   dexcomShareSessionId?: string | null | void;
-  previousExecutionAt?: DateOrString | null | void;
+  previousExecutionAt?: string | null | void;
 }
 
 /** 'Update' return type */
 export interface IUpdateResult {
-  dexcomShareLoginAttemptAt: Date | null;
+  dexcomShareLoginAttemptAt: string | null;
   dexcomShareSessionId: string | null;
-  previousExecutionAt: Date | null;
+  previousExecutionAt: string | null;
 }
 
 /** 'Update' query type */
@@ -44,9 +42,9 @@ export type ILoadParams = void;
 
 /** 'Load' return type */
 export interface ILoadResult {
-  dexcomShareLoginAttemptAt: Date | null;
+  dexcomShareLoginAttemptAt: string | null;
   dexcomShareSessionId: string | null;
-  previousExecutionAt: Date | null;
+  previousExecutionAt: string | null;
 }
 
 /** 'Load' query type */

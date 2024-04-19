@@ -11,7 +11,7 @@ export interface ICreateParams {
 export interface ICreateResult {
   amount: number;
   speedFactor: number;
-  timestamp: Date;
+  timestamp: string;
 }
 
 /** 'Create' query type */

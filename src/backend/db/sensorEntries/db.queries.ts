@@ -1,8 +1,6 @@
 /** Types generated for queries found in "src/backend/db/sensorEntries/db.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type DateOrString = Date | string;
-
 /** 'Create' parameters type */
 export interface ICreateParams {
   bloodGlucose: number;
@@ -12,8 +10,7 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   bloodGlucose: number;
-  id: string;
-  timestamp: Date;
+  timestamp: string;
   type: string;
 }
 
@@ -38,14 +35,14 @@ export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
-  from: DateOrString;
-  to: DateOrString;
+  from: string;
+  to: string;
 }
 
 /** 'ByTimestamp' return type */
 export interface IByTimestampResult {
   bloodGlucose: number;
-  timestamp: Date;
+  timestamp: string;
   type: string;
 }
 

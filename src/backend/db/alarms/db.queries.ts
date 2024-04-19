@@ -3,22 +3,20 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
 
-export type DateOrString = Date | string;
-
 /** 'CreateAlarm' parameters type */
 export interface ICreateAlarmParams {
-  deactivatedAt?: DateOrString | null | void;
+  deactivatedAt?: string | null | void;
   isActive: boolean;
   situation: situation;
 }
 
 /** 'CreateAlarm' return type */
 export interface ICreateAlarmResult {
-  deactivatedAt: Date | null;
+  deactivatedAt: string | null;
   id: string;
   isActive: boolean;
   situation: situation;
-  timestamp: Date;
+  timestamp: string;
 }
 
 /** 'CreateAlarm' query type */
@@ -53,17 +51,17 @@ export interface ICreateAlarmsParams {
   alarms: readonly ({
     situation: situation,
     isActive: boolean,
-    deactivatedAt: DateOrString | null | void
+    deactivatedAt: string | null | void
   })[];
 }
 
 /** 'CreateAlarms' return type */
 export interface ICreateAlarmsResult {
-  deactivatedAt: Date | null;
+  deactivatedAt: string | null;
   id: string;
   isActive: boolean;
   situation: situation;
-  timestamp: Date;
+  timestamp: string;
 }
 
 /** 'CreateAlarms' query type */
@@ -93,7 +91,7 @@ export interface ICreateAlarmStateParams {
   ackedBy?: string | null | void;
   alarmId: string;
   alarmLevel: number;
-  validAfterTimestamp: DateOrString;
+  validAfterTimestamp: string;
 }
 
 /** 'CreateAlarmState' return type */
@@ -102,7 +100,7 @@ export interface ICreateAlarmStateResult {
   alarmId: string;
   alarmLevel: number;
   id: string;
-  validAfterTimestamp: Date;
+  validAfterTimestamp: string;
 }
 
 /** 'CreateAlarmState' query type */

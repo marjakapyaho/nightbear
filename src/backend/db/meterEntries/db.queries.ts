@@ -9,7 +9,7 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   bloodGlucose: number;
-  timestamp: Date;
+  timestamp: string;
 }
 
 /** 'Create' query type */

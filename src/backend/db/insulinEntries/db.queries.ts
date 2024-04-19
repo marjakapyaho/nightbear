@@ -12,7 +12,7 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   amount: number;
-  timestamp: Date;
+  timestamp: string;
   type: insulintype;
 }
 
