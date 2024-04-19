@@ -1,27 +1,32 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 export function entriesCompressionLow(currentTimestamp: number): SensorEntry[] {
   return [
     {
-      timestamp: currentTimestamp - 30 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 30),
       bloodGlucose: 10,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 25 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 25),
       bloodGlucose: 10.4,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 20 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
       bloodGlucose: 9.9,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
       bloodGlucose: 7,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 10 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
       bloodGlucose: 3.8,
+      type: 'DEXCOM_G6_SHARE',
     },
   ];
 }

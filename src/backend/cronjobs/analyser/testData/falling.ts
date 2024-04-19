@@ -1,23 +1,27 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 export function entriesFalling(currentTimestamp: number): SensorEntry[] {
   return [
     {
-      timestamp: currentTimestamp - 20 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
       bloodGlucose: 11,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
       bloodGlucose: 9.8,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 10 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
       bloodGlucose: 8.0,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 5 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 5),
       bloodGlucose: 7.2,
+      type: 'DEXCOM_G6_SHARE',
     },
   ];
 }

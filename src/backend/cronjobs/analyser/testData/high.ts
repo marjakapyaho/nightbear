@@ -1,23 +1,27 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
 import { InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 export function entriesHigh(currentTimestamp: number): SensorEntry[] {
   return [
     {
-      timestamp: currentTimestamp - 20 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
       bloodGlucose: 14,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
       bloodGlucose: 14.8,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 10 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
       bloodGlucose: 14.9,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 5 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 5),
       bloodGlucose: 15.9,
+      type: 'DEXCOM_G6_SHARE',
     },
   ];
 }

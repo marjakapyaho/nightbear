@@ -1,23 +1,27 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 export function entriesOutdated(currentTimestamp: number): SensorEntry[] {
   return [
     {
-      timestamp: currentTimestamp - 45 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 45),
       bloodGlucose: 6,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 40 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 40),
       bloodGlucose: 5,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 35 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 35),
       bloodGlucose: 4.7,
+      type: 'DEXCOM_G6_SHARE',
     },
     {
-      timestamp: currentTimestamp - 30 * MIN_IN_MS,
+      timestamp: getISOStrMinusMinutes(currentTimestamp, 30),
       bloodGlucose: 3.8,
+      type: 'DEXCOM_G6_SHARE',
     },
   ];
 }
