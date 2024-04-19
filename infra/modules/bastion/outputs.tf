@@ -3,7 +3,7 @@ output "tunnel_command" {
 }
 
 output "local_connection_string" {
-  value = "postgres://${var.db.credentials}@localhost:${local.local_port}/DATABASE_NAME"
+  value = "postgres://${var.db.credentials}@localhost:${local.local_port}/DATABASE_NAME?sslmode=no-verify"
 }
 
 output "local_shell_command" {

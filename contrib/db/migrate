@@ -5,7 +5,8 @@ set -euo pipefail # exit on error; treat unset variables as errors; exit on erro
 case ${1:-} in
 
   test)
-    docker exec -it -e PGPASSWORD=nightbear nightbear-test-db psql -U nightbear -d nightbear_test
+    export DATABASE_URL="postgres://nightbear:nightbear@localhost:25432/nightbear_test"
+    npm run migrate up
     ;;
 
   stage|prod)
@@ -27,9 +28,9 @@ case ${1:-} in
     tunnel_pid=$!
     echo "Tunnel opened"
 
-    # Start Postgres shell:
-    shell_command="$(terraform output -json | jq -r .global_bastion.value.local_shell_command | sed s/DATABASE_NAME/nightbear_$1/)"
-    $shell_command
+    # Run migrations against target:
+    export DATABASE_URL="$(terraform output -json | jq -r .global_bastion.value.local_connection_string | sed s/DATABASE_NAME/nightbear_$1/)"
+    npm run migrate up
     ;;
 
   *)

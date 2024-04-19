@@ -28,7 +28,7 @@
     "\n==================== SERVER ====================": "",
     "server-start": "npm run lint-node && npm run ts-node src/backend/index.ts",
     "server-build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
-    "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 10 && ./contrib/migrate/test",
+    "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 10 && ./contrib/db/migrate test",
     "\n==================== WEB ====================": "",
     "front:start": "npm run lint-node && BROWSER=none react-scripts start",
     "web-build": "npm run lint-node && react-scripts build",
