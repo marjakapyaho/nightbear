@@ -10,10 +10,9 @@ module "global_db" {
   network     = module.global_vpc
 }
 
-module "stage_backend" {
-  source               = "./modules/backend"
-  name_prefix          = "${var.name_prefix}-stage-backend"
-  secrets              = var.secrets
-  network              = module.global_vpc
-  db_connection_string = module.global_db.connection_string.stage
+module "global_bastion" {
+  source      = "./modules/bastion"
+  name_prefix = "${var.name_prefix}-global-bastion"
+  network     = module.global_vpc
+  db          = module.global_db
 }

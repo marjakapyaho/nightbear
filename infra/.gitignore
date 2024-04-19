@@ -1,1 +1,3 @@
-.terraform
+/.terraform
+/terraform.id_rsa
+/terraform.id_rsa.pub

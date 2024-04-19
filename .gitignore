@@ -1,12 +1,9 @@
 .idea/
 node_modules/
 npm-debug.log
-/hours.txt
 .env
 .envrc
 .DS_Store
 /.history
 .vscode
 /build
-/infra/terraform.id_rsa
-/infra/terraform.id_rsa.pub
