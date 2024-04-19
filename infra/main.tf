@@ -16,3 +16,11 @@ module "global_bastion" {
   network     = module.global_vpc
   db          = module.global_db
 }
+
+module "stage_backend" {
+  source               = "./modules/backend"
+  name_prefix          = "${var.name_prefix}-stage-backend"
+  secrets              = var.secrets
+  network              = module.global_vpc
+  db_connection_string = replace(module.global_db.connection_string, "DATABASE_NAME", "nightbear_stage")
+}
