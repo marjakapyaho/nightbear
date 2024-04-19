@@ -158,7 +158,7 @@ export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], day
     date: getDateInIsoFormat(now - DAY_IN_MS * i),
     total: null,
   }));
-  const groupedEntries = groupBy(entries, entry => getDateInIsoFormat(entry.timestamp));
+  const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
     timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
     total: day.date && groupedEntries[day.date] ? getTotal(groupedEntries[day.date]) : null,
@@ -172,7 +172,7 @@ export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number) =
     date: getDateInIsoFormat(now - DAY_IN_MS * i),
     average: null,
   }));
-  const groupedEntries = groupBy(entries, entry => getDateInIsoFormat(entry.timestamp));
+  const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
     timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
     average: day.date && groupedEntries[day.date] ? getDailyAverage(groupedEntries[day.date]) : null,

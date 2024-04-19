@@ -2,6 +2,7 @@ import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scro
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import { TimelineEntries } from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'shared/utils/config';
+import { getTimeInMillis, isTimeAfter, isTimeBeforeOrEqual } from 'shared/utils/time';
 
 export const getFillColor = (bgSensor: number, bgMeter?: number) => {
   if (bgMeter) {
@@ -16,13 +17,13 @@ export const getFillColor = (bgSensor: number, bgMeter?: number) => {
   return '#54c87e';
 };
 
-const isTimestampWithinFiveMinutes = (timestampToCheck: number, baseTimestamp: number) => {
+const isTimestampWithinFiveMinutes = (timestampToCheck: string, baseTimestamp: string) => {
   const timeToCheckInMillis = 2.5 * MIN_IN_MS;
-  const upperLimit = baseTimestamp + timeToCheckInMillis;
-  const lowerLimit = baseTimestamp - timeToCheckInMillis;
+  const upperLimit = getTimeInMillis(baseTimestamp) + timeToCheckInMillis;
+  const lowerLimit = getTimeInMillis(baseTimestamp) - timeToCheckInMillis;
 
   // Upper limit is inclusive
-  return timestampToCheck > lowerLimit && timestampToCheck <= upperLimit;
+  return isTimeAfter(timestampToCheck, lowerLimit) && isTimeBeforeOrEqual(timestampToCheck, upperLimit);
 };
 
 export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries): Point[] => {
@@ -33,7 +34,7 @@ export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries
     const carb = carbEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
 
     return {
-      timestamp: entry.timestamp,
+      timestamp: getTimeInMillis(entry.timestamp),
       val: meterEntry?.bloodGlucose || entry.bloodGlucose,
       color: getFillColor(entry.bloodGlucose, meterEntry?.bloodGlucose),
       valTop: insulin?.amount,
