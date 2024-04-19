@@ -10,6 +10,6 @@ services:
       - POSTGRES_DB=nightbear_test
       - POSTGRES_PASSWORD=nightbear
     ports:
-      - '15432:5432'
+      - '25432:5432'
     volumes:
       - .:/app # this lets us exchange data easily with COPY

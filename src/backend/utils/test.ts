@@ -11,7 +11,7 @@ export const createTestContext = (timestamp = () => 1508672249758): Context => {
     httpPort: 80,
     timestamp,
     log: NO_LOGGING,
-    db: createDbClient('postgres://nightbear:nightbear@localhost:15432/nightbear_test'), // needs to match docker-compose.yml
+    db: createDbClient('postgres://nightbear:nightbear@localhost:25432/nightbear_test'), // needs to match docker-compose.yml
     storage: null,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,
