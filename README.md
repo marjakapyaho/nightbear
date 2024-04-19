@@ -8,6 +8,12 @@ Nightbear repository includes code for:
 * React UI
 * Pebble watchface and alarm app (deprecated)
 
+Add to your environment:
+
+```
+export DATABASE_URL=postgres://nightbear:nightbear@localhost:25432/nightbear_test
+```
+
 Start test DB:
 
 ```
