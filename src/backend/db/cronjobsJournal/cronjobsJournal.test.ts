@@ -2,14 +2,14 @@ import { createTestContext } from 'backend/utils/test';
 import { assert } from 'chai';
 import 'mocha';
 
-describe('features/cronjobsJournal/db', () => {
+describe('db/cronjobsJournal', () => {
   const context = createTestContext();
 
   describe('update', () => {
     it('works', async () => {
       const row = {
-        previousExecutionAt: new Date('2020-01-01'),
-        dexcomShareLoginAttemptAt: new Date('2021-01-01'),
+        previousExecutionAt: new Date('2020-01-01').toISOString(),
+        dexcomShareLoginAttemptAt: new Date('2021-01-01').toISOString(),
         dexcomShareSessionId: '123-123-123',
       };
 

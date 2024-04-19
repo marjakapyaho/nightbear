@@ -1,6 +1,5 @@
 import { createTestContext } from 'backend/utils/test';
 import { assert } from 'chai';
-import _ from 'lodash';
 import 'mocha';
 
 describe('db/insulinEntries', () => {
@@ -14,7 +13,7 @@ describe('db/insulinEntries', () => {
       });
 
       assert.equal(res.length, 1);
-      assert.isTrue(_.isDate(res[0].timestamp));
+      assert.match(res[0].timestamp, /^\d+-.*T\d+.*Z$/);
       assert.equal(res[0].amount, 5);
       assert.equal(res[0].type, 'FAST');
     });
