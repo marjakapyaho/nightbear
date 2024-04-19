@@ -3,9 +3,9 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 /** 'Update' parameters type */
 export interface IUpdateParams {
-  dexcomShareLoginAttemptAt?: string | null | void;
+  dexcomShareLoginAttemptAt?: string | Date | null | void;
   dexcomShareSessionId?: string | null | void;
-  previousExecutionAt?: string | null | void;
+  previousExecutionAt?: string | Date | null | void;
 }
 
 /** 'Update' return type */

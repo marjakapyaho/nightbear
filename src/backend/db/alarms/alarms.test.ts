@@ -21,7 +21,7 @@ describe('db/alarms', () => {
       const alarmStateRes = await context.db.alarms.createAlarmState({
         alarmId: alarmRes[0].id,
         alarmLevel: 1,
-        validAfterTimestamp: new Date(mockNow).toISOString(),
+        validAfterTimestamp: new Date(mockNow),
         ackedBy: null,
       });
 

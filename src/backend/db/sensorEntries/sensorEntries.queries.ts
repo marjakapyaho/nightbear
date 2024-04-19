@@ -35,8 +35,8 @@ export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
-  from: string;
-  to: string;
+  from: string | Date;
+  to: string | Date;
 }
 
 /** 'ByTimestamp' return type */

@@ -5,7 +5,7 @@ export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' |
 
 /** 'CreateAlarm' parameters type */
 export interface ICreateAlarmParams {
-  deactivatedAt?: string | null | void;
+  deactivatedAt?: string | Date | null | void;
   isActive: boolean;
   situation: situation;
 }
@@ -51,7 +51,7 @@ export interface ICreateAlarmsParams {
   alarms: readonly ({
     situation: situation,
     isActive: boolean,
-    deactivatedAt: string | null | void
+    deactivatedAt: string | Date | null | void
   })[];
 }
 
@@ -91,7 +91,7 @@ export interface ICreateAlarmStateParams {
   ackedBy?: string | null | void;
   alarmId: string;
   alarmLevel: number;
-  validAfterTimestamp: string;
+  validAfterTimestamp: string | Date;
 }
 
 /** 'CreateAlarmState' return type */

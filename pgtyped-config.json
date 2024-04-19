@@ -10,6 +10,9 @@
   "camelCaseColumnNames": true,
   "typesOverrides": {
     "numeric": "number",
-    "timestamptz": "string"
+    "timestamptz": {
+      "parameter": "string | Date",
+      "return": "string"
+    }
   }
 }
