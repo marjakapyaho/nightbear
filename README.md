@@ -8,8 +8,19 @@ Nightbear repository includes code for:
 * React UI
 * Pebble watchface and alarm app (deprecated)
 
-Start test db
+Start test DB:
+
 ```
 docker-compose up -d
 ./contrib/migrate/test
+```
+
+To look around in the DB:
+
+```
+$ docker exec -it -e PGPASSWORD=nightbear nightbear-test-db psql -U nightbear -d nightbear_test
+psql (16.2 (Debian 16.2-1.pgdg120+2))
+Type "help" for help.
+
+nightbear_test=# \d
 ```
