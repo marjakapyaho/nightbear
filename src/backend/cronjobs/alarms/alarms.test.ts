@@ -1,7 +1,8 @@
 import { detectAlarmActions, runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { getMockActiveAlarms, getMockAlarm } from 'backend/cronjobs/alarms/testData/mockActiveAlarms';
 import { getMockState } from 'backend/cronjobs/alarms/testData/mockState';
-import { createTestContext, getMockActiveProfile } from 'backend/utils/test';
+import { createTestContext } from 'backend/utils/test';
+import { getMockActiveProfile } from 'shared/utils/test';
 import { Alarm } from 'shared/types/alarms';
 import { describe, expect, it } from 'vitest';
 

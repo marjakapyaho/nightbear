@@ -13,7 +13,7 @@ import { entriesNoSituation } from 'backend/cronjobs/analyser/testData/no-situat
 import { entriesOutdated } from 'backend/cronjobs/analyser/testData/outdated';
 import { entriesPersistentHigh } from 'backend/cronjobs/analyser/testData/persistent-high';
 import { entriesRising } from 'backend/cronjobs/analyser/testData/rising';
-import { getMockActiveProfile } from 'backend/utils/test';
+import { getMockActiveProfile } from 'shared/utils/test';
 import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { DEFAULT_STATE } from 'shared/utils/analyser';

@@ -1,4 +1,4 @@
-import { generateSensorEntries } from 'backend/utils/test';
+import { generateSensorEntries } from 'shared/utils/test';
 import { range } from 'lodash';
 import { SensorEntry } from 'shared/types/timelineEntries';
 

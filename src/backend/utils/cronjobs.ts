@@ -3,7 +3,7 @@ import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
 import { SEC_IN_MS } from 'shared/utils/calculations';
 import { generateUuid } from 'shared/utils/id';
-import { extendLogger } from 'shared/utils/logging';
+import { extendLogger } from 'backend/utils/logging';
 import { TZ } from 'shared/utils/time';
 import { Context } from './api';
 

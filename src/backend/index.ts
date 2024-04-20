@@ -1,4 +1,4 @@
-import { consoleLogStream } from 'shared/utils/logging';
+import { consoleLogStream } from 'backend/utils/logging';
 import debug from 'debug';
 import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
 import { startExpressServer } from 'backend/utils/express';

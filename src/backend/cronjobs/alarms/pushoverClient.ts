@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Pushover from 'pushover-notifications';
 import { Situation } from 'shared/types/analyser';
-import { Logger, extendLogger } from 'shared/utils/logging';
+import { Logger, extendLogger } from 'backend/utils/logging';
 
 export type PushoverClient = ReturnType<typeof createPushoverClient>;
 

@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { Logger, extendLogger } from 'shared/utils/logging';
+import { Logger, extendLogger } from 'backend/utils/logging';
 import { pick } from 'lodash';
 
 const DEXCOM_APPLICATION_ID = 'd8665ade-9673-4e27-9ff6-92db4ce13d13';

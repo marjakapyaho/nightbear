@@ -1,4 +1,4 @@
-import { generateSensorEntries } from 'backend/utils/test';
+import { generateSensorEntries } from 'shared/utils/test';
 import { SensorEntry } from 'shared/types/timelineEntries';
 
 export function entriesBadHigh(currentTimestamp: number): SensorEntry[] {

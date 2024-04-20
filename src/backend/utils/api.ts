@@ -7,7 +7,7 @@ import {
 import { readFileSync } from 'fs';
 import { map } from 'lodash';
 import { parseNumber } from 'shared/utils/helpers';
-import { Logger, createLogger } from 'shared/utils/logging';
+import { Logger, createLogger } from 'backend/utils/logging';
 import { DbClient, createDbClient } from './db';
 
 export type Headers = {

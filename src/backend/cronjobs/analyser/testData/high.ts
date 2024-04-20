@@ -1,6 +1,6 @@
 import { InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 
-import { generateSensorEntries } from 'backend/utils/test';
+import { generateSensorEntries } from 'shared/utils/test';
 
 export function entriesHigh(currentTimestamp: number): SensorEntry[] {
   return generateSensorEntries({

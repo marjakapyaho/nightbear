@@ -1,7 +1,7 @@
 import { CarbEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
-import { generateSensorEntries } from 'backend/utils/test';
+import { generateSensorEntries } from 'shared/utils/test';
 
 export function entriesLow(currentTimestamp: number): SensorEntry[] {
   return generateSensorEntries({

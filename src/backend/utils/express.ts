@@ -1,6 +1,6 @@
 import * as bodyParser from 'body-parser';
 import { generateUuid } from 'shared/utils/id';
-import { extendLogger, Logger } from 'shared/utils/logging';
+import { extendLogger, Logger } from 'backend/utils/logging';
 import cors from 'cors';
 import express, { Request as ExpressRequest } from 'express';
 import { isString, pickBy } from 'lodash';

@@ -1,5 +1,5 @@
 import { parseAnalyserEntries } from 'backend/cronjobs/analyser/analyserUtils';
-import { generateSensorEntries } from 'backend/utils/test';
+import { generateSensorEntries } from 'shared/utils/test';
 import { AnalyserEntry } from 'shared/types/analyser';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { describe, expect, it } from 'vitest';
