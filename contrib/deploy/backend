@@ -3,7 +3,7 @@
 set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
 
 # Build code
-npm run server-build
+npm run back:build
 mv build/backend/index.js build/code.js # update entrypoint to match that of our Terraform setup
 
 # Install only a subset of dependencies, to not make the Lambda deployment exceed its ~70 MB limit

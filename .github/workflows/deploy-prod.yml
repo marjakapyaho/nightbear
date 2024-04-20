@@ -16,7 +16,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm test
-      - run: npm run web-build
+      - run: npm run front:build
       - name: Deploy frontend
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:

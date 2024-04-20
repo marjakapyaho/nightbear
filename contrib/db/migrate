@@ -6,7 +6,7 @@ case ${1:-} in
 
   test)
     export DATABASE_URL="postgres://nightbear:nightbear@localhost:25432/nightbear_test"
-    npm run migrate up
+    npm run db:migrate up
     ;;
 
   stage|prod)
@@ -30,7 +30,7 @@ case ${1:-} in
 
     # Run migrations against target:
     export DATABASE_URL="$(terraform output -json | jq -r .global_bastion.value.local_connection_string | sed s/DATABASE_NAME/nightbear_$1/)"
-    npm run migrate up
+    npm run db:migrate up
     ;;
 
   *)
