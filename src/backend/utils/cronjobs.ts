@@ -1,16 +1,16 @@
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
+import { extendLogger } from 'backend/utils/logging';
 import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
 import { SEC_IN_MS } from 'shared/utils/calculations';
 import { generateUuid } from 'shared/utils/id';
-import { extendLogger } from 'backend/utils/logging';
 import { TZ } from 'shared/utils/time';
 import { Context } from './api';
 
 export type Cronjob = (
   context: Context,
   journal: CronjobsJournal,
-) => Partial<CronjobsJournal> | Promise<Partial<CronjobsJournal> | void> | void;
+) => Promise<Partial<CronjobsJournal> | void | undefined> | void | undefined;
 
 /**
  * The process of running Cronjobs goes like this:
