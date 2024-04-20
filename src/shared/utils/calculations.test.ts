@@ -16,9 +16,11 @@ import {
   isDexcomEntryValid,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
+  HOUR_IN_MS,
 } from 'shared/utils/calculations';
-import { getISOStrMinusMinutes } from 'shared/utils/time';
+import { getISOStrMinusMinutes, getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
+import { mockNow } from 'shared/mocks/dates';
 
 const currentTimestamp = 1508672249758;
 
@@ -193,19 +195,19 @@ describe('shared/calculations', () => {
     expect(getBgAverage(sensorEntries2)).toEqual('12.0');
   });
 
-  // TODO: why these timestamps?
+  // TODO: check these
   it('calculateDailyAmounts', () => {
-    expect(calculateDailyAmounts(mockCarbEntries, 2)).toEqual([
-      { timestamp: 1713312000000, total: null },
-      { timestamp: 1713225600000, total: 40 },
+    expect(calculateDailyAmounts(mockCarbEntries, 2, getTimeInMillis(mockNow))).toEqual([
+      { timestamp: mockNow, total: 40 },
+      { timestamp: getTimeAsISOStr(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS), total: null },
     ]);
   });
 
-  // TODO: why these timestamps?
+  // TODO: check these
   it('calculateDailyAverageBgs', () => {
-    expect(calculateDailyAverageBgs(mockSensorEntries, 2)).toEqual([
-      { average: 4.655555555555555, timestamp: 1713312000000 },
-      { average: null, timestamp: 1713225600000 },
+    expect(calculateDailyAverageBgs(mockSensorEntries, 2, getTimeInMillis(mockNow))).toEqual([
+      { average: 5.5, timestamp: mockNow },
+      { average: null, timestamp: getTimeAsISOStr(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS) },
     ]);
   });
 });

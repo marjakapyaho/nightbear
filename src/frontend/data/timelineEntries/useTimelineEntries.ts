@@ -6,12 +6,7 @@ import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils'
 export const useTimelineEntries = (startMs: number, endMs = Date.now()) => {
   const queryClient = useQueryClient();
 
-  const {
-    data: timelineEntries,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useQuery<TimelineEntries>({
+  const { data, isLoading, isError, isSuccess } = useQuery<TimelineEntries>({
     queryKey: ['get-timelineEntries'],
     queryFn: () => callFetch(`/get-timelineEntries?start=${startMs}&end=${endMs}`),
   });
@@ -25,7 +20,12 @@ export const useTimelineEntries = (startMs: number, endMs = Date.now()) => {
   });
 
   return {
-    timelineEntries,
+    timelineEntries: {
+      sensorEntries: data ? data.sensorEntries : [],
+      insulinEntries: data ? data.insulinEntries : [],
+      carbEntries: data ? data.carbEntries : [],
+      meterEntries: data ? data.meterEntries : [],
+    },
     saveGraphPointData,
     isLoading,
     isError,

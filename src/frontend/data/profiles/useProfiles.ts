@@ -26,7 +26,7 @@ export const useProfiles = () => {
   });
 
   return {
-    profiles,
+    profiles: profiles || [],
     activeProfile: getActiveProfile(mockProfiles),
     activateProfile,
     isLoading,

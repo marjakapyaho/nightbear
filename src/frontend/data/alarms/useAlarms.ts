@@ -25,7 +25,7 @@ export const useAlarms = () => {
   });
 
   return {
-    alarms,
+    alarms: alarms || [],
     ackAlarm,
     isLoading,
     isError,

@@ -6,6 +6,7 @@ import { Situation, State } from 'shared/types/analyser';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
+import { getTimeAsISOStr, getTimeBetween, isTimeBeforeOrEqual } from 'shared/utils/time';
 
 const INITIAL_ALARM_LEVEL = 1;
 
@@ -25,7 +26,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Pr
   if (!activeProfile.alarmsEnabled) {
     return handleAlarmsToRemove(activeAlarms, context).then(alarms => {
       return context.db.alarms.createAlarms({
-        alarms: mapTimestampsToDates(alarms),
+        alarms,
       });
     });
   }
@@ -43,7 +44,7 @@ export function runAlarmChecks(context: Context, state: State, activeProfile: Pr
       (memo: Alarm[], next: Array<Alarm | null>) => memo.concat(next.filter(isNotNull)),
       [],
     );
-    return context.db.alarms.createAlarms({ alarms: mapTimestampsToDates(alarms) });
+    return context.db.alarms.createAlarms({ alarms });
   });
 }
 
@@ -69,7 +70,7 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   const modelsToSave: Alarm[] = [];
 
   alarms.forEach(alarm => {
-    const changedAlarm = { ...alarm, isActive: false, deactivatedAt: context.timestamp() };
+    const changedAlarm = { ...alarm, isActive: false, deactivatedAt: getTimeAsISOStr(context.timestamp()) };
     modelsToSave.push(changedAlarm);
 
     // We're not waiting for the results of pushover acks
@@ -89,16 +90,16 @@ function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Co
       let logPrefix = `Existing alarm ${alarmToString(alarm)}`;
 
       // Not yet valid
-      if (now <= validAfterTimestamp) {
+      if (isTimeBeforeOrEqual(now, validAfterTimestamp)) {
         log(
           `${logPrefix} is not yet valid again (${Math.round(
-            (validAfterTimestamp - now) / MIN_IN_MS,
+            getTimeBetween(validAfterTimestamp, now) / MIN_IN_MS,
           )} min snooze left)`,
         );
         return Promise.resolve(null);
       }
 
-      const hasBeenValidFor = Math.round((context.timestamp() - validAfterTimestamp) / MIN_IN_MS);
+      const hasBeenValidFor = Math.round(getTimeBetween(context.timestamp(), validAfterTimestamp) / MIN_IN_MS);
       // TODO: fix this
       // @ts-ignore
       const levelUpTimes = activeProfile.alarmSettings[alarm.situation.toLowerCase()].escalationAfterMinutes;
@@ -164,14 +165,14 @@ function handleAlarmsToCreate(situations: Situation[], context: Context): Promis
 export function createAlarm(situation: Situation, alarmLevel: number, context: Context): Alarm {
   return {
     id: '123',
-    timestamp: context.timestamp(),
+    timestamp: getTimeAsISOStr(context.timestamp()),
     situation,
     isActive: true,
     deactivatedAt: null,
     alarmStates: [
       {
         alarmLevel,
-        validAfterTimestamp: context.timestamp(),
+        validAfterTimestamp: getTimeAsISOStr(context.timestamp()),
         ackedBy: null,
         pushoverReceipts: [],
       },

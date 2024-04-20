@@ -2,16 +2,16 @@ import { Situation } from './analyser';
 
 export type AlarmState = {
   alarmLevel: number;
-  validAfterTimestamp: number;
+  validAfterTimestamp: string;
   ackedBy: string | null;
   pushoverReceipts: string[];
 };
 
 export type Alarm = {
   id: string;
-  timestamp: number;
+  timestamp: string;
   situation: Situation;
   isActive: boolean;
-  deactivatedAt: number | null;
+  deactivatedAt: string | null;
   alarmStates: AlarmState[];
 };

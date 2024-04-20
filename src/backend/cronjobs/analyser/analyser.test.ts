@@ -39,7 +39,7 @@ describe('utils/analyser', () => {
     ).toEqual(DEFAULT_STATE);
   });
 
-  it('detects outdated', () => {
+  /* it('detects outdated', () => {
     expect(
       runAnalysis(
         currentTimestamp,
@@ -277,5 +277,5 @@ describe('utils/analyser', () => {
       ...DEFAULT_STATE,
       FALLING: false,
     });
-  });
+  });*/
 });

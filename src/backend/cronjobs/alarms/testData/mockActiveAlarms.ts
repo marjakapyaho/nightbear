@@ -2,7 +2,7 @@ import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
 import { generateUuid } from 'shared/utils/id';
 
-export function getMockActiveAlarms(currentTimestamp: number, situation?: Situation): Alarm[] {
+export function getMockActiveAlarms(currentTimestamp: string, situation?: Situation): Alarm[] {
   if (!situation) {
     return [];
   }
@@ -27,10 +27,10 @@ export function getMockActiveAlarms(currentTimestamp: number, situation?: Situat
 }
 
 export function getMockAlarm(
-  currentTimestamp: number,
+  currentTimestamp: string,
   situation: Situation,
   isActive: boolean = true,
-  deactivatedAt: number | null = null,
+  deactivatedAt: string | null = null,
 ): Alarm {
   return {
     id: generateUuid(),

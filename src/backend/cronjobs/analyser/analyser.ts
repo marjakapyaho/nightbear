@@ -116,7 +116,7 @@ function detectLow(
   const notComingUpFromBadLow = !find(
     alarms,
     alarm =>
-      (!alarm.deactivatedAt || alarm.deactivatedAt > currentTimestamp - BAD_LOW_QUARANTINE_WINDOW) &&
+      (!alarm.deactivatedAt || isTimeAfter(alarm.deactivatedAt, currentTimestamp - BAD_LOW_QUARANTINE_WINDOW)) &&
       alarm.situation === 'BAD_LOW',
   );
   const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' }) ? LOW_CLEARING_THRESHOLD : 0;
@@ -182,7 +182,7 @@ function detectHigh(
   const notComingDownFromBadHigh = !find(
     alarms,
     alarm =>
-      (!alarm.deactivatedAt || alarm.deactivatedAt > currentTimestamp - BAD_HIGH_QUARANTINE_WINDOW) &&
+      (!alarm.deactivatedAt || isTimeAfter(alarm.deactivatedAt, currentTimestamp - BAD_HIGH_QUARANTINE_WINDOW)) &&
       alarm.situation === 'BAD_HIGH',
   );
   const correctionIfAlreadyHigh = find(onlyActive(alarms), { situation: 'HIGH' }) ? HIGH_CLEARING_THRESHOLD : 0;

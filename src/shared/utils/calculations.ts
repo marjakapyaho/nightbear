@@ -2,6 +2,7 @@ import { fill, groupBy, reduce } from 'lodash';
 import { DateTime } from 'luxon';
 import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -151,30 +152,26 @@ const getDailyAverage = (dailySensorEntries: SensorEntry[]) =>
     ? dailySensorEntries.reduce((prev, current) => prev + current.bloodGlucose, 0) / dailySensorEntries.length
     : 0;
 
-export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], days: number) => {
-  const now = Date.now();
-
+export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], days: number, now = Date.now()) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
-    date: getDateInIsoFormat(now - DAY_IN_MS * i),
+    timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
     total: null,
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
-    total: day.date && groupedEntries[day.date] ? getTotal(groupedEntries[day.date]) : null,
+    timestamp: day.timestamp,
+    total: day.timestamp && groupedEntries[day.timestamp] ? getTotal(groupedEntries[day.timestamp]) : null,
   }));
 };
 
-export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number) => {
-  const now = Date.now();
-
+export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number, now = Date.now()) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
-    date: getDateInIsoFormat(now - DAY_IN_MS * i),
+    timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
     average: null,
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: day.date ? new Date(day.date).getTime() : Date.now(),
-    average: day.date && groupedEntries[day.date] ? getDailyAverage(groupedEntries[day.date]) : null,
+    timestamp: day.timestamp,
+    average: day.timestamp && groupedEntries[day.timestamp] ? getDailyAverage(groupedEntries[day.timestamp]) : null,
   }));
 };

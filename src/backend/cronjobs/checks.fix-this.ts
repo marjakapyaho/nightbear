@@ -3,6 +3,8 @@ import { DexcomG6ShareEntry } from 'shared/types/dexcom';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { generateUuid } from 'shared/utils/id';
 import { describe } from 'vitest';
+import { mockNow } from 'shared/mocks/dates';
+/*
 
 describe('server/main/check-runner', () => {
   const timestampNow = 1508672249758;
@@ -18,14 +20,14 @@ describe('server/main/check-runner', () => {
   const alarmsArrayWithHigh: Alarm[] = [
     {
       id: generateUuid(),
-      timestamp: timestampNow,
+      timestamp: mockNow,
       situation: 'HIGH',
       isActive: true,
       deactivatedAt: null,
       alarmStates: [
         {
           alarmLevel: 1,
-          validAfterTimestamp: timestampNow,
+          validAfterTimestamp: mockNow,
           ackedBy: null,
           pushoverReceipts: [],
         },
@@ -36,20 +38,20 @@ describe('server/main/check-runner', () => {
   const alarmsArrayWithHighAndBattery: Alarm[] = [
     {
       id: '1',
-      timestamp: timestampNow,
+      timestamp: mockNow,
       situation: 'HIGH',
       isActive: true,
       deactivatedAt: null,
       alarmStates: [
         {
           alarmLevel: 1,
-          validAfterTimestamp: timestampNow,
+          validAfterTimestamp: mockNow,
           ackedBy: null,
           pushoverReceipts: [],
         },
         {
           alarmLevel: 2,
-          validAfterTimestamp: timestampNow,
+          validAfterTimestamp: mockNow,
           ackedBy: null,
           pushoverReceipts: [],
         },
@@ -73,7 +75,7 @@ describe('server/main/check-runner', () => {
   ];
 
   // TODO
-  /*  withStorage(createTestStorage => {
+  /!*  withStorage(createTestStorage => {
     it('checks', () => {
       let timestamp = timestampNow;
       const context = createTestContext(createTestStorage(), () => timestamp);
@@ -92,5 +94,6 @@ describe('server/main/check-runner', () => {
           assertEqualWithoutMeta(alarms.map(eraseModelUuid), alarmsArrayWithHighAndBattery.map(eraseModelUuid)),
         );
     });
-  });*/
+  });*!/
 });
+*/

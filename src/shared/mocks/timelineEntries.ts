@@ -2,28 +2,24 @@ import { mockNow } from 'shared/mocks/dates';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { generateSensorEntries } from 'shared/utils/test';
+import { getTimeInMillis } from 'shared/utils/time';
 
 export const mockSensorEntries: SensorEntry[] = generateSensorEntries({
-  currentTimestamp: Date.now(),
+  currentTimestamp: getTimeInMillis(mockNow),
   bloodGlucoseHistory: [4.6, 4.3, 3.8, 4.0, 4.4, 4.8, 5.2, 5.3, 5.5],
 });
 
 export const mockInsulinEntries: InsulinEntry[] = [
   {
-    timestamp: new Date().toISOString(),
+    timestamp: mockNow,
     amount: 7,
-    type: 'FAST',
-  },
-  {
-    timestamp: new Date(Date.now() - 30 * MIN_IN_MS).toISOString(),
-    amount: 1,
     type: 'FAST',
   },
 ];
 
 export const mockCarbEntries: CarbEntry[] = [
   {
-    timestamp: new Date(mockNow).toISOString(),
+    timestamp: mockNow,
     amount: 40,
     speedFactor: 1,
   },
@@ -31,7 +27,7 @@ export const mockCarbEntries: CarbEntry[] = [
 
 export const mockMeterEntries: MeterEntry[] = [
   {
-    timestamp: new Date().toISOString(),
+    timestamp: mockNow,
     bloodGlucose: 6.5,
   },
 ];
