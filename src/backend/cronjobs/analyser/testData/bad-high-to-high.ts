@@ -1,31 +1,14 @@
+import { generateSensorEntries } from 'backend/utils/test';
 import { Alarm } from 'shared/types/alarms';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { getISOStrMinusMinutes } from 'shared/utils/time';
 
 export function entriesBadHighToHigh(currentTimestamp: number): SensorEntry[] {
-  return [
-    {
-      timestamp: getISOStrMinusMinutes(currentTimestamp, 20),
-      bloodGlucose: 18.5,
-      type: 'DEXCOM_G6_SHARE',
-    },
-    {
-      timestamp: getISOStrMinusMinutes(currentTimestamp, 15),
-      bloodGlucose: 17.5,
-      type: 'DEXCOM_G6_SHARE',
-    },
-    {
-      timestamp: getISOStrMinusMinutes(currentTimestamp, 10),
-      bloodGlucose: 16.5,
-      type: 'DEXCOM_G6_SHARE',
-    },
-    {
-      timestamp: getISOStrMinusMinutes(currentTimestamp, 5),
-      bloodGlucose: 15.5,
-      type: 'DEXCOM_G6_SHARE',
-    },
-  ];
+  return generateSensorEntries({
+    currentTimestamp: currentTimestamp,
+    bloodGlucoseHistory: [18.5, 17.5, 16.5, 15.5],
+    latestEntryAge: 5,
+  });
 }
 
 export function alarmsWithInactiveBadHigh(currentTimestamp: number): Alarm[] {
