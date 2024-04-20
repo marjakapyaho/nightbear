@@ -4,10 +4,10 @@ import {
   NO_DEXCOM_SHARE,
   createDexcomShareClient,
 } from 'backend/cronjobs/dexcom/dexcom-share-client';
+import { Logger, createLogger } from 'backend/utils/logging';
 import { readFileSync } from 'fs';
 import { map } from 'lodash';
 import { parseNumber } from 'shared/utils/helpers';
-import { Logger, createLogger } from 'backend/utils/logging';
 import { DbClient, createDbClient } from './db';
 
 export type Headers = {
@@ -86,7 +86,7 @@ export function createNodeContext(): Context {
   };
 }
 
-export function createResponse(responseBody: object | string = ''): Promise<ResponsePayload> {
+export function createResponse(responseBody: object | string = ''): Response {
   return Promise.resolve({
     responseStatus: 200,
     responseBody,

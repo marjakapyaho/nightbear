@@ -1,14 +1,16 @@
-import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { Context, createResponse, Request, Response } from 'backend/utils/api';
+import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
 
-export const getTimelineEntries = (request: Request, context: Context): Response => {
+export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams;
 
-  const startTimestamp = start ? parseInt(start, 10) : context.timestamp() - 3 * HOUR_IN_MS;
-  const endTimestamp = end ? parseInt(end, 10) : context.timestamp();
-
-  return createResponse(mockTimelineEntries);
+  return createResponse(
+    await context.db.sensorEntries.byTimestamp({
+      from: new Date(start ? parseInt(start, 10) : context.timestamp() - 3 * HOUR_IN_MS).toISOString(),
+      to: new Date(end ? parseInt(end, 10) : context.timestamp()).toISOString(),
+    }),
+  );
 };
 
 export const updateTimelineEntries = (request: Request, context: Context): Response => {
