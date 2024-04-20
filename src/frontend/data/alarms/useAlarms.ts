@@ -6,7 +6,12 @@ import { mockAlarms } from 'shared/mocks/alarms';
 export const useAlarms = () => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, isSuccess } = useQuery<Alarm[]>({
+  const {
+    data: alarms,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useQuery<Alarm[]>({
     queryKey: ['get-alarms'],
     queryFn: () => callFetch('/get-alarms'),
   });
@@ -19,17 +24,11 @@ export const useAlarms = () => {
     },
   });
 
-  // TODO: use these
-  console.log(data);
-  console.log(isLoading);
-  console.log(isError);
-  console.log(isSuccess);
-
   return {
-    alarms: mockAlarms,
+    alarms,
     ackAlarm,
-    isLoading: false,
-    isError: false,
-    isSuccess: true,
+    isLoading,
+    isError,
+    isSuccess,
   };
 };

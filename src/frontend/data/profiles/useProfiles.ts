@@ -7,7 +7,12 @@ import { getActiveProfile } from 'shared/utils/profiles';
 export const useProfiles = () => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, isSuccess } = useQuery<Profile[]>({
+  const {
+    data: profiles,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useQuery<Profile[]>({
     queryKey: ['get-profiles'],
     queryFn: () => callFetch('/get-profiles'),
   });
@@ -20,18 +25,12 @@ export const useProfiles = () => {
     },
   });
 
-  // TODO: use these
-  console.log(data);
-  console.log(isLoading);
-  console.log(isError);
-  console.log(isSuccess);
-
   return {
-    profiles: mockProfiles,
+    profiles,
     activeProfile: getActiveProfile(mockProfiles),
     activateProfile,
-    isLoading: false,
-    isError: false,
-    isSuccess: true,
+    isLoading,
+    isError,
+    isSuccess,
   };
 };

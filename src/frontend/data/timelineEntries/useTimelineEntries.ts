@@ -1,13 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { TimelineEntries } from 'shared/types/timelineEntries';
-import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 
 export const useTimelineEntries = (startMs: number, endMs = Date.now()) => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, isSuccess } = useQuery<TimelineEntries>({
+  const {
+    data: timelineEntries,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useQuery<TimelineEntries>({
     queryKey: ['get-timelineEntries'],
     queryFn: () => callFetch(`/get-timelineEntries?start=${startMs}&end=${endMs}`),
   });
@@ -20,19 +24,11 @@ export const useTimelineEntries = (startMs: number, endMs = Date.now()) => {
     },
   });
 
-  // TODO: use these
-  console.log(startMs);
-  console.log(endMs);
-  console.log(data);
-  console.log(isLoading);
-  console.log(isError);
-  console.log(isSuccess);
-
   return {
-    timelineEntries: mockTimelineEntries,
+    timelineEntries,
     saveGraphPointData,
-    isLoading: false,
-    isError: false,
-    isSuccess: true,
+    isLoading,
+    isError,
+    isSuccess,
   };
 };
