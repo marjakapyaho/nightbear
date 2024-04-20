@@ -15,31 +15,31 @@ describe('utils/analyser-utils', () => {
 
   const entriesAfter: AnalyserEntry[] = [
     {
-      timestamp: currentTimestamp - 25 * MIN_IN_MS,
+      timestamp: new Date(currentTimestamp - 25 * MIN_IN_MS).toISOString(),
       bloodGlucose: 6,
       slope: null,
       rawSlope: null,
     },
     {
-      timestamp: currentTimestamp - 20 * MIN_IN_MS,
+      timestamp: new Date(currentTimestamp - 20 * MIN_IN_MS).toISOString(),
       bloodGlucose: 8.5,
       slope: 0.33,
       rawSlope: 2.5,
     },
     {
-      timestamp: currentTimestamp - 15 * MIN_IN_MS,
+      timestamp: new Date(currentTimestamp - 15 * MIN_IN_MS).toISOString(),
       bloodGlucose: 7,
       slope: 0.33,
       rawSlope: -1.5,
     },
     {
-      timestamp: currentTimestamp - 10 * MIN_IN_MS,
+      timestamp: new Date(currentTimestamp - 10 * MIN_IN_MS).toISOString(),
       bloodGlucose: 7,
       slope: -0.17,
       rawSlope: 0,
     },
     {
-      timestamp: currentTimestamp - 5 * MIN_IN_MS,
+      timestamp: new Date(currentTimestamp - 5 * MIN_IN_MS).toISOString(),
       bloodGlucose: 8,
       slope: 1,
       rawSlope: 1,

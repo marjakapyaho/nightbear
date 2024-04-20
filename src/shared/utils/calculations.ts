@@ -1,7 +1,7 @@
 import { fill, groupBy, reduce } from 'lodash';
-import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
-import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { DateTime } from 'luxon';
+import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
