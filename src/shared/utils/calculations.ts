@@ -2,7 +2,7 @@ import { fill, groupBy, reduce } from 'lodash';
 import { DateTime } from 'luxon';
 import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
-import { getTimeAsISOStr } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -159,7 +159,7 @@ export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], day
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: day.timestamp,
+    timestamp: getTimeInMillis(day.timestamp),
     total: day.timestamp && groupedEntries[day.timestamp] ? getTotal(groupedEntries[day.timestamp]) : null,
   }));
 };
@@ -171,7 +171,7 @@ export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number, n
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: day.timestamp,
+    timestamp: getTimeInMillis(day.timestamp),
     average: day.timestamp && groupedEntries[day.timestamp] ? getDailyAverage(groupedEntries[day.timestamp]) : null,
   }));
 };
