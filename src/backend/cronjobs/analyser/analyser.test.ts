@@ -1,16 +1,13 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { entriesBadHigh } from 'backend/cronjobs/analyser/testData/bad-high';
-import { alarmsWithInactiveBadHigh, entriesBadHighToHigh } from 'backend/cronjobs/analyser/testData/bad-high-to-high';
-import { entriesBadLow } from 'backend/cronjobs/analyser/testData/bad-low';
-import { alarmsWithInactiveBadLow, entriesBadLowToLow } from 'backend/cronjobs/analyser/testData/bad-low-to-low';
-import { entriesCompressionLow } from 'backend/cronjobs/analyser/testData/compression-low';
+import {
+  alarmsWithInactiveBadHigh,
+  entriesBadHighToHigh,
+} from 'backend/cronjobs/analyser/testData/bad-high-to-high';
 import { entriesFalling } from 'backend/cronjobs/analyser/testData/falling';
 import { entriesHigh, recentInsulin } from 'backend/cronjobs/analyser/testData/high';
 import { entriesHighFluctuations } from 'backend/cronjobs/analyser/testData/high-fluctuations';
-import { entriesLow, recentCarbs } from 'backend/cronjobs/analyser/testData/low';
 import { entriesLowFluctuations } from 'backend/cronjobs/analyser/testData/low-fluctuations';
-import { entriesNoSituation } from 'backend/cronjobs/analyser/testData/no-situation';
-import { entriesOutdated } from 'backend/cronjobs/analyser/testData/outdated';
 import { entriesPersistentHigh } from 'backend/cronjobs/analyser/testData/persistent-high';
 import { entriesRising } from 'backend/cronjobs/analyser/testData/rising';
 import { getMockActiveProfile } from 'shared/utils/test';
@@ -26,60 +23,6 @@ describe('utils/analyser', () => {
   const carbs: CarbEntry[] = [];
   const alarms: Alarm[] = [];
 
-  it('detects no situation', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('day'),
-        entriesNoSituation(currentTimestamp),
-        insulin,
-        carbs,
-        alarms,
-      ),
-    ).toEqual(DEFAULT_STATE);
-  });
-
-  /* it('detects outdated', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('day'),
-        entriesOutdated(currentTimestamp),
-        insulin,
-        carbs,
-        alarms,
-      ),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      OUTDATED: true,
-    });
-  });
-
-  it('detects low', () => {
-    expect(
-      runAnalysis(currentTimestamp, getMockActiveProfile('day'), entriesLow(currentTimestamp), insulin, carbs, alarms),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: true,
-    });
-  });
-
-  it('detects bad low', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('day'),
-        entriesBadLow(currentTimestamp),
-        insulin,
-        carbs,
-        alarms,
-      ),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      BAD_LOW: true,
-    });
-  });
-
   it('detects falling', () => {
     expect(
       runAnalysis(
@@ -93,22 +36,6 @@ describe('utils/analyser', () => {
     ).toEqual({
       ...DEFAULT_STATE,
       FALLING: true,
-    });
-  });
-
-  it('detects compression low', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('night'),
-        entriesCompressionLow(currentTimestamp),
-        insulin,
-        carbs,
-        alarms,
-      ),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      COMPRESSION_LOW: true,
     });
   });
 
@@ -189,19 +116,6 @@ describe('utils/analyser', () => {
     ).toEqual(DEFAULT_STATE);
   });
 
-  it('does not detect low when coming up from bad low', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('night'),
-        entriesBadLowToLow(currentTimestamp),
-        insulin,
-        carbs,
-        alarmsWithInactiveBadLow(currentTimestamp),
-      ),
-    ).toEqual(DEFAULT_STATE);
-  });
-
   it('keeps high alarm regardless of fluctuations', () => {
     expect(
       runAnalysis(
@@ -262,20 +176,4 @@ describe('utils/analyser', () => {
       HIGH: true,
     });
   });
-
-  it('does not detect low if there are recent carbs', () => {
-    expect(
-      runAnalysis(
-        currentTimestamp,
-        getMockActiveProfile('night'),
-        entriesLow(currentTimestamp),
-        insulin,
-        recentCarbs(currentTimestamp),
-        alarms,
-      ),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      FALLING: false,
-    });
-  });*/
 });

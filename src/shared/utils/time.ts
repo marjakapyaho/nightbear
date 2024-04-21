@@ -16,7 +16,11 @@ export const humanReadableLongTime = (utcISOStr: string) => {
 
 // Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.
 // Note that this may be in the past or in the future, relevant to Date.now().
-export function getActivationTimestamp(spec: { hours: number; minutes?: number; seconds?: number }) {
+export function getActivationTimestamp(spec: {
+  hours: number;
+  minutes?: number;
+  seconds?: number;
+}) {
   const d = new Date();
   d.setUTCHours(spec.hours);
   d.setUTCMinutes(spec?.minutes || 0);
@@ -44,5 +48,8 @@ export const getISOStrMinusMinutes = (timestamp: number, minutes: number): strin
     .toUTC()
     .toISO() || '';
 
-export const getTimeBetween = (time1: string | number, time2: string | number) =>
+export const getTimeSubtractedFrom = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) - getTimeInMillis(time2);
+
+export const getTimeAddedWith = (time1: string | number, time2: string | number) =>
+  getTimeInMillis(time1) + getTimeInMillis(time2);

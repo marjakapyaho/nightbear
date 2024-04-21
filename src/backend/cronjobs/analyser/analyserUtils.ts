@@ -1,8 +1,30 @@
 import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from 'shared/utils/calculations';
-import { reduce, slice, sum, find } from 'lodash';
-import { InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
-import { AnalyserEntry } from 'shared/types/analyser';
-import { getTimeBetween, isTimeAfter } from 'shared/utils/time';
+import { reduce, slice, sum, find, chain, sortBy } from 'lodash';
+import {
+  CarbEntry,
+  InsulinEntry,
+  SensorEntry,
+  SensorEntryType,
+} from 'shared/types/timelineEntries';
+import { AnalyserEntry, Situation, State } from 'shared/types/analyser';
+import {
+  getTimeAddedWith,
+  getTimeAsISOStr,
+  getTimeSubtractedFrom,
+  isTimeAfter,
+} from 'shared/utils/time';
+import { SimpleLinearRegression } from 'ml-regression-simple-linear';
+import { Profile } from 'shared/types/profiles';
+import { Alarm } from 'shared/types/alarms';
+
+export type AnalyserData = {
+  currentTimestamp: string;
+  activeProfile: Profile;
+  sensorEntries: SensorEntry[];
+  insulinEntries: InsulinEntry[];
+  carbEntries: CarbEntry[];
+  alarms: Alarm[];
+};
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -20,7 +42,9 @@ const detectNoise = (entries: AnalyserEntry[]): number[] => {
     let changedDirection = 0;
     if (previousEntry && previousEntry.slope && entry.slope) {
       changedDirection =
-        (previousEntry.slope > 0 && entry.slope < 0) || (previousEntry.slope < 0 && entry.slope > 0) ? 1 : 0;
+        (previousEntry.slope > 0 && entry.slope < 0) || (previousEntry.slope < 0 && entry.slope > 0)
+          ? 1
+          : 0;
     }
 
     return changedDirection;
@@ -36,7 +60,9 @@ const sumOfSlopes = (entries: AnalyserEntry[]) => {
 const average = (entries: AnalyserEntry[]) => {
   const middleIndex = Math.floor(entries.length / 2);
   const currentEntry = entries[middleIndex];
-  const newSlope = sumOfSlopes(entries) ? sumOfSlopes(entries) / (entries.length || 1) : currentEntry.rawSlope;
+  const newSlope = sumOfSlopes(entries)
+    ? sumOfSlopes(entries) / (entries.length || 1)
+    : currentEntry.rawSlope;
   const roundedNewSlope = newSlope ? roundTo2Decimals(newSlope) : newSlope;
   return {
     bloodGlucose: currentEntry.bloodGlucose,
@@ -59,8 +85,8 @@ const smoothSlopesWithNoise = (entries: AnalyserEntry[], noiseArray: number[]) =
   return entries.map(makeWindow(noiseArray)).map(average);
 };
 
-export const parseAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] => {
-  const analyserEntries: AnalyserEntry[] = entries
+export const mapSensorEntriesToAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] => {
+  const analyserEntries: AnalyserEntry[] = sortBy(entries, 'timestamp')
     .filter(entry => entry.bloodGlucose)
     .map(entry => ({
       bloodGlucose: entry.bloodGlucose,
@@ -78,10 +104,12 @@ export const parseAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] =>
     if (previousEntry && previousEntry.bloodGlucose && previousEntry.timestamp) {
       const previousBg = previousEntry.bloodGlucose;
       const previousTimestamp = previousEntry.timestamp;
-      const timeBetweenEntries = getTimeBetween(currentTimestamp, previousTimestamp);
+      const timeBetweenEntries = getTimeSubtractedFrom(currentTimestamp, previousTimestamp);
 
       if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE && timeBetweenEntries > 0) {
-        currentSlope = roundTo2Decimals(((currentBg - previousBg) / timeBetweenEntries) * MIN_IN_MS * 5);
+        currentSlope = roundTo2Decimals(
+          ((currentBg - previousBg) / timeBetweenEntries) * MIN_IN_MS * 5,
+        );
       }
     }
     return {
@@ -99,10 +127,48 @@ export const parseAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] =>
 
 export const checkThatThereIsNoCorrectionInsulin = (
   insulins: InsulinEntry[],
-  currentTimestamp: number,
+  currentTimestamp: string,
   highCorrectionSuppressionWindow: number,
 ) => {
   return !find(insulins, insulin =>
-    isTimeAfter(insulin.timestamp, currentTimestamp - highCorrectionSuppressionWindow * MIN_IN_MS),
+    isTimeAfter(
+      insulin.timestamp,
+      getTimeSubtractedFrom(currentTimestamp, highCorrectionSuppressionWindow * MIN_IN_MS),
+    ),
   );
 };
+
+export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) =>
+  chain(entries).sortBy('timestamp').last().value();
+
+export const getPredictedAnalyserEntries = (
+  analyserEntries: AnalyserEntry[],
+  predictionMinutes: number,
+) => {
+  if (analyserEntries.length < 2) {
+    return [];
+  }
+
+  const PREDICTION_DATA_MINUTES = 30;
+  const entries = analyserEntries.slice(-(PREDICTION_DATA_MINUTES / 5 + 1)); // use only last 30 minutes of data
+  const entriesCount = entries.length;
+  const latestEntry = getLatestAnalyserEntry(entries);
+
+  const x = Array.from(Array(entriesCount).keys());
+  const y = entries.map(entry => entry.bloodGlucose);
+
+  const regression = new SimpleLinearRegression(x, y);
+
+  const predictionCount = predictionMinutes / 5; // e.g. 30 minutes would predict 6 values
+  const predictionArray = Array.from(Array(predictionCount).keys()).map(num => entriesCount + num);
+
+  const predictedSensorEntries = regression.predict(predictionArray).map((val, i) => ({
+    bloodGlucose: val,
+    timestamp: getTimeAsISOStr(getTimeAddedWith(latestEntry?.timestamp, (i + 1) * 5 * MIN_IN_MS)),
+    type: 'DEXCOM_G6_SHARE' as SensorEntryType,
+  }));
+
+  return mapSensorEntriesToAnalyserEntries(predictedSensorEntries);
+};
+
+export const isStateCritical = (state?: State) => state?.LOW || state?.BAD_LOW || state?.BAD_HIGH;

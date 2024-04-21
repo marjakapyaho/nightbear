@@ -9,6 +9,7 @@ import { readFileSync } from 'fs';
 import { map } from 'lodash';
 import { parseNumber } from 'shared/utils/helpers';
 import { DbClient, createDbClient } from './db';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
 export type Headers = {
   [header: string]: string | string[];
@@ -32,7 +33,7 @@ export type Response = Promise<ResponsePayload>;
 
 export type Context = {
   httpPort: number;
-  timestamp: () => number;
+  timestamp: () => string;
   log: Logger;
   db: DbClient;
   storage: Storage | null; // ?
@@ -65,7 +66,8 @@ export function createNodeContext(): Context {
 
   const log = createLogger();
   const config = {
-    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES: parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // Default to 3 hours
+    DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES:
+      parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // Default to 3 hours
   };
 
   log(`Starting Nightbear version ${getDeployedVersion()}`);
@@ -73,7 +75,7 @@ export function createNodeContext(): Context {
 
   return {
     httpPort: 3000,
-    timestamp: Date.now,
+    timestamp: () => getTimeAsISOStr(Date.now()),
     log,
     db: createDbClient(DATABASE_URL),
     storage: null, // TODO

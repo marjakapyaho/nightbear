@@ -6,11 +6,12 @@ import { Situation, State } from 'shared/types/analyser';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
-import { getTimeAsISOStr, getTimeBetween, isTimeBeforeOrEqual } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeSubtractedFrom, isTimeBeforeOrEqual } from 'shared/utils/time';
 
 const INITIAL_ALARM_LEVEL = 1;
 
-const alarmToString = (alarm: Alarm) => `${alarm.situation} (level ${last(alarm.alarmStates)?.alarmLevel})`;
+const alarmToString = (alarm: Alarm) =>
+  `${alarm.situation} (level ${last(alarm.alarmStates)?.alarmLevel})`;
 const situationToString = (situation: Situation) => `${situation} (new)`;
 
 const mapTimestampsToDates = (alarms: Alarm[]) =>
@@ -19,7 +20,12 @@ const mapTimestampsToDates = (alarms: Alarm[]) =>
     deactivatedAt: alarm.deactivatedAt ? new Date(alarm.deactivatedAt) : null,
   }));
 
-export function runAlarmChecks(context: Context, state: State, activeProfile: Profile, activeAlarms: Alarm[]) {
+export function runAlarmChecks(
+  context: Context,
+  state: State,
+  activeProfile: Profile,
+  activeAlarms: Alarm[],
+) {
   const { log } = context;
 
   // If alarms are not enabled, remove all existing alarms and exit
@@ -70,7 +76,11 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   const modelsToSave: Alarm[] = [];
 
   alarms.forEach(alarm => {
-    const changedAlarm = { ...alarm, isActive: false, deactivatedAt: getTimeAsISOStr(context.timestamp()) };
+    const changedAlarm = {
+      ...alarm,
+      isActive: false,
+      deactivatedAt: getTimeAsISOStr(context.timestamp()),
+    };
     modelsToSave.push(changedAlarm);
 
     // We're not waiting for the results of pushover acks
@@ -80,7 +90,11 @@ function handleAlarmsToRemove(alarms: Alarm[], context: Context): Promise<Alarm[
   return Promise.resolve(modelsToSave);
 }
 
-function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Context): Promise<Array<Alarm | null>> {
+function handleAlarmsToKeep(
+  alarms: Alarm[],
+  activeProfile: Profile,
+  context: Context,
+): Promise<Array<Alarm | null>> {
   const { log } = context;
 
   return Promise.all(
@@ -93,29 +107,36 @@ function handleAlarmsToKeep(alarms: Alarm[], activeProfile: Profile, context: Co
       if (isTimeBeforeOrEqual(now, validAfterTimestamp)) {
         log(
           `${logPrefix} is not yet valid again (${Math.round(
-            getTimeBetween(validAfterTimestamp, now) / MIN_IN_MS,
+            getTimeSubtractedFrom(validAfterTimestamp, now) / MIN_IN_MS,
           )} min snooze left)`,
         );
         return Promise.resolve(null);
       }
 
-      const hasBeenValidFor = Math.round(getTimeBetween(context.timestamp(), validAfterTimestamp) / MIN_IN_MS);
+      const hasBeenValidFor = Math.round(
+        getTimeSubtractedFrom(context.timestamp(), validAfterTimestamp) / MIN_IN_MS,
+      );
       // TODO: fix this
       // @ts-ignore
-      const levelUpTimes = activeProfile.alarmSettings[alarm.situation.toLowerCase()].escalationAfterMinutes;
+      const levelUpTimes =
+        activeProfile.alarmSettings[alarm.situation.toLowerCase()].escalationAfterMinutes;
       // TODO: fix this
       // @ts-ignore
       const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
       const neededLevel =
-        findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 || levelUpTimes.length + 1;
+        findIndex(accumulatedTimes, minutes => minutes > hasBeenValidFor) + 1 ||
+        levelUpTimes.length + 1;
       const pushoverLevels = activeProfile.pushoverLevels;
       const pushoverRecipient = pushoverLevels[neededLevel - 2].name || 'none'; // TODO: error handling
 
-      const nextTimeMilestone = accumulatedTimes.find(time => time >= hasBeenValidFor) || max(accumulatedTimes) || '?';
+      const nextTimeMilestone =
+        accumulatedTimes.find(time => time >= hasBeenValidFor) || max(accumulatedTimes) || '?';
       logPrefix = `${logPrefix} has been valid for ${hasBeenValidFor}/${nextTimeMilestone} min`;
 
       if (neededLevel !== alarmLevel) {
-        log(`${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`);
+        log(
+          `${logPrefix} => will escalate to level ${neededLevel} (pushover "${pushoverRecipient}")`,
+        );
 
         // If recipient is none, just hold alarm for this level (used for pull notifications)
         if (pushoverRecipient === 'none') {

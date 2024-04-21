@@ -1,4 +1,4 @@
-import { parseAnalyserEntries } from 'backend/cronjobs/analyser/analyserUtils';
+import { mapSensorEntriesToAnalyserEntries } from 'backend/cronjobs/analyser/analyserUtils';
 import { generateSensorEntries } from 'shared/utils/test';
 import { AnalyserEntry } from 'shared/types/analyser';
 import { MIN_IN_MS } from 'shared/utils/calculations';
@@ -48,6 +48,6 @@ describe('utils/analyser-utils', () => {
 
   // Assertions
   it('parses correct slopes for analyser entries', () => {
-    expect(parseAnalyserEntries(entriesBefore)).toEqual(entriesAfter);
+    expect(mapSensorEntriesToAnalyserEntries(entriesBefore)).toEqual(entriesAfter);
   });
 });

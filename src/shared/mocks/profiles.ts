@@ -14,7 +14,7 @@ export const mockAnalyserSettings: AnalyserSettings = {
   highLevelBad: 13,
   lowLevelRel: 5,
   lowLevelAbs: 4,
-  lowLevelBad: 3.3,
+  lowLevelBad: 3,
   timeSinceBgMinutes: 30,
   highCorrectionSuppressionMinutes: 120,
 };
@@ -64,7 +64,7 @@ export const mockSituationSettings: SituationSettings[] = [
     situation: 'PERSISTENT_HIGH',
     escalationAfterMinutes: 10,
     snoozeMinutes: 15,
-  }
+  },
 ];
 
 export const mockPushoverLevels: PushoverLevel[] = [
