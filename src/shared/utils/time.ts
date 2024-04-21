@@ -5,14 +5,14 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 export const TZ = 'Europe/Helsinki';
 
 // @example "12:34"
-export function humanReadableShortTime(msUtc: number = Date.now()) {
-  return DateTime.fromMillis(msUtc).setZone(TZ).toFormat('HH:mm'); // https://moment.github.io/luxon/docs/manual/formatting.html#table-of-tokens
-}
+export const humanReadableShortTime = (msUtc: number = Date.now()) => {
+  return DateTime.fromMillis(msUtc).setZone(TZ).toFormat('HH:mm');
+};
 
 // @example "2020-01-31 12:34:56"
-export function humanReadableLongTime(utcISOStr: string) {
+export const humanReadableLongTime = (utcISOStr: string) => {
   return DateTime.fromISO(utcISOStr).setZone(TZ).toFormat('yyyy-MM-dd HH:mm:ss');
-}
+};
 
 // Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.
 // Note that this may be in the past or in the future, relevant to Date.now().
