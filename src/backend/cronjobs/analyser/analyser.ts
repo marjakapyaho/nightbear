@@ -105,32 +105,42 @@ export const analyzeState = (
     };
   }
 
-  state = {
-    ...state,
-    FALLING: detectFalling(state, activeProfile, entries),
-  };
+  if (detectFalling(activeProfile, entries)) {
+    return {
+      ...state,
+      FALLING: true,
+    };
+  }
 
   // Must be before HIGH
-  state = {
-    ...state,
-    BAD_HIGH: detectBadHigh(activeProfile, entries),
-  };
+  if (detectBadHigh(activeProfile, entries)) {
+    return {
+      ...state,
+      BAD_HIGH: true,
+    };
+  }
 
   // Must be before RISING
-  state = {
-    ...state,
-    HIGH: detectHigh(state, activeProfile, entries, alarms, insulin, currentTimestamp),
-  };
+  if (detectHigh(activeProfile, entries, alarms, insulin, currentTimestamp)) {
+    return {
+      ...state,
+      HIGH: true,
+    };
+  }
 
-  state = {
-    ...state,
-    RISING: detectRising(state, activeProfile, entries, insulin, currentTimestamp),
-  };
+  if (detectRising(activeProfile, entries, insulin, currentTimestamp)) {
+    return {
+      ...state,
+      RISING: true,
+    };
+  }
 
-  state = {
-    ...state,
-    PERSISTENT_HIGH: detectPersistentHigh(activeProfile, entries, currentTimestamp),
-  };
+  if (detectPersistentHigh(activeProfile, entries, insulin, currentTimestamp)) {
+    return {
+      ...state,
+      PERSISTENT_HIGH: true,
+    };
+  }
 
   return state;
 };

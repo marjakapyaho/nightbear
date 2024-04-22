@@ -2,12 +2,7 @@ import { AnalyserEntry, Situation, State } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
-import {
-  getTimeAsISOStr,
-  getTimeSubtractedFrom,
-  isTimeAfter,
-  isTimeAfterOrEqual,
-} from 'shared/utils/time';
+import { getTimeSubtractedFrom, isTimeAfter, isTimeAfterOrEqual } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
 import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import {
@@ -15,9 +10,9 @@ import {
   getLatestAnalyserEntry,
   isStateCritical,
 } from 'backend/cronjobs/analyser/analyserUtils';
-import { chain, filter, find, some } from 'lodash';
+import { chain, filter, find } from 'lodash';
 
-const ANALYSIS_TIME_WINDOW_MS = 2.5 * HOUR_IN_MS;
+const PERSISTENT_HIGH_TIME_WINDOW = 2 * HOUR_IN_MS;
 const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
 const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
@@ -126,21 +121,17 @@ export const detectLow = (
   );
 };
 
-export const detectFalling = (state: State, activeProfile: Profile, entries: AnalyserEntry[]) => {
+export const detectFalling = (activeProfile: Profile, entries: AnalyserEntry[]) => {
   const latestEntry = getLatestAnalyserEntry(entries);
   return (
-    !state.BAD_LOW &&
-    !state.LOW &&
-    !state.COMPRESSION_LOW &&
     latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
     latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs &&
-    !!latestEntry.slope &&
+    latestEntry.slope !== null &&
     latestEntry.slope < -slopeLimits.MEDIUM
   );
 };
 
 export const detectHigh = (
-  state: State,
   activeProfile: Profile,
   entries: AnalyserEntry[],
   alarms: Alarm[],
@@ -148,7 +139,6 @@ export const detectHigh = (
   currentTimestamp: string,
 ): boolean => {
   const latestEntry = getLatestAnalyserEntry(entries);
-  const notCurrentlyBadHigh = !state.BAD_HIGH;
   const notComingDownFromBadHigh = !find(
     alarms,
     alarm =>
@@ -168,7 +158,6 @@ export const detectHigh = (
     activeProfile.analyserSettings.highCorrectionSuppressionMinutes,
   );
   return (
-    notCurrentlyBadHigh &&
     notComingDownFromBadHigh &&
     thereIsNoCorrectionInsulin &&
     latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelAbs - correctionIfAlreadyHigh
@@ -181,7 +170,6 @@ export const detectBadHigh = (activeProfile: Profile, entries: AnalyserEntry[]):
 };
 
 export const detectRising = (
-  state: State,
   activeProfile: Profile,
   entries: AnalyserEntry[],
   insulins: InsulinEntry[],
@@ -194,11 +182,9 @@ export const detectRising = (
     activeProfile.analyserSettings.highCorrectionSuppressionMinutes,
   );
   return (
-    !state.BAD_HIGH &&
-    !state.HIGH &&
     thereIsNoCorrectionInsulin &&
     latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
-    !!latestEntry.slope &&
+    latestEntry.slope !== null &&
     latestEntry.slope > slopeLimits.MEDIUM
   );
 };
@@ -206,42 +192,35 @@ export const detectRising = (
 export const detectPersistentHigh = (
   activeProfile: Profile,
   entries: AnalyserEntry[],
+  insulins: InsulinEntry[],
   currentTimestamp: string,
 ) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-  const relevantTimeWindow = filter(entries, entry =>
-    isTimeAfterOrEqual(
-      entry.timestamp,
-      getTimeSubtractedFrom(currentTimestamp, ANALYSIS_TIME_WINDOW_MS),
-    ),
+  const timeWindowStart = getTimeSubtractedFrom(currentTimestamp, PERSISTENT_HIGH_TIME_WINDOW);
+  const relevantEntries = filter(entries, entry =>
+    isTimeAfterOrEqual(entry.timestamp, timeWindowStart),
   );
-  const firstEntry = chain(relevantTimeWindow).sortBy('timestamp').first().value();
-  if (!firstEntry) {
-    return false;
-  } // TODO: this is for lodash
 
-  const timeWindowLength = getTimeSubtractedFrom(latestEntry.timestamp, firstEntry.timestamp);
+  // Allow two entries to be missing, but most data should be there
+  const requiredEntriesAmount = PERSISTENT_HIGH_TIME_WINDOW / (5 * MIN_IN_MS) - 2;
+  const haveEnoughDataPoints = relevantEntries.length > requiredEntriesAmount;
 
-  // We need 2.5 hours of data (with 10 min tolerance)
-  const haveWideEnoughWindow = timeWindowLength > ANALYSIS_TIME_WINDOW_MS - MIN_IN_MS * 10;
+  const isAllDataRelativeHigh =
+    relevantEntries.filter(
+      entry =>
+        entry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
+        entry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs,
+    ).length === relevantEntries.length;
 
-  // Allow a few entries to be missing (2.5 hours would be 30 entries at 5 min intervals)
-  const haveEnoughDataPoints = relevantTimeWindow.length > 25;
+  const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(
+    insulins,
+    currentTimestamp,
+    activeProfile.analyserSettings.highCorrectionSuppressionMinutes,
+  );
 
-  // Reject the entire time period if even a single entry is above HIGH, below RELATIVE HIGH, or showing active change
-  const hasCounterConditions = some(relevantTimeWindow, entry => {
-    const isAboveHigh = entry.bloodGlucose > activeProfile.analyserSettings.highLevelAbs;
-    const isBelowRelativeHigh = entry.bloodGlucose < activeProfile.analyserSettings.highLevelRel;
-    let isFalling = false;
-    let isRisingFast = false;
+  const latestEntry = getLatestAnalyserEntry(relevantEntries);
+  const slopeIsNotDown = !(latestEntry?.slope && latestEntry?.slope < 0);
 
-    // If slope is going down at all or up fast, suppress persistent high
-    if (entry.slope) {
-      isFalling = entry.slope < 0;
-      isRisingFast = entry.slope > slopeLimits.FAST;
-    }
-    return isAboveHigh || isBelowRelativeHigh || isFalling || isRisingFast;
-  });
-
-  return haveWideEnoughWindow && haveEnoughDataPoints && !hasCounterConditions;
+  return (
+    haveEnoughDataPoints && isAllDataRelativeHigh && thereIsNoCorrectionInsulin && slopeIsNotDown
+  );
 };
