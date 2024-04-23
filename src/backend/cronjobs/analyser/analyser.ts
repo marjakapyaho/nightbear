@@ -2,17 +2,18 @@ import {
   AnalyserData,
   getLatestAnalyserEntry,
   getPredictedAnalyserEntries,
+  getPredictedSituation,
   mapSensorEntriesToAnalyserEntries,
 } from 'backend/cronjobs/analyser/analyserUtils';
-import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
-import { AnalyserEntry, State } from 'shared/types/analyser';
+import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
+import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import {
   detectBadHigh,
   detectBadLow,
   detectCompressionLow,
+  detectCriticalOutdated,
   detectFalling,
   detectHigh,
   detectLow,
@@ -28,119 +29,98 @@ export const runAnalysis = ({
   insulinEntries,
   carbEntries,
   alarms,
-}: AnalyserData): State => {
+}: AnalyserData): Situation | null => {
   const entries = mapSensorEntriesToAnalyserEntries(sensorEntries);
 
-  // Predict entries for the whole time we'll be without
-  // data and not creating outdated alarm
-  const predictedEntries = getPredictedAnalyserEntries(
-    entries,
-    activeProfile.analyserSettings.timeSinceBgMinutes,
-  );
-
-  // Get predicted state
-  const predictedState = analyzeState(
-    getLatestAnalyserEntry(predictedEntries)?.timestamp,
-    activeProfile, // TODO: this might change during prediction
-    predictedEntries,
-    [],
-    [],
-    [], // TODO: what should this be - it depends on analyze before this
-  );
-
-  // Get current state
-  return analyzeState(
+  return analyseSituation(
     currentTimestamp,
     activeProfile,
     entries,
     insulinEntries,
     carbEntries,
     alarms,
-    predictedState,
+    getPredictedSituation(activeProfile, entries),
   );
 };
 
-export const analyzeState = (
+export const analyseSituation = (
   currentTimestamp: string,
   activeProfile: Profile,
   entries: AnalyserEntry[],
   insulin: InsulinEntry[],
   carbs: CarbEntry[],
   alarms: Alarm[],
-  predictedState?: State,
-): State => {
-  let state = DEFAULT_STATE;
+  predictedSituation?: Situation | null,
+): Situation | null => {
+  const latestEntry = getLatestAnalyserEntry(entries);
 
-  // Must be first, checks also if we even have latestEntry
-  state = {
-    ...state,
-    OUTDATED: detectOutdated(activeProfile, entries, currentTimestamp, predictedState),
-  };
-
-  if (state.OUTDATED) {
-    return state;
+  /**
+   * 1. CRITICAL_OUTDATED
+   * If we have no data inside analysis range, or we've missed some data and
+   * predicted state is bad, return critical outdated immediately
+   */
+  if (detectCriticalOutdated(latestEntry, currentTimestamp, predictedSituation)) {
+    return 'CRITICAL_OUTDATED';
   }
 
-  // Must be before LOW
-  if (detectBadLow(activeProfile, entries)) {
-    return {
-      ...state,
-      BAD_LOW: true,
-    };
+  /**
+   * 2. BAD_LOW and BAD_HIGH
+   * Most critical and simple checks, must be before low and high
+   */
+  if (detectBadLow(activeProfile, latestEntry)) {
+    return 'BAD_LOW';
+  }
+  if (detectBadHigh(activeProfile, latestEntry)) {
+    return 'BAD_HIGH';
   }
 
-  // Must be before LOW and FALLING
+  /**
+   * 3. OUTDATED
+   * This is after the critical checks, so it will never override those. This also
+   * only alarms after timeSinceBgMinutes so there is a bigger delay.
+   */
+  if (detectOutdated(activeProfile, latestEntry, currentTimestamp)) {
+    return 'OUTDATED';
+  }
+
+  /**
+   * 4. COMPRESSION_LOW
+   * Must be before LOW and FALLING
+   */
   if (detectCompressionLow(activeProfile, entries, insulin, currentTimestamp)) {
-    return {
-      ...state,
-      COMPRESSION_LOW: true,
-    };
+    return 'COMPRESSION_LOW';
   }
 
-  // Must be before FALLING
-  if (detectLow(activeProfile, entries, alarms, carbs, currentTimestamp)) {
-    return {
-      ...state,
-      LOW: true,
-    };
+  /**
+   * 5. LOW and HIGH
+   * Must be before FALLING and RISING
+   */
+  if (detectLow(activeProfile, latestEntry, alarms, carbs, currentTimestamp)) {
+    return 'LOW';
+  }
+  if (detectHigh(activeProfile, latestEntry, alarms, insulin, currentTimestamp)) {
+    return 'HIGH';
   }
 
-  if (detectFalling(activeProfile, entries)) {
-    return {
-      ...state,
-      FALLING: true,
-    };
+  /**
+   * 5. FALLING and RISING
+   * Check that we're inside relative low or high and slope is big enough.
+   * Rising also checks for the presence of correction insulin.
+   */
+  if (detectFalling(activeProfile, latestEntry)) {
+    return 'FALLING';
+  }
+  if (detectRising(activeProfile, latestEntry, insulin, currentTimestamp)) {
+    return 'RISING';
   }
 
-  // Must be before HIGH
-  if (detectBadHigh(activeProfile, entries)) {
-    return {
-      ...state,
-      BAD_HIGH: true,
-    };
-  }
-
-  // Must be before RISING
-  if (detectHigh(activeProfile, entries, alarms, insulin, currentTimestamp)) {
-    return {
-      ...state,
-      HIGH: true,
-    };
-  }
-
-  if (detectRising(activeProfile, entries, insulin, currentTimestamp)) {
-    return {
-      ...state,
-      RISING: true,
-    };
-  }
-
+  /**
+   * 6. PERSISTENT_HIGH
+   * Alarms values that are only relative high, but don't seem to be going lower
+   */
   if (detectPersistentHigh(activeProfile, entries, insulin, currentTimestamp)) {
-    return {
-      ...state,
-      PERSISTENT_HIGH: true,
-    };
+    return 'PERSISTENT_HIGH';
   }
 
-  return state;
+  return null;
 };

@@ -1,6 +1,5 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
@@ -20,10 +19,7 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      HIGH: true,
-    });
+    ).toEqual('HIGH');
   });
 
   it('does not detect HIGH with recent insulin', () => {
@@ -45,7 +41,7 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('detects HIGH when insulin suppression window is over', () => {
@@ -67,10 +63,7 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      HIGH: true,
-    });
+    ).toEqual('HIGH');
   });
 
   it('does not detect HIGH when coming down from BAD_HIGH', () => {
@@ -104,7 +97,7 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not clear HIGH at the limit when there is an active HIGH alarm', () => {
@@ -138,9 +131,6 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      HIGH: true,
-    });
+    ).toEqual('HIGH');
   });
 });

@@ -1,4 +1,4 @@
-import { AnalyserEntry, Situation, State } from 'shared/types/analyser';
+import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
@@ -8,7 +8,7 @@ import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import {
   checkThatThereIsNoCorrectionInsulin,
   getLatestAnalyserEntry,
-  isStateCritical,
+  isSituationCritical,
 } from 'backend/cronjobs/analyser/analyserUtils';
 import { chain, filter, find } from 'lodash';
 
@@ -19,6 +19,7 @@ const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
 const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 const LOW_CORRECTION_SUPPRESSION_WINDOW = 30 * MIN_IN_MS;
 const TIME_SINCE_BG_CRITICAL = 15 * MIN_IN_MS;
+const ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW = 4;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -26,15 +27,12 @@ const slopeLimits = {
   FAST: 1.3,
 };
 
-export const detectOutdated = (
-  activeProfile: Profile,
-  entries: AnalyserEntry[],
+export const detectCriticalOutdated = (
+  latestEntry: AnalyserEntry,
   currentTimestamp: string,
-  predictedState?: State,
+  predictedSituation?: Situation | null,
 ) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-
-  // If there are no entries, data is outdated
+  // If there is no data, it's been hours without data, so we should alarm immediately
   if (!latestEntry) {
     return true;
   }
@@ -42,20 +40,28 @@ export const detectOutdated = (
   // How long since latest entry
   const msSinceLatestEntry = getTimeSubtractedFrom(currentTimestamp, latestEntry.timestamp);
 
-  // If we're missing at least two entries, and we're predicting critical situation
-  // inside timeSinceBgMinutes, alarm about data being outdated immediately
-  if (msSinceLatestEntry > TIME_SINCE_BG_CRITICAL && isStateCritical(predictedState)) {
-    return true;
-  }
-
-  // If situation is not predicted to be critical, follow timeSinceBgMinutes from settings
-  const msSinceBgLimit = activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS;
-  return msSinceLatestEntry > msSinceBgLimit;
+  // If we're missing at least two entries, and we're predicting critical situation,
+  // alarm about data being critically outdated immediately
+  return msSinceLatestEntry > TIME_SINCE_BG_CRITICAL && isSituationCritical(predictedSituation);
 };
 
-export const detectBadLow = (activeProfile: Profile, entries: AnalyserEntry[]) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-  return latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelBad;
+export const detectBadLow = (activeProfile: Profile, latestEntry: AnalyserEntry) =>
+  latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelBad;
+
+export const detectBadHigh = (activeProfile: Profile, latestEntry: AnalyserEntry) =>
+  latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelBad;
+
+export const detectOutdated = (
+  activeProfile: Profile,
+  latestEntry: AnalyserEntry,
+  currentTimestamp: string,
+) => {
+  // How long since latest entry
+  const msSinceLatestEntry = getTimeSubtractedFrom(currentTimestamp, latestEntry.timestamp);
+
+  // Check if we're over timeSinceBgMinutes from settings
+  const msSinceBgLimit = activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS;
+  return msSinceLatestEntry > msSinceBgLimit;
 };
 
 export const detectCompressionLow = (
@@ -65,33 +71,33 @@ export const detectCompressionLow = (
   currentTimestamp: string,
 ) => {
   const noRecentInsulin = insulin.length === 0;
+
   const isNight = activeProfile.profileName === 'night';
-  const entriesToCheck = 4;
-  const lastEntries = chain(entries).sortBy('timestamp').slice(-entriesToCheck).value();
-  const weHaveEnoughEntries = lastEntries.length === entriesToCheck;
+
+  const latestEntries = chain(entries).slice(-ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW).value();
+  const weHaveEnoughEntries = latestEntries.length === ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW;
+
   const lastEntriesAreFresh = isTimeAfter(
-    lastEntries[0].timestamp, // check that first of the last 4 entries is max 25 min old
+    latestEntries[0].timestamp, // check that first of the last 4 entries is max 25 min old
     getTimeSubtractedFrom(currentTimestamp, 25 * MIN_IN_MS),
   );
 
+  const slopeIsReallyBig = Boolean(
+    find(latestEntries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2),
+  );
+
   return (
-    noRecentInsulin &&
-    isNight &&
-    weHaveEnoughEntries &&
-    lastEntriesAreFresh &&
-    Boolean(find(lastEntries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2))
+    noRecentInsulin && isNight && weHaveEnoughEntries && lastEntriesAreFresh && slopeIsReallyBig
   );
 };
 
 export const detectLow = (
   activeProfile: Profile,
-  entries: AnalyserEntry[],
+  latestEntry: AnalyserEntry,
   alarms: Alarm[],
   carbs: CarbEntry[],
   currentTimestamp: string,
 ) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-
   const notComingUpFromBadLow = !find(
     alarms,
     alarm =>
@@ -121,24 +127,13 @@ export const detectLow = (
   );
 };
 
-export const detectFalling = (activeProfile: Profile, entries: AnalyserEntry[]) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-  return (
-    latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
-    latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs &&
-    latestEntry.slope !== null &&
-    latestEntry.slope < -slopeLimits.MEDIUM
-  );
-};
-
 export const detectHigh = (
   activeProfile: Profile,
-  entries: AnalyserEntry[],
+  latestEntry: AnalyserEntry,
   alarms: Alarm[],
   insulins: InsulinEntry[],
   currentTimestamp: string,
 ): boolean => {
-  const latestEntry = getLatestAnalyserEntry(entries);
   const notComingDownFromBadHigh = !find(
     alarms,
     alarm =>
@@ -157,6 +152,7 @@ export const detectHigh = (
     currentTimestamp,
     activeProfile.analyserSettings.highCorrectionSuppressionMinutes,
   );
+
   return (
     notComingDownFromBadHigh &&
     thereIsNoCorrectionInsulin &&
@@ -164,29 +160,33 @@ export const detectHigh = (
   );
 };
 
-export const detectBadHigh = (activeProfile: Profile, entries: AnalyserEntry[]): boolean => {
-  const latestEntry = getLatestAnalyserEntry(entries);
-  return latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelBad;
+export const detectFalling = (activeProfile: Profile, latestEntry: AnalyserEntry) => {
+  const bloodGlucoseIsRelativeLow =
+    latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
+    latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs;
+  const slopeIndicatesFalling =
+    latestEntry.slope !== null && latestEntry.slope < -slopeLimits.MEDIUM;
+
+  return bloodGlucoseIsRelativeLow && slopeIndicatesFalling;
 };
 
 export const detectRising = (
   activeProfile: Profile,
-  entries: AnalyserEntry[],
+  latestEntry: AnalyserEntry,
   insulins: InsulinEntry[],
   currentTimestamp: string,
 ) => {
-  const latestEntry = getLatestAnalyserEntry(entries);
   const thereIsNoCorrectionInsulin = checkThatThereIsNoCorrectionInsulin(
     insulins,
     currentTimestamp,
     activeProfile.analyserSettings.highCorrectionSuppressionMinutes,
   );
-  return (
-    thereIsNoCorrectionInsulin &&
+  const bloodGlucoseIsRelativeHigh =
     latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
-    latestEntry.slope !== null &&
-    latestEntry.slope > slopeLimits.MEDIUM
-  );
+    latestEntry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs;
+  const slopeIndicatesRising = latestEntry.slope !== null && latestEntry.slope > slopeLimits.MEDIUM;
+
+  return thereIsNoCorrectionInsulin && bloodGlucoseIsRelativeHigh && slopeIndicatesRising;
 };
 
 export const detectPersistentHigh = (

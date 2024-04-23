@@ -1,6 +1,5 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
 
@@ -18,10 +17,7 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      FALLING: true,
-    });
+    ).toEqual('FALLING');
   });
 
   it('does not detect FALLING if slope is too small', () => {
@@ -37,7 +33,7 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect FALLING above relative low limit', () => {
@@ -53,7 +49,7 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect FALLING below absolute low limit (detects LOW)', () => {
@@ -69,9 +65,6 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: true,
-    });
+    ).toEqual('LOW');
   });
 });

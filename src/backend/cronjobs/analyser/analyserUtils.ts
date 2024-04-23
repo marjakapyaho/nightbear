@@ -6,7 +6,7 @@ import {
   SensorEntry,
   SensorEntryType,
 } from 'shared/types/timelineEntries';
-import { AnalyserEntry, Situation, State } from 'shared/types/analyser';
+import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import {
   getTimeAddedWith,
   getTimeAsISOStr,
@@ -16,6 +16,7 @@ import {
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
+import { analyseSituation } from 'backend/cronjobs/analyser/analyser';
 
 export type AnalyserData = {
   currentTimestamp: string;
@@ -25,6 +26,8 @@ export type AnalyserData = {
   carbEntries: CarbEntry[];
   alarms: Alarm[];
 };
+
+const PREDICTION_TIME_WINDOW = 30;
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -138,8 +141,7 @@ export const checkThatThereIsNoCorrectionInsulin = (
   );
 };
 
-export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) =>
-  chain(entries).sortBy('timestamp').last().value();
+export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) => chain(entries).last().value();
 
 export const getPredictedAnalyserEntries = (
   analyserEntries: AnalyserEntry[],
@@ -171,4 +173,17 @@ export const getPredictedAnalyserEntries = (
   return mapSensorEntriesToAnalyserEntries(predictedSensorEntries);
 };
 
-export const isStateCritical = (state?: State) => state?.LOW || state?.BAD_LOW || state?.BAD_HIGH;
+export const getPredictedSituation = (activeProfile: Profile, entries: AnalyserEntry[]) => {
+  const predictedEntries = getPredictedAnalyserEntries(entries, PREDICTION_TIME_WINDOW);
+  return analyseSituation(
+    getLatestAnalyserEntry(predictedEntries)?.timestamp,
+    activeProfile, // TODO: this might change during prediction
+    predictedEntries,
+    [],
+    [],
+    [], // TODO: what should this be - it depends on analyse before this
+  );
+};
+
+export const isSituationCritical = (situation?: Situation | null) =>
+  situation === 'LOW' || situation === 'BAD_LOW' || situation === 'BAD_HIGH';

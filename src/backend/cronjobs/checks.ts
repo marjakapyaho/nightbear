@@ -35,7 +35,8 @@ export const checks: Cronjob = (context: Context, _journal) => {
 
     log(`1. Using profile: ${activeProfile?.profileName}`);
     // TODO: merge sensor entries and meter entries
-    const state = runAnalysis({
+
+    const situation = runAnalysis({
       currentTimestamp: context.timestamp(),
       activeProfile,
       sensorEntries,
@@ -43,9 +44,7 @@ export const checks: Cronjob = (context: Context, _journal) => {
       carbEntries,
       alarms,
     });
-
-    const situations = map(state, (val, key) => (val ? key : null)).filter(identity);
-    log('2. Active situations: ' + (situations.length ? situations.join(', ') : 'n/a'));
+    log(`2. Active situation: ${situation || '-'}`);
 
     // TODO
     /*    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {

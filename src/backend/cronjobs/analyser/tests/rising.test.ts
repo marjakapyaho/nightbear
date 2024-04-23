@@ -1,6 +1,5 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
@@ -20,10 +19,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      RISING: true,
-    });
+    ).toEqual('RISING');
   });
 
   it('does not detect RISING when below relative high', () => {
@@ -39,7 +35,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect RISING when above absolute high (detects HIGH)', () => {
@@ -55,10 +51,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      HIGH: true,
-    });
+    ).toEqual('HIGH');
   });
 
   it('does not detect RISING when slope is too small', () => {
@@ -74,7 +67,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect RISING when you can not calculate slope', () => {
@@ -90,7 +83,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect RISING if there is correction insulin', () => {
@@ -112,7 +105,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('detects RISING when insulin suppression window is over', () => {
@@ -134,9 +127,6 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      RISING: true,
-    });
+    ).toEqual('RISING');
   });
 });

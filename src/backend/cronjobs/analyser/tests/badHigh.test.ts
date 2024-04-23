@@ -18,9 +18,6 @@ describe('analyser/badHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      BAD_HIGH: true,
-    });
+    ).toEqual('BAD_HIGH');
   });
 });

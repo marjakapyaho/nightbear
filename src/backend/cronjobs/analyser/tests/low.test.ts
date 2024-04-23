@@ -1,6 +1,5 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
@@ -20,10 +19,7 @@ describe('analyser/low', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: true,
-    });
+    ).toEqual('LOW');
   });
 
   it('does not detect LOW when there are correction carbs near enough', () => {
@@ -45,7 +41,7 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('detects LOW when low correction suppression window is over', () => {
@@ -67,10 +63,7 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: true,
-    });
+    ).toEqual('LOW');
   });
 
   it('does not detect LOW right after BAD_LOW', () => {
@@ -104,10 +97,7 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: false,
-    });
+    ).toEqual(null);
   });
 
   it('does not clear LOW at the limit when there is an active LOW alarm', () => {
@@ -141,9 +131,6 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      LOW: true,
-    });
+    ).toEqual('LOW');
   });
 });

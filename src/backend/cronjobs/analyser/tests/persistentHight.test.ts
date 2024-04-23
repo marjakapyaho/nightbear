@@ -1,6 +1,5 @@
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
-import { DEFAULT_STATE } from 'shared/utils/analyser';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
@@ -25,10 +24,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      PERSISTENT_HIGH: true,
-    });
+    ).toEqual('PERSISTENT_HIGH');
   });
 
   it('detects PERSISTENT_HIGH without caring about values outside PERSISTENT_HIGH_TIME_WINDOW', () => {
@@ -44,10 +40,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      PERSISTENT_HIGH: true,
-    });
+    ).toEqual('PERSISTENT_HIGH');
   });
 
   it('does not detect PERSISTENT_HIGH with too few entries', () => {
@@ -63,7 +56,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect PERSISTENT_HIGH when there is even one HIGH value', () => {
@@ -79,7 +72,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect PERSISTENT_HIGH when there is even one normal value', () => {
@@ -95,7 +88,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('does not detect PERSISTENT_HIGH with recent insulin', () => {
@@ -117,7 +110,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 
   it('detects PERSISTENT_HIGH when insulin suppression window is over', () => {
@@ -139,10 +132,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual({
-      ...DEFAULT_STATE,
-      PERSISTENT_HIGH: true,
-    });
+    ).toEqual('PERSISTENT_HIGH');
   });
 
   it('does not detect PERSISTENT_HIGH when slope of last value is down', () => {
@@ -158,6 +148,6 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(DEFAULT_STATE);
+    ).toEqual(null);
   });
 });

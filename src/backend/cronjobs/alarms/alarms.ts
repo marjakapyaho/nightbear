@@ -2,7 +2,7 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 import { filter, find, findIndex, last, map, sum, take, max } from 'lodash';
 import { isNotNull, objectKeys } from 'shared/utils/helpers';
 import { Alarm, AlarmState } from 'shared/types/alarms';
-import { Situation, State } from 'shared/types/analyser';
+import { Situation } from 'shared/types/analyser';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
@@ -22,7 +22,7 @@ const mapTimestampsToDates = (alarms: Alarm[]) =>
 
 export function runAlarmChecks(
   context: Context,
-  state: State,
+  situation: Situation,
   activeProfile: Profile,
   activeAlarms: Alarm[],
 ) {
@@ -37,7 +37,10 @@ export function runAlarmChecks(
     });
   }
 
-  const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(state, activeAlarms);
+  const { alarmsToRemove, alarmsToKeep, alarmsToCreate } = detectAlarmActions(
+    situation,
+    activeAlarms,
+  );
   const alarmsToLog = alarmsToKeep.map(alarmToString).concat(alarmsToCreate.map(situationToString));
   log(`3. Active alarms: ${alarmsToLog.join(', ') || 'n/a'}`);
 
@@ -54,7 +57,7 @@ export function runAlarmChecks(
   });
 }
 
-export function detectAlarmActions(state: State, activeAlarms: Alarm[]) {
+export function detectAlarmActions(situation: Situation, activeAlarms: Alarm[]) {
   const alarmsToRemove = filter(activeAlarms, alarm => !state[alarm.situation]);
   const alarmsToKeep = filter(activeAlarms, alarm => state[alarm.situation]);
   const alarmsToCreate = objectKeys(state)

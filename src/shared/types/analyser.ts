@@ -5,16 +5,14 @@ export type AnalyserEntry = {
   rawSlope: number | null;
 };
 
-export type State = {
-  OUTDATED: boolean;
-  FALLING: boolean;
-  RISING: boolean;
-  LOW: boolean;
-  BAD_LOW: boolean;
-  COMPRESSION_LOW: boolean;
-  HIGH: boolean;
-  BAD_HIGH: boolean;
-  PERSISTENT_HIGH: boolean;
-};
-
-export type Situation = keyof State;
+export type Situation =
+  | 'CRITICAL_OUTDATED'
+  | 'BAD_LOW'
+  | 'BAD_HIGH'
+  | 'OUTDATED'
+  | 'COMPRESSION_LOW'
+  | 'LOW'
+  | 'HIGH'
+  | 'FALLING'
+  | 'RISING'
+  | 'PERSISTENT_HIGH';
