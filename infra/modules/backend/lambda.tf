@@ -19,18 +19,6 @@ resource "aws_iam_role_policy_attachment" "lambda_exec" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# No need for custom rules → use the default security group for the VPC
-data "aws_security_group" "default" {
-  vpc_id = var.network.vpc_id
-  name   = "default"
-}
-
-# Provides minimum permissions for a Lambda function to execute while accessing a resource within a VPC
-resource "aws_iam_role_policy_attachment" "lambda_vpc" {
-  role       = aws_iam_role.this.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
 # Creates our actual function
 resource "aws_lambda_function" "this" {
   function_name = var.name_prefix
@@ -43,20 +31,21 @@ resource "aws_lambda_function" "this" {
   # Note: because we're deploying outside of Terraform, we're not adding the usual update trigger:
   # source_code_hash = data.archive_file.this.output_base64sha256
 
-  vpc_config {
-    security_group_ids = [data.aws_security_group.default.id]
-    subnet_ids         = var.network.subnet_ids.private
-  }
-
   logging_config {
     log_format = "JSON" # enable JSON logging (see https://docs.aws.amazon.com/lambda/latest/dg/nodejs-logging.html for format examples)
   }
 
   environment {
     variables = {
-      NODE_PATH    = "."                      # so that node can resolve module paths like "shared/utils/logging" during runtime
-      DATABASE_URL = var.db_connection_string # where can we reach our DB
-      DEBUG        = "nightbear*"             # turn on logging for the "nightbear" namespace (see https://www.npmjs.com/package/debug)
+      NODE_PATH             = "."                      # so that node can resolve module paths like "shared/utils/logging" during runtime
+      DATABASE_URL          = var.secrets.database_url # where can we reach our DB
+      DEBUG                 = "nightbear*"             # turn on logging for the "nightbear" namespace (see https://www.npmjs.com/package/debug)
+      NIGHTBEAR_DB_URL      = "TODO: Remove once not expected by createNodeContext()"
+      PUSHOVER_USER         = "TODO: Add correct value once we re-enable the integration"
+      PUSHOVER_TOKEN        = "TODO: Add correct value once we re-enable the integration"
+      PUSHOVER_CALLBACK     = "TODO: Add correct value once we re-enable the integration"
+      DEXCOM_SHARE_USERNAME = var.secrets.dexcom_share_username
+      DEXCOM_SHARE_PASSWORD = var.secrets.dexcom_share_password
     }
   }
 }
