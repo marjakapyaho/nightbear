@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { Alarm } from 'shared/types/alarms';
-import { mockAlarms } from 'shared/mocks/alarms';
 
 export const useAlarms = () => {
   const queryClient = useQueryClient();

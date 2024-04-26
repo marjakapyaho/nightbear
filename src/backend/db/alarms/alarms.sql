@@ -1,53 +1,59 @@
 /* @name createAlarm */
 INSERT INTO alarms (
   situation,
-  is_active,
   deactivated_at
 )
 VALUES (
   :situation!,
-  :isActive!,
   :deactivatedAt
 )
 RETURNING *;
 
 /*
-  @name createAlarms
-  @param alarms -> ((
-    situation!,
-    isActive!,
-    deactivatedAt
-  )...)
+  @name deactivateAlarm
 */
-INSERT INTO alarms (
-  situation,
-  is_active,
-  deactivated_at
-) VALUES :alarms
+UPDATE alarms SET
+  deactivated_at = CURRENT_TIMESTAMP
+WHERE id = :id!
 RETURNING *;
 
 /* @name createAlarmState */
 INSERT INTO alarm_states (
   alarm_id,
   alarm_level,
-  valid_after_timestamp,
-  acked_by
+  valid_after,
+  acked_by,
+  notification_target,
+  notification_receipt,
+  notification_processed_at
 )
 VALUES (
- :alarmId!,
- :alarmLevel!,
- :validAfterTimestamp!,
- :ackedBy
-)
+   :alarmId!,
+   :alarmLevel!,
+   :validAfter!,
+   :ackedBy,
+   :notificationTarget,
+   :notificationReceipt,
+   :notificationProcessedAt
+ )
 RETURNING *;
 
-/* @name createPushoverReceipt */
-INSERT INTO pushover_receipts (
-  alarm_state_id,
-  receipt
-)
-VALUES (
- :alarmStateId!,
- :receipt!
-)
+/*
+  @name markAlarmAsProcessed
+*/
+UPDATE alarm_states SET
+  notification_receipt = :notificationReceipt,
+  notification_processed_at = CURRENT_TIMESTAMP
+WHERE id = :id!
 RETURNING *;
+
+/*
+  @name getActiveAlarm
+*/
+SELECT
+  id,
+  timestamp,
+  situation,
+  deactivated_at
+FROM alarms
+WHERE deactivated_at IS NULL;

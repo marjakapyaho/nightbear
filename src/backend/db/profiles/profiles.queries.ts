@@ -1,12 +1,17 @@
 /** Types generated for queries found in "src/backend/db/profiles/profiles.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
+export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'CRITICAL_OUTDATED' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
+
+export type numberArray = (number)[];
+
+export type stringArray = (string)[];
 
 /** 'CreateProfileTemplate' parameters type */
 export interface ICreateProfileTemplateParams {
   alarmsEnabled: boolean;
   analyserSettingsId: string;
+  notificationTargets: stringArray;
   profileName: string;
 }
 
@@ -15,6 +20,7 @@ export interface ICreateProfileTemplateResult {
   alarmsEnabled: boolean;
   analyserSettingsId: string;
   id: string;
+  notificationTargets: stringArray;
   profileName: string | null;
 }
 
@@ -24,7 +30,7 @@ export interface ICreateProfileTemplateQuery {
   result: ICreateProfileTemplateResult;
 }
 
-const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true},"params":[{"name":"profileName","required":true,"transform":{"type":"scalar"},"locs":[{"a":108,"b":120}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":125,"b":139}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":144,"b":163}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id\n)\nVALUES (\n  :profileName!,\n  :alarmsEnabled!,\n  :analyserSettingsId!\n)\nRETURNING *"};
+const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true,"notificationTargets":true},"params":[{"name":"profileName","required":true,"transform":{"type":"scalar"},"locs":[{"a":134,"b":146}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":165}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":170,"b":189}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":194,"b":214}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id,\n    notification_targets\n)\nVALUES (\n  :profileName!,\n  :alarmsEnabled!,\n  :analyserSettingsId!,\n  :notificationTargets!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -32,12 +38,14 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
  * INSERT INTO profile_templates (
  *     profile_name,
  *     alarms_enabled,
- *     analyser_settings_id
+ *     analyser_settings_id,
+ *     notification_targets
  * )
  * VALUES (
  *   :profileName!,
  *   :alarmsEnabled!,
- *   :analyserSettingsId!
+ *   :analyserSettingsId!,
+ *   :notificationTargets!
  * )
  * RETURNING *
  * ```
@@ -109,7 +117,7 @@ export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsP
 
 /** 'CreateSituationSettings' parameters type */
 export interface ICreateSituationSettingsParams {
-  escalationAfterMinutes: number;
+  escalationAfterMinutes: numberArray;
   profileTemplateId: string;
   situation: situation;
   snoozeMinutes: number;
@@ -117,7 +125,7 @@ export interface ICreateSituationSettingsParams {
 
 /** 'CreateSituationSettings' return type */
 export interface ICreateSituationSettingsResult {
-  escalationAfterMinutes: number;
+  escalationAfterMinutes: numberArray;
   profileTemplateId: string;
   situation: situation;
   snoozeMinutes: number;
@@ -150,43 +158,5 @@ const createSituationSettingsIR: any = {"usedParamSet":{"situation":true,"profil
  * ```
  */
 export const createSituationSettings = new PreparedQuery<ICreateSituationSettingsParams,ICreateSituationSettingsResult>(createSituationSettingsIR);
-
-
-/** 'CreatePushoverTargets' parameters type */
-export interface ICreatePushoverTargetsParams {
-  name: string;
-  profileTemplateId: string;
-}
-
-/** 'CreatePushoverTargets' return type */
-export interface ICreatePushoverTargetsResult {
-  id: string;
-  name: string;
-  profileTemplateId: string;
-}
-
-/** 'CreatePushoverTargets' query type */
-export interface ICreatePushoverTargetsQuery {
-  params: ICreatePushoverTargetsParams;
-  result: ICreatePushoverTargetsResult;
-}
-
-const createPushoverTargetsIR: any = {"usedParamSet":{"profileTemplateId":true,"name":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":92}]},{"name":"name","required":true,"transform":{"type":"scalar"},"locs":[{"a":98,"b":103}]}],"statement":"INSERT INTO pushover_levels (\n  profile_template_id,\n  name\n)\nVALUES (\n   :profileTemplateId!,\n   :name!\n)\nRETURNING *"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO pushover_levels (
- *   profile_template_id,
- *   name
- * )
- * VALUES (
- *    :profileTemplateId!,
- *    :name!
- * )
- * RETURNING *
- * ```
- */
-export const createPushoverTargets = new PreparedQuery<ICreatePushoverTargetsParams,ICreatePushoverTargetsResult>(createPushoverTargetsIR);
 
 

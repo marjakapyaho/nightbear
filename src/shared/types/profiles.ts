@@ -14,13 +14,8 @@ export type AnalyserSettings = {
 
 export type SituationSettings = {
   situation: Situation;
-  escalationAfterMinutes: number;
+  escalationAfterMinutes: number[];
   snoozeMinutes: number;
-};
-
-export type PushoverLevel = {
-  id: string;
-  name: string;
 };
 
 export type Profile = {
@@ -30,7 +25,7 @@ export type Profile = {
   alarmsEnabled: boolean;
   analyserSettings: AnalyserSettings;
   situationSettings: SituationSettings[];
-  pushoverLevels: PushoverLevel[];
+  notificationTargets: string[];
 };
 
 export type ProfileActivation = {

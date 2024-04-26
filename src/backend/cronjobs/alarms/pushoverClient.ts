@@ -11,12 +11,22 @@ export const NO_PUSHOVER: PushoverClient = {
   ackAlarms: () => Promise.resolve(null),
 };
 
-export function createPushoverClient(user: string, token: string, callbackUrl: string, logger: Logger) {
+export function createPushoverClient(
+  user: string,
+  token: string,
+  callbackUrl: string,
+  logger: Logger,
+) {
   const api = new Pushover({ user, token });
   const log = extendLogger(logger, 'pushover');
 
+  // TODO: remove null when db returns only undefined
   return {
-    sendAlarm(situation: Situation, recipient: string): Promise<string> {
+    sendAlarm(situation: Situation, recipient?: string | null): Promise<string | null> {
+      if (!recipient) {
+        return Promise.resolve(null);
+      }
+
       const message = {
         title: 'Nightbear alarm',
         sound: 'persistent',

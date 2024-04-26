@@ -2,12 +2,14 @@
 INSERT INTO profile_templates (
     profile_name,
     alarms_enabled,
-    analyser_settings_id
+    analyser_settings_id,
+    notification_targets
 )
 VALUES (
   :profileName!,
   :alarmsEnabled!,
-  :analyserSettingsId!
+  :analyserSettingsId!,
+  :notificationTargets!
 )
 RETURNING *;
 
@@ -46,17 +48,5 @@ VALUES (
    :profileTemplateId!,
    :escalationAfterMinutes!,
    :snoozeMinutes!
-)
-RETURNING *;
-
-
-/* @name createPushoverTargets */
-INSERT INTO pushover_levels (
-  profile_template_id,
-  name
-)
-VALUES (
-   :profileTemplateId!,
-   :name!
 )
 RETURNING *;
