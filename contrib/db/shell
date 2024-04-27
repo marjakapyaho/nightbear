@@ -2,39 +2,9 @@
 
 set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
 
-case ${1:-} in
+DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" # figure out current script path
+ENV="$("$DIR/env" $1)" # make sure we exit if the env isn't valid
+eval "$ENV" # set correct DATABASE_URL for this env
 
-  test)
-    docker exec -it -e PGPASSWORD=nightbear nightbear-test-db psql -U nightbear -d nightbear_test
-    ;;
-
-  stage|prod)
-    # Prepare for running Terraform:
-    cd infra
-    source .envrc
-
-    # Make sure we stop the tunnel regardless of how the script exits:
-    cleanup() {
-      set +eu # don't fail even if tunnel_pid is unset at this point
-      kill $tunnel_pid 2> /dev/null
-      echo "Tunnel closed"
-    }
-    trap cleanup EXIT INT TERM
-
-    # Start tunnel in background:
-    tunnel_command="$(terraform output -json | jq -r .global_bastion.value.tunnel_command)"
-    $tunnel_command &
-    tunnel_pid=$!
-    echo "Tunnel opened"
-
-    # Start Postgres shell:
-    shell_command="$(terraform output -json | jq -r .global_bastion.value.local_shell_command | sed s/DATABASE_NAME/nightbear_$1/)"
-    $shell_command
-    ;;
-
-  *)
-    echo "Please provide as argument one of: test, stage, prod"
-    exit 1
-    ;;
-
-esac
+DATABASE_URL="$(echo "$DATABASE_URL" | sed s/@localhost/@host.docker.internal/)" # localhost won't be directly reachable → update if needed
+docker run --rm -it -v "$(pwd)":/app postgres:16 psql "$DATABASE_URL"

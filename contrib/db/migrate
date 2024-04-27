@@ -2,40 +2,13 @@
 
 set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
 
-case ${1:-} in
+DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" # figure out current script path
+ENV="$("$DIR/env" $1)" # make sure we exit if the env isn't valid
+eval "$ENV" # set correct DATABASE_URL for this env
 
-  test)
-    export DATABASE_URL="postgres://nightbear:nightbear@localhost:25432/nightbear_test"
-    npm run db:migrate up
-    ;;
-
-  stage|prod)
-    # Prepare for running Terraform:
-    cd infra
-    source .envrc
-
-    # Make sure we stop the tunnel regardless of how the script exits:
-    cleanup() {
-      set +eu # don't fail even if tunnel_pid is unset at this point
-      kill $tunnel_pid 2> /dev/null
-      echo "Tunnel closed"
-    }
-    trap cleanup EXIT INT TERM
-
-    # Start tunnel in background:
-    tunnel_command="$(terraform output -json | jq -r .global_bastion.value.tunnel_command)"
-    $tunnel_command &
-    tunnel_pid=$!
-    echo "Tunnel opened"
-
-    # Run migrations against target:
-    export DATABASE_URL="$(terraform output -json | jq -r .global_bastion.value.local_connection_string | sed s/DATABASE_NAME/nightbear_$1/)"
-    npm run db:migrate up
-    ;;
-
-  *)
-    echo "Please provide as argument one of: test, stage, prod"
-    exit 1
-    ;;
-
-esac
+node_modules/.bin/node-pg-migrate \
+  --database-url-var DATABASE_URL \
+  --migrations-table migrations \
+  --migration-file-language sql \
+  --migrations-dir src/backend/migrations \
+  up
