@@ -5,7 +5,7 @@ import { useAlarms } from 'frontend/data/alarms/useAlarms';
 
 export const Config = () => {
   const { profiles, activeProfile, activateProfile } = useProfiles();
-  const { alarms, ackAlarm } = useAlarms();
+  const { activeAlarm, ackActiveAlarm } = useAlarms();
 
   return (
     <div className={styles.config}>
@@ -23,11 +23,13 @@ export const Config = () => {
       </div>
       <div className={styles.section}>
         <h1 className={styles.heading}>Active alarms</h1>
-        {alarms.map(alarm => (
-          <button key={alarm.id} className={styles.alarm} onClick={() => ackAlarm(alarm)}>
-            {alarm.situation.toUpperCase()}
+        {activeAlarm ? (
+          <button key={activeAlarm.id} className={styles.alarm} onClick={() => ackActiveAlarm()}>
+            {activeAlarm.situation.toUpperCase()}
           </button>
-        ))}
+        ) : (
+          '-'
+        )}
       </div>
     </div>
   );

@@ -6,26 +6,26 @@ export const useAlarms = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: alarms,
+    data: activeAlarm,
     isLoading,
     isError,
     isSuccess,
-  } = useQuery<Alarm[]>({
-    queryKey: ['get-alarms'],
-    queryFn: () => callFetch('/get-alarms'),
+  } = useQuery<Alarm>({
+    queryKey: ['get-active-alarm'],
+    queryFn: () => callFetch('/get-active-alarm'),
   });
 
-  const { mutate: ackAlarm } = useMutation({
-    mutationFn: (alarm: Alarm) => callFetch('/ack-alarm', 'PUT', alarm),
+  const { mutate: ackActiveAlarm } = useMutation({
+    mutationFn: () => callFetch('/ack-active-alarm', 'PUT'),
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['get-alarms'] });
+      queryClient.invalidateQueries({ queryKey: ['get-active-alarm'] });
     },
   });
 
   return {
-    alarms: alarms || [],
-    ackAlarm,
+    activeAlarm,
+    ackActiveAlarm,
     isLoading,
     isError,
     isSuccess,

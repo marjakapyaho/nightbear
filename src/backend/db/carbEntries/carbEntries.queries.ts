@@ -40,3 +40,38 @@ const createIR: any = {"usedParamSet":{"amount":true,"speedFactor":true},"params
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'ByTimestamp' parameters type */
+export interface IByTimestampParams {
+  from: string | Date;
+  to: string | Date;
+}
+
+/** 'ByTimestamp' return type */
+export interface IByTimestampResult {
+  amount: number;
+  speedFactor: number;
+  timestamp: string;
+}
+
+/** 'ByTimestamp' query type */
+export interface IByTimestampQuery {
+  params: IByTimestampParams;
+  result: IByTimestampResult;
+}
+
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":82,"b":87}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":106,"b":109}]}],"statement":"SELECT\n  timestamp,\n  amount,\n  speed_factor\nFROM carb_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   timestamp,
+ *   amount,
+ *   speed_factor
+ * FROM carb_entries
+ * WHERE timestamp >= :from! AND timestamp <= :to!
+ * ```
+ */
+export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
+
+

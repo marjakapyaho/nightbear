@@ -15,6 +15,6 @@ export type Alarm = {
   id: string;
   situation: Situation;
   isActive: boolean;
-  deactivatedAt?: string;
+  deactivatedAt?: string | null; // TODO
   alarmStates: AlarmState[];
 };

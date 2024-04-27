@@ -8,3 +8,11 @@ VALUES (
   :type!
 )
 RETURNING *;
+
+/* @name byTimestamp */
+SELECT
+  timestamp,
+  amount,
+  type
+FROM insulin_entries
+WHERE timestamp >= :from! AND timestamp <= :to!;

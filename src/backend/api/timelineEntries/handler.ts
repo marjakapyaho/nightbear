@@ -5,16 +5,39 @@ import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams;
+  const defaultFrom = getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), 3 * HOUR_IN_MS));
 
-  return createResponse(
-    await context.db.sensorEntries.byTimestamp({
-      from: start || getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), 3 * HOUR_IN_MS)),
-      to: end || context.timestamp(),
-    }),
-  );
+  const sensorEntries = await context.db.sensorEntries.byTimestamp({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
+  const insulinEntries = await context.db.insulinEntries.byTimestamp({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
+  const carbEntries = await context.db.insulinEntries.byTimestamp({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
+  const meterEntries = await context.db.insulinEntries.byTimestamp({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
+  return createResponse({
+    sensorEntries,
+    insulinEntries,
+    carbEntries,
+    meterEntries,
+  });
 };
 
 export const updateTimelineEntries = (request: Request, context: Context): Response => {
+  //const dataPoint: Point = request.requestBody;
+
   // Update carbs / insulins / meter entries for timestamp
 
   return createResponse(mockTimelineEntries);

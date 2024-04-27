@@ -32,3 +32,36 @@ const createIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[{"name":"b
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'ByTimestamp' parameters type */
+export interface IByTimestampParams {
+  from: string | Date;
+  to: string | Date;
+}
+
+/** 'ByTimestamp' return type */
+export interface IByTimestampResult {
+  bloodGlucose: number;
+  timestamp: string;
+}
+
+/** 'ByTimestamp' query type */
+export interface IByTimestampQuery {
+  params: IByTimestampParams;
+  result: IByTimestampResult;
+}
+
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":79}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":98,"b":101}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose\nFROM meter_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   timestamp,
+ *   blood_glucose
+ * FROM meter_entries
+ * WHERE timestamp >= :from! AND timestamp <= :to!
+ * ```
+ */
+export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
+
+

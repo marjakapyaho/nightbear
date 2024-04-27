@@ -74,7 +74,7 @@ export function createNodeContext(): Context {
   log(`Loaded config is: ${map(config, (val, key) => [key, val].join('=')).join(', ')}`);
 
   return {
-    httpPort: 3000,
+    httpPort: 4000,
     timestamp: () => getTimeAsISOStr(Date.now()),
     log,
     db: createDbClient(DATABASE_URL),

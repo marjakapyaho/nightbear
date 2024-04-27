@@ -3,6 +3,8 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'CRITICAL_OUTDATED' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
 
+export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
+
 /** 'CreateAlarm' parameters type */
 export interface ICreateAlarmParams {
   deactivatedAt?: string | Date | null | void;
@@ -172,13 +174,53 @@ const markAlarmAsProcessedIR: any = {"usedParamSet":{"notificationReceipt":true,
 export const markAlarmAsProcessed = new PreparedQuery<IMarkAlarmAsProcessedParams,IMarkAlarmAsProcessedResult>(markAlarmAsProcessedIR);
 
 
+/** 'MarkAllAlarmStatesAsProcessed' parameters type */
+export interface IMarkAllAlarmStatesAsProcessedParams {
+  alarmId: string;
+}
+
+/** 'MarkAllAlarmStatesAsProcessed' return type */
+export interface IMarkAllAlarmStatesAsProcessedResult {
+  ackedBy: string | null;
+  alarmId: string;
+  alarmLevel: number;
+  id: string;
+  notificationProcessedAt: string | null;
+  notificationReceipt: string | null;
+  notificationTarget: string | null;
+  timestamp: string;
+  validAfter: string;
+}
+
+/** 'MarkAllAlarmStatesAsProcessed' query type */
+export interface IMarkAllAlarmStatesAsProcessedQuery {
+  params: IMarkAllAlarmStatesAsProcessedParams;
+  result: IMarkAllAlarmStatesAsProcessedResult;
+}
+
+const markAllAlarmStatesAsProcessedIR: any = {"usedParamSet":{"alarmId":true},"params":[{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":89,"b":97}]}],"statement":"UPDATE alarm_states SET\n  notification_processed_at = CURRENT_TIMESTAMP\nWHERE alarm_id = :alarmId! AND notification_processed_at IS NULL\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE alarm_states SET
+ *   notification_processed_at = CURRENT_TIMESTAMP
+ * WHERE alarm_id = :alarmId! AND notification_processed_at IS NULL
+ * RETURNING *
+ * ```
+ */
+export const markAllAlarmStatesAsProcessed = new PreparedQuery<IMarkAllAlarmStatesAsProcessedParams,IMarkAllAlarmStatesAsProcessedResult>(markAllAlarmStatesAsProcessedIR);
+
+
 /** 'GetActiveAlarm' parameters type */
 export type IGetActiveAlarmParams = void;
 
 /** 'GetActiveAlarm' return type */
 export interface IGetActiveAlarmResult {
+  alarmStates: Json | null;
   deactivatedAt: string | null;
   id: string;
+  isActive: boolean;
   situation: situation;
 }
 
@@ -188,16 +230,36 @@ export interface IGetActiveAlarmQuery {
   result: IGetActiveAlarmResult;
 }
 
-const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  id,\n  situation,\n  deactivated_at\nFROM alarms\nWHERE deactivated_at IS NULL"};
+const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  alarm_states_query AS (\n    SELECT\n      alarm_states.alarm_id,\n      json_agg(json_build_object(\n        'id', alarm_states.id::VARCHAR,\n        'timestamp', alarm_states.timestamp,\n        'alarmLevel', alarm_states.alarm_level,\n        'validAfter', alarm_states.valid_after,\n        'ackedBy', alarm_states.acked_by,\n        'notificationTarget', alarm_states.notification_target,\n        'notificationReceipt', alarm_states.notification_receipt,\n        'notificationProcessedAt', alarm_states.notification_processed_at\n        ) ORDER BY alarm_states.timestamp) AS alarm_states\n    FROM alarm_states\n    GROUP BY alarm_states.alarm_id\n  )\nSELECT\n  alarms.id AS id,\n  situation,\n  (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS \"is_active!\",\n  deactivated_at,\n  alarm_states_query.alarm_states AS alarm_states\nFROM alarms\n  LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id\nWHERE deactivated_at IS NULL"};
 
 /**
  * Query generated from SQL:
  * ```
+ * WITH
+ *   alarm_states_query AS (
+ *     SELECT
+ *       alarm_states.alarm_id,
+ *       json_agg(json_build_object(
+ *         'id', alarm_states.id::VARCHAR,
+ *         'timestamp', alarm_states.timestamp,
+ *         'alarmLevel', alarm_states.alarm_level,
+ *         'validAfter', alarm_states.valid_after,
+ *         'ackedBy', alarm_states.acked_by,
+ *         'notificationTarget', alarm_states.notification_target,
+ *         'notificationReceipt', alarm_states.notification_receipt,
+ *         'notificationProcessedAt', alarm_states.notification_processed_at
+ *         ) ORDER BY alarm_states.timestamp) AS alarm_states
+ *     FROM alarm_states
+ *     GROUP BY alarm_states.alarm_id
+ *   )
  * SELECT
- *   id,
+ *   alarms.id AS id,
  *   situation,
- *   deactivated_at
+ *   (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS "is_active!",
+ *   deactivated_at,
+ *   alarm_states_query.alarm_states AS alarm_states
  * FROM alarms
+ *   LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id
  * WHERE deactivated_at IS NULL
  * ```
  */

@@ -7,7 +7,7 @@ import { profiles } from 'backend/cronjobs/profiles/profiles';
 import { checks } from 'backend/cronjobs/checks';
 import { temp } from 'backend/cronjobs/temp';
 import { createNodeContext } from './utils/api';
-import { ackAlarm, getAlarms } from 'backend/api/alarms/handler';
+import { ackActiveAlarm, getActiveAlarm } from 'backend/api/alarms/handler';
 import { createProfile, getProfiles } from './api/profiles/handler';
 import { getTimelineEntries, updateTimelineEntries } from './api/timelineEntries/handler';
 
@@ -20,8 +20,8 @@ const context = createNodeContext();
 // Start serving API requests
 startExpressServer(
   context,
-  ['get', '/get-alarms', getAlarms],
-  ['put', '/ack-alarm', ackAlarm],
+  ['get', '/get-active-alarm', getActiveAlarm],
+  ['put', '/ack-active-alarm', ackActiveAlarm],
   ['get', '/get-profiles', getProfiles],
   ['post', '/create-profile', createProfile],
   ['get', '/get-timeline-entries', getTimelineEntries],

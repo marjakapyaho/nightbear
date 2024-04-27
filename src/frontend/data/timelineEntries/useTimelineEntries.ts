@@ -2,13 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { TimelineEntries } from 'shared/types/timelineEntries';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
-export const useTimelineEntries = (startMs: number, endMs = Date.now()) => {
+export const useTimelineEntries = (
+  startTimestamp: string,
+  endTimestamp = getTimeAsISOStr(Date.now()),
+) => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, isSuccess } = useQuery<TimelineEntries>({
-    queryKey: ['get-timelineEntries'],
-    queryFn: () => callFetch(`/get-timelineEntries?start=${startMs}&end=${endMs}`),
+    queryKey: ['get-timeline-entries'],
+    queryFn: () => callFetch(`/get-timeline-entries?start=${startTimestamp}&end=${endTimestamp}`),
   });
 
   const { mutate: saveGraphPointData } = useMutation({

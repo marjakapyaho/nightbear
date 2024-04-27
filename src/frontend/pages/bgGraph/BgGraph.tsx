@@ -7,11 +7,13 @@ import styles from './BgGraph.module.scss';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableGraph';
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
-  const startMs = Date.now() - baseConfig.timelineRange;
-  const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } = useTimelineEntries(startMs);
+  const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange);
+  const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
+    useTimelineEntries(startTimestamp);
   const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries);
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const latestPoint = graphPoints.length ? graphPoints[0] : null;
@@ -38,7 +40,10 @@ export const BgGraph = () => {
           value={selectedPoint?.valBottom}
           onChange={newVal => {
             const newPoint = selectedPoint
-              ? { ...selectedPoint, valBottom: selectedPoint?.valBottom === newVal ? undefined : newVal }
+              ? {
+                  ...selectedPoint,
+                  valBottom: selectedPoint?.valBottom === newVal ? undefined : newVal,
+                }
               : null;
             setSelectedPoint(newPoint);
             newPoint && saveGraphPointData(newPoint);
@@ -53,7 +58,10 @@ export const BgGraph = () => {
           value={selectedPoint?.valMiddle || undefined}
           onChange={newVal => {
             const newPoint = selectedPoint
-              ? { ...selectedPoint, valMiddle: selectedPoint.valMiddle === newVal ? undefined : newVal }
+              ? {
+                  ...selectedPoint,
+                  valMiddle: selectedPoint.valMiddle === newVal ? undefined : newVal,
+                }
               : null;
             setSelectedPoint(newPoint);
             newPoint && saveGraphPointData(newPoint);

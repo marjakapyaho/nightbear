@@ -16,15 +16,20 @@ import styles from './Stats.module.scss';
 import { StatLine } from 'frontend/pages/stats/StatLine';
 import { StatGraph } from 'frontend/pages/stats/StatGraph';
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
 export const Stats = () => {
-  const { timelineEntries } = useTimelineEntries(Date.now() - 30 * DAY_IN_MS);
+  const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS));
   const { sensorEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
 
   // Override sensor entries with meter entries where necessary
   const bgEntries = sensorEntries.map(sensorEntry => {
-    const meterEntry = meterEntries.find(meterEntry => meterEntry.timestamp === sensorEntry.timestamp);
-    return meterEntry?.bloodGlucose ? { ...sensorEntry, bloodGlucose: meterEntry.bloodGlucose } : sensorEntry;
+    const meterEntry = meterEntries.find(
+      meterEntry => meterEntry.timestamp === sensorEntry.timestamp,
+    );
+    return meterEntry?.bloodGlucose
+      ? { ...sensorEntry, bloodGlucose: meterEntry.bloodGlucose }
+      : sensorEntry;
   });
 
   const timeInRange = calculateTimeInRange(bgEntries) || '';
@@ -91,9 +96,19 @@ export const Stats = () => {
         decimals={0}
       />
 
-      <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgEntries)} color="#54c87e" />
+      <StatLine
+        title="Avg BG"
+        subtitle="for 7 days"
+        figure={getBgAverage(bgEntries)}
+        color="#54c87e"
+      />
       <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color="#54c87e" />
-      <StatLine title="LOW" subtitle="below 3.7" figure={countSituations(bgEntries, 3.7, true)} color="#ee5a36" />
+      <StatLine
+        title="LOW"
+        subtitle="below 3.7"
+        figure={countSituations(bgEntries, 3.7, true)}
+        color="#ee5a36"
+      />
       <StatLine
         title="LOW"
         subtitle="below 3.0"
