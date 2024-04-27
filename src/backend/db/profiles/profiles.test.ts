@@ -1,13 +1,12 @@
 import { createTestContext } from 'backend/utils/test';
+import { mockNow } from 'shared/mocks/dates';
 import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from 'shared/mocks/dates';
 
 describe('db/profiles', () => {
   const context = createTestContext();
 
-  // TODO: support for notificationTargets
-  it.skip('creates profile', async () => {
+  it('creates profile', async () => {
     const [analyserSettings] =
       await context.db.profiles.createAnalyserSettings(mockAnalyserSettings);
 
@@ -30,7 +29,7 @@ describe('db/profiles', () => {
       ),
     );
 
-    expect(situationSettings[0].escalationAfterMinutes).toBe(10);
+    expect(situationSettings[0].escalationAfterMinutes).toEqual([10]);
     expect(situationSettings[0].snoozeMinutes).toBe(15);
 
     const [profileActivation] = await context.db.profiles.createProfileActivation({
