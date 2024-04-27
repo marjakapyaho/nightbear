@@ -1,12 +1,11 @@
 import { NO_PUSHOVER } from 'backend/cronjobs/alarms/pushoverClient';
 import { NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcom-share-client';
-import { mockProfiles } from 'shared/mocks/profiles';
-import { Profile } from 'shared/types/profiles';
 import { NO_LOGGING } from 'backend/utils/logging';
 import { Context } from './api';
 import { createDbClient } from './db';
+import { mockNow } from 'shared/mocks/dates';
 
-export const createTestContext = (timestamp = () => 1508672249758): Context => {
+export const createTestContext = (timestamp = () => mockNow): Context => {
   return {
     httpPort: 80,
     timestamp,

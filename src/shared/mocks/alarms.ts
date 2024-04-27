@@ -3,10 +3,10 @@ import { mockNow } from 'shared/mocks/dates';
 
 export const mockAlarmStates: AlarmState[] = [
   {
-    alarmLevel: 1,
-    validAfterTimestamp: mockNow,
-    ackedBy: null,
-    pushoverReceipts: [],
+    id: '1',
+    timestamp: mockNow,
+    alarmLevel: 0,
+    validAfter: mockNow,
   },
 ];
 
@@ -16,7 +16,6 @@ export const mockAlarms: Alarm[] = [
     timestamp: mockNow,
     situation: 'LOW',
     isActive: true,
-    deactivatedAt: null,
     alarmStates: mockAlarmStates,
   },
 ];

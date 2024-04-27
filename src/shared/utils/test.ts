@@ -2,6 +2,9 @@ import { SensorEntry } from 'shared/types/timelineEntries';
 import { Profile } from 'shared/types/profiles';
 import { mockProfiles } from 'shared/mocks/profiles';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { mockAlarms } from 'shared/mocks/alarms';
+import { Alarm } from 'shared/types/alarms';
+import { Situation } from 'shared/types/analyser';
 
 export const generateSensorEntries = ({
   currentTimestamp,
@@ -28,8 +31,13 @@ export const generateSensorEntries = ({
     .filter(entry => entry !== null) as SensorEntry[];
 };
 
-export const getMockActiveProfile = (profileName: string, alarmsEnabled?: boolean): Profile => ({
+export const getMockActiveProfile = (profileName = 'day', alarmsEnabled = true): Profile => ({
   ...mockProfiles[0],
-  alarmsEnabled: alarmsEnabled || true,
+  alarmsEnabled,
   profileName,
+});
+
+export const getMockActiveAlarm = (situation: Situation): Alarm => ({
+  ...mockAlarms[0],
+  situation,
 });

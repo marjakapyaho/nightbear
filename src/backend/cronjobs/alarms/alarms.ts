@@ -1,14 +1,19 @@
-import { MIN_IN_MS } from 'shared/utils/calculations';
-import { findIndex, map, sum, take } from 'lodash';
-import { Alarm, AlarmState } from 'shared/types/alarms';
+import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
-import { getTimeSubtractedFrom, isTimeBeforeOrEqual } from 'shared/utils/time';
+import { isTimeBeforeOrEqual } from 'shared/utils/time';
 import { isNotNull } from 'shared/utils/helpers';
+import { getNeededAlarmLevel, getPushoverRecipient, retryNotifications } from './utils';
 
 const INITIAL_ALARM_LEVEL = 0;
+
+type AlarmActions = {
+  remove?: Alarm;
+  keep?: Alarm;
+  create?: Situation;
+};
 
 export const runAlarmChecks = async (
   context: Context,
@@ -18,25 +23,59 @@ export const runAlarmChecks = async (
 ): Promise<string | null> => {
   const { log } = context;
 
-  // If alarms are disabled, and we have an active alarm,
-  // deactivate it otherwise just return
-  if (!activeProfile.alarmsEnabled) {
-    return activeAlarm ? deactivateAlarm(activeAlarm, context) : null;
+  const { remove, keep, create } = detectAlarmActions(situation, activeProfile, activeAlarm);
+
+  if (remove) {
+    await deactivateAlarm(remove, context);
   }
 
-  if (activeAlarm) {
-    if (activeAlarm.situation === situation) {
-      return updateAlarm(activeAlarm, activeProfile, context);
-    } else {
-      return deactivateAlarm(activeAlarm, context);
-    }
+  if (keep) {
+    return updateAlarm(keep, activeProfile, context);
   }
 
-  if (situation) {
-    return createAlarm(situation, context);
+  if (create) {
+    return createAlarm(create, context);
   }
 
   return null;
+};
+
+export const detectAlarmActions = (
+  situation: Situation | null,
+  activeProfile: Profile,
+  activeAlarm?: Alarm,
+): AlarmActions => {
+  // If there is no situation or alarms are disabled, remove active alarm
+  if (!situation || !activeProfile.alarmsEnabled) {
+    return {
+      remove: activeAlarm,
+    };
+  }
+
+  // If there is already alarm of correct type, keep it
+  if (activeAlarm && activeAlarm.situation === situation) {
+    return {
+      keep: activeAlarm,
+    };
+  }
+
+  // If there is alarm of wrong type, remove it and create new one
+  if (activeAlarm && activeAlarm.situation !== situation) {
+    return {
+      remove: activeAlarm,
+      create: situation,
+    };
+  }
+
+  // There was no previous alarm and there is a situation so create new alarm
+  if (situation) {
+    return {
+      create: situation,
+    };
+  }
+
+  // Do nothing
+  return {};
 };
 
 const deactivateAlarm = async (alarm: Alarm, context: Context) => {
@@ -45,73 +84,16 @@ const deactivateAlarm = async (alarm: Alarm, context: Context) => {
     alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNull),
   );
 
-  const [deactivatedAlarm] = await context.db.alarms.deactivateAlarm(alarm);
+  await context.db.alarms.deactivateAlarm(alarm);
 
-  return deactivatedAlarm.id;
-};
-
-const getNeededAlarmLevel = (
-  currentSituation: Situation,
-  validAfterTimestamp: string,
-  activeProfile: Profile,
-  context: Context,
-) => {
-  const hasBeenValidForMinutes = Math.round(
-    getTimeSubtractedFrom(context.timestamp(), validAfterTimestamp) / MIN_IN_MS,
-  );
-  const levelUpTimes = activeProfile.situationSettings.find(
-    situation => situation.situation === currentSituation,
-  )?.escalationAfterMinutes;
-
-  if (!levelUpTimes) {
-    // TODO: what should we return
-    return 2;
-  }
-
-  const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
-
-  return (
-    findIndex(accumulatedTimes, minutes => minutes > hasBeenValidForMinutes) + 1 ||
-    levelUpTimes.length + 1
-  );
-};
-
-const getPushoverRecipient = (neededLevel: number, activeProfile: Profile) => {
-  const availableTargetsCount = activeProfile.notificationTargets.length;
-
-  return neededLevel < availableTargetsCount
-    ? activeProfile.notificationTargets[neededLevel]
-    : null;
-};
-
-const retryNotifications = async (
-  states: AlarmState[],
-  situation: Situation,
-  context: Context,
-): Promise<AlarmState[]> => {
-  const updatedStates = await Promise.all(
-    states.map(async state => {
-      const receipt = await context.pushover.sendAlarm(situation, state.notificationTarget);
-
-      // Update alarm state to have receipt if we got it
-      if (receipt) {
-        const [updatedState] = await context.db.alarms.markAlarmAsProcessed({
-          ...state,
-          notificationReceipt: receipt,
-        });
-
-        return updatedState;
-      }
-    }),
-  );
-  return updatedStates.filter(isNotNull);
+  return alarm.id;
 };
 
 const updateAlarm = async (
   activeAlarm: Alarm,
   activeProfile: Profile,
   context: Context,
-): Promise<AlarmState[]> => {
+): Promise<string> => {
   const { log } = context;
   const { situation } = activeAlarm;
   const currentAlarmState = getAlarmState(activeAlarm);
@@ -119,7 +101,7 @@ const updateAlarm = async (
 
   // Alarm is not yet valid
   if (isTimeBeforeOrEqual(context.timestamp(), validAfter)) {
-    return [currentAlarmState];
+    return activeAlarm.id;
   }
 
   // Retry all notifications that are missing receipts
@@ -131,7 +113,8 @@ const updateAlarm = async (
 
   // No need to escalate yet, just retry notifications that are missing receipts and return
   if (neededLevel === alarmLevel) {
-    return retryNotifications(statesMissingReceipts, situation, context);
+    await retryNotifications(statesMissingReceipts, situation, context);
+    return activeAlarm.id;
   }
 
   const pushoverRecipient = getPushoverRecipient(neededLevel, activeProfile);
@@ -142,7 +125,7 @@ const updateAlarm = async (
     : null;
 
   // Escalate and create new alarm state
-  return context.db.alarms.createAlarmState({
+  await context.db.alarms.createAlarmState({
     alarmId: activeAlarm.id,
     alarmLevel: neededLevel,
     validAfter: context.timestamp(),
@@ -150,12 +133,14 @@ const updateAlarm = async (
     notificationReceipt: receipt,
     notificationProcessedAt: receipt ? context.timestamp() : null,
   });
+
+  return activeAlarm.id;
 };
 
 export const createAlarm = async (
   situation: Situation,
   context: Context,
-): Promise<AlarmState[] | null> => {
+): Promise<string | null> => {
   const [createdAlarm] = await context.db.alarms.createAlarm({
     situation,
   });
@@ -166,9 +151,11 @@ export const createAlarm = async (
     return null;
   }
 
-  return context.db.alarms.createAlarmState({
+  await context.db.alarms.createAlarmState({
     alarmId: createdAlarm.id,
     alarmLevel: INITIAL_ALARM_LEVEL,
     validAfter: context.timestamp(),
   });
+
+  return createdAlarm.id;
 };

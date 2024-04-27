@@ -1,5 +1,4 @@
 import axios from 'axios';
-// @ts-ignore
 import Pushover from 'pushover-notifications';
 import { Situation } from 'shared/types/analyser';
 import { Logger, extendLogger } from 'backend/utils/logging';
