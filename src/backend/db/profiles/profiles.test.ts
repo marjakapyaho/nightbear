@@ -1,6 +1,7 @@
 import { createTestContext } from 'backend/utils/test';
 import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
 import { describe, expect, it } from 'vitest';
+import { mockNow } from 'shared/mocks/dates';
 
 describe('db/profiles', () => {
   const context = createTestContext();
@@ -31,5 +32,13 @@ describe('db/profiles', () => {
 
     expect(situationSettings[0].escalationAfterMinutes).toBe(10);
     expect(situationSettings[0].snoozeMinutes).toBe(15);
+
+    const [profileActivation] = await context.db.profiles.createProfileActivation({
+      profileTemplateId: profileTemplate.id,
+      activatedAt: mockNow,
+    });
+
+    expect(profileActivation.profileTemplateId).toBe(profileTemplate.id);
+    expect(profileActivation.activatedAt).toBe(mockNow);
   });
 });

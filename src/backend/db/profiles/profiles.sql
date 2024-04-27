@@ -51,6 +51,21 @@ VALUES (
 )
 RETURNING *;
 
+/* @name createProfileActivation */
+INSERT INTO profiles_activations (
+  profile_template_id,
+  activated_at,
+  repeat_time_in_local_timezone,
+  deactivated_at
+)
+VALUES (
+   :profileTemplateId!,
+   :activatedAt!,
+   :repeatTimeInLocalTimezone,
+   :deactivatedAt
+ )
+RETURNING *;
+
 /*
   @name getProfiles
 */

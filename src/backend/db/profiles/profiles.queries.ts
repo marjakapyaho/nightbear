@@ -162,6 +162,52 @@ const createSituationSettingsIR: any = {"usedParamSet":{"situation":true,"profil
 export const createSituationSettings = new PreparedQuery<ICreateSituationSettingsParams,ICreateSituationSettingsResult>(createSituationSettingsIR);
 
 
+/** 'CreateProfileActivation' parameters type */
+export interface ICreateProfileActivationParams {
+  activatedAt: string | Date;
+  deactivatedAt?: string | Date | null | void;
+  profileTemplateId: string;
+  repeatTimeInLocalTimezone?: string | null | void;
+}
+
+/** 'CreateProfileActivation' return type */
+export interface ICreateProfileActivationResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileTemplateId: string;
+  repeatTimeInLocalTimezone: string | null;
+}
+
+/** 'CreateProfileActivation' query type */
+export interface ICreateProfileActivationQuery {
+  params: ICreateProfileActivationParams;
+  result: ICreateProfileActivationResult;
+}
+
+const createProfileActivationIR: any = {"usedParamSet":{"profileTemplateId":true,"activatedAt":true,"repeatTimeInLocalTimezone":true,"deactivatedAt":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":156}]},{"name":"activatedAt","required":true,"transform":{"type":"scalar"},"locs":[{"a":162,"b":174}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":180,"b":205}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":211,"b":224}]}],"statement":"INSERT INTO profiles_activations (\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\n)\nVALUES (\n   :profileTemplateId!,\n   :activatedAt!,\n   :repeatTimeInLocalTimezone,\n   :deactivatedAt\n )\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO profiles_activations (
+ *   profile_template_id,
+ *   activated_at,
+ *   repeat_time_in_local_timezone,
+ *   deactivated_at
+ * )
+ * VALUES (
+ *    :profileTemplateId!,
+ *    :activatedAt!,
+ *    :repeatTimeInLocalTimezone,
+ *    :deactivatedAt
+ *  )
+ * RETURNING *
+ * ```
+ */
+export const createProfileActivation = new PreparedQuery<ICreateProfileActivationParams,ICreateProfileActivationResult>(createProfileActivationIR);
+
+
 /** 'GetProfiles' parameters type */
 export type IGetProfilesParams = void;
 
