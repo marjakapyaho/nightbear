@@ -40,6 +40,9 @@ export const isTimeAfter = (time1: string | number, time2: string | number) =>
 export const isTimeAfterOrEqual = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) >= getTimeInMillis(time2);
 
+export const isTimeBefore = (time1: string | number, time2: string | number) =>
+  getTimeInMillis(time1) < getTimeInMillis(time2);
+
 export const isTimeBeforeOrEqual = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) <= getTimeInMillis(time2);
 

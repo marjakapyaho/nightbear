@@ -77,3 +77,47 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
 export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
 
 
+/** 'UpsertInsulinEntry' parameters type */
+export interface IUpsertInsulinEntryParams {
+  amount: number;
+  timestamp: string | Date;
+  type: insulintype;
+}
+
+/** 'UpsertInsulinEntry' return type */
+export interface IUpsertInsulinEntryResult {
+  amount: number;
+  id: string;
+  timestamp: string;
+  type: insulintype;
+}
+
+/** 'UpsertInsulinEntry' query type */
+export interface IUpsertInsulinEntryQuery {
+  params: IUpsertInsulinEntryParams;
+  result: IUpsertInsulinEntryResult;
+}
+
+const upsertInsulinEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":true,"type":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":83}]},{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":88,"b":95}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":100,"b":105}]}],"statement":"INSERT INTO insulin_entries (\n  timestamp,\n  amount,\n  type\n)\nVALUES (\n  :timestamp!,\n  :amount!,\n  :type!\n)\nON CONFLICT (timestamp) DO UPDATE SET\n  amount = EXCLUDED.amount\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO insulin_entries (
+ *   timestamp,
+ *   amount,
+ *   type
+ * )
+ * VALUES (
+ *   :timestamp!,
+ *   :amount!,
+ *   :type!
+ * )
+ * ON CONFLICT (timestamp) DO UPDATE SET
+ *   amount = EXCLUDED.amount
+ * RETURNING *
+ * ```
+ */
+export const upsertInsulinEntry = new PreparedQuery<IUpsertInsulinEntryParams,IUpsertInsulinEntryResult>(upsertInsulinEntryIR);
+
+

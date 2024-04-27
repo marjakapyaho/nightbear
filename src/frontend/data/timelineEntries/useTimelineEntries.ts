@@ -16,10 +16,10 @@ export const useTimelineEntries = (
   });
 
   const { mutate: saveGraphPointData } = useMutation({
-    mutationFn: (point: Point) => callFetch('/update-timelineEntries', 'PUT', point),
+    mutationFn: (point: Point) => callFetch('/update-timeline-entries', 'PUT', point),
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['update-timelineEntries'] });
+      queryClient.invalidateQueries({ queryKey: ['update-timeline-entries'] });
     },
   });
 

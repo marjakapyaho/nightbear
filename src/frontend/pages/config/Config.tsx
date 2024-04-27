@@ -4,8 +4,11 @@ import { useProfiles } from 'frontend/data/profiles/useProfiles';
 import { useAlarms } from 'frontend/data/alarms/useAlarms';
 
 export const Config = () => {
-  const { profiles, activeProfile, activateProfile } = useProfiles();
+  const { profiles, activeProfile, activateProfile, createProfile } = useProfiles();
   const { activeAlarm, ackActiveAlarm } = useAlarms();
+
+  // TODO: createProfile UI
+  console.log(activeProfile);
 
   return (
     <div className={styles.config}>

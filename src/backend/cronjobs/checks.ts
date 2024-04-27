@@ -9,50 +9,54 @@ import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { mockProfiles } from 'shared/mocks/profiles';
 import { mockAlarms } from 'shared/mocks/alarms';
 import { getActiveProfile } from 'shared/utils/profiles';
+import { Alarm } from 'shared/types/alarms';
+import { Profile } from 'shared/types/profiles';
+import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { SensorEntry } from 'shared/types/timelineEntries';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
-// TODO: fix these
-export const checks: Cronjob = (context: Context, _journal) => {
+const getRange = (context: Context) => ({
+  from: getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), ANALYSIS_RANGE)),
+  to: context.timestamp(),
+});
+
+export const checks: Cronjob = async (context: Context, _journal) => {
   const { log } = context;
+
   log('--- Started checks ---');
-  return Promise.all([
-    mockTimelineEntries,
-    mockProfiles,
-    mockAlarms,
-    /*    context.storage.loadLatestTimelineModels('ActiveProfile', 1),
-    getTimelineEntries(context, ANALYSIS_RANGE),
-    context.storage.loadTimelineModels(['Insulin'], ANALYSIS_RANGE, context.timestamp()),
-    context.storage.loadTimelineModels(['Carbs'], ANALYSIS_RANGE, context.timestamp()),
-    context.storage.loadLatestTimelineModels('DeviceStatus', 1),
-    context.storage.loadTimelineModels(['Alarm'], ALARM_FETCH_RANGE, context.timestamp()),*/
-  ]).then(([timelineEntries, profiles, alarms]) => {
-    const activeProfile = getActiveProfile(profiles);
-    const { sensorEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
 
-    if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
+  // TODO: get this better
+  const sensorEntries = (await context.db.sensorEntries.byTimestamp(
+    getRange(context),
+  )) as SensorEntry[];
+  const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context));
+  const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context));
+  const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context));
+  const profiles = await context.db.profiles.getProfiles();
+  const alarms = mockAlarms;
+  const [activeAlarm] = await context.db.alarms.getActiveAlarm();
 
-    log(`1. Using profile: ${activeProfile?.profileName}`);
-    // TODO: merge sensor entries and meter entries
+  // TODO: get this better
+  const activeProfile = getActiveProfile(profiles as Profile[]);
 
-    const situation = runAnalysis({
-      currentTimestamp: context.timestamp(),
-      activeProfile,
-      sensorEntries,
-      insulinEntries,
-      carbEntries,
-      alarms,
-    });
-    log(`2. Active situation: ${situation || '-'}`);
+  if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
-    // TODO
-    /*    return runAlarmChecks(context, state, activeProfile, onlyActive(alarms)).then(alarms => {
-      log(
-        `There were changes in ${alarms.length} alarms with types: ${alarms
-          .map(alarm => alarm.situation)
-          .join(', ')}`,
-      );
-    });*/
+  log(`1. Using profile: ${activeProfile?.profileName}`);
+  // TODO: merge sensor entries and meter entries
+
+  const situation = runAnalysis({
+    currentTimestamp: context.timestamp(),
+    activeProfile,
+    sensorEntries,
+    insulinEntries,
+    carbEntries,
+    alarms,
   });
+
+  log(`2. Active situation: ${situation || '-'}`);
+
+  // TODO: get this better
+  runAlarmChecks(context, situation, activeProfile, activeAlarm as Alarm);
 };

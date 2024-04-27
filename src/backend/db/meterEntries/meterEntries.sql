@@ -9,3 +9,18 @@ SELECT
   blood_glucose
 FROM meter_entries
 WHERE timestamp >= :from! AND timestamp <= :to!;
+
+/*
+  @name upsertMeterEntry
+*/
+INSERT INTO meter_entries (
+  timestamp,
+  blood_glucose
+)
+VALUES (
+  :timestamp!,
+  :bloodGlucose!
+)
+ON CONFLICT (timestamp) DO UPDATE SET
+  blood_glucose = EXCLUDED.blood_glucose
+RETURNING *;

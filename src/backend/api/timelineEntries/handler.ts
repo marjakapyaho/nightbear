@@ -1,7 +1,7 @@
-import { Context, createResponse, Request, Response } from 'backend/utils/api';
-import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
+import { Context, createResponse, Request } from 'backend/utils/api';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
 import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams;
@@ -17,12 +17,12 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
     to: end || context.timestamp(),
   });
 
-  const carbEntries = await context.db.insulinEntries.byTimestamp({
+  const carbEntries = await context.db.carbEntries.byTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });
 
-  const meterEntries = await context.db.insulinEntries.byTimestamp({
+  const meterEntries = await context.db.meterEntries.byTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });
@@ -35,10 +35,41 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
   });
 };
 
-export const updateTimelineEntries = (request: Request, context: Context): Response => {
-  //const dataPoint: Point = request.requestBody;
+export const updateTimelineEntries = async (request: Request, context: Context) => {
+  // TODO: request body is always empty
+  const dataPoint = request.requestBody as Point;
+  if (!dataPoint?.timestamp) {
+    return createResponse('error');
+  }
 
-  // Update carbs / insulins / meter entries for timestamp
+  const dataPointTimestamp = getTimeAsISOStr(dataPoint.timestamp);
 
-  return createResponse(mockTimelineEntries);
+  const [insulinEntry] = dataPoint.valTop
+    ? await context.db.insulinEntries.upsertInsulinEntry({
+        timestamp: dataPointTimestamp,
+        amount: dataPoint.valTop,
+        type: 'FAST', // TODO
+      })
+    : [];
+
+  const [meterEntry] = dataPoint.valMiddle
+    ? await context.db.meterEntries.upsertMeterEntry({
+        timestamp: dataPointTimestamp,
+        bloodGlucose: dataPoint.valMiddle,
+      })
+    : [];
+
+  const [carbEntry] = dataPoint.valBottom
+    ? await context.db.carbEntries.upsertCarbEntry({
+        timestamp: dataPointTimestamp,
+        amount: dataPoint.valBottom,
+        speedFactor: 1, // TODO
+      })
+    : [];
+
+  return createResponse({
+    insulinEntry,
+    meterEntry,
+    carbEntry,
+  });
 };

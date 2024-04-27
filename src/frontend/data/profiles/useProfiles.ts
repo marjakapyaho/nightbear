@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { Profile } from 'shared/types/profiles';
-import { mockProfiles } from 'shared/mocks/profiles';
 import { getActiveProfile } from 'shared/utils/profiles';
 
 export const useProfiles = () => {
@@ -18,17 +17,26 @@ export const useProfiles = () => {
   });
 
   const { mutate: activateProfile } = useMutation({
-    mutationFn: (profile: Profile) => callFetch('/create-profile', 'PUT', profile),
+    mutationFn: (profile: Profile) => callFetch('/activate-profile', 'POST', profile),
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['get-profiles', 'get-active-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['get-profiles'] });
+    },
+  });
+
+  const { mutate: createProfile } = useMutation({
+    mutationFn: (profile: Profile) => callFetch('/create-profile', 'POST', profile),
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['get-profiles'] });
     },
   });
 
   return {
     profiles: profiles || [],
-    activeProfile: getActiveProfile(mockProfiles),
+    activeProfile: getActiveProfile(profiles),
     activateProfile,
+    createProfile,
     isLoading,
     isError,
     isSuccess,

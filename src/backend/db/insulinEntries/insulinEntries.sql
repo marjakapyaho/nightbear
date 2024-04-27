@@ -16,3 +16,20 @@ SELECT
   type
 FROM insulin_entries
 WHERE timestamp >= :from! AND timestamp <= :to!;
+
+/*
+  @name upsertInsulinEntry
+*/
+INSERT INTO insulin_entries (
+  timestamp,
+  amount,
+  type
+)
+VALUES (
+  :timestamp!,
+  :amount!,
+  :type!
+)
+ON CONFLICT (timestamp) DO UPDATE SET
+  amount = EXCLUDED.amount
+RETURNING *;

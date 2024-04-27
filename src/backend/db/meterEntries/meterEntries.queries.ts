@@ -65,3 +65,43 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
 export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
 
 
+/** 'UpsertMeterEntry' parameters type */
+export interface IUpsertMeterEntryParams {
+  bloodGlucose: number;
+  timestamp: string | Date;
+}
+
+/** 'UpsertMeterEntry' return type */
+export interface IUpsertMeterEntryResult {
+  bloodGlucose: number;
+  id: string;
+  timestamp: string;
+}
+
+/** 'UpsertMeterEntry' query type */
+export interface IUpsertMeterEntryQuery {
+  params: IUpsertMeterEntryParams;
+  result: IUpsertMeterEntryResult;
+}
+
+const upsertMeterEntryIR: any = {"usedParamSet":{"timestamp":true,"bloodGlucose":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":70,"b":80}]},{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":85,"b":98}]}],"statement":"INSERT INTO meter_entries (\n  timestamp,\n  blood_glucose\n)\nVALUES (\n  :timestamp!,\n  :bloodGlucose!\n)\nON CONFLICT (timestamp) DO UPDATE SET\n  blood_glucose = EXCLUDED.blood_glucose\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO meter_entries (
+ *   timestamp,
+ *   blood_glucose
+ * )
+ * VALUES (
+ *   :timestamp!,
+ *   :bloodGlucose!
+ * )
+ * ON CONFLICT (timestamp) DO UPDATE SET
+ *   blood_glucose = EXCLUDED.blood_glucose
+ * RETURNING *
+ * ```
+ */
+export const upsertMeterEntry = new PreparedQuery<IUpsertMeterEntryParams,IUpsertMeterEntryResult>(upsertMeterEntryIR);
+
+

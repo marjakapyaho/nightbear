@@ -1,8 +1,7 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { getTimeAddedWith, getTimeAsISOStr, isTimeBeforeOrEqual } from 'shared/utils/time';
-import { mockProfiles } from 'shared/mocks/profiles';
-import { getAlarmState } from 'shared/utils/alarms';
+import { getTimeAddedWith, getTimeAsISOStr } from 'shared/utils/time';
+import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from 'backend/api/alarms/utils';
 import { Alarm } from 'shared/types/alarms';
 
 export const getActiveAlarm = async (request: Request, context: Context) => {
@@ -11,30 +10,30 @@ export const getActiveAlarm = async (request: Request, context: Context) => {
 };
 
 export const ackActiveAlarm = async (request: Request, context: Context) => {
-  const [activeAlarm] = await context.db.alarms.getActiveAlarm();
+  // Get active alarm
+  const [alarm] = await context.db.alarms.getActiveAlarm();
+  // TODO: HANDLE ERROR + BETTER CASTING
+  const activeAlarm = alarm as Alarm;
 
-  // TODO: who to do the casting to Alarm
-  if (
-    !activeAlarm ||
-    isTimeBeforeOrEqual(context.timestamp(), getAlarmState(activeAlarm as Alarm).validAfter)
-  ) {
+  // If we have nothing to ack, return
+  if (isThereNothingToAck(activeAlarm, context)) {
     return createResponse('Nothing to ack');
   }
 
-  // TODO
-  const activeProfile = mockProfiles[0];
-  const snoozeMinutes =
-    activeProfile.situationSettings.find(settings => settings.situation === activeAlarm.situation)
-      ?.snoozeMinutes || 10; // TODO: what to do here
+  // Get situation's snooze minutes from active profile
+  const snoozeMinutes = await getSnoozeMinutesFromActiveProfile(activeAlarm, context);
 
-  await context.db.alarms.markAllAlarmStatesAsProcessed({ alarmId: activeAlarm.id });
-  // TODO: HANDLE ERROR
-
+  // Create new alarm state with snooze minutes and reset level
   await context.db.alarms.createAlarmState({
     alarmId: activeAlarm.id,
     alarmLevel: 0,
     validAfter: getTimeAsISOStr(getTimeAddedWith(context.timestamp(), snoozeMinutes * MIN_IN_MS)),
   });
+  // TODO: HANDLE ERROR
+
+  // Mark all alarm states as processed (in case there were any notification receipts missing)
+  await context.db.alarms.markAllAlarmStatesAsProcessed({ alarmId: activeAlarm.id });
+  // TODO: HANDLE ERROR
 
   return createResponse(activeAlarm.id);
 };

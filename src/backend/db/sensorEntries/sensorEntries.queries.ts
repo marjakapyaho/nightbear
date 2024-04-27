@@ -43,6 +43,7 @@ export interface IByTimestampParams {
 /** 'ByTimestamp' return type */
 export interface IByTimestampResult {
   bloodGlucose: number;
+  id: string;
   timestamp: string;
   type: string;
 }
@@ -72,6 +73,7 @@ export type ILatestParams = void;
 /** 'Latest' return type */
 export interface ILatestResult {
   bloodGlucose: number;
+  id: string;
   timestamp: string;
   type: string;
 }
