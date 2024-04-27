@@ -8,12 +8,12 @@ import { findIndex, map, sum, take } from 'lodash';
 
 export const getNeededAlarmLevel = (
   currentSituation: Situation,
-  validAfterTimestamp: string,
+  validAfter: string,
   activeProfile: Profile,
   context: Context,
 ) => {
   const hasBeenValidForMinutes = Math.round(
-    getTimeSubtractedFrom(context.timestamp(), validAfterTimestamp) / MIN_IN_MS,
+    getTimeSubtractedFrom(context.timestamp(), validAfter) / MIN_IN_MS,
   );
   const levelUpTimes = activeProfile.situationSettings.find(
     situation => situation.situation === currentSituation,

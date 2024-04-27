@@ -13,7 +13,6 @@ export const mockAlarmStates: AlarmState[] = [
 export const mockAlarms: Alarm[] = [
   {
     id: '1',
-    timestamp: mockNow,
     situation: 'LOW',
     isActive: true,
     alarmStates: mockAlarmStates,

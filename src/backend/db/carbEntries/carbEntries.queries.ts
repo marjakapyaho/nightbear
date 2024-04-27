@@ -10,6 +10,7 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   amount: number;
+  id: string;
   speedFactor: number;
   timestamp: string;
 }

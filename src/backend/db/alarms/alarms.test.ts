@@ -10,7 +10,6 @@ describe('db/alarms', () => {
       situation: 'LOW',
     });
 
-    expect(alarm.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarm.situation).toBe('LOW');
     expect(alarm.deactivatedAt).toBe(null);
 
@@ -20,6 +19,7 @@ describe('db/alarms', () => {
       validAfter: mockNow,
     });
 
+    expect(alarmState.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarmState.alarmLevel).toBe(0);
     expect(alarmState.validAfter).toEqual(mockNow);
     expect(alarmState.ackedBy).toBeNull();

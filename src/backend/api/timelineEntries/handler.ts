@@ -1,14 +1,15 @@
 import { Context, createResponse, Request, Response } from 'backend/utils/api';
 import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
+import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams;
 
   return createResponse(
     await context.db.sensorEntries.byTimestamp({
-      from: new Date(start ? parseInt(start, 10) : context.timestamp() - 3 * HOUR_IN_MS).toISOString(),
-      to: new Date(end ? parseInt(end, 10) : context.timestamp()).toISOString(),
+      from: start || getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), 3 * HOUR_IN_MS)),
+      to: end || context.timestamp(),
     }),
   );
 };

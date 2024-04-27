@@ -80,18 +80,16 @@ describe('analyser/low', () => {
         alarms: [
           {
             id: '123',
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS)),
             situation: 'BAD_LOW',
             isActive: false,
             deactivatedAt: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 10 * MIN_IN_MS)),
             alarmStates: [
               {
+                id: '1',
+                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS)),
                 alarmLevel: 1,
-                validAfterTimestamp: getTimeAsISOStr(
-                  getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS),
-                ),
+                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS)),
                 ackedBy: null,
-                pushoverReceipts: [],
               },
             ],
           },
@@ -114,18 +112,15 @@ describe('analyser/low', () => {
         alarms: [
           {
             id: '123',
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
             situation: 'LOW',
             isActive: true,
-            deactivatedAt: null,
             alarmStates: [
               {
+                id: '1',
+                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
                 alarmLevel: 1,
-                validAfterTimestamp: getTimeAsISOStr(
-                  getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS),
-                ),
+                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
                 ackedBy: null,
-                pushoverReceipts: [],
               },
             ],
           },

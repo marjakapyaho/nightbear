@@ -5,7 +5,7 @@ import { generateSensorEntries } from 'shared/utils/test';
 import { getTimeInMillis } from 'shared/utils/time';
 
 export const mockSensorEntries: SensorEntry[] = generateSensorEntries({
-  currentTimestamp: getTimeInMillis(mockNow),
+  currentTimestamp: mockNow,
   bloodGlucoseHistory: [4.6, 4.3, 3.8, 4.0, 4.4, 4.8, 5.2, 5.3, 5.5],
 });
 

@@ -65,7 +65,6 @@ CREATE TABLE profiles_activations (
 
 CREATE TABLE alarms (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   situation situation NOT NULL,
   deactivated_at TIMESTAMPTZ
 );

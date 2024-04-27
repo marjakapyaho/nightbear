@@ -14,7 +14,6 @@ export interface ICreateAlarmResult {
   deactivatedAt: string | null;
   id: string;
   situation: situation;
-  timestamp: string;
 }
 
 /** 'CreateAlarm' query type */
@@ -52,7 +51,6 @@ export interface IDeactivateAlarmResult {
   deactivatedAt: string | null;
   id: string;
   situation: situation;
-  timestamp: string;
 }
 
 /** 'DeactivateAlarm' query type */
@@ -182,7 +180,6 @@ export interface IGetActiveAlarmResult {
   deactivatedAt: string | null;
   id: string;
   situation: situation;
-  timestamp: string;
 }
 
 /** 'GetActiveAlarm' query type */
@@ -191,14 +188,13 @@ export interface IGetActiveAlarmQuery {
   result: IGetActiveAlarmResult;
 }
 
-const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  id,\n  timestamp,\n  situation,\n  deactivated_at\nFROM alarms\nWHERE deactivated_at IS NULL"};
+const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  id,\n  situation,\n  deactivated_at\nFROM alarms\nWHERE deactivated_at IS NULL"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT
  *   id,
- *   timestamp,
  *   situation,
  *   deactivated_at
  * FROM alarms

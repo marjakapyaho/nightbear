@@ -2,7 +2,6 @@ import {
   AnalyserSettings,
   Profile,
   ProfileActivation,
-  PushoverLevel,
   SituationSettings,
 } from 'shared/types/profiles';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
@@ -22,71 +21,48 @@ export const mockAnalyserSettings: AnalyserSettings = {
 export const mockSituationSettings: SituationSettings[] = [
   {
     situation: 'OUTDATED',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'FALLING',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'RISING',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'LOW',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'BAD_LOW',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'COMPRESSION_LOW',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'HIGH',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'BAD_HIGH',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
   },
   {
     situation: 'PERSISTENT_HIGH',
-    escalationAfterMinutes: 10,
+    escalationAfterMinutes: [10],
     snoozeMinutes: 15,
-  },
-];
-
-export const mockPushoverLevels: PushoverLevel[] = [
-  {
-    id: '1',
-    name: 'first-test-phone',
-  },
-  {
-    id: '2',
-    name: 'second-test-phone',
-  },
-  {
-    id: '3',
-    name: 'third-test-phone',
-  },
-  {
-    id: '4',
-    name: 'fourth-test-phone',
-  },
-  {
-    id: '5',
-    name: 'fifth-test-phone',
   },
 ];
 
@@ -98,7 +74,7 @@ export const mockProfiles: Profile[] = [
     alarmsEnabled: true,
     analyserSettings: mockAnalyserSettings,
     situationSettings: mockSituationSettings,
-    pushoverLevels: mockPushoverLevels,
+    notificationTargets: ['first', 'second'],
   },
   {
     id: '2',
@@ -107,7 +83,7 @@ export const mockProfiles: Profile[] = [
     alarmsEnabled: true,
     analyserSettings: mockAnalyserSettings,
     situationSettings: mockSituationSettings,
-    pushoverLevels: mockPushoverLevels,
+    notificationTargets: ['first', 'second'],
   },
 ];
 

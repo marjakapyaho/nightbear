@@ -52,7 +52,6 @@ RETURNING *;
 */
 SELECT
   id,
-  timestamp,
   situation,
   deactivated_at
 FROM alarms

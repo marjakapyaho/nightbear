@@ -10,6 +10,7 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   bloodGlucose: number;
+  id: string;
   timestamp: string;
   type: string;
 }

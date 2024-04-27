@@ -27,9 +27,8 @@ describe('server/main/check-runner', () => {
       alarmStates: [
         {
           alarmLevel: 1,
-          validAfterTimestamp: mockNow,
+          validAfter: mockNow,
           ackedBy: null,
-          pushoverReceipts: [],
         },
       ],
     },
@@ -45,15 +44,13 @@ describe('server/main/check-runner', () => {
       alarmStates: [
         {
           alarmLevel: 1,
-          validAfterTimestamp: mockNow,
+          validAfter: mockNow,
           ackedBy: null,
-          pushoverReceipts: [],
         },
         {
           alarmLevel: 2,
-          validAfterTimestamp: mockNow,
+          validAfter: mockNow,
           ackedBy: null,
-          pushoverReceipts: [],
         },
       ],
     },
@@ -66,9 +63,8 @@ describe('server/main/check-runner', () => {
       alarmStates: [
         {
           alarmLevel: 1,
-          validAfterTimestamp: timestampNow + 15 * MIN_IN_MS,
+          validAfter: timestampNow + 15 * MIN_IN_MS,
           ackedBy: null,
-          pushoverReceipts: [],
         },
       ],
     },

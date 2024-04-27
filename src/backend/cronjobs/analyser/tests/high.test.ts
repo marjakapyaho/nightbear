@@ -67,6 +67,7 @@ describe('analyser/high', () => {
   });
 
   it('does not detect HIGH when coming down from BAD_HIGH', () => {
+    const timestamp30minAgo = getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS));
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -80,18 +81,16 @@ describe('analyser/high', () => {
         alarms: [
           {
             id: '1234',
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
             situation: 'BAD_HIGH',
             isActive: false,
             deactivatedAt: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 5 * MIN_IN_MS)),
             alarmStates: [
               {
+                id: '1',
+                timestamp: timestamp30minAgo,
                 alarmLevel: 1,
-                validAfterTimestamp: getTimeAsISOStr(
-                  getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS),
-                ),
+                validAfter: timestamp30minAgo,
                 ackedBy: null,
-                pushoverReceipts: [],
               },
             ],
           },
@@ -114,18 +113,15 @@ describe('analyser/high', () => {
         alarms: [
           {
             id: '1234',
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
             situation: 'HIGH',
             isActive: true,
-            deactivatedAt: null,
             alarmStates: [
               {
+                id: '1',
+                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
                 alarmLevel: 1,
-                validAfterTimestamp: getTimeAsISOStr(
-                  getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS),
-                ),
+                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
                 ackedBy: null,
-                pushoverReceipts: [],
               },
             ],
           },

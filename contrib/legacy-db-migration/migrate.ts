@@ -1,5 +1,9 @@
 import * as cliProgress from 'cli-progress';
-import { changeBloodGlucoseUnitToMmoll, isDexcomEntryValid, MIN_IN_MS } from 'src/shared/utils/calculations';
+import {
+  changeBloodGlucoseUnitToMmoll,
+  isDexcomEntryValid,
+  MIN_IN_MS,
+} from 'src/shared/utils/calculations';
 import {
   Alarm,
   Carbs,
@@ -30,7 +34,9 @@ const INCREMENTAL = !!process.env.NIGHTBEAR_MIGRATE_INCREMENTAL_MODE;
 const DOC_ID_FILTER = /./; // e.g. /2018-01-0[1-7]/
 
 const bar = new cliProgress.Bar({});
-const remoteDb = new PouchDB(process.env.NIGHTBEAR_MIGRATE_REMOTE_DB_URL || 'https://example.com/remote_db');
+const remoteDb = new PouchDB(
+  process.env.NIGHTBEAR_MIGRATE_REMOTE_DB_URL || 'https://example.com/remote_db',
+);
 const sourceDb = new PouchDB(`migrate_temp`);
 const targetStorage = createCouchDbStorage(
   process.env.NIGHTBEAR_MIGRATE_TARGET_DB_URL || 'https://example.com/target_db',
@@ -99,7 +105,9 @@ function getDocIdsToMigrate() {
     console.log('Migrating in incremental mode:', incrementalIdsToMigrate);
     return incrementalIdsToMigrate;
   } else {
-    return sourceDb.allDocs().then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
+    return sourceDb
+      .allDocs()
+      .then(res => res.rows.map(row => row.id).filter(id => !!id.match(DOC_ID_FILTER)));
   }
 }
 
@@ -121,7 +129,10 @@ function runBatchesSerially(ids: string[][]) {
   const total = ids.reduce((memo, next) => memo + next.length, 0);
   bar.start(total, 0);
   return ids
-    .reduce((memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)), Promise.resolve())
+    .reduce(
+      (memo, next) => memo.then(() => runBatch(next)).then(() => bar.increment(next.length)),
+      Promise.resolve(),
+    )
     .then(() => bar.update(total))
     .then(() => bar.stop());
 }
@@ -174,9 +185,15 @@ function toModernModels(docs: object[]) {
         return Promise.all(
           models.map(model => {
             if ('timestamp' in model) {
-              return targetStorage.loadTimelineModels(model.modelType, MIN_IN_MS * 2, model.timestamp + MIN_IN_MS);
+              return targetStorage.loadTimelineModels(
+                model.modelType,
+                MIN_IN_MS * 2,
+                model.timestamp + MIN_IN_MS,
+              );
             } else {
-              throw new Error(`Incremental migration mode not supported for: ${JSON.stringify(model)}`);
+              throw new Error(
+                `Incremental migration mode not supported for: ${JSON.stringify(model)}`,
+              );
             }
           }),
         )
@@ -261,7 +278,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
       alarmStates: [
         {
           alarmLevel: x.level,
-          validAfterTimestamp: x.validAfter || ts,
+          validAfter: x.validAfter || ts,
           ackedBy: null,
           pushoverReceipts: x.pushoverReceipts || [],
         },
@@ -360,9 +377,12 @@ function linkCalibrationsAndMeterEntries() {
   const updates = maybeLinkedDexcomCalibrations.map(cal => {
     const entries = maybeLinkedMeterEntries.filter(
       entry =>
-        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE && entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
+        cal.timestamp - entry.timestamp < CAL_PAIRING.BEFORE &&
+        entry.timestamp - cal.timestamp < CAL_PAIRING.AFTER,
     );
-    const deltas = entries.map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec').join(', ');
+    const deltas = entries
+      .map(e => ((e.timestamp - cal.timestamp) / 1000).toFixed(1) + ' sec')
+      .join(', ');
     console.log(
       `"${(cal as any).modelMeta._id}" got ${
         entries.length
@@ -374,7 +394,9 @@ function linkCalibrationsAndMeterEntries() {
     };
   });
   const actualUpdates = updates.filter(cal => !!cal.meterEntries.length);
-  console.warn(`Found MeterEntry's for ${actualUpdates.length} of ${updates.length} DexcomCalibration's`);
+  console.warn(
+    `Found MeterEntry's for ${actualUpdates.length} of ${updates.length} DexcomCalibration's`,
+  );
   return actualUpdates;
 }
 
@@ -387,7 +409,8 @@ function runBatchedCalibrationUpdatesSerially(cals: DexcomCalibration[][]) {
   bar.start(total, 0);
   return cals
     .reduce(
-      (memo, next) => memo.then(() => runCalibrationBatch(next)).then(() => bar.increment(next.length)),
+      (memo, next) =>
+        memo.then(() => runCalibrationBatch(next)).then(() => bar.increment(next.length)),
       Promise.resolve(),
     )
     .then(() => bar.update(total))
@@ -404,7 +427,10 @@ function runCalibrationBatch(cals: DexcomCalibration[]): Promise<any> {
     return new Promise((resolve, reject) => {
       run().then(resolve, err => {
         if (tries++ >= BATCH_RETRY_LIMIT) {
-          console.log(`Error: runCalibrationBatch() reached retry limit (${BATCH_RETRY_LIMIT})`, err);
+          console.log(
+            `Error: runCalibrationBatch() reached retry limit (${BATCH_RETRY_LIMIT})`,
+            err,
+          );
           reject(err);
         } else {
           console.log(
