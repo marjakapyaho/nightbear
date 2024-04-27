@@ -10,7 +10,7 @@ DATABASE_URL="$(echo "$DATABASE_URL" | sed s/@localhost/@host.docker.internal/)"
 
 if [[ $# -ge 2 ]] && [[ -f "$2" ]]; then
   # Argument is a file path, execute SQL from the file
-  docker run --rm -i -v "$(realpath "$2")":/app/sql postgres:16 psql "$DATABASE_URL" -f /app/sql
+  docker run --rm -i -v "$(pwd)":/app -v "$(realpath "$2")":/app/sql postgres:16 psql "$DATABASE_URL" -f /app/sql
 elif [[ $# -ge 2 ]]; then
   # Argument is a SQL command, execute it directly
   docker run --rm -i -v "$(pwd)":/app postgres:16 psql "$DATABASE_URL" -c "$2"

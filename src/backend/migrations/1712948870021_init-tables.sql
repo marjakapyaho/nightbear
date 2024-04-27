@@ -83,6 +83,14 @@ CREATE TABLE alarm_states (
 
 -- Timeline entries:
 
+CREATE TYPE sensor_entry_type AS ENUM (
+  'DEXCOM_G4_UPLOADER',
+  'DEXCOM_G4_UPLOADER_RAW',
+  'DEXCOM_G6_UPLOADER',
+  'DEXCOM_G6_SHARE',
+  'LIBRE_3_LINK'
+);
+
 CREATE TABLE sensor_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -90,13 +98,16 @@ CREATE TABLE sensor_entries (
   blood_glucose NUMERIC(3, 1) NOT NULL
 );
 
-CREATE TYPE insulinType AS ENUM ('FAST', 'LONG');
+CREATE TYPE insulin_type AS ENUM (
+  'FAST',
+  'LONG'
+);
 
 CREATE TABLE insulin_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   amount INTEGER NOT NULL,
-  type insulinType NOT NULL
+  type insulin_type NOT NULL
 );
 
 CREATE TABLE carb_entries (
