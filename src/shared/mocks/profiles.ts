@@ -25,6 +25,11 @@ export const mockSituationSettings: SituationSettings[] = [
     snoozeMinutes: 15,
   },
   {
+    situation: 'CRITICAL_OUTDATED',
+    escalationAfterMinutes: [10],
+    snoozeMinutes: 15,
+  },
+  {
     situation: 'FALLING',
     escalationAfterMinutes: [10],
     snoozeMinutes: 15,
