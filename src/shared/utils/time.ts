@@ -28,34 +28,36 @@ export function getActivationTimestamp(spec: {
   return d.getTime();
 }
 
+// Type converters
 export const getTimeInMillis = (time: string | number): number =>
   typeof time === 'string' ? DateTime.fromISO(time).toMillis() : time;
 
 export const getTimeAsISOStr = (time: number | string): string =>
   typeof time === 'string' ? time : DateTime.fromMillis(time).toUTC().toISO() || '';
 
-export const isTimeAfter = (time1: string | number, time2: string | number) =>
+// Comparisons
+export const isTimeLarger = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) > getTimeInMillis(time2);
 
-export const isTimeAfterOrEqual = (time1: string | number, time2: string | number) =>
+export const isTimeLargerOrEqual = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) >= getTimeInMillis(time2);
 
-export const isTimeBefore = (time1: string | number, time2: string | number) =>
+export const isTimeSmaller = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) < getTimeInMillis(time2);
 
-export const isTimeBeforeOrEqual = (time1: string | number, time2: string | number) =>
+export const isTimeSmallerOrEqual = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) <= getTimeInMillis(time2);
 
-export const getISOStrMinusMinutes = (timestamp: number, minutes: number): string =>
-  DateTime.fromMillis(timestamp - minutes * MIN_IN_MS)
-    .toUTC()
-    .toISO() || '';
-
-export const getTimeSubtractedFrom = (time1: string | number, time2: string | number) =>
-  getTimeInMillis(time1) - getTimeInMillis(time2);
-
+// Minus
 export const getTimeMinusTime = (time1: string | number, time2: string | number) =>
   getTimeAsISOStr(getTimeInMillis(time1) - getTimeInMillis(time2));
 
-export const getTimeAddedWith = (time1: string | number, time2: string | number) =>
+export const getTimeMinusTimeMs = (time1: string | number, time2: string | number) =>
+  getTimeInMillis(time1) - getTimeInMillis(time2);
+
+// Plus
+export const getTimePlusTime = (time1: string | number, time2: string | number) =>
+  getTimeAsISOStr(getTimeInMillis(time1) + getTimeInMillis(time2));
+
+export const getTimePlusTimeMs = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) + getTimeInMillis(time2);

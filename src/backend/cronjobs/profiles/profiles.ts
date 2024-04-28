@@ -1,59 +1,47 @@
-import { DAY_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
-import { getActivationTimestamp, getTimeAsISOStr, getTimeInMillis, humanReadableShortTime } from 'shared/utils/time';
-import { padStart } from 'lodash';
-import { Cronjob } from 'backend/utils/cronjobs';
+import { chain, sortBy } from 'lodash';
+import { isTimeSmallerOrEqual } from 'shared/utils/time';
+import { getActivationAsUTCTimestamp } from 'backend/cronjobs/profiles/utils';
 import { Context } from 'backend/utils/api';
+import { getActiveProfile } from 'shared/utils/profiles';
 import { Profile } from 'shared/types/profiles';
 
-// Checks if any of the scheduled profile activations match the given time range.
-// If so, activates them.
-export const profiles: Cronjob = (context, journal) => {
+export const checkAndUpdateProfileActivations = async (context: Context) => {
   const { log } = context;
-  const now = Date.now();
-  return Promise.resolve()
-    .then(() => {
-      const then = journal.previousExecutionAt && getTimeInMillis(journal.previousExecutionAt);
-      if (!then) return; // we don't know when we last ran -> let's try again on the next run
-      const sinceMin = (now - then) / MIN_IN_MS;
-      if (sinceMin > 5) log(`${sinceMin.toFixed(1)} min since last profile activation check, suspicious`);
-      return Promise.resolve();
-      /*        .then(() => context.db.profiles.todo())
-        .then(profiles => {
-          const profilesToActivate = profiles.filter(profile => {
-            if (!profile.activatedAtUtc) return false; // doesn't have a schedule -> don't care
-            const t = humanReadableShortTime;
-            const { hours, minutes } = profile.activatedAtUtc;
-            const yesterday = getActivationTimestamp(profile.activatedAtUtc) - DAY_IN_MS;
-            const today = getActivationTimestamp(profile.activatedAtUtc);
-            const atUtc = `${padStart(hours + '', 2, '0')}:${padStart(minutes + '', 2, '0')} UTC`;
-            const atLocal = t(today);
-            const match = fallsBetween(then, yesterday, now) || fallsBetween(then, today, now);
-            const readableMatch = `${match ? 'DOES' : "doesn't"} fall between ${t(then)} and ${t(now)}`;
-            if (match) log(`"${profile.profileName}" set to activate at ${atLocal} (${atUtc}), ${readableMatch}`);
-            return match;
-          });
-          if (profilesToActivate.length > 1) {
-            log('Having more than 1 profile activate on the same run is very suspicious; will skip');
-          } else if (profilesToActivate.length === 1) {
-            activateProfile(context, profilesToActivate[0]);
-          } else {
-            log(`None of the ${profiles.length} profiles need activation`);
-          }
-        });*/
-    })
-    .then(() => ({ previousExecutionAt: getTimeAsISOStr(now) })); // store the timestamp of this run into the CronjobsJournal
+  const now = context.timestamp();
+
+  const profileActivations = await context.db.profiles.getRelevantProfileActivations();
+
+  if (!profileActivations.length) {
+    throw new Error('No profile');
+  }
+
+  // TODO: TEST THIS
+  const latestActivation = sortBy(profileActivations, 'activatedAt')[0];
+
+  // Should current activation be deactivated
+  if (latestActivation.deactivatedAt && isTimeSmallerOrEqual(latestActivation.deactivatedAt, now)) {
+    // Find repeating activation that should be activated
+    const activationToActivate = chain(profileActivations)
+      .map(activation =>
+        activation.repeatTimeInLocalTimezone
+          ? {
+              id: activation.id,
+              activationTimestamp: getActivationAsUTCTimestamp(
+                activation.repeatTimeInLocalTimezone,
+                now,
+              ),
+            }
+          : null,
+      )
+      .filter(activation => Boolean(activation && activation.activationTimestamp))
+      .sortBy('activationTimestamp')
+      .last()
+      .value();
+
+    await context.db.profiles.reactivateProfileActivation(activationToActivate);
+  }
+
+  // TODO: CASTING
+  const profilesAfterUpdate = (await context.db.profiles.getProfiles()) as Profile[];
+  return getActiveProfile(profilesAfterUpdate);
 };
-
-function activateProfile(context: Context, profile: Profile) {
-  const { log } = context;
-  log(`Activating profile "${profile.profileName}"`);
-  /*  const activation = activateSavedProfile(profile, context.timestamp());
-  return context.db.profiles.saveProfile(activation).then(
-    () => log(`Activated profile "${profile.profileName}"`),
-    err => log(`Activating profile "${profile.profileName}" failed`, err),
-  );*/
-}
-
-function fallsBetween(a: number, b: number, c: number) {
-  return a <= b && b <= c;
-}

@@ -2,7 +2,7 @@ import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
-import { getTimeSubtractedFrom, isTimeAfter, isTimeAfterOrEqual } from 'shared/utils/time';
+import { getTimeMinusTimeMs, isTimeLarger, isTimeLargerOrEqual } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
 import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import {
@@ -38,7 +38,7 @@ export const detectCriticalOutdated = (
   }
 
   // How long since latest entry
-  const msSinceLatestEntry = getTimeSubtractedFrom(currentTimestamp, latestEntry.timestamp);
+  const msSinceLatestEntry = getTimeMinusTimeMs(currentTimestamp, latestEntry.timestamp);
 
   // If we're missing at least two entries, and we're predicting critical situation,
   // alarm about data being critically outdated immediately
@@ -57,7 +57,7 @@ export const detectOutdated = (
   currentTimestamp: string,
 ) => {
   // How long since latest entry
-  const msSinceLatestEntry = getTimeSubtractedFrom(currentTimestamp, latestEntry.timestamp);
+  const msSinceLatestEntry = getTimeMinusTimeMs(currentTimestamp, latestEntry.timestamp);
 
   // Check if we're over timeSinceBgMinutes from settings
   const msSinceBgLimit = activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS;
@@ -77,9 +77,9 @@ export const detectCompressionLow = (
   const latestEntries = chain(entries).slice(-ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW).value();
   const weHaveEnoughEntries = latestEntries.length === ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW;
 
-  const lastEntriesAreFresh = isTimeAfter(
+  const lastEntriesAreFresh = isTimeLarger(
     latestEntries[0].timestamp, // check that first of the last 4 entries is max 25 min old
-    getTimeSubtractedFrom(currentTimestamp, 25 * MIN_IN_MS),
+    getTimeMinusTimeMs(currentTimestamp, 25 * MIN_IN_MS),
   );
 
   const slopeIsReallyBig = Boolean(
@@ -102,17 +102,17 @@ export const detectLow = (
     alarms,
     alarm =>
       (!alarm.deactivatedAt ||
-        isTimeAfter(
+        isTimeLarger(
           alarm.deactivatedAt,
-          getTimeSubtractedFrom(currentTimestamp, BAD_LOW_QUARANTINE_WINDOW),
+          getTimeMinusTimeMs(currentTimestamp, BAD_LOW_QUARANTINE_WINDOW),
         )) &&
       alarm.situation === 'BAD_LOW',
   );
 
   const thereAreNoCorrectionCarbs = !find(carbs, carbs =>
-    isTimeAfter(
+    isTimeLarger(
       carbs.timestamp,
-      getTimeSubtractedFrom(currentTimestamp, LOW_CORRECTION_SUPPRESSION_WINDOW),
+      getTimeMinusTimeMs(currentTimestamp, LOW_CORRECTION_SUPPRESSION_WINDOW),
     ),
   );
 
@@ -138,9 +138,9 @@ export const detectHigh = (
     alarms,
     alarm =>
       (!alarm.deactivatedAt ||
-        isTimeAfter(
+        isTimeLarger(
           alarm.deactivatedAt,
-          getTimeSubtractedFrom(currentTimestamp, BAD_HIGH_QUARANTINE_WINDOW),
+          getTimeMinusTimeMs(currentTimestamp, BAD_HIGH_QUARANTINE_WINDOW),
         )) &&
       alarm.situation === 'BAD_HIGH',
   );
@@ -195,9 +195,9 @@ export const detectPersistentHigh = (
   insulins: InsulinEntry[],
   currentTimestamp: string,
 ) => {
-  const timeWindowStart = getTimeSubtractedFrom(currentTimestamp, PERSISTENT_HIGH_TIME_WINDOW);
+  const timeWindowStart = getTimeMinusTimeMs(currentTimestamp, PERSISTENT_HIGH_TIME_WINDOW);
   const relevantEntries = filter(entries, entry =>
-    isTimeAfterOrEqual(entry.timestamp, timeWindowStart),
+    isTimeLargerOrEqual(entry.timestamp, timeWindowStart),
   );
 
   // Allow two entries to be missing, but most data should be there

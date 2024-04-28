@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import {
   AnalyserSettings,
   Profile,
@@ -5,6 +6,8 @@ import {
   SituationSettings,
 } from 'shared/types/profiles';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
+import { getTimeMinusTime, TZ } from 'shared/utils/time';
+import { mockNow } from 'shared/mocks/dates';
 
 export const mockAnalyserSettings: AnalyserSettings = {
   id: '1',
@@ -94,15 +97,19 @@ export const mockProfiles: Profile[] = [
 
 export const mockProfileActivations: ProfileActivation[] = [
   {
-    id: '1',
+    id: '123',
+    profileTemplateId: '1',
     profileName: 'Day',
-    activatedAt: Date.now() - HOUR_IN_MS,
-    repeatTimeInLocalTimezone: '08:00',
+    activatedAt: getTimeMinusTime(mockNow, HOUR_IN_MS),
+    repeatTimeInLocalTimezone: DateTime.fromISO(mockNow).setZone(TZ).toFormat('HH:mm'),
   },
   {
-    id: '1',
-    profileName: 'Meeting',
-    activatedAt: Date.now() - 5 * HOUR_IN_MS,
-    deactivatedAt: Date.now() - HOUR_IN_MS,
+    id: '456',
+    profileTemplateId: '2',
+    profileName: 'Night',
+    activatedAt: getTimeMinusTime(mockNow, 13 * HOUR_IN_MS),
+    repeatTimeInLocalTimezone: DateTime.fromISO(getTimeMinusTime(mockNow, 13 * HOUR_IN_MS))
+      .setZone(TZ)
+      .toFormat('HH:mm'),
   },
 ];

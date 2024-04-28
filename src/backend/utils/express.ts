@@ -5,7 +5,7 @@ import cors from 'cors';
 import express, { Request as ExpressRequest } from 'express';
 import { isString, pickBy } from 'lodash';
 import { Context, RequestHandler, Request, Headers } from './api';
-import { getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTimeMs } from 'shared/utils/time';
 
 export type HttpMethod = 'get' | 'post' | 'put';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];
@@ -35,11 +35,9 @@ export function startExpressServer(
               }
             },
             () =>
-              res
-                .status(500)
-                .json({
-                  errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})`,
-                }),
+              res.status(500).json({
+                errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})`,
+              }),
           );
       });
     });
@@ -73,7 +71,7 @@ function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandle
     const debug = extendLogger(log, getLoggingNamespace('req', request.requestId), true);
     const then = context.timestamp();
     const duration = () =>
-      (getTimeSubtractedFrom(context.timestamp(), then) / 1000).toFixed(3) + ' sec';
+      (getTimeMinusTimeMs(context.timestamp(), then) / 1000).toFixed(3) + ' sec';
     debug(`Incoming request: ${request.requestMethod} ${request.requestPath}\n%O`, request);
     return handler(request, context).then(
       res => {

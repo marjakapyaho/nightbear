@@ -1,11 +1,11 @@
-import { isTimeBefore } from 'shared/utils/time';
+import { isTimeSmaller } from 'shared/utils/time';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Alarm } from 'shared/types/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
 
 export const isThereNothingToAck = (activeAlarm: Alarm, context: Context) =>
-  !activeAlarm || isTimeBefore(context.timestamp(), getAlarmState(activeAlarm).validAfter);
+  !activeAlarm || isTimeSmaller(context.timestamp(), getAlarmState(activeAlarm).validAfter);
 
 export const getSnoozeMinutesFromActiveProfile = async (activeAlarm: Alarm, context: Context) => {
   const profiles = await context.db.profiles.getProfiles();

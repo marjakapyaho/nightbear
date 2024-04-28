@@ -3,7 +3,7 @@ import { Situation } from 'shared/types/analyser';
 import { getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
-import { isTimeBefore } from 'shared/utils/time';
+import { isTimeSmaller } from 'shared/utils/time';
 import { isNotNull } from 'shared/utils/helpers';
 import { getNeededAlarmLevel, getPushoverRecipient, retryNotifications } from './utils';
 
@@ -100,7 +100,7 @@ const updateAlarm = async (
   const { alarmLevel, validAfter } = currentAlarmState;
 
   // Alarm is not yet valid
-  if (isTimeBefore(context.timestamp(), validAfter)) {
+  if (isTimeSmaller(context.timestamp(), validAfter)) {
     return activeAlarm.id;
   }
 

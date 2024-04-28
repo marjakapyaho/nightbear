@@ -1,7 +1,7 @@
 import { Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Context } from 'backend/utils/api';
-import { getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTimeMs } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { AlarmState } from 'shared/types/alarms';
 import { findIndex, map, sum, take } from 'lodash';
@@ -13,7 +13,7 @@ export const getNeededAlarmLevel = (
   context: Context,
 ) => {
   const hasBeenValidForMinutes = Math.round(
-    getTimeSubtractedFrom(context.timestamp(), validAfter) / MIN_IN_MS,
+    getTimeMinusTimeMs(context.timestamp(), validAfter) / MIN_IN_MS,
   );
   const levelUpTimes = activeProfile.situationSettings.find(
     situation => situation.situation === currentSituation,

@@ -2,7 +2,7 @@ import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scro
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import { TimelineEntries } from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'shared/utils/config';
-import { getTimeInMillis, isTimeAfter, isTimeBeforeOrEqual } from 'shared/utils/time';
+import { getTimeInMillis, isTimeLarger, isTimeSmallerOrEqual } from 'shared/utils/time';
 
 export const getFillColor = (bgSensor: number, bgMeter?: number) => {
   if (bgMeter) {
@@ -23,15 +23,23 @@ const isTimestampWithinFiveMinutes = (timestampToCheck: string, baseTimestamp: s
   const lowerLimit = getTimeInMillis(baseTimestamp) - timeToCheckInMillis;
 
   // Upper limit is inclusive
-  return isTimeAfter(timestampToCheck, lowerLimit) && isTimeBeforeOrEqual(timestampToCheck, upperLimit);
+  return (
+    isTimeLarger(timestampToCheck, lowerLimit) && isTimeSmallerOrEqual(timestampToCheck, upperLimit)
+  );
 };
 
 export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries): Point[] => {
   const { sensorEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
   return sensorEntries.map(entry => {
-    const insulin = insulinEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
-    const meterEntry = meterEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
-    const carb = carbEntries.find(val => isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp));
+    const insulin = insulinEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
+    const meterEntry = meterEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
+    const carb = carbEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
 
     return {
       timestamp: getTimeInMillis(entry.timestamp),

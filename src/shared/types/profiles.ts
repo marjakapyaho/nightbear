@@ -30,8 +30,9 @@ export type Profile = {
 
 export type ProfileActivation = {
   id: string;
+  profileTemplateId: string;
   profileName: string;
-  activatedAt: number;
+  activatedAt: string;
   repeatTimeInLocalTimezone?: string;
-  deactivatedAt?: number;
+  deactivatedAt?: string;
 };

@@ -7,12 +7,7 @@ import {
   SensorEntryType,
 } from 'shared/types/timelineEntries';
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
-import {
-  getTimeAddedWith,
-  getTimeAsISOStr,
-  getTimeSubtractedFrom,
-  isTimeAfter,
-} from 'shared/utils/time';
+import { getTimeMinusTimeMs, isTimeLarger, getTimePlusTime } from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
@@ -107,7 +102,7 @@ export const mapSensorEntriesToAnalyserEntries = (entries: SensorEntry[]): Analy
     if (previousEntry && previousEntry.bloodGlucose && previousEntry.timestamp) {
       const previousBg = previousEntry.bloodGlucose;
       const previousTimestamp = previousEntry.timestamp;
-      const timeBetweenEntries = getTimeSubtractedFrom(currentTimestamp, previousTimestamp);
+      const timeBetweenEntries = getTimeMinusTimeMs(currentTimestamp, previousTimestamp);
 
       if (timeBetweenEntries < TIME_LIMIT_FOR_SLOPE && timeBetweenEntries > 0) {
         currentSlope = roundTo2Decimals(
@@ -134,9 +129,9 @@ export const checkThatThereIsNoCorrectionInsulin = (
   highCorrectionSuppressionWindow: number,
 ) => {
   return !find(insulins, insulin =>
-    isTimeAfter(
+    isTimeLarger(
       insulin.timestamp,
-      getTimeSubtractedFrom(currentTimestamp, highCorrectionSuppressionWindow * MIN_IN_MS),
+      getTimeMinusTimeMs(currentTimestamp, highCorrectionSuppressionWindow * MIN_IN_MS),
     ),
   );
 };
@@ -166,7 +161,7 @@ export const getPredictedAnalyserEntries = (
 
   const predictedSensorEntries = regression.predict(predictionArray).map((val, i) => ({
     bloodGlucose: val,
-    timestamp: getTimeAsISOStr(getTimeAddedWith(latestEntry?.timestamp, (i + 1) * 5 * MIN_IN_MS)),
+    timestamp: getTimePlusTime(latestEntry?.timestamp, (i + 1) * 5 * MIN_IN_MS),
     type: 'DEXCOM_G6_SHARE' as SensorEntryType,
   }));
 

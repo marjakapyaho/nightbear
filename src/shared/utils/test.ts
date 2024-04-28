@@ -1,7 +1,7 @@
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { Profile } from 'shared/types/profiles';
 import { mockProfiles } from 'shared/mocks/profiles';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeMinusTimeMs } from 'shared/utils/time';
 import { mockAlarms } from 'shared/mocks/alarms';
 import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
@@ -21,7 +21,7 @@ export const generateSensorEntries = ({
       const intervalMinutes = 5;
       const minutesAgo =
         latestEntryAge + (bloodGlucoseHistory.length - 1 - index) * intervalMinutes;
-      const entryTimestamp = getTimeSubtractedFrom(currentTimestamp, minutesAgo * 60 * 1000);
+      const entryTimestamp = getTimeMinusTimeMs(currentTimestamp, minutesAgo * 60 * 1000);
       return {
         type: 'DEXCOM_G6_SHARE',
         timestamp: getTimeAsISOStr(entryTimestamp),

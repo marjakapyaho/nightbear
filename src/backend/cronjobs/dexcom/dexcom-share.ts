@@ -4,15 +4,25 @@ import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { isArray } from 'lodash';
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { getTimeAsISOStr, getTimeInMillis, humanReadableLongTime, isTimeAfter } from 'shared/utils/time';
+import {
+  getTimeAsISOStr,
+  getTimeInMillis,
+  humanReadableLongTime,
+  isTimeLarger,
+} from 'shared/utils/time';
 
-export const dexcomShare: Cronjob = async (context, journal): Promise<Partial<CronjobsJournal> | void> => {
+export const dexcomShare: Cronjob = async (
+  context,
+  journal,
+): Promise<Partial<CronjobsJournal> | void> => {
   const { log, dexcomShare, config } = context;
   const { dexcomShareSessionId, dexcomShareLoginAttemptAt } = journal;
-  const dexcomShareLoginAttemptTimestamp = dexcomShareLoginAttemptAt && getTimeInMillis(dexcomShareLoginAttemptAt);
+  const dexcomShareLoginAttemptTimestamp =
+    dexcomShareLoginAttemptAt && getTimeInMillis(dexcomShareLoginAttemptAt);
   const mins = config.DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES || 60;
   const loginAttemptAllowed =
-    !dexcomShareLoginAttemptTimestamp || isTimeAfter(Date.now() - dexcomShareLoginAttemptTimestamp, MIN_IN_MS * mins);
+    !dexcomShareLoginAttemptTimestamp ||
+    isTimeLarger(Date.now() - dexcomShareLoginAttemptTimestamp, MIN_IN_MS * mins);
 
   if (dexcomShareSessionId) {
     const [latestBg] = await context.db.sensorEntries.latest();
@@ -25,7 +35,11 @@ export const dexcomShare: Cronjob = async (context, journal): Promise<Partial<Cr
         ageModulo < 1.75 && // not within the time window where new BG's appear -> no point in fetching until a new one may be available again
         ageInMin >= 4.5; // our fetch window is slightly larger than 1 minute, to ensure slight scheduling wobble of the cronjob doesn't cause fetches to be skipped -> need a mechanism for preventing the opposite (i.e. unnecessary consecutive fetches)
 
-      log(`Time since last BG is ${ageInMin.toFixed(1)} min -> ${willFetch ? 'WILL' : "won't"} fetch BG`);
+      log(
+        `Time since last BG is ${ageInMin.toFixed(1)} min -> ${
+          willFetch ? 'WILL' : "won't"
+        } fetch BG`,
+      );
 
       if (!willFetch) return;
     }
@@ -70,7 +84,9 @@ export const dexcomShare: Cronjob = async (context, journal): Promise<Partial<Cr
       const readableTime = dexcomShareLoginAttemptTimestamp
         ? humanReadableLongTime(getTimeAsISOStr(dexcomShareLoginAttemptTimestamp))
         : 'n/a';
-      log(`No session, will NOT attempt login, last attempt was at ${readableTime}, too soon (under ${mins} min)`);
+      log(
+        `No session, will NOT attempt login, last attempt was at ${readableTime}, too soon (under ${mins} min)`,
+      );
     }
   }
 };

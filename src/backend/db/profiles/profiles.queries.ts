@@ -284,3 +284,73 @@ const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  a
 export const getProfiles = new PreparedQuery<IGetProfilesParams,IGetProfilesResult>(getProfilesIR);
 
 
+/** 'GetRelevantProfileActivations' parameters type */
+export type IGetRelevantProfileActivationsParams = void;
+
+/** 'GetRelevantProfileActivations' return type */
+export interface IGetRelevantProfileActivationsResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileTemplateId: string;
+  repeatTimeInLocalTimezone: string | null;
+}
+
+/** 'GetRelevantProfileActivations' query type */
+export interface IGetRelevantProfileActivationsQuery {
+  params: IGetRelevantProfileActivationsParams;
+  result: IGetRelevantProfileActivationsResult;
+}
+
+const getRelevantProfileActivationsIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  id,\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profiles_activations\nWHERE repeat_time_in_local_timezone IS NOT NULL OR deactivated_at > CURRENT_TIMESTAMP"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   id,
+ *   profile_template_id,
+ *   activated_at,
+ *   repeat_time_in_local_timezone,
+ *   deactivated_at
+ * FROM profiles_activations
+ * WHERE repeat_time_in_local_timezone IS NOT NULL OR deactivated_at > CURRENT_TIMESTAMP
+ * ```
+ */
+export const getRelevantProfileActivations = new PreparedQuery<IGetRelevantProfileActivationsParams,IGetRelevantProfileActivationsResult>(getRelevantProfileActivationsIR);
+
+
+/** 'ReactivateProfileActivation' parameters type */
+export interface IReactivateProfileActivationParams {
+  id: string;
+}
+
+/** 'ReactivateProfileActivation' return type */
+export interface IReactivateProfileActivationResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileTemplateId: string;
+  repeatTimeInLocalTimezone: string | null;
+}
+
+/** 'ReactivateProfileActivation' query type */
+export interface IReactivateProfileActivationQuery {
+  params: IReactivateProfileActivationParams;
+  result: IReactivateProfileActivationResult;
+}
+
+const reactivateProfileActivationIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":81}]}],"statement":"UPDATE profiles_activations SET\n  activated_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE profiles_activations SET
+ *   activated_at = CURRENT_TIMESTAMP
+ * WHERE id = :id!
+ * RETURNING *
+ * ```
+ */
+export const reactivateProfileActivation = new PreparedQuery<IReactivateProfileActivationParams,IReactivateProfileActivationResult>(reactivateProfileActivationIR);
+
+
