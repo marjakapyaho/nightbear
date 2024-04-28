@@ -1,13 +1,9 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
+import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
 import { getTimeAsISOStr, getTimeMinusTime } from 'shared/utils/time';
-import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
-import { generateSeedData } from 'backend/db/seed';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
-  // TODO: REMOVE THIS :D
-  await generateSeedData(context);
-
   const { start, end } = request.requestParams;
   const defaultFrom = getTimeMinusTime(context.timestamp(), 3 * HOUR_IN_MS);
 

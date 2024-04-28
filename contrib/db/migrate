@@ -3,8 +3,8 @@
 set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
 
 DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" # figure out current script path
-
-export DATABASE_URL="$("$DIR/env" ${1:-})" # set correct DATABASE_URL for this env
+DATABASE_URL="$("$DIR/env" ${1:-})" # combining this with export won't exit on error
+export DATABASE_URL
 
 node_modules/.bin/node-pg-migrate \
   --database-url-var DATABASE_URL \
