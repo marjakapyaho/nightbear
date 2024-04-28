@@ -32,9 +32,9 @@
     "front:build": "npm run lint-node && react-scripts build",
     "front:deploy": "npm run front:build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/",
     "\n==================== DB ====================": "",
-    "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 10 && ./contrib/db/migrate test",
+    "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && npm run db:migrate",
     "db:migrate": "contrib/db/migrate test",
-    "db:types": "pgtyped -c pgtyped-config.json",
+    "db:types": "eval $(contrib/db/env test) && pgtyped --config pgtyped-config.json",
     "\n==================== UTILS ====================": "",
     "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
