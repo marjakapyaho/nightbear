@@ -3,6 +3,21 @@ INSERT INTO meter_entries (blood_glucose)
 VALUES (:bloodGlucose!)
 RETURNING *;
 
+/*
+  @name createMeterEntries
+  @param meterEntries -> ((
+    bloodGlucose!,
+    timestamp!
+  )...)
+*/
+INSERT INTO meter_entries (
+  blood_glucose,
+  timestamp
+)
+VALUES :meterEntries
+RETURNING timestamp;
+
+
 /* @name byTimestamp */
 SELECT
   timestamp,

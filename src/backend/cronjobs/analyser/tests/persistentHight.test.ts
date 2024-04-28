@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 const persistentHighValues = [
@@ -124,7 +124,7 @@ describe('analyser/persistentHigh', () => {
         }),
         insulinEntries: [
           {
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 65 * MIN_IN_MS)),
+            timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
             amount: 3,
             type: 'FAST',
           },

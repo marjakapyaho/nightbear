@@ -34,6 +34,43 @@ const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params"
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'CreateSensorEntries' parameters type */
+export interface ICreateSensorEntriesParams {
+  sensorEntries: readonly ({
+    bloodGlucose: number,
+    type: string,
+    timestamp: string | Date
+  })[];
+}
+
+/** 'CreateSensorEntries' return type */
+export interface ICreateSensorEntriesResult {
+  timestamp: string;
+}
+
+/** 'CreateSensorEntries' query type */
+export interface ICreateSensorEntriesQuery {
+  params: ICreateSensorEntriesParams;
+  result: ICreateSensorEntriesResult;
+}
+
+const createSensorEntriesIR: any = {"usedParamSet":{"sensorEntries":true},"params":[{"name":"sensorEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"type","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":75,"b":88}]}],"statement":"INSERT INTO sensor_entries (\n  blood_glucose,\n  type,\n  timestamp\n)\nVALUES :sensorEntries\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO sensor_entries (
+ *   blood_glucose,
+ *   type,
+ *   timestamp
+ * )
+ * VALUES :sensorEntries
+ * RETURNING timestamp
+ * ```
+ */
+export const createSensorEntries = new PreparedQuery<ICreateSensorEntriesParams,ICreateSensorEntriesResult>(createSensorEntriesIR);
+
+
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;

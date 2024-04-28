@@ -32,6 +32,41 @@ const createIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[{"name":"b
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'CreateMeterEntries' parameters type */
+export interface ICreateMeterEntriesParams {
+  meterEntries: readonly ({
+    bloodGlucose: number,
+    timestamp: string | Date
+  })[];
+}
+
+/** 'CreateMeterEntries' return type */
+export interface ICreateMeterEntriesResult {
+  timestamp: string;
+}
+
+/** 'CreateMeterEntries' query type */
+export interface ICreateMeterEntriesQuery {
+  params: ICreateMeterEntriesParams;
+  result: ICreateMeterEntriesResult;
+}
+
+const createMeterEntriesIR: any = {"usedParamSet":{"meterEntries":true},"params":[{"name":"meterEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":66,"b":78}]}],"statement":"INSERT INTO meter_entries (\n  blood_glucose,\n  timestamp\n)\nVALUES :meterEntries\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO meter_entries (
+ *   blood_glucose,
+ *   timestamp
+ * )
+ * VALUES :meterEntries
+ * RETURNING timestamp
+ * ```
+ */
+export const createMeterEntries = new PreparedQuery<ICreateMeterEntriesParams,ICreateMeterEntriesResult>(createMeterEntriesIR);
+
+
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;

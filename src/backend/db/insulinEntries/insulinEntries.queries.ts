@@ -1,12 +1,12 @@
 /** Types generated for queries found in "src/backend/db/insulinEntries/insulinEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type insulintype = 'FAST' | 'LONG';
+export type insulin_type = 'FAST' | 'LONG';
 
 /** 'Create' parameters type */
 export interface ICreateParams {
   amount: number;
-  type: insulintype;
+  type: insulin_type;
 }
 
 /** 'Create' return type */
@@ -14,7 +14,7 @@ export interface ICreateResult {
   amount: number;
   id: string;
   timestamp: string;
-  type: insulintype;
+  type: insulin_type;
 }
 
 /** 'Create' query type */
@@ -42,6 +42,43 @@ const createIR: any = {"usedParamSet":{"amount":true,"type":true},"params":[{"na
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'CreateInsulinEntries' parameters type */
+export interface ICreateInsulinEntriesParams {
+  insulinEntries: readonly ({
+    amount: number,
+    type: insulin_type,
+    timestamp: string | Date
+  })[];
+}
+
+/** 'CreateInsulinEntries' return type */
+export interface ICreateInsulinEntriesResult {
+  timestamp: string;
+}
+
+/** 'CreateInsulinEntries' query type */
+export interface ICreateInsulinEntriesQuery {
+  params: ICreateInsulinEntriesParams;
+  result: ICreateInsulinEntriesResult;
+}
+
+const createInsulinEntriesIR: any = {"usedParamSet":{"insulinEntries":true},"params":[{"name":"insulinEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"amount","required":true},{"name":"type","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":69,"b":83}]}],"statement":"INSERT INTO insulin_entries (\n  amount,\n  type,\n  timestamp\n)\nVALUES :insulinEntries\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO insulin_entries (
+ *   amount,
+ *   type,
+ *   timestamp
+ * )
+ * VALUES :insulinEntries
+ * RETURNING timestamp
+ * ```
+ */
+export const createInsulinEntries = new PreparedQuery<ICreateInsulinEntriesParams,ICreateInsulinEntriesResult>(createInsulinEntriesIR);
+
+
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;
@@ -52,7 +89,7 @@ export interface IByTimestampParams {
 export interface IByTimestampResult {
   amount: number;
   timestamp: string;
-  type: insulintype;
+  type: insulin_type;
 }
 
 /** 'ByTimestamp' query type */
@@ -81,7 +118,7 @@ export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResu
 export interface IUpsertInsulinEntryParams {
   amount: number;
   timestamp: string | Date;
-  type: insulintype;
+  type: insulin_type;
 }
 
 /** 'UpsertInsulinEntry' return type */
@@ -89,7 +126,7 @@ export interface IUpsertInsulinEntryResult {
   amount: number;
   id: string;
   timestamp: string;
-  type: insulintype;
+  type: insulin_type;
 }
 
 /** 'UpsertInsulinEntry' query type */

@@ -9,6 +9,23 @@ VALUES (
 )
 RETURNING *;
 
+/*
+  @name createCarbEntries
+  @param carbEntries -> ((
+    amount!,
+    speedFactor!,
+    timestamp!
+  )...)
+*/
+INSERT INTO carb_entries (
+  amount,
+  speed_factor,
+  timestamp
+)
+VALUES :carbEntries
+RETURNING timestamp;
+
+
 /* @name byTimestamp */
 SELECT
   timestamp,

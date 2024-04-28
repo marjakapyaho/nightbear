@@ -5,20 +5,18 @@ import { map, identity } from 'lodash';
 import { onlyActive } from 'shared/utils/alarms';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { Context } from 'backend/utils/api';
-import { mockTimelineEntries } from 'shared/mocks/timelineEntries';
-import { mockProfiles } from 'shared/mocks/profiles';
 import { mockAlarms } from 'shared/mocks/alarms';
 import { getActiveProfile } from 'shared/utils/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { SensorEntry } from 'shared/types/timelineEntries';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
 
 const getRange = (context: Context) => ({
-  from: getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), ANALYSIS_RANGE)),
+  from: getTimeMinusTime(context.timestamp(), ANALYSIS_RANGE),
   to: context.timestamp(),
 });
 

@@ -1,11 +1,15 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeMinusTime } from 'shared/utils/time';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
+import { generateSeedData } from 'backend/db/seed';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
+  // TODO: REMOVE THIS :D
+  await generateSeedData(context);
+
   const { start, end } = request.requestParams;
-  const defaultFrom = getTimeAsISOStr(getTimeSubtractedFrom(context.timestamp(), 3 * HOUR_IN_MS));
+  const defaultFrom = getTimeMinusTime(context.timestamp(), 3 * HOUR_IN_MS);
 
   const sensorEntries = await context.db.sensorEntries.byTimestamp({
     from: start || defaultFrom,

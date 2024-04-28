@@ -40,6 +40,43 @@ const createIR: any = {"usedParamSet":{"amount":true,"speedFactor":true},"params
 export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 
 
+/** 'CreateCarbEntries' parameters type */
+export interface ICreateCarbEntriesParams {
+  carbEntries: readonly ({
+    amount: number,
+    speedFactor: number,
+    timestamp: string | Date
+  })[];
+}
+
+/** 'CreateCarbEntries' return type */
+export interface ICreateCarbEntriesResult {
+  timestamp: string;
+}
+
+/** 'CreateCarbEntries' query type */
+export interface ICreateCarbEntriesQuery {
+  params: ICreateCarbEntriesParams;
+  result: ICreateCarbEntriesResult;
+}
+
+const createCarbEntriesIR: any = {"usedParamSet":{"carbEntries":true},"params":[{"name":"carbEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"amount","required":true},{"name":"speedFactor","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":74,"b":85}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  speed_factor,\n  timestamp\n)\nVALUES :carbEntries\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO carb_entries (
+ *   amount,
+ *   speed_factor,
+ *   timestamp
+ * )
+ * VALUES :carbEntries
+ * RETURNING timestamp
+ * ```
+ */
+export const createCarbEntries = new PreparedQuery<ICreateCarbEntriesParams,ICreateCarbEntriesResult>(createCarbEntriesIR);
+
+
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;

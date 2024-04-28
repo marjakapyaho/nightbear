@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/high', () => {
@@ -55,7 +55,7 @@ describe('analyser/high', () => {
         }),
         insulinEntries: [
           {
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 65 * MIN_IN_MS)),
+            timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
             amount: 3,
             type: 'FAST',
           },
@@ -67,7 +67,7 @@ describe('analyser/high', () => {
   });
 
   it('does not detect HIGH when coming down from BAD_HIGH', () => {
-    const timestamp30minAgo = getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS));
+    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -83,7 +83,7 @@ describe('analyser/high', () => {
             id: '1234',
             situation: 'BAD_HIGH',
             isActive: false,
-            deactivatedAt: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 5 * MIN_IN_MS)),
+            deactivatedAt: getTimeMinusTime(mockNow, 5 * MIN_IN_MS),
             alarmStates: [
               {
                 id: '1',
@@ -118,9 +118,9 @@ describe('analyser/high', () => {
             alarmStates: [
               {
                 id: '1',
-                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
+                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
                 alarmLevel: 1,
-                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
+                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
                 ackedBy: null,
               },
             ],

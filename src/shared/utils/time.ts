@@ -54,5 +54,8 @@ export const getISOStrMinusMinutes = (timestamp: number, minutes: number): strin
 export const getTimeSubtractedFrom = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) - getTimeInMillis(time2);
 
+export const getTimeMinusTime = (time1: string | number, time2: string | number) =>
+  getTimeAsISOStr(getTimeInMillis(time1) - getTimeInMillis(time2));
+
 export const getTimeAddedWith = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) + getTimeInMillis(time2);

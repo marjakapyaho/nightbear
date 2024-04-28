@@ -9,6 +9,22 @@ VALUES (
 )
 RETURNING *;
 
+/*
+  @name createInsulinEntries
+  @param insulinEntries -> ((
+    amount!,
+    type!,
+    timestamp!
+  )...)
+*/
+INSERT INTO insulin_entries (
+  amount,
+  type,
+  timestamp
+)
+VALUES :insulinEntries
+RETURNING timestamp;
+
 /* @name byTimestamp */
 SELECT
   timestamp,

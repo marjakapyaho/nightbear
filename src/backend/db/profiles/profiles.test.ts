@@ -29,7 +29,7 @@ describe('db/profiles', () => {
       ),
     );
 
-    expect(situationSettings[0].escalationAfterMinutes).toEqual([10]);
+    expect(situationSettings[0].escalationAfterMinutes).toEqual([10, 10]);
     expect(situationSettings[0].snoozeMinutes).toBe(15);
 
     const [profileActivation] = await context.db.profiles.createProfileActivation({

@@ -21,52 +21,52 @@ export const mockAnalyserSettings: AnalyserSettings = {
 export const mockSituationSettings: SituationSettings[] = [
   {
     situation: 'OUTDATED',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'CRITICAL_OUTDATED',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'FALLING',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'RISING',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'LOW',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'BAD_LOW',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'COMPRESSION_LOW',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'HIGH',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'BAD_HIGH',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
   {
     situation: 'PERSISTENT_HIGH',
-    escalationAfterMinutes: [10],
+    escalationAfterMinutes: [10, 10],
     snoozeMinutes: 15,
   },
 ];

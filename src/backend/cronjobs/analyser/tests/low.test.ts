@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/low', () => {
@@ -34,7 +34,7 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 15 * MIN_IN_MS)),
+            timestamp: getTimeMinusTime(mockNow, 15 * MIN_IN_MS),
             amount: 30,
             speedFactor: 1,
           },
@@ -56,7 +56,7 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 35 * MIN_IN_MS)),
+            timestamp: getTimeMinusTime(mockNow, 35 * MIN_IN_MS),
             amount: 30,
             speedFactor: 1,
           },
@@ -82,13 +82,13 @@ describe('analyser/low', () => {
             id: '123',
             situation: 'BAD_LOW',
             isActive: false,
-            deactivatedAt: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 10 * MIN_IN_MS)),
+            deactivatedAt: getTimeMinusTime(mockNow, 10 * MIN_IN_MS),
             alarmStates: [
               {
                 id: '1',
-                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS)),
+                timestamp: getTimeMinusTime(mockNow, 40 * MIN_IN_MS),
                 alarmLevel: 1,
-                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 40 * MIN_IN_MS)),
+                validAfter: getTimeMinusTime(mockNow, 40 * MIN_IN_MS),
                 ackedBy: null,
               },
             ],
@@ -117,9 +117,9 @@ describe('analyser/low', () => {
             alarmStates: [
               {
                 id: '1',
-                timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
+                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
                 alarmLevel: 1,
-                validAfter: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 30 * MIN_IN_MS)),
+                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
                 ackedBy: null,
               },
             ],

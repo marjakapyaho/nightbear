@@ -4,7 +4,7 @@ import { AnalyserEntry } from 'shared/types/analyser';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 
 describe('utils/analyser-utils', () => {
   const entriesBefore = generateSensorEntries({
@@ -15,31 +15,31 @@ describe('utils/analyser-utils', () => {
 
   const entriesAfter: AnalyserEntry[] = [
     {
-      timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 25 * MIN_IN_MS)),
+      timestamp: getTimeMinusTime(mockNow, 25 * MIN_IN_MS),
       bloodGlucose: 6,
       slope: null,
       rawSlope: null,
     },
     {
-      timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 20 * MIN_IN_MS)),
+      timestamp: getTimeMinusTime(mockNow, 20 * MIN_IN_MS),
       bloodGlucose: 8.5,
       slope: 0.33,
       rawSlope: 2.5,
     },
     {
-      timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 15 * MIN_IN_MS)),
+      timestamp: getTimeMinusTime(mockNow, 15 * MIN_IN_MS),
       bloodGlucose: 7,
       slope: 0.33,
       rawSlope: -1.5,
     },
     {
-      timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 10 * MIN_IN_MS)),
+      timestamp: getTimeMinusTime(mockNow, 10 * MIN_IN_MS),
       bloodGlucose: 7,
       slope: -0.17,
       rawSlope: 0,
     },
     {
-      timestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 5 * MIN_IN_MS)),
+      timestamp: getTimeMinusTime(mockNow, 5 * MIN_IN_MS),
       bloodGlucose: 8,
       slope: 1,
       rawSlope: 1,

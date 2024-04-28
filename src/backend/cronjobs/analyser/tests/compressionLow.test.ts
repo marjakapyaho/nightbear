@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeAsISOStr, getTimeSubtractedFrom } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/compressionLow', () => {
@@ -44,7 +44,7 @@ describe('analyser/compressionLow', () => {
         currentTimestamp: mockNow,
         activeProfile: getMockActiveProfile('night'),
         sensorEntries: generateSensorEntries({
-          currentTimestamp: getTimeAsISOStr(getTimeSubtractedFrom(mockNow, 10 * MIN_IN_MS)),
+          currentTimestamp: getTimeMinusTime(mockNow, 10 * MIN_IN_MS),
           bloodGlucoseHistory: [10, 10.4, 9.9, 7, 3.8],
         }),
         insulinEntries: [],
