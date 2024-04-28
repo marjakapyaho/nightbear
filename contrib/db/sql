@@ -3,17 +3,15 @@
 set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
 
 DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" # figure out current script path
-ENV="$("$DIR/env" ${1:-})" # make sure we exit if the env isn't valid
-eval "$ENV" # set correct DATABASE_URL for this env
-
-DATABASE_URL="$(echo "$DATABASE_URL" | sed s/@localhost/@host.docker.internal/)" # localhost won't be directly reachable → update if needed
+DATABASE_URL="$("$DIR/env" ${1:-})" # set correct DATABASE_URL for this env
+DATABASE_URL="${DATABASE_URL/@localhost/@host.docker.internal}" # localhost won't be directly reachable → update if needed
 
 if [[ $# -ge 2 ]] && [[ -f "$2" ]]; then
-  # Argument is a file path, execute SQL from the file
+  # Argument is a file path → execute SQL from the file
   docker run --rm -i -v $(pwd):/app -v "$(realpath "$2")":/tmp/sql postgres:16 psql "$DATABASE_URL" -f /tmp/sql
 elif [[ $# -ge 2 ]]; then
-  # Argument is a SQL command, execute it directly
-  docker run --rm -i -v $(pwd):/app postgres:16 psql "$DATABASE_URL" -c "$2"
+  # Argument(s) are a SQL statement → execute it (collapsed to 1 arg)
+  docker run --rm -i -v $(pwd):/app postgres:16 psql "$DATABASE_URL" -c "${*:2}"
 else
   # No second argument provided, start interactive psql session
   docker run --rm -it -v $(pwd):/app postgres:16 psql "$DATABASE_URL"

@@ -34,9 +34,9 @@
     "\n==================== DB ====================": "",
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && npm run db:migrate",
     "db:migrate": "contrib/db/migrate test",
-    "db:types": "eval $(contrib/db/env test) && pgtyped --config pgtyped-config.json",
+    "db:types": "DATABASE_URL=$(contrib/db/env test) pgtyped --config pgtyped-config.json",
     "\n==================== UTILS ====================": "",
-    "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
+    "ts-node": "DATABASE_URL=$(contrib/db/env test) NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
   "lambdaDependencies": [
     "@pgtyped/runtime",
