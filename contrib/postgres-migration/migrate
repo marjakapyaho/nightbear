@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+
+npm run db:reset
+
+for file in $(ls contrib/postgres-migration/*.sql); do
+  contrib/db/sql test $file
+done
+
+contrib/db/dump test dump.sql
+contrib/db/sql prod DROP DATABASE nightbear_stage # use the other DB because can't drop the active DB
+contrib/db/sql prod CREATE DATABASE nightbear_stage
+contrib/db/sql stage dump.sql
