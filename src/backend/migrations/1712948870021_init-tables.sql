@@ -53,7 +53,7 @@ CREATE TABLE situation_settings (
   PRIMARY KEY(situation, profile_template_id)
 );
 
-CREATE TABLE profiles_activations (
+CREATE TABLE profile_activations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_template_id UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
   activated_at TIMESTAMPTZ NOT NULL,

@@ -1,6 +1,9 @@
-import { chain, sortBy } from 'lodash';
-import { isTimeSmallerOrEqual } from 'shared/utils/time';
-import { getActivationAsUTCTimestamp } from 'backend/cronjobs/profiles/utils';
+import { chain } from 'lodash';
+import {
+  findRepeatingActivationToActivate,
+  shouldNonRepeatingActivationBeDeactivated,
+  shouldRepeatingActivationBeSwitched,
+} from 'backend/cronjobs/profiles/utils';
 import { Context } from 'backend/utils/api';
 import { getActiveProfile } from 'shared/utils/profiles';
 import { Profile } from 'shared/types/profiles';
@@ -17,47 +20,30 @@ export const profiles: Cronjob = async (
 export const checkAndUpdateProfileActivations = async (
   context: Context,
   currentTimestamp: string,
+  timezone = 'TZ',
 ) => {
   const { log } = context;
-
   const profileActivations = await context.db.profiles.getRelevantProfileActivations();
-
-  if (!profileActivations.length) {
-    throw new Error('No profile');
-  }
-
-  console.log(chain(profileActivations).sortBy('activatedAt').last().value());
-
-  // TODO: TEST THIS
   const latestActivation = chain(profileActivations).sortBy('activatedAt').last().value();
+  const activationToActivate = findRepeatingActivationToActivate(
+    profileActivations,
+    currentTimestamp,
+    timezone,
+  );
 
-  // Should current activation be deactivated
+  /**
+   * Check if we should reactivate a repeating profile activation in either of two cases:
+   * 1. We are using a repeating activation, and it's time to activate another repeating activation
+   * 2. We are using a non-repeating activation that has reached its deactivation time
+   */
   if (
-    latestActivation.deactivatedAt &&
-    isTimeSmallerOrEqual(latestActivation.deactivatedAt, currentTimestamp)
+    shouldRepeatingActivationBeSwitched(latestActivation, activationToActivate) ||
+    shouldNonRepeatingActivationBeDeactivated(latestActivation, currentTimestamp)
   ) {
-    // Find repeating activation that should be activated
-    const activationToActivate = chain(profileActivations)
-      .map(activation =>
-        activation.repeatTimeInLocalTimezone
-          ? {
-              id: activation.id,
-              activationTimestamp: getActivationAsUTCTimestamp(
-                activation.repeatTimeInLocalTimezone,
-                currentTimestamp,
-              ),
-            }
-          : null,
-      )
-      .filter(activation => Boolean(activation && activation.activationTimestamp))
-      .sortBy('activationTimestamp')
-      .last()
-      .value();
-
     await context.db.profiles.reactivateProfileActivation(activationToActivate);
   }
 
-  // TODO: CASTING
+  // TODO: CASTING + get active profile from db with query
   const profilesAfterUpdate = (await context.db.profiles.getProfiles()) as Profile[];
   return getActiveProfile(profilesAfterUpdate);
 };

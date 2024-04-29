@@ -6,7 +6,7 @@ INSERT INTO profile_templates (
     notification_targets
 )
 VALUES (
-  :profileName!,
+  :profileName,
   :alarmsEnabled!,
   :analyserSettingsId!,
   :notificationTargets!
@@ -52,7 +52,7 @@ VALUES (
 RETURNING *;
 
 /* @name createProfileActivation */
-INSERT INTO profiles_activations (
+INSERT INTO profile_activations (
   profile_template_id,
   activated_at,
   repeat_time_in_local_timezone,
@@ -99,7 +99,7 @@ WITH
   ),
   most_recent_activation_query AS (
     SELECT profile_template_id
-    FROM profiles_activations
+    FROM profile_activations
     ORDER BY activated_at DESC
     LIMIT 1
   )
@@ -119,17 +119,27 @@ FROM profile_templates
 /*
   @name getRelevantProfileActivations
 */
+WITH
+  most_recent_activation_query AS (
+    SELECT profile_template_id
+    FROM profile_activations
+    ORDER BY activated_at DESC
+    LIMIT 1
+  )
 SELECT
-  id,
-  profile_template_id,
+  profile_activations.id,
+  profile_activations.profile_template_id,
+  profile_templates.profile_name,
   activated_at,
   repeat_time_in_local_timezone,
   deactivated_at
-FROM profiles_activations
-WHERE repeat_time_in_local_timezone IS NOT NULL OR deactivated_at > CURRENT_TIMESTAMP;
+FROM profile_activations
+  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
+WHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL;
 
 /* @name reactivateProfileActivation */
-UPDATE profiles_activations SET
+UPDATE profile_activations SET
   activated_at = CURRENT_TIMESTAMP
 WHERE id = :id!
 RETURNING *;

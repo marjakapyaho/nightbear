@@ -14,7 +14,7 @@ export interface ICreateProfileTemplateParams {
   alarmsEnabled: boolean;
   analyserSettingsId: string;
   notificationTargets: stringArray;
-  profileName: string;
+  profileName?: string | null | void;
 }
 
 /** 'CreateProfileTemplate' return type */
@@ -32,7 +32,7 @@ export interface ICreateProfileTemplateQuery {
   result: ICreateProfileTemplateResult;
 }
 
-const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true,"notificationTargets":true},"params":[{"name":"profileName","required":true,"transform":{"type":"scalar"},"locs":[{"a":134,"b":146}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":165}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":170,"b":189}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":194,"b":214}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id,\n    notification_targets\n)\nVALUES (\n  :profileName!,\n  :alarmsEnabled!,\n  :analyserSettingsId!,\n  :notificationTargets!\n)\nRETURNING *"};
+const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true,"notificationTargets":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":134,"b":145}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":150,"b":164}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":188}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":213}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id,\n    notification_targets\n)\nVALUES (\n  :profileName,\n  :alarmsEnabled!,\n  :analyserSettingsId!,\n  :notificationTargets!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -44,7 +44,7 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
  *     notification_targets
  * )
  * VALUES (
- *   :profileName!,
+ *   :profileName,
  *   :alarmsEnabled!,
  *   :analyserSettingsId!,
  *   :notificationTargets!
@@ -185,12 +185,12 @@ export interface ICreateProfileActivationQuery {
   result: ICreateProfileActivationResult;
 }
 
-const createProfileActivationIR: any = {"usedParamSet":{"profileTemplateId":true,"activatedAt":true,"repeatTimeInLocalTimezone":true,"deactivatedAt":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":156}]},{"name":"activatedAt","required":true,"transform":{"type":"scalar"},"locs":[{"a":162,"b":174}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":180,"b":205}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":211,"b":224}]}],"statement":"INSERT INTO profiles_activations (\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\n)\nVALUES (\n   :profileTemplateId!,\n   :activatedAt!,\n   :repeatTimeInLocalTimezone,\n   :deactivatedAt\n )\nRETURNING *"};
+const createProfileActivationIR: any = {"usedParamSet":{"profileTemplateId":true,"activatedAt":true,"repeatTimeInLocalTimezone":true,"deactivatedAt":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":137,"b":155}]},{"name":"activatedAt","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":173}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":179,"b":204}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":210,"b":223}]}],"statement":"INSERT INTO profile_activations (\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\n)\nVALUES (\n   :profileTemplateId!,\n   :activatedAt!,\n   :repeatTimeInLocalTimezone,\n   :deactivatedAt\n )\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO profiles_activations (
+ * INSERT INTO profile_activations (
  *   profile_template_id,
  *   activated_at,
  *   repeat_time_in_local_timezone,
@@ -228,7 +228,7 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'lowLevelBad', analyser_settings.low_level_bad,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes,\n        'highCorrectionSuppressionMinutes', analyser_settings.high_correction_suppression_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.profile_template_id,\n      json_agg(json_build_object(\n         'situation', situation_settings.situation,\n         'escalationAfterMinutes', situation_settings.escalation_after_minutes,\n         'snoozeMinutes', situation_settings.snooze_minutes\n       )) AS situation_settings\n    FROM situation_settings\n    GROUP BY situation_settings.profile_template_id\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profiles_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.profile_template_id = profile_templates.id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id"};
+const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'lowLevelBad', analyser_settings.low_level_bad,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes,\n        'highCorrectionSuppressionMinutes', analyser_settings.high_correction_suppression_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.profile_template_id,\n      json_agg(json_build_object(\n         'situation', situation_settings.situation,\n         'escalationAfterMinutes', situation_settings.escalation_after_minutes,\n         'snoozeMinutes', situation_settings.snooze_minutes\n       )) AS situation_settings\n    FROM situation_settings\n    GROUP BY situation_settings.profile_template_id\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.profile_template_id = profile_templates.id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id"};
 
 /**
  * Query generated from SQL:
@@ -263,7 +263,7 @@ const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  a
  *   ),
  *   most_recent_activation_query AS (
  *     SELECT profile_template_id
- *     FROM profiles_activations
+ *     FROM profile_activations
  *     ORDER BY activated_at DESC
  *     LIMIT 1
  *   )
@@ -292,6 +292,7 @@ export interface IGetRelevantProfileActivationsResult {
   activatedAt: string;
   deactivatedAt: string | null;
   id: string;
+  profileName: string | null;
   profileTemplateId: string;
   repeatTimeInLocalTimezone: string | null;
 }
@@ -302,19 +303,29 @@ export interface IGetRelevantProfileActivationsQuery {
   result: IGetRelevantProfileActivationsResult;
 }
 
-const getRelevantProfileActivationsIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  id,\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profiles_activations\nWHERE repeat_time_in_local_timezone IS NOT NULL OR deactivated_at > CURRENT_TIMESTAMP"};
+const getRelevantProfileActivationsIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_activations.id,\n  profile_activations.profile_template_id,\n  profile_templates.profile_name,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL"};
 
 /**
  * Query generated from SQL:
  * ```
+ * WITH
+ *   most_recent_activation_query AS (
+ *     SELECT profile_template_id
+ *     FROM profile_activations
+ *     ORDER BY activated_at DESC
+ *     LIMIT 1
+ *   )
  * SELECT
- *   id,
- *   profile_template_id,
+ *   profile_activations.id,
+ *   profile_activations.profile_template_id,
+ *   profile_templates.profile_name,
  *   activated_at,
  *   repeat_time_in_local_timezone,
  *   deactivated_at
- * FROM profiles_activations
- * WHERE repeat_time_in_local_timezone IS NOT NULL OR deactivated_at > CURRENT_TIMESTAMP
+ * FROM profile_activations
+ *   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+ *   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
+ * WHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL
  * ```
  */
 export const getRelevantProfileActivations = new PreparedQuery<IGetRelevantProfileActivationsParams,IGetRelevantProfileActivationsResult>(getRelevantProfileActivationsIR);
@@ -340,12 +351,12 @@ export interface IReactivateProfileActivationQuery {
   result: IReactivateProfileActivationResult;
 }
 
-const reactivateProfileActivationIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":81}]}],"statement":"UPDATE profiles_activations SET\n  activated_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
+const reactivateProfileActivationIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":80}]}],"statement":"UPDATE profile_activations SET\n  activated_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
- * UPDATE profiles_activations SET
+ * UPDATE profile_activations SET
  *   activated_at = CURRENT_TIMESTAMP
  * WHERE id = :id!
  * RETURNING *

@@ -20,7 +20,7 @@ export type SituationSettings = {
 
 export type Profile = {
   id: string;
-  profileName: string;
+  profileName: string | null;
   isActive: boolean;
   alarmsEnabled: boolean;
   analyserSettings: AnalyserSettings;
@@ -31,8 +31,8 @@ export type Profile = {
 export type ProfileActivation = {
   id: string;
   profileTemplateId: string;
-  profileName: string;
+  profileName: string | null;
   activatedAt: string;
-  repeatTimeInLocalTimezone?: string;
-  deactivatedAt?: string;
+  repeatTimeInLocalTimezone?: string | null;
+  deactivatedAt?: string | null;
 };

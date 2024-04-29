@@ -5,8 +5,8 @@ import {
   ProfileActivation,
   SituationSettings,
 } from 'shared/types/profiles';
-import { HOUR_IN_MS } from 'shared/utils/calculations';
-import { getTimeMinusTime, TZ } from 'shared/utils/time';
+import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
+import { getTimeMinusTime, getTimePlusTime, TZ } from 'shared/utils/time';
 import { mockNow } from 'shared/mocks/dates';
 
 export const mockAnalyserSettings: AnalyserSettings = {
@@ -101,15 +101,13 @@ export const mockProfileActivations: ProfileActivation[] = [
     profileTemplateId: '1',
     profileName: 'Day',
     activatedAt: getTimeMinusTime(mockNow, HOUR_IN_MS),
-    repeatTimeInLocalTimezone: DateTime.fromISO(mockNow).setZone(TZ).toFormat('HH:mm'),
+    repeatTimeInLocalTimezone: '8:00',
   },
   {
     id: '456',
     profileTemplateId: '2',
     profileName: 'Night',
     activatedAt: getTimeMinusTime(mockNow, 13 * HOUR_IN_MS),
-    repeatTimeInLocalTimezone: DateTime.fromISO(getTimeMinusTime(mockNow, 13 * HOUR_IN_MS))
-      .setZone(TZ)
-      .toFormat('HH:mm'),
+    repeatTimeInLocalTimezone: '20:00',
   },
 ];
