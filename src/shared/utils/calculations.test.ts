@@ -1,9 +1,6 @@
-import { mockCarbEntries, mockSensorEntries } from 'shared/mocks/timelineEntries';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import {
   MIN_IN_MS,
-  calculateDailyAmounts,
-  calculateDailyAverageBgs,
   calculateHba1c,
   calculateRaw,
   calculateTimeHigh,
@@ -16,14 +13,8 @@ import {
   isDexcomEntryValid,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
-  HOUR_IN_MS,
 } from 'shared/utils/calculations';
-import {
-  getTimeMinusTime,
-  getTimeAsISOStr,
-  getTimeInMillis,
-  getTimeMinusTime,
-} from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
 
 const currentTimestamp = 1508672249758;

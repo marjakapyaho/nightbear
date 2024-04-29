@@ -3,7 +3,7 @@ import debug from 'debug';
 import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
 import { startExpressServer } from 'backend/utils/express';
 import { runCronJobs } from 'backend/utils/cronjobs';
-import { checkAndUpdateProfileActivations } from 'backend/cronjobs/profiles/profiles';
+import { profiles } from 'backend/cronjobs/profiles/profiles';
 import { checks } from 'backend/cronjobs/checks';
 import { temp } from 'backend/cronjobs/temp';
 import { createNodeContext } from './utils/api';
@@ -32,7 +32,7 @@ startExpressServer(
 // Start running periodic tasks
 runCronJobs(context, {
   dexcomShare, // run this before checks()
-  checkAndUpdateProfileActivations,
+  profiles,
   checks, // run this after dexcomShare()
 });
 

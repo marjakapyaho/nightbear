@@ -4,10 +4,21 @@ import { getActivationAsUTCTimestamp } from 'backend/cronjobs/profiles/utils';
 import { Context } from 'backend/utils/api';
 import { getActiveProfile } from 'shared/utils/profiles';
 import { Profile } from 'shared/types/profiles';
+import { Cronjob } from 'backend/utils/cronjobs';
+import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 
-export const checkAndUpdateProfileActivations = async (context: Context) => {
+export const profiles: Cronjob = async (
+  context,
+  journal,
+): Promise<Partial<CronjobsJournal> | void> => {
+  await checkAndUpdateProfileActivations(context, context.timestamp());
+};
+
+export const checkAndUpdateProfileActivations = async (
+  context: Context,
+  currentTimestamp: string,
+) => {
   const { log } = context;
-  const now = context.timestamp();
 
   const profileActivations = await context.db.profiles.getRelevantProfileActivations();
 
@@ -15,11 +26,16 @@ export const checkAndUpdateProfileActivations = async (context: Context) => {
     throw new Error('No profile');
   }
 
+  console.log(chain(profileActivations).sortBy('activatedAt').last().value());
+
   // TODO: TEST THIS
-  const latestActivation = sortBy(profileActivations, 'activatedAt')[0];
+  const latestActivation = chain(profileActivations).sortBy('activatedAt').last().value();
 
   // Should current activation be deactivated
-  if (latestActivation.deactivatedAt && isTimeSmallerOrEqual(latestActivation.deactivatedAt, now)) {
+  if (
+    latestActivation.deactivatedAt &&
+    isTimeSmallerOrEqual(latestActivation.deactivatedAt, currentTimestamp)
+  ) {
     // Find repeating activation that should be activated
     const activationToActivate = chain(profileActivations)
       .map(activation =>
@@ -28,7 +44,7 @@ export const checkAndUpdateProfileActivations = async (context: Context) => {
               id: activation.id,
               activationTimestamp: getActivationAsUTCTimestamp(
                 activation.repeatTimeInLocalTimezone,
-                now,
+                currentTimestamp,
               ),
             }
           : null,
