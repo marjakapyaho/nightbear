@@ -33,7 +33,13 @@ export type DbClient = ReturnType<typeof createDbClient>;
  * Creates a Postgres wrapper for talking to the database.
  */
 export function createDbClient(connectionString: string) {
-  return wrapQueries(dbModules, new Pool({ connectionString }));
+  const pool = new Pool({ connectionString })
+  return {
+    ...wrapQueries(dbModules, pool),
+    async query(query: string) {
+      return await pool.query(query)
+    }
+  };
 }
 
 /**
