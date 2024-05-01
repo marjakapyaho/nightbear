@@ -1,50 +1,38 @@
 import { runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
-import { HOUR_IN_MS } from 'shared/utils/calculations';
-import { map, identity } from 'lodash';
-import { onlyActive } from 'shared/utils/alarms';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { Context } from 'backend/utils/api';
-import { mockAlarms } from 'shared/mocks/alarms';
 import { getActiveProfile } from 'shared/utils/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
-import { getTimeMinusTime } from 'shared/utils/time';
 import { SensorEntry } from 'shared/types/timelineEntries';
-import { getMergedBgEntries } from 'shared/utils/timelineEntries';
-
-export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
-export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
-
-const getRange = (context: Context) => ({
-  from: getTimeMinusTime(context.timestamp(), ANALYSIS_RANGE),
-  to: context.timestamp(),
-});
+import { getRange } from './utils';
 
 export const checks: Cronjob = async (context: Context, _journal) => {
   const { log } = context;
 
-  log('--- Started checks ---');
+  log('--- STARTED CHECKS ---');
 
-  // TODO: get this better
-  const sensorEntries = (await context.db.sensorEntries.byTimestamp(
-    getRange(context),
-  )) as SensorEntry[];
+  const sensorEntriesArray = await context.db.sensorEntries.byTimestamp(getRange(context));
   const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context));
   const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context));
   const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context));
-  const profiles = await context.db.profiles.getProfiles();
-  const alarms = mockAlarms;
-  const [activeAlarm] = await context.db.alarms.getActiveAlarm();
+  const profilesArray = await context.db.profiles.getProfiles();
+  const alarmsArray = await context.db.alarms.getAlarms(getRange(context));
+  const [activeAlarmObj] = await context.db.alarms.getAlarms({ onlyActive: true });
 
-  // TODO: get this better
-  const activeProfile = getActiveProfile(profiles as Profile[]);
+  // TODO: FIX THESE
+  const sensorEntries = sensorEntriesArray as SensorEntry[];
+  const alarms = alarmsArray as unknown as Alarm[];
+  const activeAlarm = activeAlarmObj as unknown as Alarm;
+  const profiles = profilesArray as Profile[];
 
+  const activeProfile = getActiveProfile(profiles);
+
+  // TODO: MOVE THIS
   if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
   log(`1. Using profile: ${activeProfile?.profileName}`);
-
-  // TODO: merge sensor entries and meter entries
 
   const situation = runAnalysis({
     currentTimestamp: context.timestamp(),
@@ -58,6 +46,7 @@ export const checks: Cronjob = async (context: Context, _journal) => {
 
   log(`2. Active situation: ${situation || '-'}`);
 
-  // TODO: get this better
-  runAlarmChecks(context, situation, activeProfile, activeAlarm as Alarm);
+  const alarmId = await runAlarmChecks(context, situation, activeProfile, activeAlarm);
+
+  log(`3. Active alarm with id: ${alarmId || '-'}`);
 };

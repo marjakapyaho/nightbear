@@ -1,6 +1,5 @@
 import { Profile, ProfileActivation } from 'shared/types/profiles';
 import { Context } from 'backend/utils/api';
-import { getActiveProfile } from 'shared/utils/profiles';
 
 export const createProfileWithActivation = async (
   profile: Profile,

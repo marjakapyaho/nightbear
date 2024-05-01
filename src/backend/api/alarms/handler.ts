@@ -3,17 +3,18 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 import { getTimePlusTime } from 'shared/utils/time';
 import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from 'backend/api/alarms/utils';
 import { Alarm } from 'shared/types/alarms';
+import { ALARM_DEFAULT_LEVEL } from 'shared/utils/alarms';
 
 export const getActiveAlarm = async (request: Request, context: Context) => {
-  const [activeAlarm] = await context.db.alarms.getActiveAlarm();
+  const [activeAlarm] = await context.db.alarms.getAlarms({ onlyActive: true });
   return createResponse(activeAlarm);
 };
 
 export const ackActiveAlarm = async (request: Request, context: Context) => {
   // Get active alarm
-  const [alarm] = await context.db.alarms.getActiveAlarm();
+  const [alarm] = await context.db.alarms.getAlarms({ onlyActive: true });
   // TODO: HANDLE ERROR + BETTER CASTING
-  const activeAlarm = alarm as Alarm;
+  const activeAlarm = alarm as unknown as Alarm;
 
   // If we have nothing to ack, return
   if (isThereNothingToAck(activeAlarm, context)) {
@@ -26,7 +27,7 @@ export const ackActiveAlarm = async (request: Request, context: Context) => {
   // Create new alarm state with snooze minutes and reset level
   await context.db.alarms.createAlarmState({
     alarmId: activeAlarm.id,
-    alarmLevel: 0,
+    alarmLevel: ALARM_DEFAULT_LEVEL,
     validAfter: getTimePlusTime(context.timestamp(), snoozeMinutes * MIN_IN_MS),
   });
   // TODO: HANDLE ERROR

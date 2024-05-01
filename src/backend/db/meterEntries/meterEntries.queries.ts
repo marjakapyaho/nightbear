@@ -9,7 +9,6 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   bloodGlucose: number;
-  id: string;
   timestamp: string;
 }
 
@@ -70,7 +69,7 @@ export const createMeterEntries = new PreparedQuery<ICreateMeterEntriesParams,IC
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;
-  to: string | Date;
+  to?: string | Date | null | void;
 }
 
 /** 'ByTimestamp' return type */
@@ -85,7 +84,7 @@ export interface IByTimestampQuery {
   result: IByTimestampResult;
 }
 
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":79}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":98,"b":101}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose\nFROM meter_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":79}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":107,"b":109}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose\nFROM meter_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
 
 /**
  * Query generated from SQL:
@@ -94,7 +93,7 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
  *   timestamp,
  *   blood_glucose
  * FROM meter_entries
- * WHERE timestamp >= :from! AND timestamp <= :to!
+ * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
  * ```
  */
 export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
@@ -109,7 +108,6 @@ export interface IUpsertMeterEntryParams {
 /** 'UpsertMeterEntry' return type */
 export interface IUpsertMeterEntryResult {
   bloodGlucose: number;
-  id: string;
   timestamp: string;
 }
 

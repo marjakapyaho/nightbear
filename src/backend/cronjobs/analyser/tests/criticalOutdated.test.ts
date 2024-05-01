@@ -14,6 +14,7 @@ describe('analyser/criticalOutdated', () => {
           bloodGlucoseHistory: [7.0, 6.0, 5.0, 4.7, 4.4], // Predicted low
           latestEntryAge: 25,
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -31,6 +32,7 @@ describe('analyser/criticalOutdated', () => {
           bloodGlucoseHistory: [7.0, 6.0, 6.1, 6.5, 6.4],
           latestEntryAge: 25,
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -44,6 +46,7 @@ describe('analyser/criticalOutdated', () => {
         currentTimestamp: mockNow,
         activeProfile: getMockActiveProfile('day'),
         sensorEntries: [],
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],

@@ -13,6 +13,7 @@ describe('analyser/noSituation', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [8.5, 7, 7, 8],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],

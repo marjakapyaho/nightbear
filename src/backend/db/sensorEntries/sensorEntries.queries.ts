@@ -10,7 +10,6 @@ export interface ICreateParams {
 /** 'Create' return type */
 export interface ICreateResult {
   bloodGlucose: number;
-  id: string;
   timestamp: string;
   type: string;
 }
@@ -74,13 +73,12 @@ export const createSensorEntries = new PreparedQuery<ICreateSensorEntriesParams,
 /** 'ByTimestamp' parameters type */
 export interface IByTimestampParams {
   from: string | Date;
-  to: string | Date;
+  to?: string | Date | null | void;
 }
 
 /** 'ByTimestamp' return type */
 export interface IByTimestampResult {
   bloodGlucose: number;
-  id: string;
   timestamp: string;
   type: string;
 }
@@ -91,14 +89,14 @@ export interface IByTimestampQuery {
   result: IByTimestampResult;
 }
 
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":48,"b":53}]},{"name":"to","required":true,"transform":{"type":"scalar"},"locs":[{"a":72,"b":75}]}],"statement":"SELECT *\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= :to!"};
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":48,"b":53}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":81,"b":83}]}],"statement":"SELECT *\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT *
  * FROM sensor_entries
- * WHERE timestamp >= :from! AND timestamp <= :to!
+ * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
  * ```
  */
 export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
@@ -110,7 +108,6 @@ export type ILatestParams = void;
 /** 'Latest' return type */
 export interface ILatestResult {
   bloodGlucose: number;
-  id: string;
   timestamp: string;
   type: string;
 }

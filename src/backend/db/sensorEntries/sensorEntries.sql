@@ -22,7 +22,7 @@ RETURNING timestamp;
 /* @name byTimestamp */
 SELECT *
 FROM sensor_entries
-WHERE timestamp >= :from! AND timestamp <= :to!;
+WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 
 /* @name latest */
 SELECT *

@@ -9,7 +9,7 @@ import {
   checkThatThereIsNoCorrectionInsulin,
   getLatestAnalyserEntry,
   isSituationCritical,
-} from 'backend/cronjobs/analyser/analyserUtils';
+} from 'backend/cronjobs/analyser/utils';
 import { chain, filter, find } from 'lodash';
 
 const PERSISTENT_HIGH_TIME_WINDOW = 2 * HOUR_IN_MS;

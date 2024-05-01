@@ -7,7 +7,7 @@ import {
   mockProfiles,
   mockSituationSettings,
 } from 'shared/mocks/profiles';
-import { createProfileWithActivation } from 'backend/db/profiles/profiles';
+import { createProfileWithActivation } from 'backend/db/profiles/utils';
 import { Profile } from 'shared/types/profiles';
 
 describe('profiles/checkAndUpdateProfileActivations', () => {

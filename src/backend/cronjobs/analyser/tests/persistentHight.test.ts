@@ -20,6 +20,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: persistentHighValues,
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -36,6 +37,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [11.4, ...persistentHighValues],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -52,6 +54,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [9.5, 9.5, 9.4, 9.6, 9.6, 9.5, 9.4, 9.5],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -68,6 +71,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [...persistentHighValues, 10.1, 9.5],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -84,6 +88,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [...persistentHighValues, 7.1],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -100,6 +105,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: persistentHighValues,
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: mockNow,
@@ -122,6 +128,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: persistentHighValues,
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
@@ -144,6 +151,7 @@ describe('analyser/persistentHigh', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [...persistentHighValues, 9.4],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],

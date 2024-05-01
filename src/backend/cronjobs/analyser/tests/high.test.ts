@@ -15,6 +15,7 @@ describe('analyser/high', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [9.0, 9.5, 9.6, 9.8, 10.1],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -31,6 +32,7 @@ describe('analyser/high', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [9.0, 9.5, 9.6, 9.8, 10.1],
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: mockNow,
@@ -53,6 +55,7 @@ describe('analyser/high', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [9.0, 9.5, 9.6, 9.8, 10.1],
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
@@ -76,6 +79,7 @@ describe('analyser/high', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [15.5, 14.5, 14.1, 13.5],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [
@@ -108,6 +112,7 @@ describe('analyser/high', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [11.5, 10.5, 9.9],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [

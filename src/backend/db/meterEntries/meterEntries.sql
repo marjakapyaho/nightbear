@@ -23,7 +23,7 @@ SELECT
   timestamp,
   blood_glucose
 FROM meter_entries
-WHERE timestamp >= :from! AND timestamp <= :to!;
+WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 
 /*
   @name upsertMeterEntry

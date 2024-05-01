@@ -3,7 +3,7 @@ import {
   getLatestAnalyserEntry,
   getPredictedSituation,
   mapSensorAndMeterEntriesToAnalyserEntries,
-} from 'backend/cronjobs/analyser/analyserUtils';
+} from 'backend/cronjobs/analyser/utils';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
@@ -31,19 +31,20 @@ export const runAnalysis = ({
   alarms,
 }: AnalyserData): Situation | null => {
   const entries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
+  const predictedSituation = getPredictedSituation(activeProfile, entries, currentTimestamp);
 
-  return analyseSituation(
+  return detectSituation(
     currentTimestamp,
     activeProfile,
     entries,
     insulinEntries,
     carbEntries,
     alarms,
-    getPredictedSituation(activeProfile, entries),
+    predictedSituation,
   );
 };
 
-export const analyseSituation = (
+export const detectSituation = (
   currentTimestamp: string,
   activeProfile: Profile,
   entries: AnalyserEntry[],

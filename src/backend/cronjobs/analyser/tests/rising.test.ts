@@ -15,6 +15,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6.5, 6.8, 7.4, 8.5],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -31,6 +32,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [5.5, 6.8, 7.6],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -47,6 +49,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [5.5, 6.8, 7.6, 8.8, 9.5, 10.1],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -63,6 +66,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [5.5, 6.8, 7.6, 8.1],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -79,6 +83,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [8.1],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -95,6 +100,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6.5, 6.8, 7.4, 8.5],
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: mockNow,
@@ -117,6 +123,7 @@ describe('analyser/rising', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6.5, 6.8, 7.4, 8.5],
         }),
+        meterEntries: [],
         insulinEntries: [
           {
             timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),

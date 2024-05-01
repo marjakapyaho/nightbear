@@ -4,7 +4,7 @@ import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
 import { startExpressServer } from 'backend/utils/express';
 import { runCronJobs } from 'backend/utils/cronjobs';
 import { profiles } from 'backend/cronjobs/profiles/profiles';
-import { checks } from 'backend/cronjobs/checks';
+import { checks } from 'backend/cronjobs/checks/checks';
 import { temp } from 'backend/cronjobs/temp';
 import { createNodeContext } from './utils/api';
 import { ackActiveAlarm, getActiveAlarm } from 'backend/api/alarms/handler';

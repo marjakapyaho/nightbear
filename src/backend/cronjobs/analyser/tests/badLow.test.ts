@@ -13,6 +13,7 @@ describe('analyser/badLow', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [4, 4.5, 3.5, 2.9],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],

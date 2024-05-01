@@ -13,11 +13,16 @@ import {
   SensorEntryType,
 } from 'shared/types/timelineEntries';
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
-import { getTimeMinusTimeMs, isTimeLarger, getTimePlusTime } from 'shared/utils/time';
+import {
+  getTimeMinusTimeMs,
+  isTimeLarger,
+  getTimePlusTime,
+  getTimeMinusTime,
+} from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
-import { analyseSituation } from 'backend/cronjobs/analyser/analyser';
+import { detectSituation } from 'backend/cronjobs/analyser/analyser';
 import { DateTime } from 'luxon';
 
 export type AnalyserData = {
@@ -31,6 +36,7 @@ export type AnalyserData = {
 };
 
 const PREDICTION_TIME_WINDOW = 30;
+const PREDICTION_DATA_MINUTES = 30;
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -176,13 +182,17 @@ export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) => chain(entrie
 export const getPredictedAnalyserEntries = (
   analyserEntries: AnalyserEntry[],
   predictionMinutes: number,
+  currentTimestamp: string,
 ) => {
   if (analyserEntries.length < 2) {
     return [];
   }
 
-  const PREDICTION_DATA_MINUTES = 30;
-  const entries = analyserEntries.slice(-(PREDICTION_DATA_MINUTES / 5 + 1)); // use only last 30 minutes of data
+  const predictionRangeEnd = getTimeMinusTime(
+    currentTimestamp,
+    PREDICTION_DATA_MINUTES * MIN_IN_MS,
+  );
+  const entries = analyserEntries.filter(entry => entry.timestamp > predictionRangeEnd);
   const entriesCount = entries.length;
   const latestEntry = getLatestAnalyserEntry(entries);
 
@@ -203,9 +213,18 @@ export const getPredictedAnalyserEntries = (
   return mapSensorAndMeterEntriesToAnalyserEntries(predictedSensorEntries);
 };
 
-export const getPredictedSituation = (activeProfile: Profile, entries: AnalyserEntry[]) => {
-  const predictedEntries = getPredictedAnalyserEntries(entries, PREDICTION_TIME_WINDOW);
-  return analyseSituation(
+export const getPredictedSituation = (
+  activeProfile: Profile,
+  entries: AnalyserEntry[],
+  currentTimestamp: string,
+) => {
+  const predictedEntries = getPredictedAnalyserEntries(
+    entries,
+    PREDICTION_TIME_WINDOW,
+    currentTimestamp,
+  );
+
+  return detectSituation(
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
     activeProfile, // TODO: this might change during prediction
     predictedEntries,

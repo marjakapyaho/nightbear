@@ -15,6 +15,7 @@ describe('analyser/low', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6, 5, 4.7, 3.8],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -31,6 +32,7 @@ describe('analyser/low', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6, 5, 4.7, 3.8],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [
           {
@@ -53,6 +55,7 @@ describe('analyser/low', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [6, 5, 4.7, 3.8],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [
           {
@@ -75,6 +78,7 @@ describe('analyser/low', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [2.4, 2.8, 2.9, 3.4],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [
@@ -107,6 +111,7 @@ describe('analyser/low', () => {
           currentTimestamp: mockNow,
           bloodGlucoseHistory: [3.4, 3.6, 3.8, 4.3],
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [

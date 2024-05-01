@@ -56,7 +56,7 @@ WHERE alarm_id = :alarmId! AND notification_processed_at IS NULL
 RETURNING *;
 
 /*
-  @name getActiveAlarm
+  @name getAlarms
 */
 WITH
   alarm_states_query AS (
@@ -77,10 +77,13 @@ WITH
   )
 SELECT
   alarms.id AS id,
+  timestamp,
   situation,
   (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS "is_active!",
   deactivated_at,
   alarm_states_query.alarm_states AS alarm_states
 FROM alarms
   LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id
-WHERE deactivated_at IS NULL;
+WHERE
+  (:onlyActive = TRUE AND deactivated_at IS NULL) OR
+  timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);

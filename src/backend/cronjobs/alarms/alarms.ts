@@ -1,13 +1,11 @@
 import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
-import { getAlarmState } from 'shared/utils/alarms';
+import { ALARM_DEFAULT_LEVEL, getAlarmState } from 'shared/utils/alarms';
 import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
 import { isTimeSmaller } from 'shared/utils/time';
 import { isNotNull } from 'shared/utils/helpers';
 import { getNeededAlarmLevel, getPushoverRecipient, retryNotifications } from './utils';
-
-const INITIAL_ALARM_LEVEL = 0;
 
 type AlarmActions = {
   remove?: Alarm;
@@ -153,7 +151,7 @@ export const createAlarm = async (
 
   await context.db.alarms.createAlarmState({
     alarmId: createdAlarm.id,
-    alarmLevel: INITIAL_ALARM_LEVEL,
+    alarmLevel: ALARM_DEFAULT_LEVEL,
     validAfter: context.timestamp(),
   });
 

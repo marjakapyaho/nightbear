@@ -16,6 +16,7 @@ export interface ICreateAlarmResult {
   deactivatedAt: string | null;
   id: string;
   situation: situation;
+  timestamp: string;
 }
 
 /** 'CreateAlarm' query type */
@@ -53,6 +54,7 @@ export interface IDeactivateAlarmResult {
   deactivatedAt: string | null;
   id: string;
   situation: situation;
+  timestamp: string;
 }
 
 /** 'DeactivateAlarm' query type */
@@ -212,25 +214,30 @@ const markAllAlarmStatesAsProcessedIR: any = {"usedParamSet":{"alarmId":true},"p
 export const markAllAlarmStatesAsProcessed = new PreparedQuery<IMarkAllAlarmStatesAsProcessedParams,IMarkAllAlarmStatesAsProcessedResult>(markAllAlarmStatesAsProcessedIR);
 
 
-/** 'GetActiveAlarm' parameters type */
-export type IGetActiveAlarmParams = void;
+/** 'GetAlarms' parameters type */
+export interface IGetAlarmsParams {
+  from?: string | Date | null | void;
+  onlyActive?: boolean | null | void;
+  to?: string | Date | null | void;
+}
 
-/** 'GetActiveAlarm' return type */
-export interface IGetActiveAlarmResult {
+/** 'GetAlarms' return type */
+export interface IGetAlarmsResult {
   alarmStates: Json | null;
   deactivatedAt: string | null;
   id: string;
   isActive: boolean;
   situation: situation;
+  timestamp: string;
 }
 
-/** 'GetActiveAlarm' query type */
-export interface IGetActiveAlarmQuery {
-  params: IGetActiveAlarmParams;
-  result: IGetActiveAlarmResult;
+/** 'GetAlarms' query type */
+export interface IGetAlarmsQuery {
+  params: IGetAlarmsParams;
+  result: IGetAlarmsResult;
 }
 
-const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  alarm_states_query AS (\n    SELECT\n      alarm_states.alarm_id,\n      json_agg(json_build_object(\n        'id', alarm_states.id::VARCHAR,\n        'timestamp', alarm_states.timestamp,\n        'alarmLevel', alarm_states.alarm_level,\n        'validAfter', alarm_states.valid_after,\n        'ackedBy', alarm_states.acked_by,\n        'notificationTarget', alarm_states.notification_target,\n        'notificationReceipt', alarm_states.notification_receipt,\n        'notificationProcessedAt', alarm_states.notification_processed_at\n        ) ORDER BY alarm_states.timestamp) AS alarm_states\n    FROM alarm_states\n    GROUP BY alarm_states.alarm_id\n  )\nSELECT\n  alarms.id AS id,\n  situation,\n  (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS \"is_active!\",\n  deactivated_at,\n  alarm_states_query.alarm_states AS alarm_states\nFROM alarms\n  LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id\nWHERE deactivated_at IS NULL"};
+const getAlarmsIR: any = {"usedParamSet":{"onlyActive":true,"from":true,"to":true},"params":[{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":946,"b":956}]},{"name":"from","required":false,"transform":{"type":"scalar"},"locs":[{"a":1011,"b":1015}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":1043,"b":1045}]}],"statement":"WITH\n  alarm_states_query AS (\n    SELECT\n      alarm_states.alarm_id,\n      json_agg(json_build_object(\n        'id', alarm_states.id::VARCHAR,\n        'timestamp', alarm_states.timestamp,\n        'alarmLevel', alarm_states.alarm_level,\n        'validAfter', alarm_states.valid_after,\n        'ackedBy', alarm_states.acked_by,\n        'notificationTarget', alarm_states.notification_target,\n        'notificationReceipt', alarm_states.notification_receipt,\n        'notificationProcessedAt', alarm_states.notification_processed_at\n        ) ORDER BY alarm_states.timestamp) AS alarm_states\n    FROM alarm_states\n    GROUP BY alarm_states.alarm_id\n  )\nSELECT\n  alarms.id AS id,\n  timestamp,\n  situation,\n  (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS \"is_active!\",\n  deactivated_at,\n  alarm_states_query.alarm_states AS alarm_states\nFROM alarms\n  LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id\nWHERE\n  (:onlyActive = TRUE AND deactivated_at IS NULL) OR\n  timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
 
 /**
  * Query generated from SQL:
@@ -254,15 +261,18 @@ const getActiveAlarmIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n
  *   )
  * SELECT
  *   alarms.id AS id,
+ *   timestamp,
  *   situation,
  *   (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS "is_active!",
  *   deactivated_at,
  *   alarm_states_query.alarm_states AS alarm_states
  * FROM alarms
  *   LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id
- * WHERE deactivated_at IS NULL
+ * WHERE
+ *   (:onlyActive = TRUE AND deactivated_at IS NULL) OR
+ *   timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
  * ```
  */
-export const getActiveAlarm = new PreparedQuery<IGetActiveAlarmParams,IGetActiveAlarmResult>(getActiveAlarmIR);
+export const getAlarms = new PreparedQuery<IGetAlarmsParams,IGetAlarmsResult>(getAlarmsIR);
 
 

@@ -14,6 +14,7 @@ describe('analyser/outdated', () => {
           bloodGlucoseHistory: [6.2, 6.0, 6.1, 6.0, 5.9], // No predicted low
           latestEntryAge: 35,
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
@@ -31,6 +32,7 @@ describe('analyser/outdated', () => {
           bloodGlucoseHistory: [6.2, 6.0, 6.1, 6.0, 5.9], // No predicted low
           latestEntryAge: 25,
         }),
+        meterEntries: [],
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
