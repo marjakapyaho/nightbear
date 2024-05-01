@@ -11,6 +11,7 @@ import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
 import { getTimeMinusTime } from 'shared/utils/time';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { getMergedBgEntries } from 'shared/utils/timelineEntries';
 
 export const ANALYSIS_RANGE = 3 * HOUR_IN_MS;
 export const ALARM_FETCH_RANGE = 12 * HOUR_IN_MS;
@@ -42,12 +43,14 @@ export const checks: Cronjob = async (context: Context, _journal) => {
   if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
   log(`1. Using profile: ${activeProfile?.profileName}`);
+
   // TODO: merge sensor entries and meter entries
 
   const situation = runAnalysis({
     currentTimestamp: context.timestamp(),
     activeProfile,
     sensorEntries,
+    meterEntries,
     insulinEntries,
     carbEntries,
     alarms,

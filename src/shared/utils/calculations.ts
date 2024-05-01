@@ -1,8 +1,9 @@
 import { fill, groupBy, reduce } from 'lodash';
 import { DateTime } from 'luxon';
-import { CarbEntry, InsulinEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 import { getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
+import { roundNumberToFixedDecimals } from 'shared/utils/helpers';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -27,7 +28,12 @@ export const changeBloodGlucoseUnitToMgdl = (glucoseInMmoll: number): number => 
 };
 
 // Calculates actual blood glucose in mmol/L
-export const calculateRaw = (unfiltered: number, slope: number, intercept: number, scale = 1): number | null => {
+export const calculateRaw = (
+  unfiltered: number,
+  slope: number,
+  intercept: number,
+  scale = 1,
+): number | null => {
   if (unfiltered !== 0 && slope !== 0 && scale !== 0) {
     const raw = (scale * (unfiltered - intercept)) / slope;
     return changeBloodGlucoseUnitToMmoll(raw);
@@ -92,7 +98,9 @@ export const calculateTimeInRange = (sensorEntries: SensorEntry[]) => {
   const totalCount = sensorEntries.length;
   const goodCount = sensorEntries.filter(
     entry =>
-      entry.bloodGlucose && entry.bloodGlucose >= timeInRangeLowLimit && entry.bloodGlucose <= timeInRangeHighLimit,
+      entry.bloodGlucose &&
+      entry.bloodGlucose >= timeInRangeLowLimit &&
+      entry.bloodGlucose <= timeInRangeHighLimit,
   ).length;
 
   return Math.round((goodCount / totalCount) * 100);
@@ -138,7 +146,8 @@ export const countSituations = (sensorEntries: SensorEntry[], limit: number, low
 export const getBgAverage = (sensorEntries: SensorEntry[]) => {
   const entriesWithBgs = sensorEntries.filter(entry => entry.bloodGlucose);
   return setOneDecimal(
-    entriesWithBgs.reduce((sum, entry) => sum + (entry.bloodGlucose || 0), 0) / entriesWithBgs.length,
+    entriesWithBgs.reduce((sum, entry) => sum + (entry.bloodGlucose || 0), 0) /
+      entriesWithBgs.length,
   );
 };
 
@@ -149,10 +158,15 @@ const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
 
 const getDailyAverage = (dailySensorEntries: SensorEntry[]) =>
   dailySensorEntries.length
-    ? dailySensorEntries.reduce((prev, current) => prev + current.bloodGlucose, 0) / dailySensorEntries.length
+    ? dailySensorEntries.reduce((prev, current) => prev + current.bloodGlucose, 0) /
+      dailySensorEntries.length
     : 0;
 
-export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], days: number, now = Date.now()) => {
+export const calculateDailyAmounts = (
+  entries: (InsulinEntry | CarbEntry)[],
+  days: number,
+  now = Date.now(),
+) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
     timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
     total: null,
@@ -160,11 +174,18 @@ export const calculateDailyAmounts = (entries: (InsulinEntry | CarbEntry)[], day
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
     timestamp: getTimeInMillis(day.timestamp),
-    total: day.timestamp && groupedEntries[day.timestamp] ? getTotal(groupedEntries[day.timestamp]) : null,
+    total:
+      day.timestamp && groupedEntries[day.timestamp]
+        ? getTotal(groupedEntries[day.timestamp])
+        : null,
   }));
 };
 
-export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number, now = Date.now()) => {
+export const calculateDailyAverageBgs = (
+  entries: SensorEntry[],
+  days: number,
+  now = Date.now(),
+) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
     timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
     average: null,
@@ -172,6 +193,14 @@ export const calculateDailyAverageBgs = (entries: SensorEntry[], days: number, n
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
     timestamp: getTimeInMillis(day.timestamp),
-    average: day.timestamp && groupedEntries[day.timestamp] ? getDailyAverage(groupedEntries[day.timestamp]) : null,
+    average:
+      day.timestamp && groupedEntries[day.timestamp]
+        ? getDailyAverage(groupedEntries[day.timestamp])
+        : null,
   }));
+};
+
+export const calculateAverageBg = (entries: (SensorEntry | MeterEntry)[]) => {
+  const sumOfBgs = entries.map(entry => entry.bloodGlucose).reduce((prev, cur) => prev + cur, 0);
+  return roundNumberToFixedDecimals(sumOfBgs / entries.length, 1);
 };

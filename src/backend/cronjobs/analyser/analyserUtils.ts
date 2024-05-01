@@ -1,8 +1,14 @@
-import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from 'shared/utils/calculations';
-import { reduce, slice, sum, find, chain, sortBy } from 'lodash';
+import {
+  calculateAverageBg,
+  MIN_IN_MS,
+  roundTo2Decimals,
+  TIME_LIMIT_FOR_SLOPE,
+} from 'shared/utils/calculations';
+import { reduce, slice, sum, find, chain } from 'lodash';
 import {
   CarbEntry,
   InsulinEntry,
+  MeterEntry,
   SensorEntry,
   SensorEntryType,
 } from 'shared/types/timelineEntries';
@@ -12,11 +18,13 @@ import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { analyseSituation } from 'backend/cronjobs/analyser/analyser';
+import { DateTime } from 'luxon';
 
 export type AnalyserData = {
   currentTimestamp: string;
   activeProfile: Profile;
   sensorEntries: SensorEntry[];
+  meterEntries: MeterEntry[];
   insulinEntries: InsulinEntry[];
   carbEntries: CarbEntry[];
   alarms: Alarm[];
@@ -83,15 +91,42 @@ const smoothSlopesWithNoise = (entries: AnalyserEntry[], noiseArray: number[]) =
   return entries.map(makeWindow(noiseArray)).map(average);
 };
 
-export const mapSensorEntriesToAnalyserEntries = (entries: SensorEntry[]): AnalyserEntry[] => {
-  const analyserEntries: AnalyserEntry[] = sortBy(entries, 'timestamp')
-    .filter(entry => entry.bloodGlucose)
+export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
+  const dateTime = DateTime.fromISO(timestamp);
+  const minuteSlot = Math.floor(dateTime.get('minute') / 5);
+  return dateTime
+    .set({ minute: minuteSlot * 5 })
+    .toUTC()
+    .toISO();
+};
+
+export const getMergedBgEntries = (
+  sensorEntries: SensorEntry[],
+  meterEntries?: MeterEntry[],
+): (SensorEntry | MeterEntry)[] =>
+  chain(meterEntries ? [...sensorEntries, ...meterEntries] : sensorEntries)
+    .sortBy('timestamp')
+    .groupBy(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp))
+    .flatMap(entries => ({
+      bloodGlucose: calculateAverageBg(entries),
+      timestamp: entries[0].timestamp, // Take timestamp from first entry
+    }))
+    .value();
+
+export const mapSensorAndMeterEntriesToAnalyserEntries = (
+  sensorEntries: SensorEntry[],
+  meterEntries?: MeterEntry[],
+): AnalyserEntry[] => {
+  const allEntries = getMergedBgEntries(sensorEntries, meterEntries);
+  const analyserEntries: AnalyserEntry[] = chain(allEntries)
+    .sortBy('timestamp')
     .map(entry => ({
       bloodGlucose: entry.bloodGlucose,
       timestamp: entry.timestamp,
       slope: null,
       rawSlope: null,
-    }));
+    }))
+    .value();
 
   const entriesWithSlopes = analyserEntries.map((entry, i) => {
     const currentBg = entry.bloodGlucose;
@@ -99,7 +134,7 @@ export const mapSensorEntriesToAnalyserEntries = (entries: SensorEntry[]): Analy
     const previousEntry = analyserEntries[i - 1];
     let currentSlope = null;
 
-    if (previousEntry && previousEntry.bloodGlucose && previousEntry.timestamp) {
+    if (previousEntry) {
       const previousBg = previousEntry.bloodGlucose;
       const previousTimestamp = previousEntry.timestamp;
       const timeBetweenEntries = getTimeMinusTimeMs(currentTimestamp, previousTimestamp);
@@ -165,7 +200,7 @@ export const getPredictedAnalyserEntries = (
     type: 'DEXCOM_G6_SHARE' as SensorEntryType,
   }));
 
-  return mapSensorEntriesToAnalyserEntries(predictedSensorEntries);
+  return mapSensorAndMeterEntriesToAnalyserEntries(predictedSensorEntries);
 };
 
 export const getPredictedSituation = (activeProfile: Profile, entries: AnalyserEntry[]) => {

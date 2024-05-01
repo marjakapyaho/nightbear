@@ -19,7 +19,6 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
     await truncateDb(context);
   });
 
-  // This test needs emptying db before
   it('returns already active day profile', async () => {
     dayProfile = await createProfileWithActivation(
       mockProfiles[0],
@@ -71,7 +70,7 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
     expect(activeProfile2).toEqual({ ...nightProfile, isActive: true });
   });
 
-  it('does not activate repeating profile when non-repeating profile is still current', async () => {
+  it('does not activate repeating profile when non-repeating profile is still valid', async () => {
     nightProfile = await createProfileWithActivation(
       mockProfiles[1],
       mockProfileActivations[1],
@@ -106,27 +105,20 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
     expect(activeProfile).toEqual({ ...nonRepeatingProfile, isActive: true });
   });
 
-  it('activates repeating profile when non-repeating profile is outdated', async () => {
-    const nonActiveDayProfile = await createProfileWithActivation(
-      {
-        id: '1',
-        profileName: 'Day',
-        isActive: false,
-        alarmsEnabled: true,
-        analyserSettings: mockAnalyserSettings,
-        situationSettings: mockSituationSettings,
-        notificationTargets: ['first', 'second'],
-      },
-      {
-        id: '456',
-        profileTemplateId: '1',
-        profileName: 'Day',
-        activatedAt: '2024-04-27T08:00:00.123Z',
-        repeatTimeInLocalTimezone: '8:00',
-      },
+  it('activates correct repeating profile when non-repeating profile is outdated', async () => {
+    dayProfile = await createProfileWithActivation(
+      { ...mockProfiles[0], isActive: false },
+      mockProfileActivations[0],
       context,
     );
 
+    nightProfile = await createProfileWithActivation(
+      mockProfiles[1],
+      mockProfileActivations[1],
+      context,
+    );
+
+    // Temporary meeting profile that is now active
     const meetingProfile = await createProfileWithActivation(
       {
         id: '3',
@@ -147,6 +139,7 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
       context,
     );
 
+    // Still meeting profile
     const activeProfile1 = await checkAndUpdateProfileActivations(
       context,
       '2024-04-27T10:00:00.000Z',
@@ -154,11 +147,12 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
     );
     expect(activeProfile1).toEqual({ ...meetingProfile, isActive: true });
 
+    // Meeting profile reached deactivatedAt so repeating day profile was activated
     const activeProfile2 = await checkAndUpdateProfileActivations(
       context,
       '2024-04-27T10:16:00.000Z',
       'utc',
     );
-    expect(activeProfile2).toEqual({ ...nonActiveDayProfile, isActive: true });
+    expect(activeProfile2).toEqual({ ...dayProfile, isActive: true });
   });
 });
