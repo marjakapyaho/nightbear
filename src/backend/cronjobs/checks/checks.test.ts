@@ -14,9 +14,9 @@ describe('cronjobs/checks', () => {
   });
 
   it.skip('runs checks', async () => {
-    await checks(context);
+    /*    await checks(context);
 
     // TODO
-    expect().toEqual();
+    expect().toEqual();*/
   });
 });
