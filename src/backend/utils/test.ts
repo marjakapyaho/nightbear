@@ -4,6 +4,7 @@ import { NO_LOGGING } from 'backend/utils/logging';
 import { Context } from './api';
 import { createDbClient } from './db';
 import { mockNow } from 'shared/mocks/dates';
+import { Alarm } from 'shared/types/alarms';
 
 export const createTestContext = (timestamp = () => mockNow): Context => {
   return {
@@ -36,3 +37,8 @@ export const truncateDb = async (context: Context) => {
     console.log(`Error deleting test data: ${String(e)}`);
   }
 };
+
+export const checkActiveAlarms = async (context: Context): Promise<Alarm[]> =>
+  (await context.db.alarms.getAlarms({
+    onlyActive: true,
+  })) as unknown as Alarm[];

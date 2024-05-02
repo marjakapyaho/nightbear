@@ -8,7 +8,7 @@ import { Profile } from 'shared/types/profiles';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { getRange } from './utils';
 
-export const checks: Cronjob = async (context: Context, _journal) => {
+export const checks = (async (context: Context) => {
   const { log } = context;
 
   log('--- STARTED CHECKS ---');
@@ -32,7 +32,7 @@ export const checks: Cronjob = async (context: Context, _journal) => {
   // TODO: MOVE THIS
   if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
-  log(`1. Using profile: ${activeProfile?.profileName}`);
+  log(`1. Using profile: ${activeProfile.profileName}`);
 
   const situation = runAnalysis({
     currentTimestamp: context.timestamp(),
@@ -49,4 +49,4 @@ export const checks: Cronjob = async (context: Context, _journal) => {
   const alarmId = await runAlarmChecks(context, situation, activeProfile, activeAlarm);
 
   log(`3. Active alarm with id: ${alarmId || '-'}`);
-};
+}) satisfies Cronjob;

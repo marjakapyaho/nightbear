@@ -3,8 +3,14 @@ import { Profile } from 'shared/types/profiles';
 import { Context } from 'backend/utils/api';
 import { getTimeMinusTimeMs } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
-import { AlarmState } from 'shared/types/alarms';
+import { Alarm, AlarmState } from 'shared/types/alarms';
 import { findIndex, map, sum, take } from 'lodash';
+
+export type AlarmActions = {
+  remove?: Alarm;
+  keep?: Alarm;
+  create?: Situation;
+};
 
 export const getNeededAlarmLevel = (
   currentSituation: Situation,

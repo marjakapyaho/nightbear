@@ -1,9 +1,13 @@
-import { createTestContext } from 'backend/utils/test';
+import { createTestContext, truncateDb } from 'backend/utils/test';
 import { mockNow } from 'shared/mocks/dates';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/alarms', () => {
   const context = createTestContext();
+
+  beforeEach(async () => {
+    await truncateDb(context);
+  });
 
   it('create alarm with state', async () => {
     const [alarm] = await context.db.alarms.createAlarm({

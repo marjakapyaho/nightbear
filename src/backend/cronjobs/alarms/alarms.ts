@@ -5,13 +5,12 @@ import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
 import { isTimeSmaller } from 'shared/utils/time';
 import { isNotNull } from 'shared/utils/helpers';
-import { getNeededAlarmLevel, getPushoverRecipient, retryNotifications } from './utils';
-
-type AlarmActions = {
-  remove?: Alarm;
-  keep?: Alarm;
-  create?: Situation;
-};
+import {
+  AlarmActions,
+  getNeededAlarmLevel,
+  getPushoverRecipient,
+  retryNotifications,
+} from './utils';
 
 export const runAlarmChecks = async (
   context: Context,
@@ -82,7 +81,7 @@ const deactivateAlarm = async (alarm: Alarm, context: Context) => {
     alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNull),
   );
 
-  await context.db.alarms.deactivateAlarm(alarm);
+  await context.db.alarms.deactivateAlarm({ id: alarm.id, currentTimestamp: context.timestamp() });
 
   return alarm.id;
 };
@@ -124,6 +123,7 @@ const updateAlarm = async (
 
   // Escalate and create new alarm state
   await context.db.alarms.createAlarmState({
+    timestamp: context.timestamp(),
     alarmId: activeAlarm.id,
     alarmLevel: neededLevel,
     validAfter: context.timestamp(),
@@ -140,6 +140,7 @@ export const createAlarm = async (
   context: Context,
 ): Promise<string | null> => {
   const [createdAlarm] = await context.db.alarms.createAlarm({
+    timestamp: context.timestamp(),
     situation,
   });
 
@@ -150,6 +151,7 @@ export const createAlarm = async (
   }
 
   await context.db.alarms.createAlarmState({
+    timestamp: context.timestamp(),
     alarmId: createdAlarm.id,
     alarmLevel: ALARM_DEFAULT_LEVEL,
     validAfter: context.timestamp(),

@@ -9,6 +9,7 @@ export type Json = null | boolean | number | string | Json[] | { [key: string]: 
 export interface ICreateAlarmParams {
   deactivatedAt?: string | Date | null | void;
   situation: situation;
+  timestamp?: string | Date | null | void;
 }
 
 /** 'CreateAlarm' return type */
@@ -25,16 +26,18 @@ export interface ICreateAlarmQuery {
   result: ICreateAlarmResult;
 }
 
-const createAlarmIR: any = {"usedParamSet":{"situation":true,"deactivatedAt":true},"params":[{"name":"situation","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":74}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":79,"b":92}]}],"statement":"INSERT INTO alarms (\n  situation,\n  deactivated_at\n)\nVALUES (\n  :situation!,\n  :deactivatedAt\n)\nRETURNING *"};
+const createAlarmIR: any = {"usedParamSet":{"timestamp":true,"situation":true,"deactivatedAt":true},"params":[{"name":"timestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":86,"b":95}]},{"name":"situation","required":true,"transform":{"type":"scalar"},"locs":[{"a":120,"b":130}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":135,"b":148}]}],"statement":"INSERT INTO alarms (\n  timestamp,\n  situation,\n  deactivated_at\n)\nVALUES (\n  coalesce(:timestamp, CURRENT_TIMESTAMP),\n  :situation!,\n  :deactivatedAt\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO alarms (
+ *   timestamp,
  *   situation,
  *   deactivated_at
  * )
  * VALUES (
+ *   coalesce(:timestamp, CURRENT_TIMESTAMP),
  *   :situation!,
  *   :deactivatedAt
  * )
@@ -46,6 +49,7 @@ export const createAlarm = new PreparedQuery<ICreateAlarmParams,ICreateAlarmResu
 
 /** 'DeactivateAlarm' parameters type */
 export interface IDeactivateAlarmParams {
+  currentTimestamp?: string | Date | null | void;
   id: string;
 }
 
@@ -63,13 +67,13 @@ export interface IDeactivateAlarmQuery {
   result: IDeactivateAlarmResult;
 }
 
-const deactivateAlarmIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":66,"b":69}]}],"statement":"UPDATE alarms SET\n  deactivated_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
+const deactivateAlarmIR: any = {"usedParamSet":{"currentTimestamp":true,"id":true},"params":[{"name":"currentTimestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":62}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":95,"b":98}]}],"statement":"UPDATE alarms SET\n  deactivated_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)\nWHERE id = :id!\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE alarms SET
- *   deactivated_at = CURRENT_TIMESTAMP
+ *   deactivated_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
  * WHERE id = :id!
  * RETURNING *
  * ```
@@ -85,6 +89,7 @@ export interface ICreateAlarmStateParams {
   notificationProcessedAt?: string | Date | null | void;
   notificationReceipt?: string | null | void;
   notificationTarget?: string | null | void;
+  timestamp?: string | Date | null | void;
   validAfter: string | Date;
 }
 
@@ -107,12 +112,13 @@ export interface ICreateAlarmStateQuery {
   result: ICreateAlarmStateResult;
 }
 
-const createAlarmStateIR: any = {"usedParamSet":{"alarmId":true,"alarmLevel":true,"validAfter":true,"ackedBy":true,"notificationTarget":true,"notificationReceipt":true,"notificationProcessedAt":true},"params":[{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":170,"b":178}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":195}]},{"name":"validAfter","required":true,"transform":{"type":"scalar"},"locs":[{"a":201,"b":212}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":218,"b":225}]},{"name":"notificationTarget","required":false,"transform":{"type":"scalar"},"locs":[{"a":231,"b":249}]},{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":255,"b":274}]},{"name":"notificationProcessedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":280,"b":303}]}],"statement":"INSERT INTO alarm_states (\n  alarm_id,\n  alarm_level,\n  valid_after,\n  acked_by,\n  notification_target,\n  notification_receipt,\n  notification_processed_at\n)\nVALUES (\n   :alarmId!,\n   :alarmLevel!,\n   :validAfter!,\n   :ackedBy,\n   :notificationTarget,\n   :notificationReceipt,\n   :notificationProcessedAt\n )\nRETURNING *"};
+const createAlarmStateIR: any = {"usedParamSet":{"timestamp":true,"alarmId":true,"alarmLevel":true,"validAfter":true,"ackedBy":true,"notificationTarget":true,"notificationReceipt":true,"notificationProcessedAt":true},"params":[{"name":"timestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":192,"b":201}]},{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":227,"b":235}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":252}]},{"name":"validAfter","required":true,"transform":{"type":"scalar"},"locs":[{"a":258,"b":269}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":275,"b":282}]},{"name":"notificationTarget","required":false,"transform":{"type":"scalar"},"locs":[{"a":288,"b":306}]},{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":312,"b":331}]},{"name":"notificationProcessedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":337,"b":360}]}],"statement":"INSERT INTO alarm_states (\n  timestamp,\n  alarm_id,\n  alarm_level,\n  valid_after,\n  acked_by,\n  notification_target,\n  notification_receipt,\n  notification_processed_at\n)\nVALUES (\n   coalesce(:timestamp, CURRENT_TIMESTAMP),\n   :alarmId!,\n   :alarmLevel!,\n   :validAfter!,\n   :ackedBy,\n   :notificationTarget,\n   :notificationReceipt,\n   :notificationProcessedAt\n )\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO alarm_states (
+ *   timestamp,
  *   alarm_id,
  *   alarm_level,
  *   valid_after,
@@ -122,6 +128,7 @@ const createAlarmStateIR: any = {"usedParamSet":{"alarmId":true,"alarmLevel":tru
  *   notification_processed_at
  * )
  * VALUES (
+ *    coalesce(:timestamp, CURRENT_TIMESTAMP),
  *    :alarmId!,
  *    :alarmLevel!,
  *    :validAfter!,
@@ -138,6 +145,7 @@ export const createAlarmState = new PreparedQuery<ICreateAlarmStateParams,ICreat
 
 /** 'MarkAlarmAsProcessed' parameters type */
 export interface IMarkAlarmAsProcessedParams {
+  currentTimestamp?: string | Date | null | void;
   id: string;
   notificationReceipt?: string | null | void;
 }
@@ -161,14 +169,14 @@ export interface IMarkAlarmAsProcessedQuery {
   result: IMarkAlarmAsProcessedResult;
 }
 
-const markAlarmAsProcessedIR: any = {"usedParamSet":{"notificationReceipt":true,"id":true},"params":[{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":68}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":133}]}],"statement":"UPDATE alarm_states SET\n  notification_receipt = :notificationReceipt,\n  notification_processed_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
+const markAlarmAsProcessedIR: any = {"usedParamSet":{"notificationReceipt":true,"currentTimestamp":true,"id":true},"params":[{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":68}]},{"name":"currentTimestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":110,"b":126}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":159,"b":162}]}],"statement":"UPDATE alarm_states SET\n  notification_receipt = :notificationReceipt,\n  notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)\nWHERE id = :id!\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE alarm_states SET
  *   notification_receipt = :notificationReceipt,
- *   notification_processed_at = CURRENT_TIMESTAMP
+ *   notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
  * WHERE id = :id!
  * RETURNING *
  * ```
@@ -179,6 +187,7 @@ export const markAlarmAsProcessed = new PreparedQuery<IMarkAlarmAsProcessedParam
 /** 'MarkAllAlarmStatesAsProcessed' parameters type */
 export interface IMarkAllAlarmStatesAsProcessedParams {
   alarmId: string;
+  currentTimestamp?: string | Date | null | void;
 }
 
 /** 'MarkAllAlarmStatesAsProcessed' return type */
@@ -200,13 +209,13 @@ export interface IMarkAllAlarmStatesAsProcessedQuery {
   result: IMarkAllAlarmStatesAsProcessedResult;
 }
 
-const markAllAlarmStatesAsProcessedIR: any = {"usedParamSet":{"alarmId":true},"params":[{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":89,"b":97}]}],"statement":"UPDATE alarm_states SET\n  notification_processed_at = CURRENT_TIMESTAMP\nWHERE alarm_id = :alarmId! AND notification_processed_at IS NULL\nRETURNING *"};
+const markAllAlarmStatesAsProcessedIR: any = {"usedParamSet":{"currentTimestamp":true,"alarmId":true},"params":[{"name":"currentTimestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":63,"b":79}]},{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":126}]}],"statement":"UPDATE alarm_states SET\n  notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)\nWHERE alarm_id = :alarmId! AND notification_processed_at IS NULL\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE alarm_states SET
- *   notification_processed_at = CURRENT_TIMESTAMP
+ *   notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
  * WHERE alarm_id = :alarmId! AND notification_processed_at IS NULL
  * RETURNING *
  * ```

@@ -1,9 +1,13 @@
-import { createTestContext } from 'backend/utils/test';
+import { createTestContext, truncateDb } from 'backend/utils/test';
 import { DateTime } from 'luxon';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/sensorEntries', () => {
   const context = createTestContext();
+
+  beforeEach(async () => {
+    await truncateDb(context);
+  });
 
   describe('create', () => {
     it('works', async () => {

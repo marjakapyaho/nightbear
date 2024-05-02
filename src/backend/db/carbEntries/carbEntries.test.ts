@@ -1,8 +1,12 @@
-import { createTestContext } from 'backend/utils/test';
-import { describe, expect, it } from 'vitest';
+import { createTestContext, truncateDb } from 'backend/utils/test';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/carbEntries', () => {
   const context = createTestContext();
+
+  beforeEach(async () => {
+    await truncateDb(context);
+  });
 
   describe('insert', () => {
     it('works', async () => {

@@ -188,8 +188,9 @@ export const getPredictedAnalyserEntries = (
     return [];
   }
 
+  const latestEntryTimestamp = getLatestAnalyserEntry(analyserEntries)?.timestamp;
   const predictionRangeEnd = getTimeMinusTime(
-    currentTimestamp,
+    latestEntryTimestamp,
     PREDICTION_DATA_MINUTES * MIN_IN_MS,
   );
   const entries = analyserEntries.filter(entry => entry.timestamp > predictionRangeEnd);

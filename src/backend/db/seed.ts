@@ -29,7 +29,7 @@ export const generateSeedData = async (context: Context) => {
   await context.db.insulinEntries.createInsulinEntries({
     insulinEntries: [
       {
-        timestamp: getTimeMinusTime(now, 15 * MIN_IN_MS),
+        timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
         amount: 5,
         type: 'FAST',
       },
@@ -39,7 +39,7 @@ export const generateSeedData = async (context: Context) => {
   await context.db.meterEntries.createMeterEntries({
     meterEntries: [
       {
-        timestamp: now,
+        timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
         bloodGlucose: 5.8,
       },
     ],

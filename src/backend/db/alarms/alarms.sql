@@ -1,9 +1,11 @@
 /* @name createAlarm */
 INSERT INTO alarms (
+  timestamp,
   situation,
   deactivated_at
 )
 VALUES (
+  coalesce(:timestamp, CURRENT_TIMESTAMP),
   :situation!,
   :deactivatedAt
 )
@@ -13,12 +15,13 @@ RETURNING *;
   @name deactivateAlarm
 */
 UPDATE alarms SET
-  deactivated_at = CURRENT_TIMESTAMP
+  deactivated_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
 WHERE id = :id!
 RETURNING *;
 
 /* @name createAlarmState */
 INSERT INTO alarm_states (
+  timestamp,
   alarm_id,
   alarm_level,
   valid_after,
@@ -28,6 +31,7 @@ INSERT INTO alarm_states (
   notification_processed_at
 )
 VALUES (
+   coalesce(:timestamp, CURRENT_TIMESTAMP),
    :alarmId!,
    :alarmLevel!,
    :validAfter!,
@@ -43,7 +47,7 @@ RETURNING *;
 */
 UPDATE alarm_states SET
   notification_receipt = :notificationReceipt,
-  notification_processed_at = CURRENT_TIMESTAMP
+  notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
 WHERE id = :id!
 RETURNING *;
 
@@ -51,7 +55,7 @@ RETURNING *;
   @name markAllAlarmStatesAsProcessed
 */
 UPDATE alarm_states SET
-  notification_processed_at = CURRENT_TIMESTAMP
+  notification_processed_at = coalesce(:currentTimestamp, CURRENT_TIMESTAMP)
 WHERE alarm_id = :alarmId! AND notification_processed_at IS NULL
 RETURNING *;
 
