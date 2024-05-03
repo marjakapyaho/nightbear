@@ -1,5 +1,4 @@
 import { fill, groupBy, reduce } from 'lodash';
-import { DateTime } from 'luxon';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 import { getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
@@ -150,8 +149,6 @@ export const getBgAverage = (sensorEntries: SensorEntry[]) => {
       entriesWithBgs.length,
   );
 };
-
-const getDateInIsoFormat = (timestamp: number) => DateTime.fromMillis(timestamp).toISODate();
 
 const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
   dailyAmounts.reduce((prev, current) => prev + current.amount, 0);

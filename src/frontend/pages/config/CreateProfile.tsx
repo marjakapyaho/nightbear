@@ -17,7 +17,7 @@ export const CreateProfile = ({ activeProfile, createProfile }: Props) => {
         <div className={styles.field}>
           <input
             className={styles.input}
-            value={localProfile.profileName}
+            value={localProfile.profileName || ''}
             onChange={event =>
               setLocalProfile({ ...localProfile, profileName: event.target.value })
             }

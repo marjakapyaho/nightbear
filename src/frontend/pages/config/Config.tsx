@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styles from './Config.module.scss';
 import { useProfiles } from 'frontend/data/profiles/useProfiles';
 import { useAlarms } from 'frontend/data/alarms/useAlarms';
-import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { CreateProfile } from 'frontend/pages/config/CreateProfile';
 
 export const Config = () => {
@@ -23,7 +22,7 @@ export const Config = () => {
             className={`${styles.profile} ${profile.id === activeProfile?.id ? styles.active : ''}`}
             onClick={() => activateProfile(profile)}
           >
-            {profile.profileName.toUpperCase()}
+            {profile.profileName?.toUpperCase()}
           </div>
         ))}
         <div
