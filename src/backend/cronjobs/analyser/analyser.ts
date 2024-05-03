@@ -31,7 +31,14 @@ export const runAnalysis = ({
   alarms,
 }: AnalyserData): Situation | null => {
   const entries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
-  const predictedSituation = getPredictedSituation(activeProfile, entries, currentTimestamp);
+  const predictedSituation = getPredictedSituation(
+    activeProfile,
+    entries,
+    currentTimestamp,
+    insulinEntries,
+    carbEntries,
+    alarms,
+  );
 
   return detectSituation(
     currentTimestamp,
@@ -51,7 +58,7 @@ export const detectSituation = (
   insulin: InsulinEntry[],
   carbs: CarbEntry[],
   alarms: Alarm[],
-  predictedSituation?: Situation | null,
+  predictedSituation: Situation | null,
 ): Situation | null => {
   const latestEntry = getLatestAnalyserEntry(entries);
 
@@ -60,7 +67,7 @@ export const detectSituation = (
    * If we have no data inside analysis range, or we've missed some data and
    * predicted state is bad, return critical outdated immediately
    */
-  if (detectCriticalOutdated(latestEntry, currentTimestamp, predictedSituation)) {
+  if (detectCriticalOutdated(latestEntry, insulin, currentTimestamp, predictedSituation)) {
     return 'CRITICAL_OUTDATED';
   }
 
@@ -108,7 +115,7 @@ export const detectSituation = (
    * Check that we're inside relative low or high and slope is big enough.
    * Rising also checks for the presence of correction insulin.
    */
-  if (detectFalling(activeProfile, latestEntry)) {
+  if (detectFalling(activeProfile, latestEntry, predictedSituation)) {
     return 'FALLING';
   }
   if (detectRising(activeProfile, latestEntry, insulin, currentTimestamp)) {

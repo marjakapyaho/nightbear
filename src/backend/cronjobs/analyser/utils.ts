@@ -18,6 +18,7 @@ import {
   isTimeLarger,
   getTimePlusTime,
   getTimeMinusTime,
+  getTimeInMillis,
 } from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
@@ -35,8 +36,8 @@ export type AnalyserData = {
   alarms: Alarm[];
 };
 
-const PREDICTION_TIME_WINDOW = 30;
-const PREDICTION_DATA_MINUTES = 30;
+const PREDICTION_TIME_MINUTES = 20;
+const DATA_USED_FOR_PREDICTION_MINUTES = 30;
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -182,7 +183,6 @@ export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) => chain(entrie
 export const getPredictedAnalyserEntries = (
   analyserEntries: AnalyserEntry[],
   predictionMinutes: number,
-  currentTimestamp: string,
 ) => {
   if (analyserEntries.length < 2) {
     return [];
@@ -191,7 +191,7 @@ export const getPredictedAnalyserEntries = (
   const latestEntryTimestamp = getLatestAnalyserEntry(analyserEntries)?.timestamp;
   const predictionRangeEnd = getTimeMinusTime(
     latestEntryTimestamp,
-    PREDICTION_DATA_MINUTES * MIN_IN_MS,
+    DATA_USED_FOR_PREDICTION_MINUTES * MIN_IN_MS,
   );
   const entries = analyserEntries.filter(entry => entry.timestamp > predictionRangeEnd);
   const entriesCount = entries.length;
@@ -218,22 +218,53 @@ export const getPredictedSituation = (
   activeProfile: Profile,
   entries: AnalyserEntry[],
   currentTimestamp: string,
+  insulinEntries: InsulinEntry[],
+  carbEntries: CarbEntry[],
+  alarms: Alarm[],
 ) => {
-  const predictedEntries = getPredictedAnalyserEntries(
-    entries,
-    PREDICTION_TIME_WINDOW,
-    currentTimestamp,
-  );
+  const predictedEntries = getPredictedAnalyserEntries(entries, PREDICTION_TIME_MINUTES);
 
   return detectSituation(
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
     activeProfile, // TODO: this might change during prediction
     predictedEntries,
-    [],
-    [],
-    [], // TODO: what should this be - it depends on analyse before this
+    insulinEntries,
+    carbEntries,
+    alarms,
+    null,
   );
 };
 
 export const isSituationCritical = (situation?: Situation | null) =>
-  situation === 'LOW' || situation === 'BAD_LOW' || situation === 'BAD_HIGH';
+  situation === 'LOW' ||
+  situation === 'BAD_LOW' ||
+  situation === 'FALLING' ||
+  situation === 'BAD_HIGH';
+
+export const getPercentOfInsulinRemaining = (timestamp: string) => {};
+
+// Adjusted from: https://github.com/LoopKit/LoopKit/blob/dev/LoopKit/InsulinKit/ExponentialInsulinModel.swift
+export const getInsulinOnBoard = (timestamp: string) => {
+  const actionDuration = 360; // Fiasp
+  const peakActivityTime = 55; // Fiasp
+  const t = getTimeInMillis(timestamp);
+
+  const pi =
+    (peakActivityTime * (1 - peakActivityTime / actionDuration)) /
+    (1 - (2 * peakActivityTime) / actionDuration);
+  const a = (2 * pi) / actionDuration;
+  const S = 1 / (1 - a + (1 + a) * Math.exp(-actionDuration / pi));
+
+  if (t <= 0) {
+    return 1;
+  } else if (t >= actionDuration) {
+    return 0;
+  }
+
+  return (
+    1 -
+    S *
+      (1 - a) *
+      ((Math.pow(t, 2) / (pi * actionDuration * (1 - a)) - t / pi - 1) * Math.exp(-t / pi) + 1)
+  );
+};

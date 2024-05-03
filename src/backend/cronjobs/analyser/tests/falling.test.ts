@@ -71,4 +71,21 @@ describe('analyser/falling', () => {
       }),
     ).toEqual('LOW');
   });
+
+  it('detects FALLING here', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [6.0, 5.7, 5.5, 5.2, 5.0, 4.7, 4.5, 4.3, 4.0],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('FALLING');
+  });
 });
