@@ -1,26 +1,26 @@
 /** Types generated for queries found in "src/backend/db/sensorEntries/sensorEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** 'Create' parameters type */
-export interface ICreateParams {
+/** 'CreateSensorEntry' parameters type */
+export interface ICreateSensorEntryParams {
   bloodGlucose: number;
   type: string;
 }
 
-/** 'Create' return type */
-export interface ICreateResult {
+/** 'CreateSensorEntry' return type */
+export interface ICreateSensorEntryResult {
   bloodGlucose: number;
   timestamp: string;
   type: string;
 }
 
-/** 'Create' query type */
-export interface ICreateQuery {
-  params: ICreateParams;
-  result: ICreateResult;
+/** 'CreateSensorEntry' query type */
+export interface ICreateSensorEntryQuery {
+  params: ICreateSensorEntryParams;
+  result: ICreateSensorEntryResult;
 }
 
-const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":70}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":78}]}],"statement":"INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *"};
+const createSensorEntryIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":70}]},{"name":"type","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":78}]}],"statement":"INSERT INTO sensor_entries (blood_glucose, type)\nVALUES (:bloodGlucose!, :type!)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -30,7 +30,7 @@ const createIR: any = {"usedParamSet":{"bloodGlucose":true,"type":true},"params"
  * RETURNING *
  * ```
  */
-export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
+export const createSensorEntry = new PreparedQuery<ICreateSensorEntryParams,ICreateSensorEntryResult>(createSensorEntryIR);
 
 
 /** 'CreateSensorEntries' parameters type */
@@ -70,26 +70,26 @@ const createSensorEntriesIR: any = {"usedParamSet":{"sensorEntries":true},"param
 export const createSensorEntries = new PreparedQuery<ICreateSensorEntriesParams,ICreateSensorEntriesResult>(createSensorEntriesIR);
 
 
-/** 'ByTimestamp' parameters type */
-export interface IByTimestampParams {
+/** 'GetSensorEntriesByTimestamp' parameters type */
+export interface IGetSensorEntriesByTimestampParams {
   from: string | Date;
   to?: string | Date | null | void;
 }
 
-/** 'ByTimestamp' return type */
-export interface IByTimestampResult {
+/** 'GetSensorEntriesByTimestamp' return type */
+export interface IGetSensorEntriesByTimestampResult {
   bloodGlucose: number;
   timestamp: string;
   type: string;
 }
 
-/** 'ByTimestamp' query type */
-export interface IByTimestampQuery {
-  params: IByTimestampParams;
-  result: IByTimestampResult;
+/** 'GetSensorEntriesByTimestamp' query type */
+export interface IGetSensorEntriesByTimestampQuery {
+  params: IGetSensorEntriesByTimestampParams;
+  result: IGetSensorEntriesByTimestampResult;
 }
 
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":48,"b":53}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":81,"b":83}]}],"statement":"SELECT *\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
+const getSensorEntriesByTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":48,"b":53}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":81,"b":83}]}],"statement":"SELECT *\nFROM sensor_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
 
 /**
  * Query generated from SQL:
@@ -99,26 +99,26 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
  * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
  * ```
  */
-export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
+export const getSensorEntriesByTimestamp = new PreparedQuery<IGetSensorEntriesByTimestampParams,IGetSensorEntriesByTimestampResult>(getSensorEntriesByTimestampIR);
 
 
-/** 'Latest' parameters type */
-export type ILatestParams = void;
+/** 'GetLatestSensorEntry' parameters type */
+export type IGetLatestSensorEntryParams = void;
 
-/** 'Latest' return type */
-export interface ILatestResult {
+/** 'GetLatestSensorEntry' return type */
+export interface IGetLatestSensorEntryResult {
   bloodGlucose: number;
   timestamp: string;
   type: string;
 }
 
-/** 'Latest' query type */
-export interface ILatestQuery {
-  params: ILatestParams;
-  result: ILatestResult;
+/** 'GetLatestSensorEntry' query type */
+export interface IGetLatestSensorEntryQuery {
+  params: IGetLatestSensorEntryParams;
+  result: IGetLatestSensorEntryResult;
 }
 
-const latestIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT *\nFROM sensor_entries\nORDER BY timestamp DESC\nLIMIT 1"};
+const getLatestSensorEntryIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT *\nFROM sensor_entries\nORDER BY timestamp DESC\nLIMIT 1"};
 
 /**
  * Query generated from SQL:
@@ -129,6 +129,6 @@ const latestIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT *\nFROM
  * LIMIT 1
  * ```
  */
-export const latest = new PreparedQuery<ILatestParams,ILatestResult>(latestIR);
+export const getLatestSensorEntry = new PreparedQuery<IGetLatestSensorEntryParams,IGetLatestSensorEntryResult>(getLatestSensorEntryIR);
 
 

@@ -4,11 +4,10 @@ import * as cronjobsJournal from 'backend/db/cronjobsJournal/cronjobsJournal.que
 import * as insulinEntries from 'backend/db/insulinEntries/insulinEntries.queries';
 import * as meterEntries from 'backend/db/meterEntries/meterEntries.queries';
 import * as profiles from 'backend/db/profiles/profiles.queries';
+import { queries } from 'backend/db/queries';
 import * as sensorEntries from 'backend/db/sensorEntries/sensorEntries.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
-import { Context } from 'backend/utils/api';
-import { PreparedQuery } from '@pgtyped/runtime';
 
 /**
  * All DB modules need to be listed here to become accessible via the DB wrapper.
@@ -38,6 +37,7 @@ export function createDbClient(connectionString: string) {
   const pool = new Pool({ connectionString });
   return {
     ...wrapQueries(dbModules, pool),
+    ...queries(pool),
     async query(query: string) {
       return await pool.query(query);
     },

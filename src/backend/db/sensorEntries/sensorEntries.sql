@@ -1,4 +1,4 @@
-/* @name create */
+/* @name createSensorEntry */
 INSERT INTO sensor_entries (blood_glucose, type)
 VALUES (:bloodGlucose!, :type!)
 RETURNING *;
@@ -19,12 +19,12 @@ INSERT INTO sensor_entries (
 VALUES :sensorEntries
 RETURNING timestamp;
 
-/* @name byTimestamp */
+/* @name getSensorEntriesByTimestamp */
 SELECT *
 FROM sensor_entries
 WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 
-/* @name latest */
+/* @name getLatestSensorEntry */
 SELECT *
 FROM sensor_entries
 ORDER BY timestamp DESC

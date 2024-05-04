@@ -25,7 +25,7 @@ export const dexcomShare: Cronjob = async (
     isTimeLarger(Date.now() - dexcomShareLoginAttemptTimestamp, MIN_IN_MS * mins);
 
   if (dexcomShareSessionId) {
-    const [latestBg] = await context.db.sensorEntries.latest();
+    const latestBg = await context.db.getLatestSensorEntry();
 
     if (latestBg) {
       const ageInMin = (Date.now() - getTimeInMillis(latestBg.timestamp)) / MIN_IN_MS;
@@ -55,7 +55,7 @@ export const dexcomShare: Cronjob = async (
       if (latestBg && latestBg.timestamp === model.timestamp) {
         log(`This entry already exists: ${desc}`); // already exists in the DB -> no need to do anything!
       } else {
-        await context.db.sensorEntries.create(model); // we didn't find the entry yet -> create it
+        await context.db.createSensorEntry(model); // we didn't find the entry yet -> create it
         log(`Saved new SensorEntry: ${desc}`);
       }
     } catch (err) {
