@@ -164,19 +164,6 @@ export const mapSensorAndMeterEntriesToAnalyserEntries = (
   return smoothSlopesWithNoise(entriesWithSlopes, noiseArray);
 };
 
-export const checkThatThereIsNoCorrectionInsulin = (
-  insulins: InsulinEntry[],
-  currentTimestamp: string,
-  highCorrectionSuppressionWindow: number,
-) => {
-  return !find(insulins, insulin =>
-    isTimeLarger(
-      insulin.timestamp,
-      getTimeMinusTimeMs(currentTimestamp, highCorrectionSuppressionWindow * MIN_IN_MS),
-    ),
-  );
-};
-
 export const getLatestAnalyserEntry = (entries: AnalyserEntry[]) => chain(entries).last().value();
 
 export const getPredictedAnalyserEntries = (
@@ -216,8 +203,9 @@ export const getPredictedAnalyserEntries = (
 export const getPredictedSituation = (
   activeProfile: Profile,
   entries: AnalyserEntry[],
-  insulinEntries: InsulinEntry[],
-  carbEntries: CarbEntry[],
+  insulinOnBoard: number,
+  carbsOnBoard: number,
+  insulinToCarbsRatio: number | null,
   alarms: Alarm[],
 ) => {
   const predictedEntries = getPredictedAnalyserEntries(entries, PREDICTION_TIME_MINUTES);
@@ -226,8 +214,9 @@ export const getPredictedSituation = (
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
     activeProfile, // TODO: this might change during prediction
     predictedEntries,
-    insulinEntries,
-    carbEntries,
+    insulinOnBoard,
+    carbsOnBoard,
+    insulinToCarbsRatio,
     alarms,
     null,
   );

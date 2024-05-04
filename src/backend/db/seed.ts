@@ -21,7 +21,7 @@ export const generateSeedData = async (context: Context) => {
       {
         timestamp: getTimeMinusTime(now, 50 * MIN_IN_MS),
         amount: 20,
-        speedFactor: 1.5,
+        durationFactor: 1.5,
       },
     ],
   });
@@ -30,7 +30,7 @@ export const generateSeedData = async (context: Context) => {
     insulinEntries: [
       {
         timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
-        amount: 5,
+        amount: 1,
         type: 'FAST',
       },
     ],

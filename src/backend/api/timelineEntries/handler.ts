@@ -63,7 +63,7 @@ export const updateTimelineEntries = async (request: Request, context: Context) 
     ? await context.db.carbEntries.upsertCarbEntry({
         timestamp: dataPointTimestamp,
         amount: dataPoint.valBottom,
-        speedFactor: 1, // TODO
+        durationFactor: 1, // TODO
       })
     : [];
 

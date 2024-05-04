@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 const persistentHighValues = [
@@ -96,7 +96,7 @@ describe('analyser/persistentHigh', () => {
     ).toEqual(null);
   });
 
-  it('does not detect PERSISTENT_HIGH with recent insulin', () => {
+  it('does not detect PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -108,7 +108,7 @@ describe('analyser/persistentHigh', () => {
         meterEntries: [],
         insulinEntries: [
           {
-            timestamp: mockNow,
+            timestamp: getTimeMinusMinutes(mockNow, 50),
             amount: 3,
             type: 'FAST',
           },
@@ -119,7 +119,7 @@ describe('analyser/persistentHigh', () => {
     ).toEqual(null);
   });
 
-  it('detects PERSISTENT_HIGH when insulin suppression window is over', () => {
+  it('detects PERSISTENT_HIGH when insulin on board drops below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -131,7 +131,7 @@ describe('analyser/persistentHigh', () => {
         meterEntries: [],
         insulinEntries: [
           {
-            timestamp: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
+            timestamp: getTimeMinusMinutes(mockNow, 120),
             amount: 3,
             type: 'FAST',
           },

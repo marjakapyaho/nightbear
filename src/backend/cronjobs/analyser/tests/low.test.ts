@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/low', () => {
@@ -23,7 +23,7 @@ describe('analyser/low', () => {
     ).toEqual('LOW');
   });
 
-  it('does not detect LOW when there are correction carbs near enough', () => {
+  it('does not detect LOW when carbs on board is over 10', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -36,9 +36,9 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeMinusTime(mockNow, 15 * MIN_IN_MS),
-            amount: 30,
-            speedFactor: 1,
+            timestamp: getTimeMinusMinutes(mockNow, 20),
+            amount: 20,
+            durationFactor: 1,
           },
         ],
         alarms: [],
@@ -46,7 +46,7 @@ describe('analyser/low', () => {
     ).toEqual(null);
   });
 
-  it('detects LOW when low correction suppression window is over', () => {
+  it('detects LOW when carbs on board is less than 10 and there is no insulin', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -59,11 +59,51 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeMinusTime(mockNow, 35 * MIN_IN_MS),
+            timestamp: getTimeMinusMinutes(mockNow, 35),
             amount: 30,
-            speedFactor: 1,
+            durationFactor: 1,
           },
         ],
+        alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('detects LOW when carbs on board is more than 10 and there is insulin', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [6, 5, 4.7, 3.8],
+        }),
+        meterEntries: [],
+        insulinEntries: [{ timestamp: getTimeMinusMinutes(mockNow, 60), amount: 1, type: 'FAST' }],
+        carbEntries: [
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 35),
+            amount: 50,
+            durationFactor: 1,
+          },
+        ],
+        alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('detects LOW when could not calculate insulin to carbs ratio', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [6, 5, 4.7, 3.8],
+        }),
+        meterEntries: [],
+        insulinEntries: [{ timestamp: getTimeMinusMinutes(mockNow, 60), amount: 1, type: 'FAST' }],
+        carbEntries: [], // Divider is zero
         alarms: [],
       }),
     ).toEqual('LOW');
@@ -86,13 +126,13 @@ describe('analyser/low', () => {
             id: '123',
             situation: 'BAD_LOW',
             isActive: false,
-            deactivatedAt: getTimeMinusTime(mockNow, 10 * MIN_IN_MS),
+            deactivatedAt: getTimeMinusMinutes(mockNow, 10),
             alarmStates: [
               {
                 id: '1',
-                timestamp: getTimeMinusTime(mockNow, 40 * MIN_IN_MS),
+                timestamp: getTimeMinusMinutes(mockNow, 40),
                 alarmLevel: 1,
-                validAfter: getTimeMinusTime(mockNow, 40 * MIN_IN_MS),
+                validAfter: getTimeMinusMinutes(mockNow, 40),
                 ackedBy: null,
               },
             ],
@@ -122,9 +162,9 @@ describe('analyser/low', () => {
             alarmStates: [
               {
                 id: '1',
-                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                timestamp: getTimeMinusMinutes(mockNow, 30),
                 alarmLevel: 1,
-                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                validAfter: getTimeMinusMinutes(mockNow, 30),
                 ackedBy: null,
               },
             ],

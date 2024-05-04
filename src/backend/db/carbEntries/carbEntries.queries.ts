@@ -4,13 +4,13 @@ import { PreparedQuery } from '@pgtyped/runtime';
 /** 'Create' parameters type */
 export interface ICreateParams {
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
 }
 
 /** 'Create' return type */
 export interface ICreateResult {
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
   timestamp: string;
 }
 
@@ -20,18 +20,18 @@ export interface ICreateQuery {
   result: ICreateResult;
 }
 
-const createIR: any = {"usedParamSet":{"amount":true,"speedFactor":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":72}]},{"name":"speedFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":89}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  speed_factor\n)\nVALUES (\n  :amount!,\n  :speedFactor!\n)\nRETURNING *"};
+const createIR: any = {"usedParamSet":{"amount":true,"durationFactor":true},"params":[{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":68,"b":75}]},{"name":"durationFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":80,"b":95}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  duration_factor\n)\nVALUES (\n  :amount!,\n  :durationFactor!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO carb_entries (
  *   amount,
- *   speed_factor
+ *   duration_factor
  * )
  * VALUES (
  *   :amount!,
- *   :speedFactor!
+ *   :durationFactor!
  * )
  * RETURNING *
  * ```
@@ -43,7 +43,7 @@ export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
 export interface ICreateCarbEntriesParams {
   carbEntries: readonly ({
     amount: number,
-    speedFactor: number,
+    durationFactor: number,
     timestamp: string | Date
   })[];
 }
@@ -59,14 +59,14 @@ export interface ICreateCarbEntriesQuery {
   result: ICreateCarbEntriesResult;
 }
 
-const createCarbEntriesIR: any = {"usedParamSet":{"carbEntries":true},"params":[{"name":"carbEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"amount","required":true},{"name":"speedFactor","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":74,"b":85}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  speed_factor,\n  timestamp\n)\nVALUES :carbEntries\nRETURNING timestamp"};
+const createCarbEntriesIR: any = {"usedParamSet":{"carbEntries":true},"params":[{"name":"carbEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"amount","required":true},{"name":"durationFactor","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":77,"b":88}]}],"statement":"INSERT INTO carb_entries (\n  amount,\n  duration_factor,\n  timestamp\n)\nVALUES :carbEntries\nRETURNING timestamp"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO carb_entries (
  *   amount,
- *   speed_factor,
+ *   duration_factor,
  *   timestamp
  * )
  * VALUES :carbEntries
@@ -85,7 +85,7 @@ export interface IByTimestampParams {
 /** 'ByTimestamp' return type */
 export interface IByTimestampResult {
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
   timestamp: string;
 }
 
@@ -95,7 +95,7 @@ export interface IByTimestampQuery {
   result: IByTimestampResult;
 }
 
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":82,"b":87}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":115,"b":117}]}],"statement":"SELECT\n  timestamp,\n  amount,\n  speed_factor\nFROM carb_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
+const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":85,"b":90}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":118,"b":120}]}],"statement":"SELECT\n  timestamp,\n  amount,\n  duration_factor\nFROM carb_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
 
 /**
  * Query generated from SQL:
@@ -103,7 +103,7 @@ const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"n
  * SELECT
  *   timestamp,
  *   amount,
- *   speed_factor
+ *   duration_factor
  * FROM carb_entries
  * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
  * ```
@@ -114,14 +114,14 @@ export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResu
 /** 'UpsertCarbEntry' parameters type */
 export interface IUpsertCarbEntryParams {
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
   timestamp: string | Date;
 }
 
 /** 'UpsertCarbEntry' return type */
 export interface IUpsertCarbEntryResult {
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
   timestamp: string;
 }
 
@@ -131,7 +131,7 @@ export interface IUpsertCarbEntryQuery {
   result: IUpsertCarbEntryResult;
 }
 
-const upsertCarbEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":true,"speedFactor":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":88}]},{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":93,"b":100}]},{"name":"speedFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":105,"b":117}]}],"statement":"INSERT INTO carb_entries (\n  timestamp,\n  amount,\n  speed_factor\n)\nVALUES (\n  :timestamp!,\n  :amount!,\n  :speedFactor!\n)\nON CONFLICT (timestamp) DO UPDATE SET\n  amount = EXCLUDED.amount\nRETURNING *"};
+const upsertCarbEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":true,"durationFactor":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":81,"b":91}]},{"name":"amount","required":true,"transform":{"type":"scalar"},"locs":[{"a":96,"b":103}]},{"name":"durationFactor","required":true,"transform":{"type":"scalar"},"locs":[{"a":108,"b":123}]}],"statement":"INSERT INTO carb_entries (\n  timestamp,\n  amount,\n  duration_factor\n)\nVALUES (\n  :timestamp!,\n  :amount!,\n  :durationFactor!\n)\nON CONFLICT (timestamp) DO UPDATE SET\n  amount = EXCLUDED.amount\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -139,12 +139,12 @@ const upsertCarbEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":true,"
  * INSERT INTO carb_entries (
  *   timestamp,
  *   amount,
- *   speed_factor
+ *   duration_factor
  * )
  * VALUES (
  *   :timestamp!,
  *   :amount!,
- *   :speedFactor!
+ *   :durationFactor!
  * )
  * ON CONFLICT (timestamp) DO UPDATE SET
  *   amount = EXCLUDED.amount

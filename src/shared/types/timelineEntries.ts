@@ -16,7 +16,7 @@ export type InsulinEntry = {
 export type CarbEntry = {
   timestamp: string;
   amount: number;
-  speedFactor: number;
+  durationFactor: number;
 };
 
 export type MeterEntry = {

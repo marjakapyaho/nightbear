@@ -112,7 +112,7 @@ CREATE TABLE insulin_entries (
 CREATE TABLE carb_entries (
   timestamp TIMESTAMPTZ NOT NULL PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
   amount INTEGER NOT NULL,
-  speed_factor NUMERIC(2, 1) NOT NULL
+  duration_factor NUMERIC(2, 1) NOT NULL
 );
 
 CREATE TABLE meter_entries (

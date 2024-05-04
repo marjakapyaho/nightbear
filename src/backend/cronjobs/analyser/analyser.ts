@@ -4,7 +4,7 @@ import {
   getPredictedSituation,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from 'backend/cronjobs/analyser/utils';
-import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
+import { CarbEntry } from 'shared/types/timelineEntries';
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
@@ -20,6 +20,11 @@ import {
   detectPersistentHigh,
   detectRising,
 } from './situations';
+import {
+  calculateInsulinToCarbsRatio,
+  getCarbsOnBoard,
+  getInsulinOnBoard,
+} from 'shared/utils/calculations';
 
 export const runAnalysis = ({
   currentTimestamp,
@@ -31,11 +36,16 @@ export const runAnalysis = ({
   alarms,
 }: AnalyserData): Situation | null => {
   const entries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
+  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries);
+  const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries);
+  const insulinToCarbsRatio = calculateInsulinToCarbsRatio(insulinOnBoard, carbsOnBoard);
+
   const predictedSituation = getPredictedSituation(
     activeProfile,
     entries,
-    insulinEntries,
-    carbEntries,
+    insulinOnBoard,
+    carbsOnBoard,
+    insulinToCarbsRatio,
     alarms,
   );
 
@@ -43,8 +53,9 @@ export const runAnalysis = ({
     currentTimestamp,
     activeProfile,
     entries,
-    insulinEntries,
-    carbEntries,
+    insulinOnBoard,
+    carbsOnBoard,
+    insulinToCarbsRatio,
     alarms,
     predictedSituation,
   );
@@ -54,8 +65,9 @@ export const detectSituation = (
   currentTimestamp: string,
   activeProfile: Profile,
   entries: AnalyserEntry[],
-  insulin: InsulinEntry[],
-  carbs: CarbEntry[],
+  insulinOnBoard: number,
+  carbsOnBoard: number,
+  insulinToCarbsRatio: number | null,
   alarms: Alarm[],
   predictedSituation: Situation | null,
 ): Situation | null => {
@@ -66,7 +78,7 @@ export const detectSituation = (
    * If we have no data inside analysis range, or we've missed some data and
    * predicted state is bad, return critical outdated immediately
    */
-  if (detectCriticalOutdated(latestEntry, insulin, currentTimestamp, predictedSituation)) {
+  if (detectCriticalOutdated(latestEntry, insulinOnBoard, currentTimestamp, predictedSituation)) {
     return 'CRITICAL_OUTDATED';
   }
 
@@ -94,7 +106,7 @@ export const detectSituation = (
    * 4. COMPRESSION_LOW
    * Must be before LOW and FALLING
    */
-  if (detectCompressionLow(activeProfile, entries, insulin, currentTimestamp)) {
+  if (detectCompressionLow(activeProfile, entries, insulinOnBoard, currentTimestamp)) {
     return 'COMPRESSION_LOW';
   }
 
@@ -102,10 +114,19 @@ export const detectSituation = (
    * 5. LOW and HIGH
    * Must be before FALLING and RISING
    */
-  if (detectLow(activeProfile, latestEntry, alarms, carbs, currentTimestamp)) {
+  if (
+    detectLow(
+      activeProfile,
+      latestEntry,
+      alarms,
+      carbsOnBoard,
+      insulinToCarbsRatio,
+      currentTimestamp,
+    )
+  ) {
     return 'LOW';
   }
-  if (detectHigh(activeProfile, latestEntry, alarms, insulin, currentTimestamp)) {
+  if (detectHigh(activeProfile, latestEntry, alarms, insulinOnBoard, currentTimestamp)) {
     return 'HIGH';
   }
 
@@ -117,7 +138,7 @@ export const detectSituation = (
   if (detectFalling(activeProfile, latestEntry, predictedSituation)) {
     return 'FALLING';
   }
-  if (detectRising(activeProfile, latestEntry, insulin, currentTimestamp)) {
+  if (detectRising(activeProfile, latestEntry, insulinOnBoard)) {
     return 'RISING';
   }
 
@@ -125,7 +146,7 @@ export const detectSituation = (
    * 6. PERSISTENT_HIGH
    * Alarms values that are only relative high, but don't seem to be going lower
    */
-  if (detectPersistentHigh(activeProfile, entries, insulin, currentTimestamp)) {
+  if (detectPersistentHigh(activeProfile, entries, insulinOnBoard, currentTimestamp)) {
     return 'PERSISTENT_HIGH';
   }
 

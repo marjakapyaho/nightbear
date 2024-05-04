@@ -12,13 +12,13 @@ describe('db/carbEntries', () => {
     it('works', async () => {
       const res = await context.db.carbEntries.create({
         amount: 20,
-        speedFactor: 1.5,
+        durationFactor: 1.5,
       });
 
       expect(res).toHaveLength(1);
       expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
       expect(res[0].amount).toBe(20);
-      expect(res[0].speedFactor).toBe(1.5);
+      expect(res[0].durationFactor).toBe(1.5);
     });
   });
 });

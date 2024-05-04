@@ -15,6 +15,9 @@ import {
   timestampIsUnderMaxAge,
   getPercentOfInsulinRemaining,
   getInsulinOnBoard,
+  getPercentOfCarbsRemaining,
+  getCarbsOnBoard,
+  calculateInsulinToCarbsRatio,
 } from 'shared/utils/calculations';
 import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
@@ -356,5 +359,92 @@ describe('shared/calculations', () => {
         },
       ]),
     ).toEqual(0);
+  });
+
+  it('getPercentOfCarbsRemaining', () => {
+    // Different duration factors at 0 hours
+    expect(getPercentOfCarbsRemaining(mockNow, mockNow, 1)).toEqual(1);
+    expect(getPercentOfCarbsRemaining(mockNow, mockNow, 2)).toEqual(1);
+    expect(getPercentOfCarbsRemaining(mockNow, mockNow, 3)).toEqual(1);
+    expect(getPercentOfCarbsRemaining(mockNow, mockNow, 4)).toEqual(1);
+
+    // Different duration factors at 1 hour
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 60), mockNow, 1)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 60), mockNow, 2)).toEqual(
+      0.3627927518708771,
+    );
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 60), mockNow, 3)).toEqual(
+      0.6208273667349686,
+    );
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 60), mockNow, 4)).toEqual(
+      0.75383496994724,
+    );
+
+    // Different duration factors at 2 hours
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 120), mockNow, 1)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 120), mockNow, 2)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 120), mockNow, 3)).toEqual(
+      0.1608677119365367,
+    );
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 120), mockNow, 4)).toEqual(
+      0.3627927518708771,
+    );
+
+    // Different duration factors at 3 hours
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 180), mockNow, 1)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 180), mockNow, 2)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 180), mockNow, 3)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 180), mockNow, 4)).toEqual(
+      0.08942351916577251,
+    );
+
+    // Different duration factors at 4 hours
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 240), mockNow, 1)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 240), mockNow, 2)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 240), mockNow, 3)).toEqual(0);
+    expect(getPercentOfCarbsRemaining(getTimeMinusMinutes(mockNow, 240), mockNow, 4)).toEqual(0);
+  });
+
+  it('getCarbsOnBoard', () => {
+    expect(
+      getCarbsOnBoard(mockNow, [
+        {
+          timestamp: mockNow,
+          amount: 60,
+          durationFactor: 1,
+        },
+      ]),
+    ).toEqual(60);
+    expect(
+      getCarbsOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 60,
+          durationFactor: 1,
+        },
+      ]),
+    ).toEqual(0);
+    expect(
+      getCarbsOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 60,
+          durationFactor: 4,
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 30,
+          durationFactor: 2,
+        },
+      ]),
+    ).toEqual(32.65134766837894);
+  });
+
+  it('calculateInsulinToCarbsRatio', () => {
+    expect(calculateInsulinToCarbsRatio(5, 50)).toEqual(1);
+    expect(calculateInsulinToCarbsRatio(10, 50)).toEqual(2);
+    expect(calculateInsulinToCarbsRatio(2, 40)).toEqual(0.5);
+    expect(calculateInsulinToCarbsRatio(1, 40)).toEqual(0.25);
+    expect(calculateInsulinToCarbsRatio(2, 80)).toEqual(0.25);
   });
 });

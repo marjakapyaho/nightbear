@@ -1,11 +1,11 @@
 /* @name create */
 INSERT INTO carb_entries (
   amount,
-  speed_factor
+  duration_factor
 )
 VALUES (
   :amount!,
-  :speedFactor!
+  :durationFactor!
 )
 RETURNING *;
 
@@ -13,13 +13,13 @@ RETURNING *;
   @name createCarbEntries
   @param carbEntries -> ((
     amount!,
-    speedFactor!,
+    durationFactor!,
     timestamp!
   )...)
 */
 INSERT INTO carb_entries (
   amount,
-  speed_factor,
+  duration_factor,
   timestamp
 )
 VALUES :carbEntries
@@ -30,7 +30,7 @@ RETURNING timestamp;
 SELECT
   timestamp,
   amount,
-  speed_factor
+  duration_factor
 FROM carb_entries
 WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 
@@ -40,12 +40,12 @@ WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 INSERT INTO carb_entries (
   timestamp,
   amount,
-  speed_factor
+  duration_factor
 )
 VALUES (
   :timestamp!,
   :amount!,
-  :speedFactor!
+  :durationFactor!
 )
 ON CONFLICT (timestamp) DO UPDATE SET
   amount = EXCLUDED.amount

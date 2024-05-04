@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/compressionLow', () => {
@@ -46,11 +46,52 @@ describe('analyser/compressionLow', () => {
         currentTimestamp: mockNow,
         activeProfile: getMockActiveProfile('night'),
         sensorEntries: generateSensorEntries({
-          currentTimestamp: getTimeMinusTime(mockNow, 10 * MIN_IN_MS),
+          currentTimestamp: mockNow,
           bloodGlucoseHistory: [10, 10.4, 9.9, 7, 3.8],
+          latestEntryAge: 11,
         }),
         meterEntries: [],
         insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('does not detect COMPRESSION_LOW with too little entries', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('night'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [10.0, null, null, null, null, 9.9, 7, 3.8],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('does not detect COMPRESSION_LOW with too much insulin on board', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('night'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [10, 10.4, 9.9, 7, 3.8],
+        }),
+        meterEntries: [],
+        insulinEntries: [
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 80),
+            amount: 1,
+            type: 'FAST',
+          },
+        ],
         carbEntries: [],
         alarms: [],
       }),

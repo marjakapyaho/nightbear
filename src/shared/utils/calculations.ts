@@ -7,7 +7,7 @@ import {
   getTimeMinusTime,
   getTimeMinusTimeMs,
 } from 'shared/utils/time';
-import { roundNumberToFixedDecimals } from 'shared/utils/helpers';
+import { isValidNumber, roundNumberToFixedDecimals } from 'shared/utils/helpers';
 import { Context } from 'backend/utils/api';
 
 export const SEC_IN_MS = 1000;
@@ -209,23 +209,20 @@ export const calculateAverageBg = (entries: (SensorEntry | MeterEntry)[]) => {
 };
 
 // Adjusted from: https://github.com/LoopKit/LoopKit/blob/dev/LoopKit/InsulinKit/ExponentialInsulinModel.swift (MIT license)
-export const getPercentOfInsulinRemaining = (
-  injectionTimestamp: string,
-  currentTimestamp: string,
+const calculatePercentageRemaining = (
+  actionDuration: number,
+  peakActivityTime: number,
+  minutesSince: number,
 ) => {
-  const actionDuration = 360; // Minutes (Fiasp)
-  const peakActivityTime = 55; // Minutes (Fiasp)
-  const t = getTimeMinusTimeMs(currentTimestamp, injectionTimestamp) / MIN_IN_MS; // Time since injection in minutes
-
   const pi =
     (peakActivityTime * (1 - peakActivityTime / actionDuration)) /
     (1 - (2 * peakActivityTime) / actionDuration);
   const a = (2 * pi) / actionDuration;
   const S = 1 / (1 - a + (1 + a) * Math.exp(-actionDuration / pi));
 
-  if (t <= 0) {
+  if (minutesSince <= 0) {
     return 1;
-  } else if (t >= actionDuration) {
+  } else if (minutesSince >= actionDuration) {
     return 0;
   }
 
@@ -233,8 +230,23 @@ export const getPercentOfInsulinRemaining = (
     1 -
     S *
       (1 - a) *
-      ((Math.pow(t, 2) / (pi * actionDuration * (1 - a)) - t / pi - 1) * Math.exp(-t / pi) + 1)
+      ((Math.pow(minutesSince, 2) / (pi * actionDuration * (1 - a)) - minutesSince / pi - 1) *
+        Math.exp(-minutesSince / pi) +
+        1)
   );
+};
+
+// Adjusted from: https://github.com/LoopKit/LoopKit/blob/dev/LoopKit/InsulinKit/ExponentialInsulinModel.swift (MIT license)
+export const getPercentOfInsulinRemaining = (
+  injectionTimestamp: string,
+  currentTimestamp: string,
+) => {
+  const actionDuration = 360; // Minutes (Fiasp)
+  const peakActivityTime = 55; // Minutes (Fiasp)
+  const minutesSinceInjection =
+    getTimeMinusTimeMs(currentTimestamp, injectionTimestamp) / MIN_IN_MS;
+
+  return calculatePercentageRemaining(actionDuration, peakActivityTime, minutesSinceInjection);
 };
 
 export const getInsulinOnBoard = (currentTimestamp: string, insulinEntries: InsulinEntry[]) =>
@@ -248,3 +260,36 @@ export const getInsulinOnBoard = (currentTimestamp: string, insulinEntries: Insu
       return insulinRemainingPercentage * entry.amount;
     })
     .reduce((prev, cur) => prev + cur, 0);
+
+// Adjusted from the insulin graph above
+export const getPercentOfCarbsRemaining = (
+  digestionTimestamp: string,
+  currentTimestamp: string,
+  durationFactor: number,
+) => {
+  const actionDuration = 60 * durationFactor; // Minutes (default is for sugar)
+  const peakActivityTime = 20 * durationFactor; // Minutes (default is for sugar)
+  const minutesSinceDigestion =
+    getTimeMinusTimeMs(currentTimestamp, digestionTimestamp) / MIN_IN_MS;
+
+  return calculatePercentageRemaining(actionDuration, peakActivityTime, minutesSinceDigestion);
+};
+
+export const getCarbsOnBoard = (currentTimestamp: string, carbEntries: CarbEntry[]) =>
+  carbEntries
+    .map(entry => {
+      const carbsRemainingPercentage = getPercentOfCarbsRemaining(
+        entry.timestamp,
+        currentTimestamp,
+        entry.durationFactor,
+      );
+      return carbsRemainingPercentage * entry.amount;
+    })
+    .reduce((prev, cur) => prev + cur, 0);
+
+export const calculateInsulinToCarbsRatio = (insulinOnBoard: number, carbsOnBoard: number) => {
+  const carbsToOneUnitOfInsulin = 10;
+  const neededInsulinForCarbs = carbsOnBoard / carbsToOneUnitOfInsulin;
+  const ratio = insulinOnBoard / neededInsulinForCarbs;
+  return isValidNumber(ratio) ? ratio : null;
+};

@@ -17,6 +17,8 @@ export const parseNumber = (num?: string) => {
   return isFinite(parsed) ? parsed : undefined;
 };
 
+export const isValidNumber = (num: number) => isFinite(num) && !isNaN(num);
+
 export const roundNumberToFixedDecimals = (num: number, decimals = 0): number => {
   const factor = getFactor(decimals);
   return Math.round(num * factor) / factor;

@@ -21,7 +21,7 @@ export const mockCarbEntries: CarbEntry[] = [
   {
     timestamp: mockNow,
     amount: 40,
-    speedFactor: 1,
+    durationFactor: 1,
   },
 ];
 
