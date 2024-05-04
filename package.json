@@ -50,7 +50,8 @@
     "lodash",
     "luxon",
     "pg",
-    "pushover-notifications"
+    "pushover-notifications",
+    "zod"
   ],
   "dependencies": {
     "@pgtyped/cli": "2.3.0",
@@ -100,7 +101,8 @@
     "sass": "1.69.5",
     "scroll-into-view": "1.16.2",
     "ts-node": "10.9.2",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "zod": "3.23.6"
   },
   "overrides": {
     "nth-check": "2.1.1",
