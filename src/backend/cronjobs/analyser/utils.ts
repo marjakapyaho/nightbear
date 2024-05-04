@@ -18,7 +18,6 @@ import {
   isTimeLarger,
   getTimePlusTime,
   getTimeMinusTime,
-  getTimeInMillis,
 } from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
@@ -37,7 +36,7 @@ export type AnalyserData = {
 };
 
 const PREDICTION_TIME_MINUTES = 20;
-const DATA_USED_FOR_PREDICTION_MINUTES = 30;
+const DATA_USED_FOR_PREDICTION_MINUTES = 20;
 
 const changeSum = (numbers: number[]): number => {
   return sum(numbers);
@@ -217,7 +216,6 @@ export const getPredictedAnalyserEntries = (
 export const getPredictedSituation = (
   activeProfile: Profile,
   entries: AnalyserEntry[],
-  currentTimestamp: string,
   insulinEntries: InsulinEntry[],
   carbEntries: CarbEntry[],
   alarms: Alarm[],
@@ -240,31 +238,3 @@ export const isSituationCritical = (situation?: Situation | null) =>
   situation === 'BAD_LOW' ||
   situation === 'FALLING' ||
   situation === 'BAD_HIGH';
-
-export const getPercentOfInsulinRemaining = (timestamp: string) => {};
-
-// Adjusted from: https://github.com/LoopKit/LoopKit/blob/dev/LoopKit/InsulinKit/ExponentialInsulinModel.swift
-export const getInsulinOnBoard = (timestamp: string) => {
-  const actionDuration = 360; // Fiasp
-  const peakActivityTime = 55; // Fiasp
-  const t = getTimeInMillis(timestamp);
-
-  const pi =
-    (peakActivityTime * (1 - peakActivityTime / actionDuration)) /
-    (1 - (2 * peakActivityTime) / actionDuration);
-  const a = (2 * pi) / actionDuration;
-  const S = 1 / (1 - a + (1 + a) * Math.exp(-actionDuration / pi));
-
-  if (t <= 0) {
-    return 1;
-  } else if (t >= actionDuration) {
-    return 0;
-  }
-
-  return (
-    1 -
-    S *
-      (1 - a) *
-      ((Math.pow(t, 2) / (pi * actionDuration * (1 - a)) - t / pi - 1) * Math.exp(-t / pi) + 1)
-  );
-};

@@ -13,9 +13,13 @@ import {
   isDexcomEntryValid,
   roundTo2Decimals,
   timestampIsUnderMaxAge,
+  getPercentOfInsulinRemaining,
+  getInsulinOnBoard,
 } from 'shared/utils/calculations';
-import { getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
+import { mockInsulinEntries } from 'shared/mocks/timelineEntries';
+import { mockNow } from 'shared/mocks/dates';
 
 const currentTimestamp = 1508672249758;
 
@@ -215,4 +219,142 @@ describe('shared/calculations', () => {
       { average: null, timestamp: getTimeAsISOStr(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS) },
     ]);
   });*/
+
+  it('getPercentOfInsulinRemaining', () => {
+    expect(getPercentOfInsulinRemaining(mockNow, mockNow)).toEqual(1);
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 10), mockNow)).toEqual(
+      0.984412149586579,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 30), mockNow)).toEqual(
+      0.8885478448395222,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 60), mockNow)).toEqual(
+      0.6807104906555019,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 120), mockNow)).toEqual(
+      0.3143821335622309,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 150), mockNow)).toEqual(
+      0.19543068101103533,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 180), mockNow)).toEqual(
+      0.11466084114529174,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 240), mockNow)).toEqual(
+      0.03158858427303446,
+    );
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 360), mockNow)).toEqual(0);
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 400), mockNow)).toEqual(0);
+    expect(getPercentOfInsulinRemaining(getTimeMinusMinutes(mockNow, 800), mockNow)).toEqual(0);
+  });
+
+  it('getInsulinOnBoard', () => {
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: mockNow,
+          amount: 7,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(7);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 7,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(4.764973434588514);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 4,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(1.2575285342489235);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 4,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 2,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(2.6189495155599274);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 4,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 2,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(2.6189495155599274);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 180),
+          amount: 8,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 5,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 3,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(4.531328868939994);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 130),
+          amount: 23,
+          type: 'LONG', // Not counted
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 120),
+          amount: 5,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 60),
+          amount: 3,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(3.61404213977766);
+    expect(
+      getInsulinOnBoard(mockNow, [
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 400),
+          amount: 9,
+          type: 'FAST',
+        },
+        {
+          timestamp: getTimeMinusMinutes(mockNow, 360),
+          amount: 9,
+          type: 'FAST',
+        },
+      ]),
+    ).toEqual(0);
+  });
 });

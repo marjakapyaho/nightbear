@@ -55,6 +55,9 @@ export const getTimeMinusTime = (time1: string | number, time2: string | number)
 export const getTimeMinusTimeMs = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) - getTimeInMillis(time2);
 
+export const getTimeMinusMinutes = (time1: string | number, minutes: number) =>
+  getTimeAsISOStr(getTimeInMillis(time1) - minutes * MIN_IN_MS);
+
 // Plus
 export const getTimePlusTime = (time1: string | number, time2: string | number) =>
   getTimeAsISOStr(getTimeInMillis(time1) + getTimeInMillis(time2));

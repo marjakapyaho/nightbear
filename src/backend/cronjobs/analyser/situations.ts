@@ -4,10 +4,9 @@ import { Alarm } from 'shared/types/alarms';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { getTimeMinusTimeMs, isTimeLarger, isTimeLargerOrEqual } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
-import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
+import { getInsulinOnBoard, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import {
   checkThatThereIsNoCorrectionInsulin,
-  getInsulinOnBoard,
   getLatestAnalyserEntry,
   isSituationCritical,
 } from 'backend/cronjobs/analyser/utils';
@@ -21,6 +20,7 @@ const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 const LOW_CORRECTION_SUPPRESSION_WINDOW = 30 * MIN_IN_MS;
 const TIME_SINCE_BG_CRITICAL = 15 * MIN_IN_MS;
 const ENTRIES_TO_CHECK_FOR_COMPRESSION_LOW = 4;
+const RELEVANT_IOB_LIMIT = 0.5;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -39,7 +39,7 @@ export const detectCriticalOutdated = (
     return true;
   }
 
-  const hasRecentInsulin = getInsulinOnBoard();
+  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulin);
 
   // How long since latest entry
   const msSinceLatestEntry = getTimeMinusTimeMs(currentTimestamp, latestEntry.timestamp);
@@ -48,7 +48,7 @@ export const detectCriticalOutdated = (
   // alarm about data being critically outdated immediately
   return (
     msSinceLatestEntry > TIME_SINCE_BG_CRITICAL &&
-    (isSituationCritical(predictedSituation) || hasRecentInsulin)
+    (isSituationCritical(predictedSituation) || insulinOnBoard > RELEVANT_IOB_LIMIT)
   );
 };
 
@@ -177,10 +177,14 @@ export const detectFalling = (
     latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs;
   const slopeIndicatesFalling =
     latestEntry.slope !== null && latestEntry.slope < -slopeLimits.MEDIUM;
+  const slopeIsNegative = latestEntry.slope !== null && latestEntry.slope < 0;
   const predictedSituationIsLowOrBadLow =
     predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
 
-  return bloodGlucoseIsRelativeLow && (slopeIndicatesFalling || predictedSituationIsLowOrBadLow);
+  return (
+    bloodGlucoseIsRelativeLow &&
+    (slopeIndicatesFalling || (predictedSituationIsLowOrBadLow && slopeIsNegative))
+  );
 };
 
 export const detectRising = (

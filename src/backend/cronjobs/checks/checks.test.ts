@@ -71,7 +71,6 @@ describe('cronjobs/checks', () => {
         latestEntryAge: 0,
       }),
     });
-
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Adds RISING alarm

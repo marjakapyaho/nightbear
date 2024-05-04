@@ -1,8 +1,14 @@
 import { fill, groupBy, reduce } from 'lodash';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
-import { getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
+import {
+  getTimeAsISOStr,
+  getTimeInMillis,
+  getTimeMinusTime,
+  getTimeMinusTimeMs,
+} from 'shared/utils/time';
 import { roundNumberToFixedDecimals } from 'shared/utils/helpers';
+import { Context } from 'backend/utils/api';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -201,3 +207,44 @@ export const calculateAverageBg = (entries: (SensorEntry | MeterEntry)[]) => {
   const sumOfBgs = entries.map(entry => entry.bloodGlucose).reduce((prev, cur) => prev + cur, 0);
   return roundNumberToFixedDecimals(sumOfBgs / entries.length, 1);
 };
+
+// Adjusted from: https://github.com/LoopKit/LoopKit/blob/dev/LoopKit/InsulinKit/ExponentialInsulinModel.swift (MIT license)
+export const getPercentOfInsulinRemaining = (
+  injectionTimestamp: string,
+  currentTimestamp: string,
+) => {
+  const actionDuration = 360; // Minutes (Fiasp)
+  const peakActivityTime = 55; // Minutes (Fiasp)
+  const t = getTimeMinusTimeMs(currentTimestamp, injectionTimestamp) / MIN_IN_MS; // Time since injection in minutes
+
+  const pi =
+    (peakActivityTime * (1 - peakActivityTime / actionDuration)) /
+    (1 - (2 * peakActivityTime) / actionDuration);
+  const a = (2 * pi) / actionDuration;
+  const S = 1 / (1 - a + (1 + a) * Math.exp(-actionDuration / pi));
+
+  if (t <= 0) {
+    return 1;
+  } else if (t >= actionDuration) {
+    return 0;
+  }
+
+  return (
+    1 -
+    S *
+      (1 - a) *
+      ((Math.pow(t, 2) / (pi * actionDuration * (1 - a)) - t / pi - 1) * Math.exp(-t / pi) + 1)
+  );
+};
+
+export const getInsulinOnBoard = (currentTimestamp: string, insulinEntries: InsulinEntry[]) =>
+  insulinEntries
+    .filter(entry => entry.type === 'FAST')
+    .map(entry => {
+      const insulinRemainingPercentage = getPercentOfInsulinRemaining(
+        entry.timestamp,
+        currentTimestamp,
+      );
+      return insulinRemainingPercentage * entry.amount;
+    })
+    .reduce((prev, cur) => prev + cur, 0);

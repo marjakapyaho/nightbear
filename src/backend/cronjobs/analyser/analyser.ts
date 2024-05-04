@@ -34,7 +34,6 @@ export const runAnalysis = ({
   const predictedSituation = getPredictedSituation(
     activeProfile,
     entries,
-    currentTimestamp,
     insulinEntries,
     carbEntries,
     alarms,
