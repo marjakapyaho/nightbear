@@ -1,11 +1,21 @@
-export type SensorEntryType = 'DEXCOM_G6_SHARE';
-export type InsulinEntryType = 'FAST' | 'LONG';
+import { z } from 'zod';
 
-export type SensorEntry = {
-  timestamp: string;
-  bloodGlucose: number;
-  type: SensorEntryType;
-};
+/* eslint-disable @typescript-eslint/no-redeclare */
+
+export const SensorEntryType = z.enum(['DEXCOM_G6_SHARE']);
+export type SensorEntryType = z.infer<typeof SensorEntryType>;
+
+export const InsulinEntryType = z.enum(['FAST', 'LONG']);
+export type InsulinEntryType = z.infer<typeof InsulinEntryType>;
+
+export type SensorEntry = z.infer<typeof SensorEntry>;
+export const SensorEntry = z.object({
+  timestamp: z.string(),
+  bloodGlucose: z.number(),
+  type: SensorEntryType,
+});
+
+// TODO: Convert rest of types
 
 export type InsulinEntry = {
   timestamp: string;
