@@ -1,9 +1,8 @@
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
-import { getTimeMinusTimeMs, isTimeLarger } from 'shared/utils/time';
+import { getTimeMinusTimeMs, isTimeLarger, minToMs } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
-import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import {
   getRelevantEntries,
   isSituationCritical,
@@ -11,13 +10,16 @@ import {
 } from 'backend/cronjobs/analyser/utils';
 import { find } from 'lodash';
 
-const PERSISTENT_HIGH_TIME_WINDOW_MINUTES = 120;
-const COMPRESSION_LOW_TIME_WINDOW_MINUTES = 25;
+// Minutes
+const PERSISTENT_HIGH_TIME_WINDOW = 120;
+const COMPRESSION_LOW_TIME_WINDOW = 25;
+const BAD_LOW_QUARANTINE_WINDOW = 15;
+const BAD_HIGH_QUARANTINE_WINDOW = 90;
+const TIME_SINCE_BG_CRITICAL = 15;
+
+// Other units
 const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
-const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
-const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
-const TIME_SINCE_BG_CRITICAL = 15 * MIN_IN_MS;
 const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
 const RELEVANT_COB_LIMIT_FOR_LOW = 10;
@@ -44,10 +46,10 @@ export const detectCriticalOutdated = (
   // How long since latest entry
   const msSinceLatestEntry = getTimeMinusTimeMs(currentTimestamp, latestEntry.timestamp);
 
-  // If we're missing at least two entries, and we're predicting critical situation,
-  // alarm about data being critically outdated immediately
+  // If we're missing at least two entries, and we're predicting critical situation or have
+  // relevant amount of insulin, alarm about data being critically outdated immediately
   return (
-    msSinceLatestEntry > TIME_SINCE_BG_CRITICAL &&
+    msSinceLatestEntry > minToMs(TIME_SINCE_BG_CRITICAL) &&
     (isSituationCritical(predictedSituation) || insulinOnBoard > RELEVANT_IOB_LIMIT_FOR_LOW)
   );
 };
@@ -67,8 +69,7 @@ export const detectOutdated = (
   const msSinceLatestEntry = getTimeMinusTimeMs(currentTimestamp, latestEntry.timestamp);
 
   // Check if we're over timeSinceBgMinutes from settings
-  const msSinceBgLimit = activeProfile.analyserSettings.timeSinceBgMinutes * MIN_IN_MS;
-  return msSinceLatestEntry > msSinceBgLimit;
+  return msSinceLatestEntry > minToMs(activeProfile.analyserSettings.timeSinceBgMinutes);
 };
 
 export const detectCompressionLow = (
@@ -77,14 +78,14 @@ export const detectCompressionLow = (
   insulinOnBoard: number,
   currentTimestamp: string,
 ) => {
-  const noRecentInsulin = insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_LOW;
+  const noRelevantInsulin = insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_LOW;
 
   const isNight = activeProfile.profileName === 'night';
 
   const { relevantEntries, hasEnoughData } = getRelevantEntries(
     currentTimestamp,
     entries,
-    COMPRESSION_LOW_TIME_WINDOW_MINUTES,
+    COMPRESSION_LOW_TIME_WINDOW,
   );
 
   const slopeIsReallyBig = Boolean(
@@ -94,7 +95,7 @@ export const detectCompressionLow = (
     ),
   );
 
-  return noRecentInsulin && isNight && hasEnoughData && slopeIsReallyBig;
+  return noRelevantInsulin && isNight && hasEnoughData && slopeIsReallyBig;
 };
 
 export const detectLow = (
@@ -111,11 +112,12 @@ export const detectLow = (
       (!alarm.deactivatedAt ||
         isTimeLarger(
           alarm.deactivatedAt,
-          getTimeMinusTimeMs(currentTimestamp, BAD_LOW_QUARANTINE_WINDOW),
+          getTimeMinusTimeMs(currentTimestamp, minToMs(BAD_LOW_QUARANTINE_WINDOW)),
         )) &&
       alarm.situation === 'BAD_LOW',
   );
 
+  // TODO: check this
   const thereIsNotEnoughCarbs =
     insulinToCarbsRatio === null ||
     carbsOnBoard < RELEVANT_COB_LIMIT_FOR_LOW ||
@@ -145,7 +147,7 @@ export const detectHigh = (
       (!alarm.deactivatedAt ||
         isTimeLarger(
           alarm.deactivatedAt,
-          getTimeMinusTimeMs(currentTimestamp, BAD_HIGH_QUARANTINE_WINDOW),
+          getTimeMinusTimeMs(currentTimestamp, minToMs(BAD_HIGH_QUARANTINE_WINDOW)),
         )) &&
       alarm.situation === 'BAD_HIGH',
   );
@@ -198,15 +200,15 @@ export const detectRising = (
 
 export const detectPersistentHigh = (
   activeProfile: Profile,
-  entries: AnalyserEntry[],
   latestEntry: AnalyserEntry,
+  entries: AnalyserEntry[],
   insulinOnBoard: number,
   currentTimestamp: string,
 ) => {
   const { relevantEntries, hasEnoughData } = getRelevantEntries(
     currentTimestamp,
     entries,
-    PERSISTENT_HIGH_TIME_WINDOW_MINUTES,
+    PERSISTENT_HIGH_TIME_WINDOW,
   );
 
   const isAllDataRelativeHigh =

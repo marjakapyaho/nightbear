@@ -35,6 +35,8 @@ export const getTimeInMillis = (time: string | number): number =>
 export const getTimeAsISOStr = (time: number | string): string =>
   typeof time === 'string' ? time : DateTime.fromMillis(time).toUTC().toISO() || '';
 
+export const minToMs = (minutes: number) => minutes * MIN_IN_MS;
+
 // Comparisons
 export const isTimeLarger = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) > getTimeInMillis(time2);

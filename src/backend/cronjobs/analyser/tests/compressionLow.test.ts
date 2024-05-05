@@ -58,7 +58,7 @@ describe('analyser/compressionLow', () => {
     ).toEqual('LOW');
   });
 
-  it('does not detect COMPRESSION_LOW with too little entries', () => {
+  it('does not detect COMPRESSION_LOW with too few entries', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
