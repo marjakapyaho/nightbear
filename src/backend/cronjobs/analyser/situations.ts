@@ -1,19 +1,18 @@
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
-import {
-  getTimeAsISOStr,
-  getTimeMinusTimeMs,
-  isTimeLarger,
-  isTimeLargerOrEqual,
-} from 'shared/utils/time';
+import { getTimeMinusTimeMs, isTimeLarger } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
 import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
-import { getLatestAnalyserEntry, isSituationCritical } from 'backend/cronjobs/analyser/utils';
-import { chain, filter, find } from 'lodash';
+import {
+  getRelevantEntries,
+  isSituationCritical,
+  slopeIsDown,
+} from 'backend/cronjobs/analyser/utils';
+import { find } from 'lodash';
 
-const PERSISTENT_HIGH_TIME_WINDOW = 2 * HOUR_IN_MS;
-const COMPRESSION_LOW_TIME_WINDOW = 25 * MIN_IN_MS;
+const PERSISTENT_HIGH_TIME_WINDOW_MINUTES = 120;
+const COMPRESSION_LOW_TIME_WINDOW_MINUTES = 25;
 const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
 const BAD_LOW_QUARANTINE_WINDOW = 15 * MIN_IN_MS;
@@ -21,11 +20,14 @@ const BAD_HIGH_QUARANTINE_WINDOW = 1.5 * HOUR_IN_MS;
 const TIME_SINCE_BG_CRITICAL = 15 * MIN_IN_MS;
 const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
+const RELEVANT_COB_LIMIT_FOR_LOW = 10;
+const INSULIN_TO_CARBS_RATIO_LIMIT_FOR_LOW = 0.3;
 
 const slopeLimits = {
   SLOW: 0.3,
   MEDIUM: 0.6,
   FAST: 1.3,
+  MEGA_FAST: 2,
 };
 
 export const detectCriticalOutdated = (
@@ -79,17 +81,20 @@ export const detectCompressionLow = (
 
   const isNight = activeProfile.profileName === 'night';
 
-  const timeWindowStart = getTimeMinusTimeMs(currentTimestamp, COMPRESSION_LOW_TIME_WINDOW);
-  const relevantEntries = filter(entries, entry =>
-    isTimeLargerOrEqual(entry.timestamp, timeWindowStart),
+  const { relevantEntries, hasEnoughData } = getRelevantEntries(
+    currentTimestamp,
+    entries,
+    COMPRESSION_LOW_TIME_WINDOW_MINUTES,
   );
-  const weHaveEnoughFreshEntries = relevantEntries.length >= 4;
 
   const slopeIsReallyBig = Boolean(
-    find(relevantEntries, entry => entry.rawSlope && Math.abs(entry.rawSlope) > 2),
+    find(
+      relevantEntries,
+      entry => entry.rawSlope && Math.abs(entry.rawSlope) > slopeLimits.MEGA_FAST,
+    ),
   );
 
-  return noRecentInsulin && isNight && weHaveEnoughFreshEntries && slopeIsReallyBig;
+  return noRecentInsulin && isNight && hasEnoughData && slopeIsReallyBig;
 };
 
 export const detectLow = (
@@ -112,7 +117,9 @@ export const detectLow = (
   );
 
   const thereIsNotEnoughCarbs =
-    insulinToCarbsRatio === null || carbsOnBoard < 10 || insulinToCarbsRatio > 0.3; // TODO
+    insulinToCarbsRatio === null ||
+    carbsOnBoard < RELEVANT_COB_LIMIT_FOR_LOW ||
+    insulinToCarbsRatio > INSULIN_TO_CARBS_RATIO_LIMIT_FOR_LOW;
 
   const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' })
     ? LOW_CLEARING_THRESHOLD
@@ -163,13 +170,12 @@ export const detectFalling = (
     latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs;
   const slopeIndicatesFalling =
     latestEntry.slope !== null && latestEntry.slope < -slopeLimits.MEDIUM;
-  const slopeIsNegative = latestEntry.slope !== null && latestEntry.slope < 0;
   const predictedSituationIsLowOrBadLow =
     predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
 
   return (
     bloodGlucoseIsRelativeLow &&
-    (slopeIndicatesFalling || (predictedSituationIsLowOrBadLow && slopeIsNegative))
+    (slopeIndicatesFalling || (predictedSituationIsLowOrBadLow && slopeIsDown(latestEntry)))
   );
 };
 
@@ -193,17 +199,15 @@ export const detectRising = (
 export const detectPersistentHigh = (
   activeProfile: Profile,
   entries: AnalyserEntry[],
+  latestEntry: AnalyserEntry,
   insulinOnBoard: number,
   currentTimestamp: string,
 ) => {
-  const timeWindowStart = getTimeMinusTimeMs(currentTimestamp, PERSISTENT_HIGH_TIME_WINDOW);
-  const relevantEntries = filter(entries, entry =>
-    isTimeLargerOrEqual(entry.timestamp, timeWindowStart),
+  const { relevantEntries, hasEnoughData } = getRelevantEntries(
+    currentTimestamp,
+    entries,
+    PERSISTENT_HIGH_TIME_WINDOW_MINUTES,
   );
-
-  // Allow two entries to be missing, but most data should be there
-  const requiredEntriesAmount = PERSISTENT_HIGH_TIME_WINDOW / (5 * MIN_IN_MS) - 2;
-  const haveEnoughDataPoints = relevantEntries.length > requiredEntriesAmount;
 
   const isAllDataRelativeHigh =
     relevantEntries.filter(
@@ -212,11 +216,10 @@ export const detectPersistentHigh = (
         entry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs,
     ).length === relevantEntries.length;
 
-  const latestEntry = getLatestAnalyserEntry(relevantEntries);
-  const slopeIsNotDown = !(latestEntry?.slope && latestEntry?.slope < 0);
+  const slopeIsNotDown = !slopeIsDown(latestEntry);
 
   return (
-    haveEnoughDataPoints &&
+    hasEnoughData &&
     isAllDataRelativeHigh &&
     insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH &&
     slopeIsNotDown

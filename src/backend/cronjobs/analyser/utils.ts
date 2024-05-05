@@ -4,7 +4,7 @@ import {
   roundTo2Decimals,
   TIME_LIMIT_FOR_SLOPE,
 } from 'shared/utils/calculations';
-import { reduce, slice, sum, find, chain } from 'lodash';
+import { reduce, slice, sum, chain } from 'lodash';
 import {
   CarbEntry,
   InsulinEntry,
@@ -15,9 +15,9 @@ import {
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import {
   getTimeMinusTimeMs,
-  isTimeLarger,
   getTimePlusTime,
   getTimeMinusTime,
+  isTimeLargerOrEqual,
 } from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
@@ -101,7 +101,7 @@ export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
   const dateTime = DateTime.fromISO(timestamp);
   const minuteSlot = Math.floor(dateTime.get('minute') / 5);
   return dateTime
-    .set({ minute: minuteSlot * 5 })
+    .set({ minute: minuteSlot * 5, second: 0, millisecond: 0 })
     .toUTC()
     .toISO();
 };
@@ -113,9 +113,9 @@ export const getMergedBgEntries = (
   chain(meterEntries ? [...sensorEntries, ...meterEntries] : sensorEntries)
     .sortBy('timestamp')
     .groupBy(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp))
-    .flatMap(entries => ({
+    .flatMap((entries, groupTimestamp) => ({
       bloodGlucose: calculateAverageBg(entries),
-      timestamp: entries[0].timestamp, // Take timestamp from first entry
+      timestamp: groupTimestamp,
     }))
     .value();
 
@@ -227,3 +227,30 @@ export const isSituationCritical = (situation?: Situation | null) =>
   situation === 'BAD_LOW' ||
   situation === 'FALLING' ||
   situation === 'BAD_HIGH';
+
+const hasEnoughData = (relevantEntries: AnalyserEntry[], dataNeededMinutes: number) => {
+  // E.g. we want 30 min of data which could have 30/5 = 6 entries but depending
+  // on start time and delay could only have 5 entries, and then we'll leave
+  // one entry slack for the check (= -2)
+  const entriesNeeded = dataNeededMinutes / 5 - 1;
+  return relevantEntries.length >= entriesNeeded;
+};
+
+export const getRelevantEntries = (
+  currentTimestamp: string,
+  entries: AnalyserEntry[],
+  dataNeededMinutes: number,
+) => {
+  const dataNeededMs = dataNeededMinutes * MIN_IN_MS;
+  const timeWindowStart = getTimeMinusTimeMs(currentTimestamp, dataNeededMs);
+  const relevantEntries = entries.filter(entry =>
+    isTimeLargerOrEqual(entry.timestamp, timeWindowStart),
+  );
+
+  return {
+    relevantEntries,
+    hasEnoughData: hasEnoughData(relevantEntries, dataNeededMinutes),
+  };
+};
+
+export const slopeIsDown = (entry: AnalyserEntry) => entry.slope !== null && entry.slope < 0;

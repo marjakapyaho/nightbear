@@ -146,7 +146,7 @@ export const detectSituation = (
    * 6. PERSISTENT_HIGH
    * Alarms values that are only relative high, but don't seem to be going lower
    */
-  if (detectPersistentHigh(activeProfile, entries, insulinOnBoard, currentTimestamp)) {
+  if (detectPersistentHigh(activeProfile, entries, latestEntry, insulinOnBoard, currentTimestamp)) {
     return 'PERSISTENT_HIGH';
   }
 
