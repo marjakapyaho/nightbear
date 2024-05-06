@@ -202,22 +202,22 @@ export const getPredictedAnalyserEntries = (
 
 export const getPredictedSituation = (
   activeProfile: Profile,
-  entries: AnalyserEntry[],
-  insulinOnBoard: number,
-  carbsOnBoard: number,
-  insulinToCarbsRatio: number | null,
+  analyserEntries: AnalyserEntry[],
+  insulinEntries: InsulinEntry[],
+  carbEntries: CarbEntry[],
   alarms: Alarm[],
+  requiredCarbsToInsulin: number | null,
 ) => {
-  const predictedEntries = getPredictedAnalyserEntries(entries, PREDICTION_TIME_MINUTES);
+  const predictedEntries = getPredictedAnalyserEntries(analyserEntries, PREDICTION_TIME_MINUTES);
 
   return detectSituation(
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
     activeProfile, // TODO: this might change during prediction
     predictedEntries,
-    insulinOnBoard,
-    carbsOnBoard,
-    insulinToCarbsRatio,
+    insulinEntries,
+    carbEntries,
     alarms,
+    requiredCarbsToInsulin,
     null,
   );
 };
@@ -236,17 +236,22 @@ const hasEnoughData = (relevantEntries: AnalyserEntry[], dataNeededMinutes: numb
   return relevantEntries.length >= entriesNeeded;
 };
 
-export const getRelevantEntries = (
+const getEntriesWithinTimeRange = (
   currentTimestamp: string,
   entries: AnalyserEntry[],
   dataNeededMinutes: number,
 ) => {
   const dataNeededMs = dataNeededMinutes * MIN_IN_MS;
   const timeWindowStart = getTimeMinusTimeMs(currentTimestamp, dataNeededMs);
-  const relevantEntries = entries.filter(entry =>
-    isTimeLargerOrEqual(entry.timestamp, timeWindowStart),
-  );
+  return entries.filter(entry => isTimeLargerOrEqual(entry.timestamp, timeWindowStart));
+};
 
+export const getRelevantEntries = (
+  currentTimestamp: string,
+  entries: AnalyserEntry[],
+  dataNeededMinutes: number,
+) => {
+  const relevantEntries = getEntriesWithinTimeRange(currentTimestamp, entries, dataNeededMinutes);
   return {
     relevantEntries,
     hasEnoughData: hasEnoughData(relevantEntries, dataNeededMinutes),

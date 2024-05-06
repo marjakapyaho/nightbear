@@ -17,11 +17,11 @@ import {
   getInsulinOnBoard,
   getPercentOfCarbsRemaining,
   getCarbsOnBoard,
-  calculateInsulinToCarbsRatio,
+  calculateCurrentCarbsToInsulinRatio,
+  calculateRequiredCarbsToInsulinRatio,
 } from 'shared/utils/calculations';
-import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusHours, getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
-import { mockInsulinEntries } from 'shared/mocks/timelineEntries';
 import { mockNow } from 'shared/mocks/dates';
 
 const currentTimestamp = 1508672249758;
@@ -440,11 +440,69 @@ describe('shared/calculations', () => {
     ).toEqual(32.65134766837894);
   });
 
-  it('calculateInsulinToCarbsRatio', () => {
-    expect(calculateInsulinToCarbsRatio(5, 50)).toEqual(1);
-    expect(calculateInsulinToCarbsRatio(10, 50)).toEqual(2);
-    expect(calculateInsulinToCarbsRatio(2, 40)).toEqual(0.5);
-    expect(calculateInsulinToCarbsRatio(1, 40)).toEqual(0.25);
-    expect(calculateInsulinToCarbsRatio(2, 80)).toEqual(0.25);
+  it('calculateCurrentCarbsToInsulinRatio', () => {
+    expect(calculateCurrentCarbsToInsulinRatio(50, 5)).toEqual(10);
+    expect(calculateCurrentCarbsToInsulinRatio(50, 10)).toEqual(5);
+    expect(calculateCurrentCarbsToInsulinRatio(40, 2)).toEqual(20);
+    expect(calculateCurrentCarbsToInsulinRatio(40, 1)).toEqual(40);
+    expect(calculateCurrentCarbsToInsulinRatio(80, 2)).toEqual(40);
+  });
+
+  it('calculateRequiredCarbsToInsulinRatio', () => {
+    expect(calculateRequiredCarbsToInsulinRatio(getTimeMinusHours(mockNow, 3), [], [])).toEqual(
+      null,
+    );
+    // Only entries over 2 hours old are considered
+    expect(
+      calculateRequiredCarbsToInsulinRatio(
+        mockNow,
+        [{ timestamp: getTimeMinusHours(mockNow, 1), amount: 70, durationFactor: 4 }],
+        [{ timestamp: getTimeMinusHours(mockNow, 1), amount: 7, type: 'FAST' }],
+      ),
+    ).toEqual(null);
+    expect(
+      calculateRequiredCarbsToInsulinRatio(
+        mockNow,
+        [],
+        [{ timestamp: getTimeMinusHours(mockNow, 3), amount: 5, type: 'FAST' }],
+      ),
+    ).toEqual(0);
+    expect(
+      calculateRequiredCarbsToInsulinRatio(
+        mockNow,
+        [{ timestamp: getTimeMinusHours(mockNow, 3), amount: 70, durationFactor: 4 }],
+        [{ timestamp: getTimeMinusHours(mockNow, 3), amount: 7, type: 'FAST' }],
+      ),
+    ).toEqual(10);
+    expect(
+      calculateRequiredCarbsToInsulinRatio(
+        mockNow,
+        [
+          { timestamp: getTimeMinusHours(mockNow, 8), amount: 70, durationFactor: 4 },
+          { timestamp: getTimeMinusHours(mockNow, 5), amount: 80, durationFactor: 4 },
+          { timestamp: getTimeMinusHours(mockNow, 3), amount: 40, durationFactor: 1 },
+        ],
+        [
+          { timestamp: getTimeMinusHours(mockNow, 8), amount: 3, type: 'FAST' },
+          { timestamp: getTimeMinusHours(mockNow, 5), amount: 4, type: 'FAST' },
+          { timestamp: getTimeMinusHours(mockNow, 3), amount: 1, type: 'FAST' },
+        ],
+      ),
+    ).toEqual(23.75);
+    expect(
+      calculateRequiredCarbsToInsulinRatio(
+        mockNow,
+        [
+          { timestamp: getTimeMinusHours(mockNow, 8), amount: 30, durationFactor: 4 },
+          { timestamp: getTimeMinusHours(mockNow, 5), amount: 50, durationFactor: 4 },
+          { timestamp: getTimeMinusHours(mockNow, 3), amount: 40, durationFactor: 1 },
+        ],
+        [
+          { timestamp: getTimeMinusHours(mockNow, 8), amount: 9, type: 'FAST' },
+          { timestamp: getTimeMinusHours(mockNow, 5), amount: 10, type: 'FAST' },
+          { timestamp: getTimeMinusHours(mockNow, 3), amount: 6, type: 'FAST' },
+        ],
+      ),
+    ).toEqual(4.8);
   });
 });

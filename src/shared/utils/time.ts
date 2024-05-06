@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { MIN_IN_MS } from 'shared/utils/calculations';
+import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 
 // TODO: Make this configurable via env (or just use env.TZ as-is)
 export const TZ = 'Europe/Helsinki';
@@ -36,6 +36,7 @@ export const getTimeAsISOStr = (time: number | string): string =>
   typeof time === 'string' ? time : DateTime.fromMillis(time).toUTC().toISO() || '';
 
 export const minToMs = (minutes: number) => minutes * MIN_IN_MS;
+export const hourToMs = (minutes: number) => minutes * HOUR_IN_MS;
 
 // Comparisons
 export const isTimeLarger = (time1: string | number, time2: string | number) =>
@@ -59,6 +60,9 @@ export const getTimeMinusTimeMs = (time1: string | number, time2: string | numbe
 
 export const getTimeMinusMinutes = (time1: string | number, minutes: number) =>
   getTimeAsISOStr(getTimeInMillis(time1) - minutes * MIN_IN_MS);
+
+export const getTimeMinusHours = (time1: string | number, hours: number) =>
+  getTimeAsISOStr(getTimeInMillis(time1) - hours * HOUR_IN_MS);
 
 // Plus
 export const getTimePlusTime = (time1: string | number, time2: string | number) =>

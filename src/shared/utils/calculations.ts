@@ -6,9 +6,11 @@ import {
   getTimeInMillis,
   getTimeMinusTime,
   getTimeMinusTimeMs,
+  hourToMs,
 } from 'shared/utils/time';
 import { isValidNumber, roundNumberToFixedDecimals } from 'shared/utils/helpers';
 import { Context } from 'backend/utils/api';
+import { getEntriesBeforeMs } from 'backend/cronjobs/checks/utils';
 
 export const SEC_IN_MS = 1000;
 export const MIN_IN_MS = 60 * SEC_IN_MS;
@@ -287,9 +289,32 @@ export const getCarbsOnBoard = (currentTimestamp: string, carbEntries: CarbEntry
     })
     .reduce((prev, cur) => prev + cur, 0);
 
-export const calculateInsulinToCarbsRatio = (insulinOnBoard: number, carbsOnBoard: number) => {
-  const carbsToOneUnitOfInsulin = 10;
-  const neededInsulinForCarbs = carbsOnBoard / carbsToOneUnitOfInsulin;
-  const ratio = insulinOnBoard / neededInsulinForCarbs;
+export const calculateCurrentCarbsToInsulinRatio = (
+  carbsOnBoard: number,
+  insulinOnBoard: number,
+) => {
+  const ratio = carbsOnBoard / insulinOnBoard;
+  return isValidNumber(ratio) ? ratio : null;
+};
+
+export const calculateRequiredCarbsToInsulinRatio = (
+  currentTimestamp: string,
+  carbEntries: CarbEntry[],
+  insulinEntries: InsulinEntry[],
+) => {
+  // Ignore last 2 hours as we might be having an issue with missing insulin or carbs, so it's not a good example
+  const relevantCarbEntries = getEntriesBeforeMs(currentTimestamp, carbEntries, hourToMs(2));
+  const relevantInsulinEntries = getEntriesBeforeMs(currentTimestamp, insulinEntries, hourToMs(2));
+
+  const sumOfCarbs = relevantCarbEntries
+    .map(entry => entry.amount)
+    .reduce((prev, cur) => prev + cur, 0);
+
+  const sumOfInsulins = relevantInsulinEntries
+    .map(entry => entry.amount)
+    .reduce((prev, cur) => prev + cur, 0);
+
+  const ratio = sumOfCarbs / sumOfInsulins;
+
   return isValidNumber(ratio) ? ratio : null;
 };

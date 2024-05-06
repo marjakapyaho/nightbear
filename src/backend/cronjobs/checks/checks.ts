@@ -10,15 +10,16 @@ import { getRange } from './utils';
 
 export const checks = (async (context: Context) => {
   const { log } = context;
+  const currentTimestamp = context.timestamp();
 
-  log('--- STARTED CHECKS ---');
+  log(`----- STARTED CHECKS AT: ${currentTimestamp} -----`);
 
-  const sensorEntriesArray = await context.db.sensorEntries.byTimestamp(getRange(context));
-  const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context));
-  const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context));
-  const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context));
+  const sensorEntriesArray = await context.db.sensorEntries.byTimestamp(getRange(context, 3));
+  const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context, 24));
+  const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context, 24));
+  const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context, 3));
   const profilesArray = await context.db.profiles.getProfiles();
-  const alarmsArray = await context.db.alarms.getAlarms(getRange(context));
+  const alarmsArray = await context.db.alarms.getAlarms(getRange(context, 12));
   const [activeAlarmObj] = await context.db.alarms.getAlarms({ onlyActive: true });
 
   // TODO: FIX THESE
@@ -26,7 +27,6 @@ export const checks = (async (context: Context) => {
   const alarms = alarmsArray as unknown as Alarm[];
   const activeAlarm = activeAlarmObj as unknown as Alarm;
   const profiles = profilesArray as Profile[];
-
   const activeProfile = getActiveProfile(profiles);
 
   // TODO: MOVE THIS
@@ -35,7 +35,7 @@ export const checks = (async (context: Context) => {
   log(`1. Using profile: ${activeProfile.profileName}`);
 
   const situation = runAnalysis({
-    currentTimestamp: context.timestamp(),
+    currentTimestamp,
     activeProfile,
     sensorEntries,
     meterEntries,

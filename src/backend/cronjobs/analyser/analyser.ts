@@ -4,7 +4,7 @@ import {
   getPredictedSituation,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from 'backend/cronjobs/analyser/utils';
-import { CarbEntry } from 'shared/types/timelineEntries';
+import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
@@ -21,10 +21,13 @@ import {
   detectRising,
 } from './situations';
 import {
-  calculateInsulinToCarbsRatio,
+  calculateCurrentCarbsToInsulinRatio,
+  calculateRequiredCarbsToInsulinRatio,
   getCarbsOnBoard,
   getInsulinOnBoard,
 } from 'shared/utils/calculations';
+import { getEntriesWithinTimeRange } from 'backend/cronjobs/checks/utils';
+import { hourToMs } from 'shared/utils/time';
 
 export const runAnalysis = ({
   currentTimestamp,
@@ -35,28 +38,36 @@ export const runAnalysis = ({
   carbEntries,
   alarms,
 }: AnalyserData): Situation | null => {
-  const entries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
-  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries);
-  const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries);
-  const insulinToCarbsRatio = calculateInsulinToCarbsRatio(insulinOnBoard, carbsOnBoard);
+  const analyserEntries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
+  const requiredCarbsToInsulin = calculateRequiredCarbsToInsulinRatio(
+    currentTimestamp,
+    carbEntries,
+    insulinEntries,
+  );
+  const relevantInsulinEntries = getEntriesWithinTimeRange(
+    currentTimestamp,
+    insulinEntries,
+    hourToMs(6),
+  );
+  const relevantCarbEntries = getEntriesWithinTimeRange(currentTimestamp, carbEntries, hourToMs(6));
 
   const predictedSituation = getPredictedSituation(
     activeProfile,
-    entries,
-    insulinOnBoard,
-    carbsOnBoard,
-    insulinToCarbsRatio,
+    analyserEntries,
+    relevantInsulinEntries,
+    relevantCarbEntries,
     alarms,
+    requiredCarbsToInsulin,
   );
 
   return detectSituation(
     currentTimestamp,
     activeProfile,
-    entries,
-    insulinOnBoard,
-    carbsOnBoard,
-    insulinToCarbsRatio,
+    analyserEntries,
+    relevantInsulinEntries,
+    relevantCarbEntries,
     alarms,
+    requiredCarbsToInsulin,
     predictedSituation,
   );
 };
@@ -64,14 +75,21 @@ export const runAnalysis = ({
 export const detectSituation = (
   currentTimestamp: string,
   activeProfile: Profile,
-  entries: AnalyserEntry[],
-  insulinOnBoard: number,
-  carbsOnBoard: number,
-  insulinToCarbsRatio: number | null,
+  analyserEntries: AnalyserEntry[],
+  insulinEntries: InsulinEntry[],
+  carbEntries: CarbEntry[],
   alarms: Alarm[],
+  requiredCarbsToInsulin: number | null,
   predictedSituation: Situation | null,
 ): Situation | null => {
-  const latestEntry = getLatestAnalyserEntry(entries);
+  const latestEntry = getLatestAnalyserEntry(analyserEntries);
+  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries);
+  const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries);
+  const currentCarbsToInsulin = calculateCurrentCarbsToInsulinRatio(carbsOnBoard, insulinOnBoard);
+  const thereIsTooMuchInsulin =
+    currentCarbsToInsulin !== null &&
+    requiredCarbsToInsulin !== null &&
+    currentCarbsToInsulin <= requiredCarbsToInsulin;
 
   /**
    * 1. CRITICAL_OUTDATED
@@ -106,7 +124,7 @@ export const detectSituation = (
    * 4. COMPRESSION_LOW
    * Must be before LOW and FALLING
    */
-  if (detectCompressionLow(activeProfile, entries, insulinOnBoard, currentTimestamp)) {
+  if (detectCompressionLow(activeProfile, analyserEntries, insulinOnBoard, currentTimestamp)) {
     return 'COMPRESSION_LOW';
   }
 
@@ -119,8 +137,8 @@ export const detectSituation = (
       activeProfile,
       latestEntry,
       alarms,
-      carbsOnBoard,
-      insulinToCarbsRatio,
+      carbEntries,
+      thereIsTooMuchInsulin,
       currentTimestamp,
     )
   ) {
@@ -146,7 +164,15 @@ export const detectSituation = (
    * 6. PERSISTENT_HIGH
    * Alarms values that are only relative high, but don't seem to be going lower
    */
-  if (detectPersistentHigh(activeProfile, latestEntry, entries, insulinOnBoard, currentTimestamp)) {
+  if (
+    detectPersistentHigh(
+      activeProfile,
+      latestEntry,
+      analyserEntries,
+      insulinOnBoard,
+      currentTimestamp,
+    )
+  ) {
     return 'PERSISTENT_HIGH';
   }
 

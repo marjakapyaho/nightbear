@@ -23,7 +23,7 @@ describe('analyser/low', () => {
     ).toEqual('LOW');
   });
 
-  it('does not detect LOW when carbs on board is over 10', () => {
+  it('does not detect LOW when there are carbs taken within LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -36,7 +36,7 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeMinusMinutes(mockNow, 20),
+            timestamp: getTimeMinusMinutes(mockNow, 15),
             amount: 20,
             durationFactor: 1,
           },
@@ -46,7 +46,7 @@ describe('analyser/low', () => {
     ).toEqual(null);
   });
 
-  it('detects LOW when carbs on board is less than 10 and there is no insulin', () => {
+  it('detects LOW when there are carbs taken outside LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -59,8 +59,8 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [
           {
-            timestamp: getTimeMinusMinutes(mockNow, 35),
-            amount: 30,
+            timestamp: getTimeMinusMinutes(mockNow, 30),
+            amount: 50,
             durationFactor: 1,
           },
         ],
@@ -69,7 +69,7 @@ describe('analyser/low', () => {
     ).toEqual('LOW');
   });
 
-  it('detects LOW when carbs on board is more than 10 and there is insulin', () => {
+  it('detects LOW even if taken carbs are inside LOW_CORRECTION_SUPPRESSION_WINDOW if there is too much insulin', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -79,11 +79,23 @@ describe('analyser/low', () => {
           bloodGlucoseHistory: [6, 5, 4.7, 3.8],
         }),
         meterEntries: [],
-        insulinEntries: [{ timestamp: getTimeMinusMinutes(mockNow, 60), amount: 1, type: 'FAST' }],
+        insulinEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
+          { timestamp: getTimeMinusMinutes(mockNow, 300), amount: 5, type: 'FAST' },
+          // To affect currentCarbsToInsulin (calculates as 40/5=8)
+          { timestamp: getTimeMinusMinutes(mockNow, 60), amount: 5, type: 'FAST' },
+        ],
         carbEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
           {
-            timestamp: getTimeMinusMinutes(mockNow, 35),
+            timestamp: getTimeMinusMinutes(mockNow, 300),
             amount: 50,
+            durationFactor: 1,
+          },
+          // To affect currentCarbsToInsulin (calculates as 40/5=8)
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 15),
+            amount: 40,
             durationFactor: 1,
           },
         ],

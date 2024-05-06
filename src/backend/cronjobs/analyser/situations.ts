@@ -9,6 +9,9 @@ import {
   slopeIsDown,
 } from 'backend/cronjobs/analyser/utils';
 import { find } from 'lodash';
+import { CarbEntry } from 'shared/types/timelineEntries';
+import { getEntriesWithinTimeRange } from 'backend/cronjobs/checks/utils';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 
 // Minutes
 const PERSISTENT_HIGH_TIME_WINDOW = 120;
@@ -16,6 +19,7 @@ const COMPRESSION_LOW_TIME_WINDOW = 25;
 const BAD_LOW_QUARANTINE_WINDOW = 15;
 const BAD_HIGH_QUARANTINE_WINDOW = 90;
 const TIME_SINCE_BG_CRITICAL = 15;
+const LOW_CORRECTION_SUPPRESSION_WINDOW = 20;
 
 // Other units
 const HIGH_CLEARING_THRESHOLD = 1;
@@ -23,7 +27,6 @@ const LOW_CLEARING_THRESHOLD = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
 const RELEVANT_COB_LIMIT_FOR_LOW = 10;
-const INSULIN_TO_CARBS_RATIO_LIMIT_FOR_LOW = 0.3;
 
 const slopeLimits = {
   SLOW: 0.3,
@@ -102,8 +105,8 @@ export const detectLow = (
   activeProfile: Profile,
   latestEntry: AnalyserEntry,
   alarms: Alarm[],
-  carbsOnBoard: number,
-  insulinToCarbsRatio: number | null,
+  carbEntries: CarbEntry[],
+  thereIsTooMuchInsulin: boolean,
   currentTimestamp: string,
 ) => {
   const notComingUpFromBadLow = !find(
@@ -117,11 +120,13 @@ export const detectLow = (
       alarm.situation === 'BAD_LOW',
   );
 
-  // TODO: check this
-  const thereIsNotEnoughCarbs =
-    insulinToCarbsRatio === null ||
-    carbsOnBoard < RELEVANT_COB_LIMIT_FOR_LOW ||
-    insulinToCarbsRatio > INSULIN_TO_CARBS_RATIO_LIMIT_FOR_LOW;
+  // TODO: continue this
+  const thereAreNoCorrectionCarbs =
+    getEntriesWithinTimeRange(
+      currentTimestamp,
+      carbEntries,
+      minToMs(LOW_CORRECTION_SUPPRESSION_WINDOW),
+    ).length === 0;
 
   const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' })
     ? LOW_CLEARING_THRESHOLD
@@ -129,7 +134,7 @@ export const detectLow = (
 
   return (
     notComingUpFromBadLow &&
-    thereIsNotEnoughCarbs &&
+    (thereAreNoCorrectionCarbs || thereIsTooMuchInsulin) &&
     latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelAbs + correctionIfAlreadyLow
   );
 };
