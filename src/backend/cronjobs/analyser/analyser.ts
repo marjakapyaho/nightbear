@@ -2,6 +2,7 @@ import {
   AnalyserData,
   getLatestAnalyserEntry,
   getPredictedSituation,
+  isThereTooMuchInsulin,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from 'backend/cronjobs/analyser/utils';
 import { CarbEntry, InsulinEntry } from 'shared/types/timelineEntries';
@@ -37,7 +38,7 @@ export const runAnalysis = ({
   insulinEntries,
   carbEntries,
   alarms,
-}: AnalyserData): Situation | null => {
+}: AnalyserData): Situation | 'NO_SITUATION' => {
   const analyserEntries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
   const requiredCarbsToInsulin = calculateRequiredCarbsToInsulinRatio(
     currentTimestamp,
@@ -80,16 +81,16 @@ export const detectSituation = (
   carbEntries: CarbEntry[],
   alarms: Alarm[],
   requiredCarbsToInsulin: number | null,
-  predictedSituation: Situation | null,
-): Situation | null => {
+  predictedSituation?: Situation | 'NO_SITUATION',
+): Situation | 'NO_SITUATION' => {
   const latestEntry = getLatestAnalyserEntry(analyserEntries);
   const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries);
   const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries);
   const currentCarbsToInsulin = calculateCurrentCarbsToInsulinRatio(carbsOnBoard, insulinOnBoard);
-  const thereIsTooMuchInsulin =
-    currentCarbsToInsulin !== null &&
-    requiredCarbsToInsulin !== null &&
-    currentCarbsToInsulin <= requiredCarbsToInsulin;
+  const thereIsTooMuchInsulin = isThereTooMuchInsulin(
+    requiredCarbsToInsulin,
+    currentCarbsToInsulin,
+  );
 
   /**
    * 1. CRITICAL_OUTDATED
@@ -140,6 +141,7 @@ export const detectSituation = (
       carbEntries,
       thereIsTooMuchInsulin,
       currentTimestamp,
+      predictedSituation,
     )
   ) {
     return 'LOW';
@@ -176,5 +178,5 @@ export const detectSituation = (
     return 'PERSISTENT_HIGH';
   }
 
-  return null;
+  return 'NO_SITUATION';
 };

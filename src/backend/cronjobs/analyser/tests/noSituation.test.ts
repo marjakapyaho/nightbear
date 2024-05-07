@@ -18,6 +18,6 @@ describe('analyser/noSituation', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 });

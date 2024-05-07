@@ -84,12 +84,12 @@ describe('cronjobs/alarms', () => {
     const alarm = await createAlarmWithState('LOW', context);
 
     // Test alarm actions detection (does not touch db)
-    expect(detectAlarmActions(null, getMockActiveProfile(), alarm)).toEqual({
+    expect(detectAlarmActions('NO_SITUATION', getMockActiveProfile(), alarm)).toEqual({
       remove: alarm,
     });
 
     // Run checks (also uses function above)
-    await runAlarmChecks(context, null, getMockActiveProfile(), alarm);
+    await runAlarmChecks(context, 'NO_SITUATION', getMockActiveProfile(), alarm);
 
     // Should have removed previous existing alarm
     expect(await checkActiveAlarms(context)).toHaveLength(0);

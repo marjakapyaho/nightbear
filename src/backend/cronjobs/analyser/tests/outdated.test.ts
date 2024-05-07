@@ -37,6 +37,6 @@ describe('analyser/outdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 });

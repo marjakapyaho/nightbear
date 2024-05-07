@@ -43,7 +43,7 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('detects LOW when there are carbs taken outside LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
@@ -151,10 +151,42 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
-  it('does not clear LOW at the limit when there is an active LOW alarm', () => {
+  it('does not clear LOW at the limit when predicted situation is still indicating low', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [4.5, 3.9, 3.8, 3.9, 4.0, 3.9, 4.1],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '123',
+            situation: 'LOW',
+            isActive: true,
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusMinutes(mockNow, 30),
+                alarmLevel: 1,
+                validAfter: getTimeMinusMinutes(mockNow, 30),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('clears LOW at the limit even when there is an active LOW alarm if predicted situation is indicating rise', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -183,6 +215,6 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual('LOW');
+    ).toEqual('NO_SITUATION');
   });
 });

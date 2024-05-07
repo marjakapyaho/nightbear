@@ -43,7 +43,7 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('detects HIGH when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
@@ -100,7 +100,7 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not clear HIGH at the limit when there is an active HIGH alarm', () => {

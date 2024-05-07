@@ -35,7 +35,7 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect FALLING above relative low limit', () => {
@@ -52,7 +52,7 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect FALLING below absolute low limit (detects LOW)', () => {

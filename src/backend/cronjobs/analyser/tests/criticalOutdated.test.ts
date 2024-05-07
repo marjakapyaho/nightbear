@@ -88,7 +88,7 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('detects CRITICAL_OUTDATED when predicted state is not bad but there is insulin on board', () => {

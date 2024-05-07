@@ -59,7 +59,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect PERSISTENT_HIGH when there is even one HIGH value', () => {
@@ -76,7 +76,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect PERSISTENT_HIGH when there is even one normal value', () => {
@@ -93,7 +93,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
@@ -116,7 +116,7 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('detects PERSISTENT_HIGH when insulin on board drops below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
@@ -156,6 +156,6 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 });

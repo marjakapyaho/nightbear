@@ -5,18 +5,22 @@ import { getTimeMinusTimeMs, isTimeLarger, minToMs } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
 import {
   getRelevantEntries,
+  isBloodGlucoseRelativeHigh,
+  isBloodGlucoseRelativeLow,
   isSituationCritical,
-  slopeIsDown,
+  isSlopeFalling,
+  slopeIsNegative,
+  isSlopeRising,
+  isPredictedSituationAnyLowOrMissing,
+  isPredictedSituationAnyHighOrMissing,
 } from 'backend/cronjobs/analyser/utils';
 import { find } from 'lodash';
 import { CarbEntry } from 'shared/types/timelineEntries';
 import { getEntriesWithinTimeRange } from 'backend/cronjobs/checks/utils';
-import { MIN_IN_MS } from 'shared/utils/calculations';
 
 // Minutes
 const PERSISTENT_HIGH_TIME_WINDOW = 120;
 const COMPRESSION_LOW_TIME_WINDOW = 25;
-const BAD_LOW_QUARANTINE_WINDOW = 15;
 const BAD_HIGH_QUARANTINE_WINDOW = 90;
 const TIME_SINCE_BG_CRITICAL = 15;
 const LOW_CORRECTION_SUPPRESSION_WINDOW = 20;
@@ -26,9 +30,8 @@ const HIGH_CLEARING_THRESHOLD = 1;
 const LOW_CLEARING_THRESHOLD = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
-const RELEVANT_COB_LIMIT_FOR_LOW = 10;
 
-const slopeLimits = {
+export const slopeLimits = {
   SLOW: 0.3,
   MEDIUM: 0.6,
   FAST: 1.3,
@@ -39,7 +42,7 @@ export const detectCriticalOutdated = (
   latestEntry: AnalyserEntry,
   insulinOnBoard: number,
   currentTimestamp: string,
-  predictedSituation: Situation | null,
+  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
   // If there is no data, it's been hours without data, so we should alarm immediately
   if (!latestEntry) {
@@ -108,19 +111,10 @@ export const detectLow = (
   carbEntries: CarbEntry[],
   thereIsTooMuchInsulin: boolean,
   currentTimestamp: string,
+  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
-  const notComingUpFromBadLow = !find(
-    alarms,
-    alarm =>
-      (!alarm.deactivatedAt ||
-        isTimeLarger(
-          alarm.deactivatedAt,
-          getTimeMinusTimeMs(currentTimestamp, minToMs(BAD_LOW_QUARANTINE_WINDOW)),
-        )) &&
-      alarm.situation === 'BAD_LOW',
-  );
+  const notGoingUp = isPredictedSituationAnyLowOrMissing(predictedSituation);
 
-  // TODO: continue this
   const thereAreNoCorrectionCarbs =
     getEntriesWithinTimeRange(
       currentTimestamp,
@@ -133,7 +127,7 @@ export const detectLow = (
     : 0;
 
   return (
-    notComingUpFromBadLow &&
+    notGoingUp &&
     (thereAreNoCorrectionCarbs || thereIsTooMuchInsulin) &&
     latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelAbs + correctionIfAlreadyLow
   );
@@ -170,19 +164,15 @@ export const detectHigh = (
 export const detectFalling = (
   activeProfile: Profile,
   latestEntry: AnalyserEntry,
-  predictedSituation: Situation | null,
+  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
-  const bloodGlucoseIsRelativeLow =
-    latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
-    latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs;
-  const slopeIndicatesFalling =
-    latestEntry.slope !== null && latestEntry.slope < -slopeLimits.MEDIUM;
-  const predictedSituationIsLowOrBadLow =
-    predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
+  const bloodGlucoseIsRelativeLow = isBloodGlucoseRelativeLow(latestEntry, activeProfile);
+  const slopeIsFalling = isSlopeFalling(latestEntry);
+  const predictedSituationIsLowOrBadLow = isPredictedSituationAnyLowOrMissing(predictedSituation);
 
   return (
     bloodGlucoseIsRelativeLow &&
-    (slopeIndicatesFalling || (predictedSituationIsLowOrBadLow && slopeIsDown(latestEntry)))
+    (slopeIsFalling || (slopeIsNegative(latestEntry) && predictedSituationIsLowOrBadLow))
   );
 };
 
@@ -191,15 +181,11 @@ export const detectRising = (
   latestEntry: AnalyserEntry,
   insulinOnBoard: number,
 ) => {
-  const bloodGlucoseIsRelativeHigh =
-    latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
-    latestEntry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs;
-  const slopeIndicatesRising = latestEntry.slope !== null && latestEntry.slope > slopeLimits.MEDIUM;
+  const bloodGlucoseIsRelativeHigh = isBloodGlucoseRelativeHigh(latestEntry, activeProfile);
+  const slopeIsRising = isSlopeRising(latestEntry);
 
   return (
-    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH &&
-    bloodGlucoseIsRelativeHigh &&
-    slopeIndicatesRising
+    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH && bloodGlucoseIsRelativeHigh && slopeIsRising
   );
 };
 
@@ -217,13 +203,10 @@ export const detectPersistentHigh = (
   );
 
   const isAllDataRelativeHigh =
-    relevantEntries.filter(
-      entry =>
-        entry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
-        entry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs,
-    ).length === relevantEntries.length;
+    relevantEntries.filter(entry => isBloodGlucoseRelativeHigh(entry, activeProfile)).length ===
+    relevantEntries.length;
 
-  const slopeIsNotDown = !slopeIsDown(latestEntry);
+  const slopeIsNotDown = !slopeIsNegative(latestEntry);
 
   return (
     hasEnoughData &&

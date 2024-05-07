@@ -24,6 +24,7 @@ import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { detectSituation } from 'backend/cronjobs/analyser/analyser';
 import { DateTime } from 'luxon';
+import { slopeLimits } from './situations';
 
 export type AnalyserData = {
   currentTimestamp: string;
@@ -218,11 +219,10 @@ export const getPredictedSituation = (
     carbEntries,
     alarms,
     requiredCarbsToInsulin,
-    null,
   );
 };
 
-export const isSituationCritical = (situation?: Situation | null) =>
+export const isSituationCritical = (situation?: Situation | 'NO_SITUATION') =>
   situation === 'LOW' ||
   situation === 'BAD_LOW' ||
   situation === 'FALLING' ||
@@ -258,4 +258,36 @@ export const getRelevantEntries = (
   };
 };
 
-export const slopeIsDown = (entry: AnalyserEntry) => entry.slope !== null && entry.slope < 0;
+export const slopeIsNegative = (entry: AnalyserEntry) => entry.slope !== null && entry.slope < 0;
+
+export const isSlopeFalling = (entry: AnalyserEntry) =>
+  entry.slope !== null && entry.slope < -slopeLimits.MEDIUM;
+
+export const isSlopeRising = (entry: AnalyserEntry) =>
+  entry.slope !== null && entry.slope > slopeLimits.MEDIUM;
+
+export const isThereTooMuchInsulin = (
+  requiredCarbsToInsulin: number | null,
+  currentCarbsToInsulin: number | null,
+) =>
+  currentCarbsToInsulin !== null &&
+  requiredCarbsToInsulin !== null &&
+  currentCarbsToInsulin <= requiredCarbsToInsulin;
+
+export const isBloodGlucoseRelativeLow = (latestEntry: AnalyserEntry, activeProfile: Profile) =>
+  latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
+  latestEntry.bloodGlucose >= activeProfile.analyserSettings.lowLevelAbs;
+
+export const isBloodGlucoseRelativeHigh = (latestEntry: AnalyserEntry, activeProfile: Profile) =>
+  latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
+  latestEntry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs;
+
+// If predictedSituation is not defined, we're doing the "predictedSituation" detection
+// for analyser and can just ignore predicted situation param
+export const isPredictedSituationAnyLowOrMissing = (
+  predictedSituation?: Situation | 'NO_SITUATION',
+) => !predictedSituation || predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
+
+export const isPredictedSituationAnyHighOrMissing = (
+  predictedSituation?: Situation | 'NO_SITUATION',
+) => !predictedSituation || predictedSituation === 'HIGH' || predictedSituation === 'BAD_HIGH';

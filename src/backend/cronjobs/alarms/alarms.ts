@@ -14,7 +14,7 @@ import {
 
 export const runAlarmChecks = async (
   context: Context,
-  situation: Situation | null,
+  situation: Situation | 'NO_SITUATION',
   activeProfile: Profile,
   activeAlarm?: Alarm,
 ): Promise<string | null> => {
@@ -38,12 +38,12 @@ export const runAlarmChecks = async (
 };
 
 export const detectAlarmActions = (
-  situation: Situation | null,
+  situation: Situation | 'NO_SITUATION',
   activeProfile: Profile,
   activeAlarm?: Alarm,
 ): AlarmActions => {
   // If there is no situation or alarms are disabled, remove active alarm
-  if (!situation || !activeProfile.alarmsEnabled) {
+  if (situation === 'NO_SITUATION' || !activeProfile.alarmsEnabled) {
     return {
       remove: activeAlarm,
     };
@@ -65,14 +65,9 @@ export const detectAlarmActions = (
   }
 
   // There was no previous alarm and there is a situation so create new alarm
-  if (situation) {
-    return {
-      create: situation,
-    };
-  }
-
-  // Do nothing
-  return {};
+  return {
+    create: situation,
+  };
 };
 
 const deactivateAlarm = async (alarm: Alarm, context: Context) => {

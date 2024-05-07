@@ -16,7 +16,7 @@ describe('cronjobs/checks', () => {
     await generateSeedData(context);
   });
 
-  it.only('runs checks', async () => {
+  it('runs checks', async () => {
     let currentTimestamp = mockNow;
     let alarms: Alarm[];
 

@@ -37,7 +37,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect RISING when above absolute high (detects HIGH)', () => {
@@ -71,7 +71,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect RISING when you can not calculate slope', () => {
@@ -88,7 +88,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('does not detect RISING if insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
@@ -111,7 +111,7 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual(null);
+    ).toEqual('NO_SITUATION');
   });
 
   it('detects RISING when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
