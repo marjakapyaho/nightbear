@@ -1,7 +1,8 @@
 import { last } from 'lodash';
 import { Alarm, AlarmState } from 'shared/types/alarms';
 
-export const ALARM_DEFAULT_LEVEL = 0;
+export const ALARM_START_LEVEL = 0;
+export const ALARM_FALLBACK_LEVEL = 1;
 
 export const onlyActive = (alarms: Alarm[]) => alarms.filter(alarm => alarm.isActive);
 

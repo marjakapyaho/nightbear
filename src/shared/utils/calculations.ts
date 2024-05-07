@@ -1,15 +1,8 @@
 import { fill, groupBy, reduce } from 'lodash';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
-import {
-  getTimeAsISOStr,
-  getTimeInMillis,
-  getTimeMinusTime,
-  getTimeMinusTimeMs,
-  hourToMs,
-} from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeInMillis, getTimeMinusTimeMs, hourToMs } from 'shared/utils/time';
 import { isValidNumber, roundNumberToFixedDecimals } from 'shared/utils/helpers';
-import { Context } from 'backend/utils/api';
 import { getEntriesBeforeMs } from 'backend/cronjobs/checks/utils';
 
 export const SEC_IN_MS = 1000;

@@ -12,6 +12,6 @@ export const getSnoozeMinutesFromActiveProfile = async (activeAlarm: Alarm, cont
   const activeProfile = profiles.find(profile => profile.isActive) as Profile; // TODO
   return (
     activeProfile?.situationSettings?.find(settings => settings.situation === activeAlarm.situation)
-      ?.snoozeMinutes || 10
-  ); // TODO: what to do here
+      ?.snoozeMinutes || 0
+  );
 };

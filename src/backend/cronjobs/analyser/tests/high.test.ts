@@ -6,7 +6,7 @@ import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/high', () => {
-  it('detects HIGH', () => {
+  it('detects HIGH above high limit', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -19,6 +19,138 @@ describe('analyser/high', () => {
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
+      }),
+    ).toEqual('HIGH');
+  });
+
+  it('does not clear HIGH above HIGH_CLEARING_THRESHOLD when there is active HIGH alarm', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [11.5, 10.5, 9.9],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '1234',
+            situation: 'HIGH',
+            isActive: true,
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                alarmLevel: 1,
+                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('HIGH');
+  });
+
+  it('clears HIGH below HIGH_CLEARING_THRESHOLD even if there is active HIGH alarm', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [11.5, 10.5, 9.0],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '1234',
+            situation: 'HIGH',
+            isActive: true,
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                alarmLevel: 1,
+                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('NO_SITUATION');
+  });
+
+  it('does not detect HIGH after BAD_HIGH when we are inside BAD_HIGH_QUARANTINE_WINDOW', () => {
+    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [15.5, 14.5, 14.1, 13.5],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '1234',
+            situation: 'BAD_HIGH',
+            isActive: false,
+            deactivatedAt: getTimeMinusTime(mockNow, 5 * MIN_IN_MS),
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: timestamp30minAgo,
+                alarmLevel: 1,
+                validAfter: timestamp30minAgo,
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('NO_SITUATION');
+  });
+
+  it('detects HIGH after BAD_HIGH when we are outside BAD_HIGH_QUARANTINE_WINDOW', () => {
+    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [15.5, 14.5, 14.1, 13.5],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '1234',
+            situation: 'BAD_HIGH',
+            isActive: false,
+            deactivatedAt: getTimeMinusTime(mockNow, 65 * MIN_IN_MS),
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: timestamp30minAgo,
+                alarmLevel: 1,
+                validAfter: timestamp30minAgo,
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
       }),
     ).toEqual('HIGH');
   });
@@ -69,68 +201,37 @@ describe('analyser/high', () => {
     ).toEqual('HIGH');
   });
 
-  it('does not detect HIGH when coming down from BAD_HIGH', () => {
-    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
+  it('detects HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too little insulin for carbs', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
         activeProfile: getMockActiveProfile('day'),
         sensorEntries: generateSensorEntries({
           currentTimestamp: mockNow,
-          bloodGlucoseHistory: [15.5, 14.5, 14.1, 13.5],
+          bloodGlucoseHistory: [9.0, 9.5, 9.6, 9.8, 10.1],
         }),
         meterEntries: [],
-        insulinEntries: [],
-        carbEntries: [],
-        alarms: [
+        insulinEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
+          { timestamp: getTimeMinusMinutes(mockNow, 300), amount: 5, type: 'FAST' },
+          // To affect currentCarbsToInsulin
+          { timestamp: getTimeMinusMinutes(mockNow, 60), amount: 5, type: 'FAST' },
+        ],
+        carbEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
           {
-            id: '1234',
-            situation: 'BAD_HIGH',
-            isActive: false,
-            deactivatedAt: getTimeMinusTime(mockNow, 5 * MIN_IN_MS),
-            alarmStates: [
-              {
-                id: '1',
-                timestamp: timestamp30minAgo,
-                alarmLevel: 1,
-                validAfter: timestamp30minAgo,
-                ackedBy: null,
-              },
-            ],
+            timestamp: getTimeMinusMinutes(mockNow, 300),
+            amount: 50,
+            durationFactor: 1,
+          },
+          // To affect currentCarbsToInsulin
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 15),
+            amount: 70,
+            durationFactor: 1,
           },
         ],
-      }),
-    ).toEqual('NO_SITUATION');
-  });
-
-  it('does not clear HIGH at the limit when there is an active HIGH alarm', () => {
-    expect(
-      runAnalysis({
-        currentTimestamp: mockNow,
-        activeProfile: getMockActiveProfile('day'),
-        sensorEntries: generateSensorEntries({
-          currentTimestamp: mockNow,
-          bloodGlucoseHistory: [11.5, 10.5, 9.9],
-        }),
-        meterEntries: [],
-        insulinEntries: [],
-        carbEntries: [],
-        alarms: [
-          {
-            id: '1234',
-            situation: 'HIGH',
-            isActive: true,
-            alarmStates: [
-              {
-                id: '1',
-                timestamp: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
-                alarmLevel: 1,
-                validAfter: getTimeMinusTime(mockNow, 30 * MIN_IN_MS),
-                ackedBy: null,
-              },
-            ],
-          },
-        ],
+        alarms: [],
       }),
     ).toEqual('HIGH');
   });

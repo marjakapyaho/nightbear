@@ -1,7 +1,7 @@
 import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
-import { getTimeMinusTimeMs, isTimeLarger, minToMs } from 'shared/utils/time';
+import { getTimeMinusTimeMs, minToMs } from 'shared/utils/time';
 import { onlyActive } from 'shared/utils/alarms';
 import {
   getRelevantEntries,
@@ -12,7 +12,9 @@ import {
   slopeIsNegative,
   isSlopeRising,
   isPredictedSituationAnyLowOrMissing,
-  isPredictedSituationAnyHighOrMissing,
+  getHighLimitWithPossibleAddition,
+  areThereSpecificSituationsInGivenWindow,
+  getLowLimitWithPossibleAddition,
 } from 'backend/cronjobs/analyser/utils';
 import { find } from 'lodash';
 import { CarbEntry } from 'shared/types/timelineEntries';
@@ -21,13 +23,14 @@ import { getEntriesWithinTimeRange } from 'backend/cronjobs/checks/utils';
 // Minutes
 const PERSISTENT_HIGH_TIME_WINDOW = 120;
 const COMPRESSION_LOW_TIME_WINDOW = 25;
-const BAD_HIGH_QUARANTINE_WINDOW = 90;
+export const BAD_HIGH_QUARANTINE_WINDOW = 60;
+export const BAD_LOW_QUARANTINE_WINDOW = 15;
 const TIME_SINCE_BG_CRITICAL = 15;
 const LOW_CORRECTION_SUPPRESSION_WINDOW = 20;
 
 // Other units
-const HIGH_CLEARING_THRESHOLD = 1;
-const LOW_CLEARING_THRESHOLD = 0.5;
+export const HIGH_CLEARING_THRESHOLD = 1;
+export const LOW_CLEARING_THRESHOLD = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
 const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
 
@@ -109,28 +112,27 @@ export const detectLow = (
   latestEntry: AnalyserEntry,
   alarms: Alarm[],
   carbEntries: CarbEntry[],
-  thereIsTooMuchInsulin: boolean,
+  thereIsTooMuchInsulinForCarbs: boolean,
   currentTimestamp: string,
-  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
-  const notGoingUp = isPredictedSituationAnyLowOrMissing(predictedSituation);
+  const bloodGlucoseIsLow =
+    latestEntry.bloodGlucose < getLowLimitWithPossibleAddition(alarms, activeProfile);
 
-  const thereAreNoCorrectionCarbs =
+  const notComingUpFromBadLow = areThereSpecificSituationsInGivenWindow(
+    currentTimestamp,
+    alarms,
+    'BAD_LOW',
+    BAD_LOW_QUARANTINE_WINDOW,
+  );
+
+  const thereAreNotEnoughCorrectionCarbs =
     getEntriesWithinTimeRange(
       currentTimestamp,
       carbEntries,
       minToMs(LOW_CORRECTION_SUPPRESSION_WINDOW),
-    ).length === 0;
+    ).length === 0 || thereIsTooMuchInsulinForCarbs;
 
-  const correctionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' })
-    ? LOW_CLEARING_THRESHOLD
-    : 0;
-
-  return (
-    notGoingUp &&
-    (thereAreNoCorrectionCarbs || thereIsTooMuchInsulin) &&
-    latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelAbs + correctionIfAlreadyLow
-  );
+  return bloodGlucoseIsLow && notComingUpFromBadLow && thereAreNotEnoughCorrectionCarbs;
 };
 
 export const detectHigh = (
@@ -138,27 +140,23 @@ export const detectHigh = (
   latestEntry: AnalyserEntry,
   alarms: Alarm[],
   insulinOnBoard: number,
+  thereIsTooLittleInsulinForCarbs: boolean,
   currentTimestamp: string,
 ): boolean => {
-  const notComingDownFromBadHigh = !find(
-    alarms,
-    alarm =>
-      (!alarm.deactivatedAt ||
-        isTimeLarger(
-          alarm.deactivatedAt,
-          getTimeMinusTimeMs(currentTimestamp, minToMs(BAD_HIGH_QUARANTINE_WINDOW)),
-        )) &&
-      alarm.situation === 'BAD_HIGH',
-  );
-  const correctionIfAlreadyHigh = find(onlyActive(alarms), { situation: 'HIGH' })
-    ? HIGH_CLEARING_THRESHOLD
-    : 0;
+  const bloodGlucoseIsHigh =
+    latestEntry.bloodGlucose > getHighLimitWithPossibleAddition(alarms, activeProfile);
 
-  return (
-    notComingDownFromBadHigh &&
-    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH &&
-    latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelAbs - correctionIfAlreadyHigh
+  const notComingDownFromBadHigh = areThereSpecificSituationsInGivenWindow(
+    currentTimestamp,
+    alarms,
+    'BAD_HIGH',
+    BAD_HIGH_QUARANTINE_WINDOW,
   );
+
+  const thereIsNotEnoughCorrectionInsulin =
+    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH || thereIsTooLittleInsulinForCarbs;
+
+  return bloodGlucoseIsHigh && notComingDownFromBadHigh && thereIsNotEnoughCorrectionInsulin;
 };
 
 export const detectFalling = (

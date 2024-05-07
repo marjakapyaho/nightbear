@@ -5,6 +5,7 @@ import { getTimeMinusTimeMs } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { Alarm, AlarmState } from 'shared/types/alarms';
 import { findIndex, map, sum, take } from 'lodash';
+import { ALARM_FALLBACK_LEVEL } from 'shared/utils/alarms';
 
 export type AlarmActions = {
   remove?: Alarm;
@@ -26,8 +27,7 @@ export const getNeededAlarmLevel = (
   )?.escalationAfterMinutes;
 
   if (!levelUpTimes) {
-    // TODO: what should we return
-    return 2;
+    return ALARM_FALLBACK_LEVEL;
   }
 
   const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));

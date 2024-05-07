@@ -2,6 +2,7 @@ import {
   AnalyserData,
   getLatestAnalyserEntry,
   getPredictedSituation,
+  isThereTooLittleInsulin,
   isThereTooMuchInsulin,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from 'backend/cronjobs/analyser/utils';
@@ -91,6 +92,10 @@ export const detectSituation = (
     requiredCarbsToInsulin,
     currentCarbsToInsulin,
   );
+  const thereIsTooLittleInsulin = isThereTooLittleInsulin(
+    requiredCarbsToInsulin,
+    currentCarbsToInsulin,
+  );
 
   /**
    * 1. CRITICAL_OUTDATED
@@ -141,12 +146,20 @@ export const detectSituation = (
       carbEntries,
       thereIsTooMuchInsulin,
       currentTimestamp,
-      predictedSituation,
     )
   ) {
     return 'LOW';
   }
-  if (detectHigh(activeProfile, latestEntry, alarms, insulinOnBoard, currentTimestamp)) {
+  if (
+    detectHigh(
+      activeProfile,
+      latestEntry,
+      alarms,
+      insulinOnBoard,
+      thereIsTooLittleInsulin,
+      currentTimestamp,
+    )
+  ) {
     return 'HIGH';
   }
 

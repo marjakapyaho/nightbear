@@ -6,7 +6,7 @@ import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 
 describe('analyser/low', () => {
-  it('detects LOW', () => {
+  it('detects LOW below low limit', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -19,6 +19,136 @@ describe('analyser/low', () => {
         insulinEntries: [],
         carbEntries: [],
         alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('does not clear LOW below LOW_CLEARING_THRESHOLD when there is active LOW alarm', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [4.5, 3.9, 3.8, 3.9, 4.0, 3.9, 4.1],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '123',
+            situation: 'LOW',
+            isActive: true,
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusMinutes(mockNow, 30),
+                alarmLevel: 1,
+                validAfter: getTimeMinusMinutes(mockNow, 30),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('LOW');
+  });
+
+  it('clears LOW after LOW_CLEARING_THRESHOLD even if there is alarm', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [4.5, 3.9, 3.8, 3.9, 4.0, 3.9, 4.6],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '123',
+            situation: 'LOW',
+            isActive: true,
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusMinutes(mockNow, 30),
+                alarmLevel: 1,
+                validAfter: getTimeMinusMinutes(mockNow, 30),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('NO_SITUATION');
+  });
+
+  it('does not detect LOW after BAD_LOW when we are inside BAD_LOW_QUARANTINE_WINDOW', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [2.4, 2.8, 2.9, 3.4],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '123',
+            situation: 'BAD_LOW',
+            isActive: false,
+            deactivatedAt: getTimeMinusMinutes(mockNow, 10),
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusMinutes(mockNow, 40),
+                alarmLevel: 1,
+                validAfter: getTimeMinusMinutes(mockNow, 40),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('NO_SITUATION');
+  });
+
+  it('detects LOW after BAD_LOW when we are outside BAD_LOW_QUARANTINE_WINDOW', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [2.4, 2.8, 2.9, 3.4],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [
+          {
+            id: '123',
+            situation: 'BAD_LOW',
+            isActive: false,
+            deactivatedAt: getTimeMinusMinutes(mockNow, 20), // Outside window
+            alarmStates: [
+              {
+                id: '1',
+                timestamp: getTimeMinusMinutes(mockNow, 40),
+                alarmLevel: 1,
+                validAfter: getTimeMinusMinutes(mockNow, 40),
+                ackedBy: null,
+              },
+            ],
+          },
+        ],
       }),
     ).toEqual('LOW');
   });
@@ -82,7 +212,7 @@ describe('analyser/low', () => {
         insulinEntries: [
           // To affect requiredCarbsToInsulin (calculates as 50/5=10)
           { timestamp: getTimeMinusMinutes(mockNow, 300), amount: 5, type: 'FAST' },
-          // To affect currentCarbsToInsulin (calculates as 40/5=8)
+          // To affect currentCarbsToInsulin
           { timestamp: getTimeMinusMinutes(mockNow, 60), amount: 5, type: 'FAST' },
         ],
         carbEntries: [
@@ -92,10 +222,10 @@ describe('analyser/low', () => {
             amount: 50,
             durationFactor: 1,
           },
-          // To affect currentCarbsToInsulin (calculates as 40/5=8)
+          // To affect currentCarbsToInsulin
           {
             timestamp: getTimeMinusMinutes(mockNow, 15),
-            amount: 40,
+            amount: 60,
             durationFactor: 1,
           },
         ],
@@ -119,102 +249,5 @@ describe('analyser/low', () => {
         alarms: [],
       }),
     ).toEqual('LOW');
-  });
-
-  it('does not detect LOW right after BAD_LOW', () => {
-    expect(
-      runAnalysis({
-        currentTimestamp: mockNow,
-        activeProfile: getMockActiveProfile('day'),
-        sensorEntries: generateSensorEntries({
-          currentTimestamp: mockNow,
-          bloodGlucoseHistory: [2.4, 2.8, 2.9, 3.4],
-        }),
-        meterEntries: [],
-        insulinEntries: [],
-        carbEntries: [],
-        alarms: [
-          {
-            id: '123',
-            situation: 'BAD_LOW',
-            isActive: false,
-            deactivatedAt: getTimeMinusMinutes(mockNow, 10),
-            alarmStates: [
-              {
-                id: '1',
-                timestamp: getTimeMinusMinutes(mockNow, 40),
-                alarmLevel: 1,
-                validAfter: getTimeMinusMinutes(mockNow, 40),
-                ackedBy: null,
-              },
-            ],
-          },
-        ],
-      }),
-    ).toEqual('NO_SITUATION');
-  });
-
-  it('does not clear LOW at the limit when predicted situation is still indicating low', () => {
-    expect(
-      runAnalysis({
-        currentTimestamp: mockNow,
-        activeProfile: getMockActiveProfile('day'),
-        sensorEntries: generateSensorEntries({
-          currentTimestamp: mockNow,
-          bloodGlucoseHistory: [4.5, 3.9, 3.8, 3.9, 4.0, 3.9, 4.1],
-        }),
-        meterEntries: [],
-        insulinEntries: [],
-        carbEntries: [],
-        alarms: [
-          {
-            id: '123',
-            situation: 'LOW',
-            isActive: true,
-            alarmStates: [
-              {
-                id: '1',
-                timestamp: getTimeMinusMinutes(mockNow, 30),
-                alarmLevel: 1,
-                validAfter: getTimeMinusMinutes(mockNow, 30),
-                ackedBy: null,
-              },
-            ],
-          },
-        ],
-      }),
-    ).toEqual('LOW');
-  });
-
-  it('clears LOW at the limit even when there is an active LOW alarm if predicted situation is indicating rise', () => {
-    expect(
-      runAnalysis({
-        currentTimestamp: mockNow,
-        activeProfile: getMockActiveProfile('day'),
-        sensorEntries: generateSensorEntries({
-          currentTimestamp: mockNow,
-          bloodGlucoseHistory: [3.4, 3.6, 3.8, 4.3],
-        }),
-        meterEntries: [],
-        insulinEntries: [],
-        carbEntries: [],
-        alarms: [
-          {
-            id: '123',
-            situation: 'LOW',
-            isActive: true,
-            alarmStates: [
-              {
-                id: '1',
-                timestamp: getTimeMinusMinutes(mockNow, 30),
-                alarmLevel: 1,
-                validAfter: getTimeMinusMinutes(mockNow, 30),
-                ackedBy: null,
-              },
-            ],
-          },
-        ],
-      }),
-    ).toEqual('NO_SITUATION');
   });
 });

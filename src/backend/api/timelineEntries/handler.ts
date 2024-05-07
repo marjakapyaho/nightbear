@@ -36,7 +36,6 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
 };
 
 export const updateTimelineEntries = async (request: Request, context: Context) => {
-  // TODO: request body is always empty
   const dataPoint = request.requestBody as Point;
   if (!dataPoint?.timestamp) {
     return createResponse('error');

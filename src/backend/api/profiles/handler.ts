@@ -7,7 +7,6 @@ export const getProfiles = async (request: Request, context: Context) => {
 };
 
 export const activateProfile = async (request: Request, context: Context) => {
-  // TODO: body is empty
   const profile = request.requestBody as Profile;
 
   if (!profile?.id) {

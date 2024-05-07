@@ -3,7 +3,7 @@ import { MIN_IN_MS } from 'shared/utils/calculations';
 import { getTimePlusTime } from 'shared/utils/time';
 import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from 'backend/api/alarms/utils';
 import { Alarm } from 'shared/types/alarms';
-import { ALARM_DEFAULT_LEVEL } from 'shared/utils/alarms';
+import { ALARM_START_LEVEL } from 'shared/utils/alarms';
 
 export const getActiveAlarm = async (request: Request, context: Context) => {
   const [activeAlarm] = await context.db.alarms.getAlarms({ onlyActive: true });
@@ -27,7 +27,7 @@ export const ackActiveAlarm = async (request: Request, context: Context) => {
   // Create new alarm state with snooze minutes and reset level
   await context.db.alarms.createAlarmState({
     alarmId: activeAlarm.id,
-    alarmLevel: ALARM_DEFAULT_LEVEL,
+    alarmLevel: ALARM_START_LEVEL,
     validAfter: getTimePlusTime(context.timestamp(), snoozeMinutes * MIN_IN_MS),
   });
   // TODO: HANDLE ERROR

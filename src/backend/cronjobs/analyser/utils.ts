@@ -4,7 +4,7 @@ import {
   roundTo2Decimals,
   TIME_LIMIT_FOR_SLOPE,
 } from 'shared/utils/calculations';
-import { reduce, slice, sum, chain } from 'lodash';
+import { reduce, slice, sum, chain, find } from 'lodash';
 import {
   CarbEntry,
   InsulinEntry,
@@ -18,13 +18,18 @@ import {
   getTimePlusTime,
   getTimeMinusTime,
   isTimeLargerOrEqual,
+  isTimeLarger,
+  minToMs,
 } from 'shared/utils/time';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { detectSituation } from 'backend/cronjobs/analyser/analyser';
 import { DateTime } from 'luxon';
-import { slopeLimits } from './situations';
+import { HIGH_CLEARING_THRESHOLD, LOW_CLEARING_THRESHOLD, slopeLimits } from './situations';
+import { onlyActive } from 'shared/utils/alarms';
+
+const CARBS_TO_INSULIN_MULTIPLIER = 1.5;
 
 export type AnalyserData = {
   currentTimestamp: string;
@@ -70,9 +75,13 @@ const sumOfSlopes = (entries: AnalyserEntry[]) => {
   return reduce(entries, (slopeSum, entry) => slopeSum + (entry.slope || 0), 0);
 };
 
-const average = (entries: AnalyserEntry[]) => {
-  const middleIndex = Math.floor(entries.length / 2);
-  const currentEntry = entries[middleIndex];
+const average = ({
+  entries,
+  currentEntry,
+}: {
+  entries: AnalyserEntry[];
+  currentEntry: AnalyserEntry;
+}) => {
   const newSlope = sumOfSlopes(entries)
     ? sumOfSlopes(entries) / (entries.length || 1)
     : currentEntry.rawSlope;
@@ -86,11 +95,11 @@ const average = (entries: AnalyserEntry[]) => {
 };
 
 const makeWindow = (noiseArray: number[]) => {
-  return (_number: AnalyserEntry, index: number, entries: AnalyserEntry[]): AnalyserEntry[] => {
+  return (currentEntry: AnalyserEntry, index: number, entries: AnalyserEntry[]) => {
     const noise = noiseArray[index];
     const start = Math.max(0, index - noise);
     const end = Math.min(entries.length, index + noise + 1);
-    return slice(entries, start, end);
+    return { entries: slice(entries, start, end), currentEntry };
   };
 };
 
@@ -272,7 +281,15 @@ export const isThereTooMuchInsulin = (
 ) =>
   currentCarbsToInsulin !== null &&
   requiredCarbsToInsulin !== null &&
-  currentCarbsToInsulin <= requiredCarbsToInsulin;
+  currentCarbsToInsulin < requiredCarbsToInsulin * CARBS_TO_INSULIN_MULTIPLIER;
+
+export const isThereTooLittleInsulin = (
+  requiredCarbsToInsulin: number | null,
+  currentCarbsToInsulin: number | null,
+) =>
+  currentCarbsToInsulin !== null &&
+  requiredCarbsToInsulin !== null &&
+  currentCarbsToInsulin > requiredCarbsToInsulin * CARBS_TO_INSULIN_MULTIPLIER;
 
 export const isBloodGlucoseRelativeLow = (latestEntry: AnalyserEntry, activeProfile: Profile) =>
   latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelRel &&
@@ -288,6 +305,34 @@ export const isPredictedSituationAnyLowOrMissing = (
   predictedSituation?: Situation | 'NO_SITUATION',
 ) => !predictedSituation || predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
 
-export const isPredictedSituationAnyHighOrMissing = (
-  predictedSituation?: Situation | 'NO_SITUATION',
-) => !predictedSituation || predictedSituation === 'HIGH' || predictedSituation === 'BAD_HIGH';
+export const areThereSpecificSituationsInGivenWindow = (
+  currentTimestamp: string,
+  alarms: Alarm[],
+  situation: Situation,
+  windowMinutes: number,
+) =>
+  !alarms.find(alarm => {
+    const alarmDeactivatedInsideGivenWindow =
+      alarm.deactivatedAt &&
+      isTimeLarger(
+        alarm.deactivatedAt,
+        getTimeMinusTimeMs(currentTimestamp, minToMs(windowMinutes)),
+      );
+
+    return alarm.situation === situation && (alarm.isActive || alarmDeactivatedInsideGivenWindow);
+  });
+
+export const getHighLimitWithPossibleAddition = (alarms: Alarm[], activeProfile: Profile) => {
+  const thresholdAdditionIfAlreadyHigh = find(onlyActive(alarms), { situation: 'HIGH' })
+    ? HIGH_CLEARING_THRESHOLD
+    : 0;
+  return activeProfile.analyserSettings.highLevelAbs - thresholdAdditionIfAlreadyHigh;
+};
+
+export const getLowLimitWithPossibleAddition = (alarms: Alarm[], activeProfile: Profile) => {
+  const thresholdAdditionIfAlreadyLow = find(onlyActive(alarms), { situation: 'LOW' })
+    ? LOW_CLEARING_THRESHOLD
+    : 0;
+
+  return activeProfile.analyserSettings.lowLevelAbs + thresholdAdditionIfAlreadyLow;
+};

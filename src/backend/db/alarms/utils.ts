@@ -1,7 +1,7 @@
 import { Context } from 'backend/utils/api';
 import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
-import { ALARM_DEFAULT_LEVEL } from 'shared/utils/alarms';
+import { ALARM_START_LEVEL } from 'shared/utils/alarms';
 
 export const createAlarmWithState = async (situation: Situation, context: Context) => {
   const [alarm] = await context.db.alarms.createAlarm({
@@ -9,7 +9,7 @@ export const createAlarmWithState = async (situation: Situation, context: Contex
   });
   await context.db.alarms.createAlarmState({
     alarmId: alarm.id,
-    alarmLevel: ALARM_DEFAULT_LEVEL,
+    alarmLevel: ALARM_START_LEVEL,
     validAfter: context.timestamp(),
   });
 

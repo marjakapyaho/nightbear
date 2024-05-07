@@ -2,7 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusMinutes } from 'shared/utils/time';
 
 describe('analyser/criticalOutdated', () => {
   it('detects CRITICAL_OUTDATED when there is no data', () => {
