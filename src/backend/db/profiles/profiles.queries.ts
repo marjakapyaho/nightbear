@@ -57,25 +57,21 @@ export const createProfileTemplate = new PreparedQuery<ICreateProfileTemplatePar
 
 /** 'CreateAnalyserSettings' parameters type */
 export interface ICreateAnalyserSettingsParams {
-  highCorrectionSuppressionMinutes: number;
   highLevelAbs: number;
   highLevelBad: number;
   highLevelRel: number;
   lowLevelAbs: number;
-  lowLevelBad: number;
   lowLevelRel: number;
   timeSinceBgMinutes: number;
 }
 
 /** 'CreateAnalyserSettings' return type */
 export interface ICreateAnalyserSettingsResult {
-  highCorrectionSuppressionMinutes: number;
   highLevelAbs: number;
   highLevelBad: number;
   highLevelRel: number;
   id: string;
   lowLevelAbs: number;
-  lowLevelBad: number;
   lowLevelRel: number;
   timeSinceBgMinutes: number;
 }
@@ -86,7 +82,7 @@ export interface ICreateAnalyserSettingsQuery {
   result: ICreateAnalyserSettingsResult;
 }
 
-const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"lowLevelBad":true,"timeSinceBgMinutes":true,"highCorrectionSuppressionMinutes":true},"params":[{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":213,"b":226}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":231,"b":244}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":249,"b":262}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":267,"b":279}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":284,"b":296}]},{"name":"lowLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":301,"b":313}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":318,"b":337}]},{"name":"highCorrectionSuppressionMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":342,"b":375}]}],"statement":"INSERT INTO analyser_settings (\n  high_level_rel,\n  high_level_abs,\n  high_level_bad,\n  low_level_rel,\n  low_level_abs,\n  low_level_bad,\n  time_since_bg_minutes,\n  high_correction_suppression_minutes\n)\nVALUES (\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :lowLevelBad!,\n  :timeSinceBgMinutes!,\n  :highCorrectionSuppressionMinutes!\n)\nRETURNING *"};
+const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true},"params":[{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":157,"b":170}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":175,"b":188}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":206}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":211,"b":223}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":240}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":245,"b":264}]}],"statement":"INSERT INTO analyser_settings (\n  high_level_rel,\n  high_level_abs,\n  high_level_bad,\n  low_level_rel,\n  low_level_abs,\n  time_since_bg_minutes\n)\nVALUES (\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -97,9 +93,7 @@ const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"high
  *   high_level_bad,
  *   low_level_rel,
  *   low_level_abs,
- *   low_level_bad,
- *   time_since_bg_minutes,
- *   high_correction_suppression_minutes
+ *   time_since_bg_minutes
  * )
  * VALUES (
  *   :highLevelRel!,
@@ -107,9 +101,7 @@ const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"high
  *   :highLevelBad!,
  *   :lowLevelRel!,
  *   :lowLevelAbs!,
- *   :lowLevelBad!,
- *   :timeSinceBgMinutes!,
- *   :highCorrectionSuppressionMinutes!
+ *   :timeSinceBgMinutes!
  * )
  * RETURNING *
  * ```
@@ -228,7 +220,7 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'lowLevelBad', analyser_settings.low_level_bad,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes,\n        'highCorrectionSuppressionMinutes', analyser_settings.high_correction_suppression_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.profile_template_id,\n      json_agg(json_build_object(\n         'situation', situation_settings.situation,\n         'escalationAfterMinutes', situation_settings.escalation_after_minutes,\n         'snoozeMinutes', situation_settings.snooze_minutes\n       )) AS situation_settings\n    FROM situation_settings\n    GROUP BY situation_settings.profile_template_id\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.profile_template_id = profile_templates.id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id"};
+const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.profile_template_id,\n      json_agg(json_build_object(\n         'situation', situation_settings.situation,\n         'escalationAfterMinutes', situation_settings.escalation_after_minutes,\n         'snoozeMinutes', situation_settings.snooze_minutes\n       )) AS situation_settings\n    FROM situation_settings\n    GROUP BY situation_settings.profile_template_id\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.profile_template_id = profile_templates.id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id"};
 
 /**
  * Query generated from SQL:
@@ -244,9 +236,7 @@ const getProfilesIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  a
  *         'highLevelBad', analyser_settings.high_level_bad,
  *         'lowLevelRel', analyser_settings.low_level_rel,
  *         'lowLevelAbs', analyser_settings.low_level_abs,
- *         'lowLevelBad', analyser_settings.low_level_bad,
- *         'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes,
- *         'highCorrectionSuppressionMinutes', analyser_settings.high_correction_suppression_minutes
+ *         'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes
  *       ) AS analyser_settings
  *     FROM analyser_settings
  *   ),

@@ -110,7 +110,7 @@ export const detectSituation = (
    * 2. BAD_LOW and BAD_HIGH
    * Most critical and simple checks, must be before low and high
    */
-  if (detectBadLow(activeProfile, latestEntry)) {
+  if (detectBadLow(latestEntry)) {
     return 'BAD_LOW';
   }
   if (detectBadHigh(activeProfile, latestEntry)) {
@@ -136,7 +136,7 @@ export const detectSituation = (
 
   /**
    * 5. LOW and HIGH
-   * Must be before FALLING and RISING
+   * Check if we're low or high.
    */
   if (
     detectLow(
@@ -165,13 +165,29 @@ export const detectSituation = (
 
   /**
    * 5. FALLING and RISING
-   * Check that we're inside relative low or high and slope is big enough.
-   * Rising also checks for the presence of correction insulin.
+   * Check if we're going low or high soon.
    */
-  if (detectFalling(activeProfile, latestEntry, predictedSituation)) {
+  if (
+    detectFalling(
+      activeProfile,
+      latestEntry,
+      carbEntries,
+      currentTimestamp,
+      thereIsTooMuchInsulin,
+      predictedSituation,
+    )
+  ) {
     return 'FALLING';
   }
-  if (detectRising(activeProfile, latestEntry, insulinOnBoard)) {
+  if (
+    detectRising(
+      activeProfile,
+      latestEntry,
+      insulinOnBoard,
+      thereIsTooLittleInsulin,
+      predictedSituation,
+    )
+  ) {
     return 'RISING';
   }
 
@@ -185,6 +201,7 @@ export const detectSituation = (
       latestEntry,
       analyserEntries,
       insulinOnBoard,
+      thereIsTooLittleInsulin,
       currentTimestamp,
     )
   ) {

@@ -12,9 +12,7 @@ export const mockAnalyserSettings: AnalyserSettings = {
   highLevelBad: 14,
   lowLevelRel: 6,
   lowLevelAbs: 4,
-  lowLevelBad: 3,
   timeSinceBgMinutes: 30,
-  highCorrectionSuppressionMinutes: 60,
 };
 
 export const mockSituationSettings: SituationSettings[] = [

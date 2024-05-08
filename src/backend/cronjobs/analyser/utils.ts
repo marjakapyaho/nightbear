@@ -26,10 +26,33 @@ import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { detectSituation } from 'backend/cronjobs/analyser/analyser';
 import { DateTime } from 'luxon';
-import { HIGH_CLEARING_THRESHOLD, LOW_CLEARING_THRESHOLD, slopeLimits } from './situations';
 import { onlyActive } from 'shared/utils/alarms';
 
-const CARBS_TO_INSULIN_MULTIPLIER = 1.5;
+// Critical settings
+export const LOW_LEVEL_BAD = 3.0;
+
+// Minutes
+export const PERSISTENT_HIGH_TIME_WINDOW = 60;
+export const COMPRESSION_LOW_TIME_WINDOW = 25;
+export const LOW_COUNT_LIMIT_FOR_COMPRESSION_LOW = 4;
+export const BAD_HIGH_QUARANTINE_WINDOW = 60;
+export const BAD_LOW_QUARANTINE_WINDOW = 15;
+export const TIME_SINCE_BG_CRITICAL = 15;
+export const LOW_CORRECTION_SUPPRESSION_WINDOW = 20;
+
+// Other units
+export const HIGH_CLEARING_THRESHOLD = 1;
+export const LOW_CLEARING_THRESHOLD = 0.5;
+export const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
+export const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
+export const CARBS_TO_INSULIN_MULTIPLIER = 1.5;
+
+export const slopeLimits = {
+  SLOW: 0.3,
+  MEDIUM: 0.6,
+  FAST: 1.3,
+  MEGA_FAST: 2,
+};
 
 export type AnalyserData = {
   currentTimestamp: string;
@@ -222,7 +245,7 @@ export const getPredictedSituation = (
 
   return detectSituation(
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
-    activeProfile, // TODO: this might change during prediction
+    activeProfile,
     predictedEntries,
     insulinEntries,
     carbEntries,
@@ -268,6 +291,7 @@ export const getRelevantEntries = (
 };
 
 export const slopeIsNegative = (entry: AnalyserEntry) => entry.slope !== null && entry.slope < 0;
+export const slopeIsPositive = (entry: AnalyserEntry) => entry.slope !== null && entry.slope > 0;
 
 export const isSlopeFalling = (entry: AnalyserEntry) =>
   entry.slope !== null && entry.slope < -slopeLimits.MEDIUM;
@@ -304,6 +328,10 @@ export const isBloodGlucoseRelativeHigh = (latestEntry: AnalyserEntry, activePro
 export const isPredictedSituationAnyLowOrMissing = (
   predictedSituation?: Situation | 'NO_SITUATION',
 ) => !predictedSituation || predictedSituation === 'LOW' || predictedSituation === 'BAD_LOW';
+
+export const isPredictedSituationAnyHighOrMissing = (
+  predictedSituation?: Situation | 'NO_SITUATION',
+) => !predictedSituation || predictedSituation === 'HIGH' || predictedSituation === 'BAD_HIGH';
 
 export const areThereSpecificSituationsInGivenWindow = (
   currentTimestamp: string,

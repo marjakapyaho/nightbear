@@ -97,4 +97,38 @@ describe('analyser/compressionLow', () => {
       }),
     ).toEqual('LOW');
   });
+
+  it('does not detect COMPRESSION_LOW with bad low values (detects BAD_LOW)', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('night'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [10, 10.4, 9.9, 7, 3.8, 2.9],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('BAD_LOW');
+  });
+
+  it('does not detect COMPRESSION_LOW with too many low values', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('night'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [10, 10.4, 9.9, 7, 3.8, 3.7, 3.6, 3.5],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('LOW');
+  });
 });

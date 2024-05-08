@@ -32,9 +32,7 @@ CREATE TABLE analyser_settings (
   high_level_bad NUMERIC(3, 1) NOT NULL,
   low_level_rel NUMERIC(3, 1) NOT NULL,
   low_level_abs NUMERIC(3, 1) NOT NULL,
-  low_level_bad NUMERIC(3, 1) NOT NULL,
-  time_since_bg_minutes INTEGER NOT NULL,
-  high_correction_suppression_minutes INTEGER NOT NULL
+  time_since_bg_minutes INTEGER NOT NULL
 );
 
 CREATE TABLE profile_templates (

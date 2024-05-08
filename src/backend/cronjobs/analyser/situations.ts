@@ -2,7 +2,6 @@ import { AnalyserEntry, Situation } from 'shared/types/analyser';
 import { Profile } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
 import { getTimeMinusTimeMs, minToMs } from 'shared/utils/time';
-import { onlyActive } from 'shared/utils/alarms';
 import {
   getRelevantEntries,
   isBloodGlucoseRelativeHigh,
@@ -15,31 +14,23 @@ import {
   getHighLimitWithPossibleAddition,
   areThereSpecificSituationsInGivenWindow,
   getLowLimitWithPossibleAddition,
+  slopeIsPositive,
+  isPredictedSituationAnyHighOrMissing,
+  TIME_SINCE_BG_CRITICAL,
+  RELEVANT_IOB_LIMIT_FOR_LOW,
+  COMPRESSION_LOW_TIME_WINDOW,
+  slopeLimits,
+  LOW_COUNT_LIMIT_FOR_COMPRESSION_LOW,
+  BAD_LOW_QUARANTINE_WINDOW,
+  LOW_CORRECTION_SUPPRESSION_WINDOW,
+  BAD_HIGH_QUARANTINE_WINDOW,
+  RELEVANT_IOB_LIMIT_FOR_HIGH,
+  PERSISTENT_HIGH_TIME_WINDOW,
+  LOW_LEVEL_BAD,
 } from 'backend/cronjobs/analyser/utils';
 import { find } from 'lodash';
 import { CarbEntry } from 'shared/types/timelineEntries';
 import { getEntriesWithinTimeRange } from 'backend/cronjobs/checks/utils';
-
-// Minutes
-const PERSISTENT_HIGH_TIME_WINDOW = 120;
-const COMPRESSION_LOW_TIME_WINDOW = 25;
-export const BAD_HIGH_QUARANTINE_WINDOW = 60;
-export const BAD_LOW_QUARANTINE_WINDOW = 15;
-const TIME_SINCE_BG_CRITICAL = 15;
-const LOW_CORRECTION_SUPPRESSION_WINDOW = 20;
-
-// Other units
-export const HIGH_CLEARING_THRESHOLD = 1;
-export const LOW_CLEARING_THRESHOLD = 0.5;
-const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5;
-const RELEVANT_IOB_LIMIT_FOR_HIGH = 1;
-
-export const slopeLimits = {
-  SLOW: 0.3,
-  MEDIUM: 0.6,
-  FAST: 1.3,
-  MEGA_FAST: 2,
-};
 
 export const detectCriticalOutdated = (
   latestEntry: AnalyserEntry,
@@ -63,8 +54,8 @@ export const detectCriticalOutdated = (
   );
 };
 
-export const detectBadLow = (activeProfile: Profile, latestEntry: AnalyserEntry) =>
-  latestEntry.bloodGlucose < activeProfile.analyserSettings.lowLevelBad;
+export const detectBadLow = (latestEntry: AnalyserEntry) =>
+  latestEntry.bloodGlucose < LOW_LEVEL_BAD;
 
 export const detectBadHigh = (activeProfile: Profile, latestEntry: AnalyserEntry) =>
   latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelBad;
@@ -104,7 +95,17 @@ export const detectCompressionLow = (
     ),
   );
 
-  return noRelevantInsulin && isNight && hasEnoughData && slopeIsReallyBig;
+  const thereAreNotTooManyLowEntries =
+    relevantEntries.filter(entry => entry.bloodGlucose < activeProfile.analyserSettings.lowLevelAbs)
+      .length < LOW_COUNT_LIMIT_FOR_COMPRESSION_LOW;
+
+  return (
+    noRelevantInsulin &&
+    isNight &&
+    hasEnoughData &&
+    slopeIsReallyBig &&
+    thereAreNotTooManyLowEntries
+  );
 };
 
 export const detectLow = (
@@ -162,15 +163,25 @@ export const detectHigh = (
 export const detectFalling = (
   activeProfile: Profile,
   latestEntry: AnalyserEntry,
+  carbEntries: CarbEntry[],
+  currentTimestamp: string,
+  thereIsTooMuchInsulinForCarbs: boolean,
   predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
   const bloodGlucoseIsRelativeLow = isBloodGlucoseRelativeLow(latestEntry, activeProfile);
   const slopeIsFalling = isSlopeFalling(latestEntry);
   const predictedSituationIsLowOrBadLow = isPredictedSituationAnyLowOrMissing(predictedSituation);
+  const thereAreNotEnoughCorrectionCarbs =
+    getEntriesWithinTimeRange(
+      currentTimestamp,
+      carbEntries,
+      minToMs(LOW_CORRECTION_SUPPRESSION_WINDOW),
+    ).length === 0 || thereIsTooMuchInsulinForCarbs;
 
   return (
     bloodGlucoseIsRelativeLow &&
-    (slopeIsFalling || (slopeIsNegative(latestEntry) && predictedSituationIsLowOrBadLow))
+    (slopeIsFalling || (slopeIsNegative(latestEntry) && predictedSituationIsLowOrBadLow)) &&
+    thereAreNotEnoughCorrectionCarbs
   );
 };
 
@@ -178,12 +189,20 @@ export const detectRising = (
   activeProfile: Profile,
   latestEntry: AnalyserEntry,
   insulinOnBoard: number,
+  thereIsTooLittleInsulinForCarbs: boolean,
+  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
   const bloodGlucoseIsRelativeHigh = isBloodGlucoseRelativeHigh(latestEntry, activeProfile);
   const slopeIsRising = isSlopeRising(latestEntry);
+  const predictedSituationIsHighOrBadHigh =
+    isPredictedSituationAnyHighOrMissing(predictedSituation);
+  const thereIsNotEnoughCorrectionInsulin =
+    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH || thereIsTooLittleInsulinForCarbs;
 
   return (
-    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH && bloodGlucoseIsRelativeHigh && slopeIsRising
+    bloodGlucoseIsRelativeHigh &&
+    (slopeIsRising || (slopeIsPositive(latestEntry) && predictedSituationIsHighOrBadHigh)) &&
+    thereIsNotEnoughCorrectionInsulin
   );
 };
 
@@ -192,6 +211,7 @@ export const detectPersistentHigh = (
   latestEntry: AnalyserEntry,
   entries: AnalyserEntry[],
   insulinOnBoard: number,
+  thereIsTooLittleInsulinForCarbs: boolean,
   currentTimestamp: string,
 ) => {
   const { relevantEntries, hasEnoughData } = getRelevantEntries(
@@ -204,12 +224,12 @@ export const detectPersistentHigh = (
     relevantEntries.filter(entry => isBloodGlucoseRelativeHigh(entry, activeProfile)).length ===
     relevantEntries.length;
 
+  const thereIsNotEnoughCorrectionInsulin =
+    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH || thereIsTooLittleInsulinForCarbs;
+
   const slopeIsNotDown = !slopeIsNegative(latestEntry);
 
   return (
-    hasEnoughData &&
-    isAllDataRelativeHigh &&
-    insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH &&
-    slopeIsNotDown
+    hasEnoughData && isAllDataRelativeHigh && thereIsNotEnoughCorrectionInsulin && slopeIsNotDown
   );
 };

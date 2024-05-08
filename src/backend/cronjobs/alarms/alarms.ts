@@ -23,14 +23,17 @@ export const runAlarmChecks = async (
   const { remove, keep, create } = detectAlarmActions(situation, activeProfile, activeAlarm);
 
   if (remove) {
+    log(`Removing alarm with situation: ${remove.situation}`);
     await deactivateAlarm(remove, context);
   }
 
   if (keep) {
+    log(`Keeping alarm with situation: ${keep.situation}`);
     return updateAlarm(keep, activeProfile, context);
   }
 
   if (create) {
+    log(`Creating alarm with situation: ${create}`);
     return createAlarm(create, context);
   }
 

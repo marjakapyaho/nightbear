@@ -7,9 +7,7 @@ export type AnalyserSettings = {
   highLevelBad: number;
   lowLevelRel: number;
   lowLevelAbs: number;
-  lowLevelBad: number;
   timeSinceBgMinutes: number;
-  highCorrectionSuppressionMinutes: number;
 };
 
 export type SituationSettings = {

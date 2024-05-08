@@ -119,7 +119,7 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('NO_SITUATION');
   });
 
-  it('detects PERSISTENT_HIGH when insulin on board drops below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
+  it('detects PERSISTENT_HIGH when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -157,5 +157,40 @@ describe('analyser/persistentHigh', () => {
         alarms: [],
       }),
     ).toEqual('NO_SITUATION');
+  });
+
+  it('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: persistentHighValues,
+        }),
+        meterEntries: [],
+        insulinEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
+          { timestamp: getTimeMinusMinutes(mockNow, 300), amount: 5, type: 'FAST' },
+          // To affect currentCarbsToInsulin
+          { timestamp: getTimeMinusMinutes(mockNow, 60), amount: 5, type: 'FAST' },
+        ],
+        carbEntries: [
+          // To affect requiredCarbsToInsulin (calculates as 50/5=10)
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 300),
+            amount: 50,
+            durationFactor: 1,
+          },
+          // To affect currentCarbsToInsulin
+          {
+            timestamp: getTimeMinusMinutes(mockNow, 15),
+            amount: 70,
+            durationFactor: 1,
+          },
+        ],
+        alarms: [],
+      }),
+    ).toEqual('PERSISTENT_HIGH');
   });
 });

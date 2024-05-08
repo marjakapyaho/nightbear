@@ -20,9 +20,7 @@ INSERT INTO analyser_settings (
   high_level_bad,
   low_level_rel,
   low_level_abs,
-  low_level_bad,
-  time_since_bg_minutes,
-  high_correction_suppression_minutes
+  time_since_bg_minutes
 )
 VALUES (
   :highLevelRel!,
@@ -30,9 +28,7 @@ VALUES (
   :highLevelBad!,
   :lowLevelRel!,
   :lowLevelAbs!,
-  :lowLevelBad!,
-  :timeSinceBgMinutes!,
-  :highCorrectionSuppressionMinutes!
+  :timeSinceBgMinutes!
 )
 RETURNING *;
 
@@ -80,9 +76,7 @@ WITH
         'highLevelBad', analyser_settings.high_level_bad,
         'lowLevelRel', analyser_settings.low_level_rel,
         'lowLevelAbs', analyser_settings.low_level_abs,
-        'lowLevelBad', analyser_settings.low_level_bad,
-        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes,
-        'highCorrectionSuppressionMinutes', analyser_settings.high_correction_suppression_minutes
+        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes
       ) AS analyser_settings
     FROM analyser_settings
   ),

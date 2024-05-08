@@ -12,9 +12,15 @@ import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 
 export const profiles: Cronjob = async (
   context,
-  journal,
+  _journal,
 ): Promise<Partial<CronjobsJournal> | void> => {
-  await checkAndUpdateProfileActivations(context, context.timestamp());
+  const { log } = context;
+
+  log('1. Checking profile activations');
+
+  const activeProfile = await checkAndUpdateProfileActivations(context, context.timestamp());
+
+  log(`3. Ended up with active profile named: ${activeProfile?.profileName}`);
 };
 
 export const checkAndUpdateProfileActivations = async (
@@ -40,7 +46,10 @@ export const checkAndUpdateProfileActivations = async (
     shouldRepeatingActivationBeSwitched(latestActivation, activationToActivate) ||
     shouldNonRepeatingActivationBeDeactivated(latestActivation, currentTimestamp)
   ) {
+    log(`2. Activating repeating activation with id: ${activationToActivate.id}`);
     await context.db.profiles.reactivateProfileActivation(activationToActivate);
+  } else {
+    log('2. No activations needed.');
   }
 
   // TODO: CASTING + get active profile from db with query
