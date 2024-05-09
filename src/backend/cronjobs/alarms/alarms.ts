@@ -89,7 +89,6 @@ const updateAlarm = async (
   activeProfile: Profile,
   context: Context,
 ): Promise<string> => {
-  const { log } = context;
   const { situation } = activeAlarm;
   const currentAlarmState = getAlarmState(activeAlarm);
   const { alarmLevel, validAfter } = currentAlarmState;

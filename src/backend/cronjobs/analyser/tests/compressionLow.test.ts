@@ -2,8 +2,7 @@ import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { generateSensorEntries, getMockActiveProfile } from 'shared/utils/test';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
-import { getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
-import { MIN_IN_MS } from 'shared/utils/calculations';
+import { getTimeMinusMinutes } from 'shared/utils/time';
 
 describe('analyser/compressionLow', () => {
   it('detects COMPRESSION_LOW with sudden abnormal drop during night', () => {

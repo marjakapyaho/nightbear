@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { isTimeSmallerOrEqual, TZ } from 'shared/utils/time';
+import { isTimeSmallerOrEqual } from 'shared/utils/time';
 import { DAY_IN_MS } from 'shared/utils/calculations';
 import { ProfileActivation } from 'shared/types/profiles';
 import { chain } from 'lodash';

@@ -1,7 +1,6 @@
 import { detectAlarmActions, runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { checkActiveAlarms, createTestContext, truncateDb } from 'backend/utils/test';
 import { getMockActiveProfile } from 'shared/utils/test';
-import { Alarm } from 'shared/types/alarms';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createAlarmWithState } from 'backend/db/alarms/utils';
 

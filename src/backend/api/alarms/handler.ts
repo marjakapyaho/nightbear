@@ -1,6 +1,5 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
-import { MIN_IN_MS } from 'shared/utils/calculations';
-import { getTimePlusTime } from 'shared/utils/time';
+import { getTimePlusMinutes } from 'shared/utils/time';
 import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from 'backend/api/alarms/utils';
 import { Alarm } from 'shared/types/alarms';
 import { ALARM_START_LEVEL } from 'shared/utils/alarms';
@@ -28,7 +27,7 @@ export const ackActiveAlarm = async (request: Request, context: Context) => {
   await context.db.alarms.createAlarmState({
     alarmId: activeAlarm.id,
     alarmLevel: ALARM_START_LEVEL,
-    validAfter: getTimePlusTime(context.timestamp(), snoozeMinutes * MIN_IN_MS),
+    validAfter: getTimePlusMinutes(context.timestamp(), snoozeMinutes),
   });
   // TODO: HANDLE ERROR
 

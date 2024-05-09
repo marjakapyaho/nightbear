@@ -68,5 +68,8 @@ export const getTimeMinusHours = (time1: string | number, hours: number) =>
 export const getTimePlusTime = (time1: string | number, time2: string | number) =>
   getTimeAsISOStr(getTimeInMillis(time1) + getTimeInMillis(time2));
 
+export const getTimePlusMinutes = (time1: string | number, minutes: number) =>
+  getTimeAsISOStr(getTimeInMillis(time1) + minutes * MIN_IN_MS);
+
 export const getTimePlusTimeMs = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) + getTimeInMillis(time2);

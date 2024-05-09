@@ -1,8 +1,6 @@
 import { mockNow } from 'shared/mocks/dates';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
-import { MIN_IN_MS } from 'shared/utils/calculations';
 import { generateSensorEntries } from 'shared/utils/test';
-import { getTimeInMillis } from 'shared/utils/time';
 
 export const mockSensorEntries: SensorEntry[] = generateSensorEntries({
   currentTimestamp: mockNow,
