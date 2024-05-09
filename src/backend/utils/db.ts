@@ -69,69 +69,18 @@ function wrapQueries<
 /**
  * Performs the actual query against the DB. Also converts rows from snake_case to camelCase.
  */
-async function performQuery(
+const performQuery = async (
   query: { run: (args: unknown, client: Pool) => Promise<Record<string, unknown>[]> },
   args: unknown,
   pool: Pool,
-) {
+) => {
   const res = await query.run(args, pool);
   return res.map(row => _.mapKeys(row, (_val, key) => _.camelCase(key)));
-}
+};
 
 export type GenParams<T> = T extends PreparedQuery<infer P, any> ? P : void;
 
-export function bindQueryShorthands(pool: Pool) {
-  return {
-    one,
-    many,
-  };
-
-  async function one<
-    Schema extends z.ZodTypeAny,
-    Params extends object,
-    Result extends z.infer<Schema>, // note: the "extends" constraint can be dropped if we just want to rely on the Zod schema, and ignore DB-side types completely
-  >(
-    schema: Schema,
-    method: PreparedQuery<Params, Result>,
-    params: Params,
-  ): Promise<z.infer<Schema>>;
-  async function one<
-    Schema extends z.ZodTypeAny,
-    Params extends void,
-    Result extends z.infer<Schema>,
-  >(schema: Schema, method: PreparedQuery<Params, Result>): Promise<z.infer<Schema>>;
-  async function one<Schema extends z.ZodTypeAny, Params, Result extends z.infer<Schema>>(
-    schema: Schema,
-    method: PreparedQuery<Params, Result>,
-    params?: Params,
-  ): Promise<z.infer<Schema>> {
-    return runQueryAndValidateResult(pool, true, schema, method, params);
-  }
-
-  async function many<
-    Schema extends z.ZodTypeAny,
-    Params extends object,
-    Result extends z.infer<Schema>, // note: the "extends" constraint can be dropped if we just want to rely on the Zod schema, and ignore DB-side types completely
-  >(
-    schema: Schema,
-    method: PreparedQuery<Params, Result>,
-    params: Params,
-  ): Promise<z.infer<Schema>[]>;
-  async function many<
-    Schema extends z.ZodTypeAny,
-    Params extends void,
-    Result extends z.infer<Schema>,
-  >(schema: Schema, method: PreparedQuery<Params, Result>): Promise<z.infer<Schema>[]>;
-  async function many<Schema extends z.ZodTypeAny, Params, Result extends z.infer<Schema>>(
-    schema: Schema,
-    method: PreparedQuery<Params, Result>,
-    params?: Params,
-  ): Promise<z.infer<Schema>[]> {
-    return runQueryAndValidateResult(pool, false, schema, method, params);
-  }
-}
-
-async function runQueryAndValidateResult<
+export const runQueryAndValidateResult = async <
   One extends boolean,
   Schema extends z.ZodTypeAny,
   Params,
@@ -142,7 +91,7 @@ async function runQueryAndValidateResult<
   schema: Schema,
   method: PreparedQuery<Params, Result>,
   params?: Params,
-): Promise<One extends true ? z.infer<Schema> : z.infer<Schema>[]> {
+): Promise<One extends true ? z.infer<Schema> : z.infer<Schema>[]> => {
   const raw = await method.run(params as Params, pool);
   const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
   if (one) {
@@ -152,4 +101,35 @@ async function runQueryAndValidateResult<
   } else {
     return z.array(schema).parse(mapped);
   }
-}
+};
+
+export const bindQueryShorthands = (pool: Pool) => {
+  const one = async <
+    Schema extends z.ZodTypeAny,
+    Params extends object | void,
+    Result extends z.infer<Schema>,
+  >(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params?: Params extends object ? Params : undefined,
+  ): Promise<z.infer<Schema>> => {
+    return runQueryAndValidateResult(pool, true, schema, method, params as Params);
+  };
+
+  const many = async <
+    Schema extends z.ZodTypeAny,
+    Params extends object | void,
+    Result extends z.infer<Schema>,
+  >(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params?: Params extends object ? Params : undefined,
+  ): Promise<z.infer<Schema>[]> => {
+    return runQueryAndValidateResult(pool, false, schema, method, params as Params);
+  };
+
+  return {
+    one,
+    many,
+  };
+};
