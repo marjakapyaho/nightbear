@@ -1,18 +1,25 @@
-export type AnalyserEntry = {
-  timestamp: string;
-  bloodGlucose: number;
-  slope: number | null;
-  rawSlope: number | null;
-};
+import { z } from 'zod';
 
-export type Situation =
-  | 'CRITICAL_OUTDATED'
-  | 'BAD_LOW'
-  | 'BAD_HIGH'
-  | 'OUTDATED'
-  | 'COMPRESSION_LOW'
-  | 'LOW'
-  | 'HIGH'
-  | 'FALLING'
-  | 'RISING'
-  | 'PERSISTENT_HIGH';
+/* eslint-disable @typescript-eslint/no-redeclare */
+
+export const AnalyserEntry = z.object({
+  timestamp: z.string(),
+  bloodGlucose: z.number(),
+  slope: z.optional(z.number()),
+  rawSlope: z.number(z.number()),
+});
+export type AnalyserEntry = z.infer<typeof AnalyserEntry>;
+
+export const Situation = z.enum([
+  'CRITICAL_OUTDATED',
+  'BAD_LOW',
+  'BAD_HIGH',
+  'OUTDATED',
+  'COMPRESSION_LOW',
+  'LOW',
+  'HIGH',
+  'FALLING',
+  'RISING',
+  'PERSISTENT_HIGH',
+]);
+export type Situation = z.infer<typeof Situation>;

@@ -14,16 +14,15 @@ export const checks = (async (context: Context) => {
 
   log(`----- STARTED CHECKS AT: ${currentTimestamp} -----`);
 
-  const sensorEntriesArray = await context.db.getSensorEntriesByTimestamp(getRange(context, 3));
-  const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context, 24));
-  const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context, 24));
-  const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context, 3));
+  const sensorEntries = await context.db.getSensorEntriesByTimestamp(getRange(context, 3));
+  const insulinEntries = await context.db.getInsulinEntriesByTimestamp(getRange(context, 24));
+  const carbEntries = await context.db.getCarbEntriesByTimestamp(getRange(context, 24));
+  const meterEntries = await context.db.getMeterEntriesByTimestamp(getRange(context, 3));
   const profilesArray = await context.db.profiles.getProfiles();
   const alarmsArray = await context.db.alarms.getAlarms(getRange(context, 12));
   const [activeAlarmObj] = await context.db.alarms.getAlarms({ onlyActive: true });
 
   // TODO: FIX THESE
-  const sensorEntries = sensorEntriesArray as SensorEntry[];
   const alarms = alarmsArray as unknown as Alarm[];
   const activeAlarm = activeAlarmObj as unknown as Alarm;
   const profiles = profilesArray as Profile[];

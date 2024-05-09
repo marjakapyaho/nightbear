@@ -12,17 +12,17 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
     to: end || context.timestamp(),
   });
 
-  const insulinEntries = await context.db.insulinEntries.byTimestamp({
+  const insulinEntries = await context.db.getInsulinEntriesByTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });
 
-  const carbEntries = await context.db.carbEntries.byTimestamp({
+  const carbEntries = await context.db.getCarbEntriesByTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });
 
-  const meterEntries = await context.db.meterEntries.byTimestamp({
+  const meterEntries = await context.db.getMeterEntriesByTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });
@@ -43,28 +43,28 @@ export const updateTimelineEntries = async (request: Request, context: Context) 
 
   const dataPointTimestamp = getTimeAsISOStr(dataPoint.timestamp);
 
-  const [insulinEntry] = dataPoint.valTop
-    ? await context.db.insulinEntries.upsertInsulinEntry({
+  const insulinEntry = dataPoint.valTop
+    ? await context.db.upsertInsulinEntry({
         timestamp: dataPointTimestamp,
         amount: dataPoint.valTop,
         type: 'FAST', // TODO
       })
-    : [];
+    : null;
 
-  const [meterEntry] = dataPoint.valMiddle
-    ? await context.db.meterEntries.upsertMeterEntry({
+  const meterEntry = dataPoint.valMiddle
+    ? await context.db.upsertMeterEntry({
         timestamp: dataPointTimestamp,
         bloodGlucose: dataPoint.valMiddle,
       })
-    : [];
+    : null;
 
-  const [carbEntry] = dataPoint.valBottom
-    ? await context.db.carbEntries.upsertCarbEntry({
+  const carbEntry = dataPoint.valBottom
+    ? await context.db.upsertCarbEntry({
         timestamp: dataPointTimestamp,
         amount: dataPoint.valBottom,
         durationFactor: 1, // TODO
       })
-    : [];
+    : null;
 
   return createResponse({
     insulinEntry,

@@ -17,7 +17,7 @@ INSERT INTO sensor_entries (
   timestamp
 )
 VALUES :sensorEntries
-RETURNING timestamp;
+RETURNING *;
 
 /* @name getSensorEntriesByTimestamp */
 SELECT *

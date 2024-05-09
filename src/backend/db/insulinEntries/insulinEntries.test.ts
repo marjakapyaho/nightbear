@@ -1,5 +1,6 @@
 import { createTestContext, truncateDb } from 'backend/utils/test';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { mockNow } from 'shared/mocks/dates';
 
 describe('db/insulinEntries', () => {
   const context = createTestContext();
@@ -8,17 +9,17 @@ describe('db/insulinEntries', () => {
     await truncateDb(context);
   });
 
-  describe('insert', () => {
+  describe('upsert new insulin entry', () => {
     it('works', async () => {
-      const res = await context.db.insulinEntries.create({
+      const insulinEntry = await context.db.upsertInsulinEntry({
+        timestamp: mockNow,
         amount: 5,
         type: 'FAST',
       });
 
-      expect(res).toHaveLength(1);
-      expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
-      expect(res[0].amount).toBe(5);
-      expect(res[0].type).toBe('FAST');
+      expect(insulinEntry.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(insulinEntry.amount).toBe(5);
+      expect(insulinEntry.type).toBe('FAST');
     });
   });
 });

@@ -8,42 +8,36 @@ export const generateSeedData = async (context: Context) => {
   const now = getTimeMinusTime(context.timestamp(), MIN_IN_MS);
 
   // Create timeline entries
-  await context.db.sensorEntries.createSensorEntries({
-    sensorEntries: generateSensorEntries({
+  await context.db.createSensorEntries(
+    generateSensorEntries({
       currentTimestamp: now,
       bloodGlucoseHistory: [3.8, 4.4, 4.9, 5.1, 5.3, 5.5, 5.6, 5.5, 4.5, 3.9],
       latestEntryAge: 1,
     }),
-  });
+  );
 
-  await context.db.carbEntries.createCarbEntries({
-    carbEntries: [
-      {
-        timestamp: getTimeMinusTime(now, 50 * MIN_IN_MS),
-        amount: 20,
-        durationFactor: 1.5,
-      },
-    ],
-  });
+  await context.db.createCarbEntries([
+    {
+      timestamp: getTimeMinusTime(now, 50 * MIN_IN_MS),
+      amount: 20,
+      durationFactor: 1.5,
+    },
+  ]);
 
-  await context.db.insulinEntries.createInsulinEntries({
-    insulinEntries: [
-      {
-        timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
-        amount: 1,
-        type: 'FAST',
-      },
-    ],
-  });
+  await context.db.createInsulinEntries([
+    {
+      timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
+      amount: 1,
+      type: 'FAST',
+    },
+  ]);
 
-  await context.db.meterEntries.createMeterEntries({
-    meterEntries: [
-      {
-        timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
-        bloodGlucose: 5.8,
-      },
-    ],
-  });
+  await context.db.createMeterEntries([
+    {
+      timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
+      bloodGlucose: 5.8,
+    },
+  ]);
 
   // Create active alarm
   const [alarm] = await context.db.alarms.createAlarm({

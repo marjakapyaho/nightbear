@@ -46,7 +46,9 @@ export interface ICreateSensorEntriesParams {
 
 /** 'CreateSensorEntries' return type */
 export interface ICreateSensorEntriesResult {
+  bloodGlucose: number;
   timestamp: string;
+  type: sensor_entry_type;
 }
 
 /** 'CreateSensorEntries' query type */
@@ -55,7 +57,7 @@ export interface ICreateSensorEntriesQuery {
   result: ICreateSensorEntriesResult;
 }
 
-const createSensorEntriesIR: any = {"usedParamSet":{"sensorEntries":true},"params":[{"name":"sensorEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"type","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":75,"b":88}]}],"statement":"INSERT INTO sensor_entries (\n  blood_glucose,\n  type,\n  timestamp\n)\nVALUES :sensorEntries\nRETURNING timestamp"};
+const createSensorEntriesIR: any = {"usedParamSet":{"sensorEntries":true},"params":[{"name":"sensorEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"type","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":75,"b":88}]}],"statement":"INSERT INTO sensor_entries (\n  blood_glucose,\n  type,\n  timestamp\n)\nVALUES :sensorEntries\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -66,7 +68,7 @@ const createSensorEntriesIR: any = {"usedParamSet":{"sensorEntries":true},"param
  *   timestamp
  * )
  * VALUES :sensorEntries
- * RETURNING timestamp
+ * RETURNING *
  * ```
  */
 export const createSensorEntries = new PreparedQuery<ICreateSensorEntriesParams,ICreateSensorEntriesResult>(createSensorEntriesIR);

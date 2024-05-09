@@ -1,5 +1,6 @@
 import { createTestContext, truncateDb } from 'backend/utils/test';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { mockNow } from 'shared/mocks/dates';
 
 describe('db/carbEntries', () => {
   const context = createTestContext();
@@ -8,17 +9,17 @@ describe('db/carbEntries', () => {
     await truncateDb(context);
   });
 
-  describe('insert', () => {
+  describe('upsert new carb entry', () => {
     it('works', async () => {
-      const res = await context.db.carbEntries.create({
+      const carbEntry = await context.db.upsertCarbEntry({
+        timestamp: mockNow,
         amount: 20,
         durationFactor: 1.5,
       });
 
-      expect(res).toHaveLength(1);
-      expect(res[0].timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
-      expect(res[0].amount).toBe(20);
-      expect(res[0].durationFactor).toBe(1.5);
+      expect(carbEntry.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
+      expect(carbEntry.amount).toBe(20);
+      expect(carbEntry.durationFactor).toBe(1.5);
     });
   });
 });

@@ -1,20 +1,25 @@
+import { z } from 'zod';
 import { Situation } from './analyser';
 
-export type AlarmState = {
-  id: string;
-  timestamp: string;
-  alarmLevel: number;
-  validAfter: string;
-  ackedBy?: string | null; // TODO
-  notificationTarget?: string | null; // TODO
-  notificationReceipt?: string | null; // TODO
-  notificationProcessedAt?: string | null; // TODO
-};
+/* eslint-disable @typescript-eslint/no-redeclare */
 
-export type Alarm = {
-  id: string;
-  situation: Situation;
-  isActive: boolean;
-  deactivatedAt?: string | null; // TODO
-  alarmStates: AlarmState[];
-};
+export const AlarmState = z.object({
+  id: z.string(),
+  timestamp: z.string(),
+  alarmLevel: z.number(),
+  validAfter: z.string(),
+  ackedBy: z.optional(z.string()),
+  notificationTarget: z.optional(z.string()),
+  notificationReceipt: z.optional(z.string()),
+  notificationProcessedAt: z.optional(z.string()),
+});
+export type AlarmState = z.infer<typeof AlarmState>;
+
+export const Alarm = z.object({
+  id: z.string(),
+  situation: Situation,
+  isActive: z.boolean(),
+  deactivatedAt: z.optional(z.string()),
+  alarmStates: z.array(AlarmState),
+});
+export type Alarm = z.infer<typeof Alarm>;

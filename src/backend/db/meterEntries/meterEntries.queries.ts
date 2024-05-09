@@ -1,104 +1,6 @@
 /** Types generated for queries found in "src/backend/db/meterEntries/meterEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** 'Create' parameters type */
-export interface ICreateParams {
-  bloodGlucose: number;
-}
-
-/** 'Create' return type */
-export interface ICreateResult {
-  bloodGlucose: number;
-  timestamp: string;
-}
-
-/** 'Create' query type */
-export interface ICreateQuery {
-  params: ICreateParams;
-  result: ICreateResult;
-}
-
-const createIR: any = {"usedParamSet":{"bloodGlucose":true},"params":[{"name":"bloodGlucose","required":true,"transform":{"type":"scalar"},"locs":[{"a":50,"b":63}]}],"statement":"INSERT INTO meter_entries (blood_glucose)\nVALUES (:bloodGlucose!)\nRETURNING *"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO meter_entries (blood_glucose)
- * VALUES (:bloodGlucose!)
- * RETURNING *
- * ```
- */
-export const create = new PreparedQuery<ICreateParams,ICreateResult>(createIR);
-
-
-/** 'CreateMeterEntries' parameters type */
-export interface ICreateMeterEntriesParams {
-  meterEntries: readonly ({
-    bloodGlucose: number,
-    timestamp: string | Date
-  })[];
-}
-
-/** 'CreateMeterEntries' return type */
-export interface ICreateMeterEntriesResult {
-  timestamp: string;
-}
-
-/** 'CreateMeterEntries' query type */
-export interface ICreateMeterEntriesQuery {
-  params: ICreateMeterEntriesParams;
-  result: ICreateMeterEntriesResult;
-}
-
-const createMeterEntriesIR: any = {"usedParamSet":{"meterEntries":true},"params":[{"name":"meterEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":66,"b":78}]}],"statement":"INSERT INTO meter_entries (\n  blood_glucose,\n  timestamp\n)\nVALUES :meterEntries\nRETURNING timestamp"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO meter_entries (
- *   blood_glucose,
- *   timestamp
- * )
- * VALUES :meterEntries
- * RETURNING timestamp
- * ```
- */
-export const createMeterEntries = new PreparedQuery<ICreateMeterEntriesParams,ICreateMeterEntriesResult>(createMeterEntriesIR);
-
-
-/** 'ByTimestamp' parameters type */
-export interface IByTimestampParams {
-  from: string | Date;
-  to?: string | Date | null | void;
-}
-
-/** 'ByTimestamp' return type */
-export interface IByTimestampResult {
-  bloodGlucose: number;
-  timestamp: string;
-}
-
-/** 'ByTimestamp' query type */
-export interface IByTimestampQuery {
-  params: IByTimestampParams;
-  result: IByTimestampResult;
-}
-
-const byTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":79}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":107,"b":109}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose\nFROM meter_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
-
-/**
- * Query generated from SQL:
- * ```
- * SELECT
- *   timestamp,
- *   blood_glucose
- * FROM meter_entries
- * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
- * ```
- */
-export const byTimestamp = new PreparedQuery<IByTimestampParams,IByTimestampResult>(byTimestampIR);
-
-
 /** 'UpsertMeterEntry' parameters type */
 export interface IUpsertMeterEntryParams {
   bloodGlucose: number;
@@ -136,5 +38,74 @@ const upsertMeterEntryIR: any = {"usedParamSet":{"timestamp":true,"bloodGlucose"
  * ```
  */
 export const upsertMeterEntry = new PreparedQuery<IUpsertMeterEntryParams,IUpsertMeterEntryResult>(upsertMeterEntryIR);
+
+
+/** 'CreateMeterEntries' parameters type */
+export interface ICreateMeterEntriesParams {
+  meterEntries: readonly ({
+    bloodGlucose: number,
+    timestamp: string | Date
+  })[];
+}
+
+/** 'CreateMeterEntries' return type */
+export interface ICreateMeterEntriesResult {
+  bloodGlucose: number;
+  timestamp: string;
+}
+
+/** 'CreateMeterEntries' query type */
+export interface ICreateMeterEntriesQuery {
+  params: ICreateMeterEntriesParams;
+  result: ICreateMeterEntriesResult;
+}
+
+const createMeterEntriesIR: any = {"usedParamSet":{"meterEntries":true},"params":[{"name":"meterEntries","required":false,"transform":{"type":"pick_array_spread","keys":[{"name":"bloodGlucose","required":true},{"name":"timestamp","required":true}]},"locs":[{"a":66,"b":78}]}],"statement":"INSERT INTO meter_entries (\n  blood_glucose,\n  timestamp\n)\nVALUES :meterEntries\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO meter_entries (
+ *   blood_glucose,
+ *   timestamp
+ * )
+ * VALUES :meterEntries
+ * RETURNING *
+ * ```
+ */
+export const createMeterEntries = new PreparedQuery<ICreateMeterEntriesParams,ICreateMeterEntriesResult>(createMeterEntriesIR);
+
+
+/** 'GetMeterEntriesByTimestamp' parameters type */
+export interface IGetMeterEntriesByTimestampParams {
+  from: string | Date;
+  to?: string | Date | null | void;
+}
+
+/** 'GetMeterEntriesByTimestamp' return type */
+export interface IGetMeterEntriesByTimestampResult {
+  bloodGlucose: number;
+  timestamp: string;
+}
+
+/** 'GetMeterEntriesByTimestamp' query type */
+export interface IGetMeterEntriesByTimestampQuery {
+  params: IGetMeterEntriesByTimestampParams;
+  result: IGetMeterEntriesByTimestampResult;
+}
+
+const getMeterEntriesByTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":79}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":107,"b":109}]}],"statement":"SELECT\n  timestamp,\n  blood_glucose\nFROM meter_entries\nWHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   timestamp,
+ *   blood_glucose
+ * FROM meter_entries
+ * WHERE timestamp >= :from! AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
+ * ```
+ */
+export const getMeterEntriesByTimestamp = new PreparedQuery<IGetMeterEntriesByTimestampParams,IGetMeterEntriesByTimestampResult>(getMeterEntriesByTimestampIR);
 
 

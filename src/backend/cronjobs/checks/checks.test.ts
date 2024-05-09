@@ -33,13 +33,13 @@ describe('cronjobs/checks', () => {
     expect(alarms[0].situation).toEqual('LOW');
 
     currentTimestamp = getTimePlusTime(mockNow, 5 * MIN_IN_MS);
-    await context.db.sensorEntries.createSensorEntries({
-      sensorEntries: generateSensorEntries({
+    await context.db.createSensorEntries(
+      generateSensorEntries({
         currentTimestamp,
         bloodGlucoseHistory: [4.3],
         latestEntryAge: 0,
       }),
-    });
+    );
 
     await checks({ ...context, timestamp: () => currentTimestamp });
 
@@ -49,13 +49,13 @@ describe('cronjobs/checks', () => {
     expect(alarms[0].situation).toEqual('LOW');
 
     currentTimestamp = getTimePlusTime(mockNow, 10 * MIN_IN_MS);
-    await context.db.sensorEntries.createSensorEntries({
-      sensorEntries: generateSensorEntries({
+    await context.db.createSensorEntries(
+      generateSensorEntries({
         currentTimestamp,
         bloodGlucoseHistory: [4.9],
         latestEntryAge: 0,
       }),
-    });
+    );
 
     await checks({ ...context, timestamp: () => currentTimestamp });
 
@@ -64,13 +64,13 @@ describe('cronjobs/checks', () => {
     expect(alarms).toHaveLength(0);
 
     currentTimestamp = getTimePlusTime(mockNow, 35 * MIN_IN_MS);
-    await context.db.sensorEntries.createSensorEntries({
-      sensorEntries: generateSensorEntries({
+    await context.db.createSensorEntries(
+      generateSensorEntries({
         currentTimestamp,
         bloodGlucoseHistory: [5.6, 6.5, 7.5, 8.7, 9.9],
         latestEntryAge: 0,
       }),
-    });
+    );
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Adds RISING alarm
@@ -80,13 +80,13 @@ describe('cronjobs/checks', () => {
     const risingAlarmId = alarms[0].id;
 
     currentTimestamp = getTimePlusTime(mockNow, 40 * MIN_IN_MS);
-    await context.db.sensorEntries.createSensorEntries({
-      sensorEntries: generateSensorEntries({
+    await context.db.createSensorEntries(
+      generateSensorEntries({
         currentTimestamp,
         bloodGlucoseHistory: [10.5],
         latestEntryAge: 0,
       }),
-    });
+    );
 
     await checks({ ...context, timestamp: () => currentTimestamp });
 
