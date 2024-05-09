@@ -7,7 +7,7 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
   const { start, end } = request.requestParams;
   const defaultFrom = getTimeMinusTime(context.timestamp(), 3 * HOUR_IN_MS);
 
-  const sensorEntries = await context.db.sensorEntries.byTimestamp({
+  const sensorEntries = await context.db.getSensorEntriesByTimestamp({
     from: start || defaultFrom,
     to: end || context.timestamp(),
   });

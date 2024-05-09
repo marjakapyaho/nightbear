@@ -1,11 +1,11 @@
 import { runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
-import { Cronjob } from 'backend/utils/cronjobs';
 import { Context } from 'backend/utils/api';
-import { getActiveProfile } from 'shared/utils/profiles';
+import { Cronjob } from 'backend/utils/cronjobs';
 import { Alarm } from 'shared/types/alarms';
 import { Profile } from 'shared/types/profiles';
 import { SensorEntry } from 'shared/types/timelineEntries';
+import { getActiveProfile } from 'shared/utils/profiles';
 import { getRange } from './utils';
 
 export const checks = (async (context: Context) => {
@@ -14,7 +14,7 @@ export const checks = (async (context: Context) => {
 
   log(`----- STARTED CHECKS AT: ${currentTimestamp} -----`);
 
-  const sensorEntriesArray = await context.db.sensorEntries.byTimestamp(getRange(context, 3));
+  const sensorEntriesArray = await context.db.getSensorEntriesByTimestamp(getRange(context, 3));
   const insulinEntries = await context.db.insulinEntries.byTimestamp(getRange(context, 24));
   const carbEntries = await context.db.carbEntries.byTimestamp(getRange(context, 24));
   const meterEntries = await context.db.meterEntries.byTimestamp(getRange(context, 3));
