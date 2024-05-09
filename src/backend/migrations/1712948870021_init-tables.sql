@@ -92,7 +92,7 @@ CREATE TYPE sensor_entry_type AS ENUM (
 
 CREATE TABLE sensor_entries (
   timestamp TIMESTAMPTZ NOT NULL PRIMARY KEY DEFAULT CURRENT_TIMESTAMP,
-  type TEXT NOT NULL,
+  type sensor_entry_type NOT NULL,
   blood_glucose NUMERIC(3, 1) NOT NULL
 );
 

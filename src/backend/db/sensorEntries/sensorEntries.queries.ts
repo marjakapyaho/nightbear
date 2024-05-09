@@ -1,17 +1,19 @@
 /** Types generated for queries found in "src/backend/db/sensorEntries/sensorEntries.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
+export type sensor_entry_type = 'DEXCOM_G4_UPLOADER' | 'DEXCOM_G4_UPLOADER_RAW' | 'DEXCOM_G6_SHARE' | 'DEXCOM_G6_UPLOADER' | 'LIBRE_3_LINK';
+
 /** 'CreateSensorEntry' parameters type */
 export interface ICreateSensorEntryParams {
   bloodGlucose: number;
-  type: string;
+  type: sensor_entry_type;
 }
 
 /** 'CreateSensorEntry' return type */
 export interface ICreateSensorEntryResult {
   bloodGlucose: number;
   timestamp: string;
-  type: string;
+  type: sensor_entry_type;
 }
 
 /** 'CreateSensorEntry' query type */
@@ -37,7 +39,7 @@ export const createSensorEntry = new PreparedQuery<ICreateSensorEntryParams,ICre
 export interface ICreateSensorEntriesParams {
   sensorEntries: readonly ({
     bloodGlucose: number,
-    type: string,
+    type: sensor_entry_type,
     timestamp: string | Date
   })[];
 }
@@ -80,7 +82,7 @@ export interface IGetSensorEntriesByTimestampParams {
 export interface IGetSensorEntriesByTimestampResult {
   bloodGlucose: number;
   timestamp: string;
-  type: string;
+  type: sensor_entry_type;
 }
 
 /** 'GetSensorEntriesByTimestamp' query type */
@@ -109,7 +111,7 @@ export type IGetLatestSensorEntryParams = void;
 export interface IGetLatestSensorEntryResult {
   bloodGlucose: number;
   timestamp: string;
-  type: string;
+  type: sensor_entry_type;
 }
 
 /** 'GetLatestSensorEntry' query type */

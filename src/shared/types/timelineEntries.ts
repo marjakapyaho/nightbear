@@ -2,7 +2,13 @@ import { z } from 'zod';
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
-export const SensorEntryType = z.enum(['DEXCOM_G6_SHARE']);
+export const SensorEntryType = z.enum([
+  'DEXCOM_G4_UPLOADER',
+  'DEXCOM_G4_UPLOADER_RAW',
+  'DEXCOM_G6_UPLOADER',
+  'DEXCOM_G6_SHARE',
+  'LIBRE_3_LINK',
+]);
 export type SensorEntryType = z.infer<typeof SensorEntryType>;
 
 export const InsulinEntryType = z.enum(['FAST', 'LONG']);
