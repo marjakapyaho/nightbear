@@ -4,10 +4,11 @@ set -euo pipefail # exit on error; treat unset variables as errors; exit on erro
 
 case ${1:-} in
   test)  echo $DATABASE_URL_TEST ;;
+  dev)  echo $DATABASE_URL_DEV ;;
   stage) echo $DATABASE_URL_STAGE ;;
   prod)  echo $DATABASE_URL_PROD ;;
   *)
-    echo -e "ERROR: Valid environments are: test, stage, prod" >&2
+    echo -e "ERROR: Valid environments are: test, dev, stage, prod" >&2
     exit 1
     ;;
 esac

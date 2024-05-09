@@ -25,7 +25,7 @@
     "fix-prettier": "prettier --write $(npm run --silent list-ts) $(npm run --silent list-scss)",
     "fix-eslint": "eslint --fix $(npm run --silent list-ts)",
     "\n==================== BACK ====================": "",
-    "back:start": "npm run lint-node && npm run ts-node src/backend/index.ts",
+    "back:start": "npm run lint-node && DATABASE_URL=$(contrib/db/env dev) npm run ts-node src/backend/index.ts",
     "back:build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
     "\n==================== FRONT ====================": "",
     "front:start": "npm run lint-node && BROWSER=none react-scripts start",
