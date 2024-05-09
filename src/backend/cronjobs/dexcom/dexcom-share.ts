@@ -25,23 +25,35 @@ export const dexcomShare: Cronjob = async (
     isTimeLarger(Date.now() - dexcomShareLoginAttemptTimestamp, MIN_IN_MS * mins);
 
   if (dexcomShareSessionId) {
-    const latestBg = await context.db.getLatestSensorEntry();
+    let latestBg;
+    try {
+      latestBg = await context.db.getLatestSensorEntry();
 
-    if (latestBg) {
-      const ageInMin = (Date.now() - getTimeInMillis(latestBg.timestamp)) / MIN_IN_MS;
-      const ageModulo = ageInMin % 5;
-      const willFetch =
-        ageModulo > 0.35 && // new BG's aren't visible on Dexcom Share immediately -> give it a bit of time
-        ageModulo < 1.75 && // not within the time window where new BG's appear -> no point in fetching until a new one may be available again
-        ageInMin >= 4.5; // our fetch window is slightly larger than 1 minute, to ensure slight scheduling wobble of the cronjob doesn't cause fetches to be skipped -> need a mechanism for preventing the opposite (i.e. unnecessary consecutive fetches)
+      if (latestBg) {
+        const ageInMin = (Date.now() - getTimeInMillis(latestBg.timestamp)) / MIN_IN_MS;
+        const ageModulo = ageInMin % 5;
+        const willFetch =
+          ageModulo > 0.35 && // new BG's aren't visible on Dexcom Share immediately → give it a bit of time
+          ageModulo < 1.75 && // not within the time window where new BG's appear → no point in fetching until a new one may be available again
+          ageInMin >= 4.5; // our fetch window is slightly larger than 1 minute, to ensure slight scheduling wobble of the cronjob doesn't cause fetches to be skipped → need a mechanism for preventing the opposite (i.e. unnecessary consecutive fetches)
 
-      log(
-        `Time since last BG is ${ageInMin.toFixed(1)} min -> ${
-          willFetch ? 'WILL' : "won't"
-        } fetch BG`,
-      );
+        log(
+          `Time since last BG is ${ageInMin.toFixed(1)} min → ${
+            willFetch ? 'WILL' : "won't"
+          } fetch BG`,
+        );
 
-      if (!willFetch) return;
+        if (!willFetch) return;
+      }
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.match(/Expected exactly one result row but got 0 instead/)
+      ) {
+        log(`Assuming this is the first time ever we're trying to fetch BG`);
+      } else {
+        throw err; // something else is wrong, and it might not be safe to proceed (continuous error loop for example)
+      }
     }
 
     try {
@@ -50,12 +62,12 @@ export const dexcomShare: Cronjob = async (
       const lagInMin = (Date.now() - getTimeInMillis(model.timestamp)) / MIN_IN_MS;
       const desc = `BG ${model.bloodGlucose}, timestamp ${humanReadableLongTime(model.timestamp)}`;
 
-      log(`BG lag is ${lagInMin.toFixed(1)} min (may include clock drift!)`);
+      log(`BG lag is ${lagInMin.toFixed(1)} min (may include clock drift)`);
 
       if (latestBg && latestBg.timestamp === model.timestamp) {
-        log(`This entry already exists: ${desc}`); // already exists in the DB -> no need to do anything!
+        log(`This entry already exists: ${desc}`); // already exists in the DB → no need to do anything!
       } else {
-        await context.db.createSensorEntry(model); // we didn't find the entry yet -> create it
+        await context.db.createSensorEntry(model); // we didn't find the entry yet → create it
         log(`Saved new SensorEntry: ${desc}`);
       }
     } catch (err) {
