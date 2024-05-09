@@ -7,11 +7,13 @@ import { mockNow } from 'shared/mocks/dates';
 import { Alarm } from 'shared/types/alarms';
 
 export const createTestContext = (timestamp = () => mockNow): Context => {
+  if (!process.env.DATABASE_URL_TEST)
+    throw new Error(`Test suite requires DATABASE_URL_TEST to be set on the env`); // normally we abstract env selection via DATABASE_URL, but relying on that in the test runner too might be dangerous
   return {
     httpPort: 80,
     timestamp,
     log: NO_LOGGING,
-    db: createDbClient('postgres://nightbear:nightbear@localhost:25432/nightbear_test'), // needs to match docker-compose.yml
+    db: createDbClient(process.env.DATABASE_URL_TEST),
     storage: null,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,

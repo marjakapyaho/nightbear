@@ -33,9 +33,9 @@
     "front:deploy": "npm run front:build && aws --profile nightbear s3 cp --acl public-read --cache-control=no-store,must-revalidate --recursive build s3://aws-static-site---stage-nightbear-fi/",
     "\n==================== DB ====================": "",
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && npm run db:migrate",
-    "db:migrate": "contrib/db/migrate test",
+    "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
     "db:types": "pgtyped --config pgtyped-config.json",
-    "db:seed": "npm run db:reset && npm run ts-node src/backend/scripts/dbSeed.ts",
+    "db:seed": "DATABASE_URL=$(contrib/db/env dev) npm run ts-node src/backend/scripts/dbSeed.ts",
     "\n==================== UTILS ====================": "",
     "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
