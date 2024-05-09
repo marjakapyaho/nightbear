@@ -1,10 +1,11 @@
 import { NO_PUSHOVER } from 'backend/cronjobs/alarms/pushoverClient';
 import { NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcom-share-client';
 import { NO_LOGGING } from 'backend/utils/logging';
-import { Context } from './api';
-import { createDbClient } from './db';
 import { mockNow } from 'shared/mocks/dates';
 import { Alarm } from 'shared/types/alarms';
+import { generateUuid } from 'shared/utils/id';
+import { Context, Request } from './api';
+import { createDbClient } from './db';
 
 export const createTestContext = (timestamp = () => mockNow): Context => {
   if (!process.env.DATABASE_URL_TEST)
@@ -44,3 +45,15 @@ export const checkActiveAlarms = async (context: Context): Promise<Alarm[]> =>
   (await context.db.alarms.getAlarms({
     onlyActive: true,
   })) as unknown as Alarm[];
+
+export function createRequest(request: Partial<Request>): Request {
+  return {
+    requestId: generateUuid(),
+    requestMethod: 'GET',
+    requestPath: '/',
+    requestParams: {},
+    requestHeaders: {},
+    requestBody: '',
+    ...request,
+  };
+}
