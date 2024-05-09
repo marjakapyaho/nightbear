@@ -1,3 +1,4 @@
+import { PreparedQuery } from '@pgtyped/runtime';
 import * as alarms from 'backend/db/alarms/alarms.queries';
 import * as carbEntries from 'backend/db/carbEntries/carbEntries.queries';
 import * as cronjobsJournal from 'backend/db/cronjobsJournal/cronjobsJournal.queries';
@@ -8,6 +9,7 @@ import { queries } from 'backend/db/queries';
 import * as sensorEntries from 'backend/db/sensorEntries/sensorEntries.queries';
 import _ from 'lodash';
 import { Client, Pool, types } from 'pg';
+import { z } from 'zod';
 
 /**
  * All DB modules need to be listed here to become accessible via the DB wrapper.
@@ -76,34 +78,78 @@ async function performQuery(
   return res.map(row => _.mapKeys(row, (_val, key) => _.camelCase(key)));
 }
 
-/*export const one = async <ParamsType, ReturnType>(
-  context: Context,
-  query: PreparedQuery<ParamsType, ReturnType>,
-  params: ParamsType,
-): Promise<ReturnType> => {
-  try {
-    context.db.query.run();
-    const rows = await query.run(params, client);
-    if (rows.length === 1) {
-      return rows[0];
-    }
-    if (rows.length === 0) {
-      throw new Error('Error');
-    }
-  } catch (e: unknown) {
-    throw new Error('Error');
-  }
-  throw new Error('Error');
-};
+export type GenParams<T> = T extends PreparedQuery<infer P, any> ? P : void;
 
-export const many = async <ParamsType, ReturnType>(
-  client: PoolClient,
-  query: PreparedQuery<ParamsType, ReturnType>,
-  params: ParamsType,
-): Promise<ReturnType[] | FastifyError> => {
-  try {
-    return await query.run(params, client);
-  } catch (e: unknown) {
-    return processDBError(e);
+export function bindQueryShorthands(pool: Pool) {
+  return {
+    one,
+    many,
+  };
+
+  async function one<
+    Schema extends z.ZodTypeAny,
+    Params extends object,
+    Result extends z.infer<Schema>, // note: the "extends" constraint can be dropped if we just want to rely on the Zod schema, and ignore DB-side types completely
+  >(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params: Params,
+  ): Promise<z.infer<Schema>>;
+  async function one<
+    Schema extends z.ZodTypeAny,
+    Params extends void,
+    Result extends z.infer<Schema>,
+  >(schema: Schema, method: PreparedQuery<Params, Result>): Promise<z.infer<Schema>>;
+  async function one<Schema extends z.ZodTypeAny, Params, Result extends z.infer<Schema>>(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params?: Params,
+  ): Promise<z.infer<Schema>> {
+    return runQueryAndValidateResult(pool, true, schema, method, params);
   }
-};*/
+
+  async function many<
+    Schema extends z.ZodTypeAny,
+    Params extends object,
+    Result extends z.infer<Schema>, // note: the "extends" constraint can be dropped if we just want to rely on the Zod schema, and ignore DB-side types completely
+  >(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params: Params,
+  ): Promise<z.infer<Schema>[]>;
+  async function many<
+    Schema extends z.ZodTypeAny,
+    Params extends void,
+    Result extends z.infer<Schema>,
+  >(schema: Schema, method: PreparedQuery<Params, Result>): Promise<z.infer<Schema>[]>;
+  async function many<Schema extends z.ZodTypeAny, Params, Result extends z.infer<Schema>>(
+    schema: Schema,
+    method: PreparedQuery<Params, Result>,
+    params?: Params,
+  ): Promise<z.infer<Schema>[]> {
+    return runQueryAndValidateResult(pool, false, schema, method, params);
+  }
+}
+
+async function runQueryAndValidateResult<
+  One extends boolean,
+  Schema extends z.ZodTypeAny,
+  Params,
+  Result extends z.infer<Schema>,
+>(
+  pool: Pool,
+  one: One,
+  schema: Schema,
+  method: PreparedQuery<Params, Result>,
+  params?: Params,
+): Promise<One extends true ? z.infer<Schema> : z.infer<Schema>[]> {
+  const raw = await method.run(params as Params, pool);
+  const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
+  if (one) {
+    if (mapped.length !== 1)
+      throw new Error(`Expected exactly one result row but got ${mapped.length} instead`);
+    return schema.parse(mapped[0]);
+  } else {
+    return z.array(schema).parse(mapped);
+  }
+}
