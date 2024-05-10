@@ -41,7 +41,7 @@ export const getPushoverRecipient = (neededLevel: number, activeProfile: Profile
 
   return neededLevel < availableTargetsCount
     ? activeProfile.notificationTargets[neededLevel]
-    : null;
+    : undefined;
 };
 
 export const retryNotifications = async (
@@ -55,12 +55,10 @@ export const retryNotifications = async (
 
       // Update alarm state to have receipt if we got it
       if (receipt) {
-        const [updatedState] = await context.db.alarms.markAlarmAsProcessed({
+        return context.db.markAlarmAsProcessed({
           ...state,
           notificationReceipt: receipt,
         });
-
-        return updatedState;
       }
     }),
   );

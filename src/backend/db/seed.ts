@@ -40,15 +40,7 @@ export const generateSeedData = async (context: Context) => {
   ]);
 
   // Create active alarm
-  const [alarm] = await context.db.alarms.createAlarm({
-    situation: 'LOW',
-  });
-
-  await context.db.alarms.createAlarmState({
-    alarmId: alarm.id,
-    alarmLevel: 0,
-    validAfter: now,
-  });
+  await context.db.createAlarmWithState('LOW');
 
   // Create active day profile
   const dayProfile = await context.db.createProfile(mockProfiles[0]);

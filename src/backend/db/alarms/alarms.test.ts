@@ -10,19 +10,11 @@ describe('db/alarms', () => {
   });
 
   it('create alarm with state', async () => {
-    const [alarm] = await context.db.alarms.createAlarm({
-      situation: 'LOW',
-    });
+    const alarm = await context.db.createAlarmWithState('LOW');
+    const alarmState = await context.db.getAlarmStateByAlarmId(alarm.id);
 
     expect(alarm.situation).toBe('LOW');
     expect(alarm.deactivatedAt).toBe(null);
-
-    const [alarmState] = await context.db.alarms.createAlarmState({
-      alarmId: alarm.id,
-      alarmLevel: 0,
-      validAfter: mockNow,
-    });
-
     expect(alarmState.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarmState.alarmLevel).toBe(0);
     expect(alarmState.validAfter).toEqual(mockNow);

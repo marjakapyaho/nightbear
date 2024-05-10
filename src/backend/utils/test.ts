@@ -41,10 +41,8 @@ export const truncateDb = async (context: Context) => {
   }
 };
 
-export const checkActiveAlarms = async (context: Context): Promise<Alarm[]> =>
-  (await context.db.alarms.getAlarms({
-    onlyActive: true,
-  })) as unknown as Alarm[];
+export const checkActiveAlarm = async (context: Context): Promise<Alarm> =>
+  context.db.getActiveAlarm();
 
 export function createRequest(request: Partial<Request>): Request {
   return {

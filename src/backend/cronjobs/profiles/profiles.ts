@@ -29,7 +29,7 @@ export const checkAndUpdateProfileActivations = async (
   timezone = 'TZ',
 ) => {
   const { log } = context;
-  const profileActivations = await context.db.profiles.getRelevantProfileActivations();
+  const profileActivations = await context.db.getRelevantProfileActivations();
   const latestActivation = chain(profileActivations).sortBy('activatedAt').last().value();
   const activationToActivate = findRepeatingActivationToActivate(
     profileActivations,
@@ -47,12 +47,10 @@ export const checkAndUpdateProfileActivations = async (
     shouldNonRepeatingActivationBeDeactivated(latestActivation, currentTimestamp)
   ) {
     log(`2. Activating repeating activation with id: ${activationToActivate.id}`);
-    await context.db.profiles.reactivateProfileActivation(activationToActivate);
+    await context.db.reactivateProfileActivation(activationToActivate.id);
   } else {
     log('2. No activations needed.');
   }
 
-  // TODO: CASTING + get active profile from db with query
-  const profilesAfterUpdate = (await context.db.profiles.getProfiles()) as Profile[];
-  return getActiveProfile(profilesAfterUpdate);
+  return context.db.getActiveProfile();
 };

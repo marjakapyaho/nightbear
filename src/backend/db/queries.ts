@@ -38,6 +38,18 @@ import {
   reactivateProfileActivation,
 } from './profiles/profiles.queries';
 import { z } from 'zod';
+import { Alarm, AlarmState } from 'shared/types/alarms';
+import {
+  createAlarm,
+  createAlarmState,
+  deactivateAlarm,
+  getAlarms,
+  markAlarmAsProcessed,
+  markAllAlarmStatesAsProcessed,
+  getAlarmStateByAlarmId,
+} from './alarms/alarms.queries';
+import { ALARM_START_LEVEL } from 'shared/utils/alarms';
+import { Situation } from 'shared/types/analyser';
 
 export const queries = (pool: Pool) => {
   const { one, many } = bindQueryShorthands(pool);
@@ -136,6 +148,61 @@ export const queries = (pool: Pool) => {
 
     async reactivateProfileActivation(profileActivationId: string) {
       return one(ProfileActivation, reactivateProfileActivation, profileActivationId);
+    },
+
+    async createAlarm(alarm: Omit<Alarm, 'id'>) {
+      return one(Alarm, createAlarm, alarm);
+    },
+
+    async deactivateAlarm(alarmId: string, currentTimestamp: string) {
+      return one(Alarm, deactivateAlarm, { alarmId, currentTimestamp });
+    },
+
+    async createAlarmState(
+      alarmId: string,
+      validAfter?: string,
+      alarmLevel?: number,
+      notificationTarget?: string,
+      notificationReceipt?: string,
+      notificationProcessedAt?: string,
+    ) {
+      return one(AlarmState, createAlarmState, {
+        alarmLevel: alarmLevel || ALARM_START_LEVEL,
+        alarmId,
+        validAfter,
+        notificationTarget,
+        notificationReceipt,
+        notificationProcessedAt,
+      });
+    },
+
+    async createAlarmWithState(situation: Situation) {
+      const createdAlarm = await one(Alarm, createAlarm, { situation });
+      await one(AlarmState, createAlarmState, {
+        alarmId: createdAlarm.id,
+        alarmLevel: ALARM_START_LEVEL,
+      });
+      return createdAlarm;
+    },
+
+    async markAlarmAsProcessed(alarmState: AlarmState) {
+      return one(AlarmState, markAlarmAsProcessed, alarmState);
+    },
+
+    async markAllAlarmStatesAsProcessed(alarmId: string) {
+      return many(AlarmState, markAllAlarmStatesAsProcessed, { alarmId });
+    },
+
+    async getAlarms(timeRange: GenParams<typeof getAlarms>) {
+      return many(Alarm, getAlarms, timeRange);
+    },
+
+    async getActiveAlarm() {
+      return one(Alarm, getAlarms, { onlyActive: true });
+    },
+
+    async getAlarmStateByAlarmId(alarmId: string) {
+      return one(AlarmState, getAlarmStateByAlarmId, alarmId);
     },
   };
 };

@@ -22,9 +22,9 @@ export function createPushoverClient(
 
   // TODO: remove null when db returns only undefined
   return {
-    sendAlarm(situation: Situation, recipient?: string | null): Promise<string | null> {
+    sendAlarm(situation: Situation, recipient?: string | null): Promise<string | undefined> {
       if (!recipient) {
-        return Promise.resolve(null);
+        return Promise.resolve(undefined);
       }
 
       const message = {

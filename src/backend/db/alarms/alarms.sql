@@ -34,7 +34,7 @@ VALUES (
    coalesce(:timestamp, CURRENT_TIMESTAMP),
    :alarmId!,
    :alarmLevel!,
-   :validAfter!,
+   coalesce(:validAfter, CURRENT_TIMESTAMP),
    :ackedBy,
    :notificationTarget,
    :notificationReceipt,
@@ -91,3 +91,20 @@ FROM alarms
 WHERE
   (:onlyActive = TRUE AND deactivated_at IS NULL) OR
   timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
+
+/*
+  @name getAlarmStateByAlarmId
+*/
+SELECT DISTINCT
+  id,
+  timestamp,
+  alarm_id,
+  alarm_level,
+  valid_after,
+  acked_by,
+  notification_target,
+  notification_receipt,
+  notification_processed_at
+FROM alarm_states
+WHERE :alarmId = alarm_id
+ORDER BY timestamp DESC;

@@ -90,7 +90,7 @@ export interface ICreateAlarmStateParams {
   notificationReceipt?: string | null | void;
   notificationTarget?: string | null | void;
   timestamp?: string | Date | null | void;
-  validAfter: string | Date;
+  validAfter?: string | Date | null | void;
 }
 
 /** 'CreateAlarmState' return type */
@@ -112,7 +112,7 @@ export interface ICreateAlarmStateQuery {
   result: ICreateAlarmStateResult;
 }
 
-const createAlarmStateIR: any = {"usedParamSet":{"timestamp":true,"alarmId":true,"alarmLevel":true,"validAfter":true,"ackedBy":true,"notificationTarget":true,"notificationReceipt":true,"notificationProcessedAt":true},"params":[{"name":"timestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":192,"b":201}]},{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":227,"b":235}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":252}]},{"name":"validAfter","required":true,"transform":{"type":"scalar"},"locs":[{"a":258,"b":269}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":275,"b":282}]},{"name":"notificationTarget","required":false,"transform":{"type":"scalar"},"locs":[{"a":288,"b":306}]},{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":312,"b":331}]},{"name":"notificationProcessedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":337,"b":360}]}],"statement":"INSERT INTO alarm_states (\n  timestamp,\n  alarm_id,\n  alarm_level,\n  valid_after,\n  acked_by,\n  notification_target,\n  notification_receipt,\n  notification_processed_at\n)\nVALUES (\n   coalesce(:timestamp, CURRENT_TIMESTAMP),\n   :alarmId!,\n   :alarmLevel!,\n   :validAfter!,\n   :ackedBy,\n   :notificationTarget,\n   :notificationReceipt,\n   :notificationProcessedAt\n )\nRETURNING *"};
+const createAlarmStateIR: any = {"usedParamSet":{"timestamp":true,"alarmId":true,"alarmLevel":true,"validAfter":true,"ackedBy":true,"notificationTarget":true,"notificationReceipt":true,"notificationProcessedAt":true},"params":[{"name":"timestamp","required":false,"transform":{"type":"scalar"},"locs":[{"a":192,"b":201}]},{"name":"alarmId","required":true,"transform":{"type":"scalar"},"locs":[{"a":227,"b":235}]},{"name":"alarmLevel","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":252}]},{"name":"validAfter","required":false,"transform":{"type":"scalar"},"locs":[{"a":267,"b":277}]},{"name":"ackedBy","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":310}]},{"name":"notificationTarget","required":false,"transform":{"type":"scalar"},"locs":[{"a":316,"b":334}]},{"name":"notificationReceipt","required":false,"transform":{"type":"scalar"},"locs":[{"a":340,"b":359}]},{"name":"notificationProcessedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":365,"b":388}]}],"statement":"INSERT INTO alarm_states (\n  timestamp,\n  alarm_id,\n  alarm_level,\n  valid_after,\n  acked_by,\n  notification_target,\n  notification_receipt,\n  notification_processed_at\n)\nVALUES (\n   coalesce(:timestamp, CURRENT_TIMESTAMP),\n   :alarmId!,\n   :alarmLevel!,\n   coalesce(:validAfter, CURRENT_TIMESTAMP),\n   :ackedBy,\n   :notificationTarget,\n   :notificationReceipt,\n   :notificationProcessedAt\n )\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -131,7 +131,7 @@ const createAlarmStateIR: any = {"usedParamSet":{"timestamp":true,"alarmId":true
  *    coalesce(:timestamp, CURRENT_TIMESTAMP),
  *    :alarmId!,
  *    :alarmLevel!,
- *    :validAfter!,
+ *    coalesce(:validAfter, CURRENT_TIMESTAMP),
  *    :ackedBy,
  *    :notificationTarget,
  *    :notificationReceipt,
@@ -283,5 +283,52 @@ const getAlarmsIR: any = {"usedParamSet":{"onlyActive":true,"from":true,"to":tru
  * ```
  */
 export const getAlarms = new PreparedQuery<IGetAlarmsParams,IGetAlarmsResult>(getAlarmsIR);
+
+
+/** 'GetAlarmStateByAlarmId' parameters type */
+export interface IGetAlarmStateByAlarmIdParams {
+  alarmId?: string | null | void;
+}
+
+/** 'GetAlarmStateByAlarmId' return type */
+export interface IGetAlarmStateByAlarmIdResult {
+  ackedBy: string | null;
+  alarmId: string;
+  alarmLevel: number;
+  id: string;
+  notificationProcessedAt: string | null;
+  notificationReceipt: string | null;
+  notificationTarget: string | null;
+  timestamp: string;
+  validAfter: string;
+}
+
+/** 'GetAlarmStateByAlarmId' query type */
+export interface IGetAlarmStateByAlarmIdQuery {
+  params: IGetAlarmStateByAlarmIdParams;
+  result: IGetAlarmStateByAlarmIdResult;
+}
+
+const getAlarmStateByAlarmIdIR: any = {"usedParamSet":{"alarmId":true},"params":[{"name":"alarmId","required":false,"transform":{"type":"scalar"},"locs":[{"a":188,"b":195}]}],"statement":"SELECT DISTINCT\n  id,\n  timestamp,\n  alarm_id,\n  alarm_level,\n  valid_after,\n  acked_by,\n  notification_target,\n  notification_receipt,\n  notification_processed_at\nFROM alarm_states\nWHERE :alarmId = alarm_id\nORDER BY timestamp DESC"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT DISTINCT
+ *   id,
+ *   timestamp,
+ *   alarm_id,
+ *   alarm_level,
+ *   valid_after,
+ *   acked_by,
+ *   notification_target,
+ *   notification_receipt,
+ *   notification_processed_at
+ * FROM alarm_states
+ * WHERE :alarmId = alarm_id
+ * ORDER BY timestamp DESC
+ * ```
+ */
+export const getAlarmStateByAlarmId = new PreparedQuery<IGetAlarmStateByAlarmIdParams,IGetAlarmStateByAlarmIdResult>(getAlarmStateByAlarmIdIR);
 
 

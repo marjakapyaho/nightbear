@@ -79,7 +79,7 @@ const deactivateAlarm = async (alarm: Alarm, context: Context) => {
     alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNull),
   );
 
-  await context.db.alarms.deactivateAlarm({ id: alarm.id, currentTimestamp: context.timestamp() });
+  await context.db.deactivateAlarm(alarm.id, context.timestamp());
 
   return alarm.id;
 };
@@ -116,18 +116,17 @@ const updateAlarm = async (
   // Send new pushover if there is recipient
   const receipt = pushoverRecipient
     ? await context.pushover.sendAlarm(situation, pushoverRecipient)
-    : null;
+    : undefined;
 
   // Escalate and create new alarm state
-  await context.db.alarms.createAlarmState({
-    timestamp: context.timestamp(),
-    alarmId: activeAlarm.id,
-    alarmLevel: neededLevel,
-    validAfter: context.timestamp(),
-    notificationTarget: pushoverRecipient,
-    notificationReceipt: receipt,
-    notificationProcessedAt: receipt ? context.timestamp() : null,
-  });
+  await context.db.createAlarmState(
+    activeAlarm.id,
+    context.timestamp(),
+    neededLevel,
+    pushoverRecipient,
+    receipt,
+    receipt && context.timestamp(),
+  );
 
   return activeAlarm.id;
 };
@@ -136,23 +135,6 @@ export const createAlarm = async (
   situation: Situation,
   context: Context,
 ): Promise<string | null> => {
-  const [createdAlarm] = await context.db.alarms.createAlarm({
-    timestamp: context.timestamp(),
-    situation,
-  });
-
-  if (!createdAlarm) {
-    // TODO: handle errors
-    console.log('HANDLE ERROR');
-    return null;
-  }
-
-  await context.db.alarms.createAlarmState({
-    timestamp: context.timestamp(),
-    alarmId: createdAlarm.id,
-    alarmLevel: ALARM_START_LEVEL,
-    validAfter: context.timestamp(),
-  });
-
-  return createdAlarm.id;
+  const alarm = await context.db.createAlarmWithState(situation);
+  return alarm.id;
 };
