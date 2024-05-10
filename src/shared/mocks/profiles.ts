@@ -1,4 +1,5 @@
 import {
+  AlarmSettings,
   AnalyserSettings,
   Profile,
   ProfileActivation,
@@ -15,58 +16,24 @@ export const mockAnalyserSettings: AnalyserSettings = {
   timeSinceBgMinutes: 30,
 };
 
-export const mockSituationSettings: SituationSettings[] = [
-  {
-    situation: 'OUTDATED',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'CRITICAL_OUTDATED',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'FALLING',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'RISING',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'LOW',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'BAD_LOW',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'COMPRESSION_LOW',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'HIGH',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'BAD_HIGH',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-  {
-    situation: 'PERSISTENT_HIGH',
-    escalationAfterMinutes: [10, 10],
-    snoozeMinutes: 15,
-  },
-];
+export const mockAlarmSettings: AlarmSettings = {
+  escalationAfterMinutes: [10, 10],
+  snoozeMinutes: 15,
+};
+
+export const mockSituationSettings: SituationSettings = {
+  id: '1',
+  OUTDATED: mockAlarmSettings,
+  CRITICAL_OUTDATED: mockAlarmSettings,
+  FALLING: mockAlarmSettings,
+  RISING: mockAlarmSettings,
+  LOW: mockAlarmSettings,
+  BAD_LOW: mockAlarmSettings,
+  COMPRESSION_LOW: mockAlarmSettings,
+  HIGH: mockAlarmSettings,
+  BAD_HIGH: mockAlarmSettings,
+  PERSISTENT_HIGH: mockAlarmSettings,
+};
 
 export const mockProfiles: Profile[] = [
   {

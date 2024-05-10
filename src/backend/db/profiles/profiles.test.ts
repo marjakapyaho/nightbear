@@ -11,16 +11,14 @@ describe('db/profiles', () => {
   });
 
   it('creates profile', async () => {
-    const createdProfile = context.db.createProfile(mockProfiles[0]);
+    const profile = mockProfiles[0];
+    const activation = mockProfileActivations[0];
 
-    expect(createdProfile.profileName).toBe('Test profile');
-    expect(createdProfile.alarmsEnabled).toBe(true);
-    expect(createdProfile.situationSettings.escalationAfterMinutes).toEqual([10, 10]);
-    expect(createdProfile.situationSettings.snoozeMinutes).toBe(15);
+    const createdProfile = await context.db.createProfile(profile);
+    const createdActivation = await context.db.createProfileActivation(activation);
 
-    const [profileActivation] = await context.db.createProfileActivation(mockProfileActivations[0]);
-
-    expect(profileActivation.profileTemplateId).toBe(mockProfileActivations[0].id);
-    expect(profileActivation.activatedAt).toBe(mockNow);
+    expect(createdProfile.id).toBe(profile.id);
+    expect(createdActivation.profileTemplateId).toBe(profile.id);
+    expect(createdActivation.activatedAt).toBe(mockNow);
   });
 });

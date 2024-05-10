@@ -1,4 +1,4 @@
-import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
+import { mockAnalyserSettings, mockProfiles, mockSituationSettings } from 'shared/mocks/profiles';
 import { Context } from 'backend/utils/api';
 import { generateSensorEntries } from 'shared/utils/test';
 import { getTimeMinusTime } from 'shared/utils/time';
@@ -50,53 +50,17 @@ export const generateSeedData = async (context: Context) => {
     validAfter: now,
   });
 
-  // Create not active night profile
-  const [analyserSettings1] =
-    await context.db.profiles.createAnalyserSettings(mockAnalyserSettings);
-
-  const [profileTemplate1] = await context.db.profiles.createProfileTemplate({
-    profileName: 'Day',
-    alarmsEnabled: true,
-    analyserSettingsId: analyserSettings1.id,
-    notificationTargets: ['first', 'second'],
-  });
-
-  await Promise.all(
-    mockSituationSettings.map(settings =>
-      context.db.profiles.createSituationSettings({
-        ...settings,
-        profileTemplateId: profileTemplate1.id,
-      }),
-    ),
-  );
-
-  await context.db.profiles.createProfileActivation({
-    profileTemplateId: profileTemplate1.id,
+  // Create active day profile
+  const dayProfile = await context.db.createProfile(mockProfiles[0]);
+  await context.db.createProfileActivation({
+    profileTemplateId: dayProfile.id,
     activatedAt: now,
   });
 
-  // Create active profile
-  const [analyserSettings2] =
-    await context.db.profiles.createAnalyserSettings(mockAnalyserSettings);
-
-  const [profileTemplate2] = await context.db.profiles.createProfileTemplate({
-    profileName: 'Night',
-    alarmsEnabled: true,
-    analyserSettingsId: analyserSettings2.id,
-    notificationTargets: ['first', 'second'],
-  });
-
-  await Promise.all(
-    mockSituationSettings.map(settings =>
-      context.db.profiles.createSituationSettings({
-        ...settings,
-        profileTemplateId: profileTemplate2.id,
-      }),
-    ),
-  );
-
-  await context.db.profiles.createProfileActivation({
-    profileTemplateId: profileTemplate2.id,
+  // Create not active night profile
+  const nightProfile = await context.db.createProfile(mockProfiles[1]);
+  await context.db.createProfileActivation({
+    profileTemplateId: nightProfile.id,
     activatedAt: getTimeMinusTime(now, 300 * MIN_IN_MS),
     deactivatedAt: getTimeMinusTime(now, 2 * MIN_IN_MS),
   });

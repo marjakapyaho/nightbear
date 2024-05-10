@@ -37,24 +37,16 @@ CREATE TABLE analyser_settings (
 
 CREATE TABLE situation_settings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  OUTDATED_escalation_after_minutes INTEGER[] NOT NULL,
-  OUTDATED_snooze_minutes INTEGER NOT NULL,
-  CRITICAL_OUTDATED_escalation_after_minutes INTEGER[] NOT NULL,
-  CRITICAL_OUTDATED_snooze_minutes INTEGER NOT NULL,
-  FALLING_escalation_after_minutes INTEGER[] NOT NULL,
-  FALLING_snooze_minutes INTEGER NOT NULL,
-  RISING_escalation_after_minutes INTEGER[] NOT NULL,
-  RISING_snooze_minutes INTEGER NOT NULL,
-  LOW_escalation_after_minutes INTEGER[] NOT NULL,
-  LOW_snooze_minutes INTEGER NOT NULL,
-  BAD_LOW_escalation_after_minutes INTEGER[] NOT NULL,
-  BAD_LOW_snooze_minutes INTEGER NOT NULL,
-  HIGH_escalation_after_minutes INTEGER[] NOT NULL,
-  HIGH_snooze_minutes INTEGER NOT NULL,
-  BAD_HIGH_escalation_after_minutes INTEGER[] NOT NULL,
-  BAD_HIGH_snooze_minutes INTEGER NOT NULL,
-  PERSISTENT_HIGH_escalation_after_minutes INTEGER[] NOT NULL,
-  PERSISTENT_HIGH_snooze_minutes INTEGER NOT NULL
+  OUTDATED JSONB NOT NULL,
+  CRITICAL_OUTDATED JSONB NOT NULL,
+  FALLING JSONB NOT NULL,
+  RISING JSONB NOT NULL,
+  LOW JSONB NOT NULL,
+  BAD_LOW JSONB NOT NULL,
+  COMPRESSION_LOW JSONB NOT NULL,
+  HIGH JSONB NOT NULL,
+  BAD_HIGH JSONB NOT NULL,
+  PERSISTENT_HIGH JSONB NOT NULL
 );
 
 CREATE TABLE profile_templates (

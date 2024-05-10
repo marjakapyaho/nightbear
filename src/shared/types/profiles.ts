@@ -14,26 +14,24 @@ export const AnalyserSettings = z.object({
 });
 export type AnalyserSettings = z.infer<typeof AnalyserSettings>;
 
+export const AlarmSettings = z.object({
+  escalationAfterMinutes: z.array(z.number()),
+  snoozeMinutes: z.number(),
+});
+export type AlarmSettings = z.infer<typeof AlarmSettings>;
+
 export const SituationSettings = z.object({
   id: z.string(),
-  outdatedEscalationAfterMinutes: z.array(z.number()),
-  outdatedSnoozeMinutes: z.number(),
-  criticalOutdatedEscalationAfterMinutes: z.array(z.number()),
-  criticalOutdatedSnoozeMinutes: z.number(),
-  fallingEscalationAfterMinutes: z.array(z.number()),
-  fallingSnoozeMinutes: z.number(),
-  risingEscalationAfterMinutes: z.array(z.number()),
-  risingSnoozeMinutes: z.number(),
-  lowEscalationAfterMinutes: z.array(z.number()),
-  lowSnoozeMinutes: z.number(),
-  badLowEscalationAfterMinutes: z.array(z.number()),
-  badLowSnoozeMinutes: z.number(),
-  highEscalationAfterMinutes: z.array(z.number()),
-  highSnoozeMinutes: z.number(),
-  badHighEscalationAfterMinutes: z.array(z.number()),
-  badHighSnoozeMinutes: z.number(),
-  persistentHighEscalationAfterMinutes: z.array(z.number()),
-  persistentHighSnoozeMinutes: z.number(),
+  OUTDATED: AlarmSettings,
+  CRITICAL_OUTDATED: AlarmSettings,
+  FALLING: AlarmSettings,
+  RISING: AlarmSettings,
+  LOW: AlarmSettings,
+  BAD_LOW: AlarmSettings,
+  COMPRESSION_LOW: AlarmSettings,
+  HIGH: AlarmSettings,
+  BAD_HIGH: AlarmSettings,
+  PERSISTENT_HIGH: AlarmSettings,
 });
 export type SituationSettings = z.infer<typeof SituationSettings>;
 

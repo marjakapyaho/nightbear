@@ -3,8 +3,6 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
-export type numberArray = (number)[];
-
 export type stringArray = (string)[];
 
 /** 'CreateProfileTemplate' parameters type */
@@ -113,47 +111,31 @@ export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsP
 
 /** 'CreateSituationSettings' parameters type */
 export interface ICreateSituationSettingsParams {
-  badHighEscalationAfterMinutes: numberArray;
-  badHighSnoozeMinutes: number;
-  badLowEscalationAfterMinutes: numberArray;
-  badLowSnoozeMinutes: number;
-  criticalOutdatedEscalationAfterMinutes: numberArray;
-  criticalOutdatedSnoozeMinutes: number;
-  fallingEscalationAfterMinutes: numberArray;
-  fallingSnoozeMinutes: number;
-  highEscalationAfterMinutes: numberArray;
-  highSnoozeMinutes: number;
-  lowEscalationAfterMinutes: numberArray;
-  lowSnoozeMinutes: number;
-  outdatedEscalationAfterMinutes: numberArray;
-  outdatedSnoozeMinutes: number;
-  persistentHighEscalationAfterMinutes: numberArray;
-  persistentHighSnoozeMinutes: number;
-  risingEscalationAfterMinutes: numberArray;
-  risingSnoozeMinutes: number;
+  BAD_HIGH: Json;
+  BAD_LOW: Json;
+  COMPRESSION_LOW: Json;
+  CRITICAL_OUTDATED: Json;
+  FALLING: Json;
+  HIGH: Json;
+  LOW: Json;
+  OUTDATED: Json;
+  PERSISTENT_HIGH: Json;
+  RISING: Json;
 }
 
 /** 'CreateSituationSettings' return type */
 export interface ICreateSituationSettingsResult {
-  badHighEscalationAfterMinutes: numberArray;
-  badHighSnoozeMinutes: number;
-  badLowEscalationAfterMinutes: numberArray;
-  badLowSnoozeMinutes: number;
-  criticalOutdatedEscalationAfterMinutes: numberArray;
-  criticalOutdatedSnoozeMinutes: number;
-  fallingEscalationAfterMinutes: numberArray;
-  fallingSnoozeMinutes: number;
-  highEscalationAfterMinutes: numberArray;
-  highSnoozeMinutes: number;
+  badHigh: Json;
+  badLow: Json;
+  compressionLow: Json;
+  criticalOutdated: Json;
+  falling: Json;
+  high: Json;
   id: string;
-  lowEscalationAfterMinutes: numberArray;
-  lowSnoozeMinutes: number;
-  outdatedEscalationAfterMinutes: numberArray;
-  outdatedSnoozeMinutes: number;
-  persistentHighEscalationAfterMinutes: numberArray;
-  persistentHighSnoozeMinutes: number;
-  risingEscalationAfterMinutes: numberArray;
-  risingSnoozeMinutes: number;
+  low: Json;
+  outdated: Json;
+  persistentHigh: Json;
+  rising: Json;
 }
 
 /** 'CreateSituationSettings' query type */
@@ -162,50 +144,34 @@ export interface ICreateSituationSettingsQuery {
   result: ICreateSituationSettingsResult;
 }
 
-const createSituationSettingsIR: any = {"usedParamSet":{"outdatedEscalationAfterMinutes":true,"outdatedSnoozeMinutes":true,"criticalOutdatedEscalationAfterMinutes":true,"criticalOutdatedSnoozeMinutes":true,"fallingEscalationAfterMinutes":true,"fallingSnoozeMinutes":true,"risingEscalationAfterMinutes":true,"risingSnoozeMinutes":true,"lowEscalationAfterMinutes":true,"lowSnoozeMinutes":true,"badLowEscalationAfterMinutes":true,"badLowSnoozeMinutes":true,"highEscalationAfterMinutes":true,"highSnoozeMinutes":true,"badHighEscalationAfterMinutes":true,"badHighSnoozeMinutes":true,"persistentHighEscalationAfterMinutes":true,"persistentHighSnoozeMinutes":true},"params":[{"name":"outdatedEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":628,"b":659}]},{"name":"outdatedSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":665,"b":687}]},{"name":"criticalOutdatedEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":693,"b":732}]},{"name":"criticalOutdatedSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":738,"b":768}]},{"name":"fallingEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":774,"b":804}]},{"name":"fallingSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":810,"b":831}]},{"name":"risingEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":837,"b":866}]},{"name":"risingSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":872,"b":892}]},{"name":"lowEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":898,"b":924}]},{"name":"lowSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":930,"b":947}]},{"name":"badLowEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":953,"b":982}]},{"name":"badLowSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":988,"b":1008}]},{"name":"highEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1014,"b":1041}]},{"name":"highSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1047,"b":1065}]},{"name":"badHighEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1071,"b":1101}]},{"name":"badHighSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1107,"b":1128}]},{"name":"persistentHighEscalationAfterMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1134,"b":1171}]},{"name":"persistentHighSnoozeMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":1177,"b":1205}]}],"statement":"INSERT INTO situation_settings (\n  OUTDATED_escalation_after_minutes,\n  OUTDATED_snooze_minutes,\n  CRITICAL_OUTDATED_escalation_after_minutes,\n  CRITICAL_OUTDATED_snooze_minutes,\n  FALLING_escalation_after_minutes,\n  FALLING_snooze_minutes,\n  RISING_escalation_after_minutes,\n  RISING_snooze_minutes,\n  LOW_escalation_after_minutes,\n  LOW_snooze_minutes,\n  BAD_LOW_escalation_after_minutes,\n  BAD_LOW_snooze_minutes,\n  HIGH_escalation_after_minutes,\n  HIGH_snooze_minutes,\n  BAD_HIGH_escalation_after_minutes,\n  BAD_HIGH_snooze_minutes,\n  PERSISTENT_HIGH_escalation_after_minutes,\n  PERSISTENT_HIGH_snooze_minutes\n)\nVALUES (\n   :outdatedEscalationAfterMinutes!,\n   :outdatedSnoozeMinutes!,\n   :criticalOutdatedEscalationAfterMinutes!,\n   :criticalOutdatedSnoozeMinutes!,\n   :fallingEscalationAfterMinutes!,\n   :fallingSnoozeMinutes!,\n   :risingEscalationAfterMinutes!,\n   :risingSnoozeMinutes!,\n   :lowEscalationAfterMinutes!,\n   :lowSnoozeMinutes!,\n   :badLowEscalationAfterMinutes!,\n   :badLowSnoozeMinutes!,\n   :highEscalationAfterMinutes!,\n   :highSnoozeMinutes!,\n   :badHighEscalationAfterMinutes!,\n   :badHighSnoozeMinutes!,\n   :persistentHighEscalationAfterMinutes!,\n   :persistentHighSnoozeMinutes!\n)\nRETURNING *"};
+const createSituationSettingsIR: any = {"usedParamSet":{"OUTDATED":true,"CRITICAL_OUTDATED":true,"FALLING":true,"RISING":true,"LOW":true,"BAD_LOW":true,"COMPRESSION_LOW":true,"HIGH":true,"BAD_HIGH":true,"PERSISTENT_HIGH":true},"params":[{"name":"OUTDATED","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":185}]},{"name":"CRITICAL_OUTDATED","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":209}]},{"name":"FALLING","required":true,"transform":{"type":"scalar"},"locs":[{"a":215,"b":223}]},{"name":"RISING","required":true,"transform":{"type":"scalar"},"locs":[{"a":229,"b":236}]},{"name":"LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":242,"b":246}]},{"name":"BAD_LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":252,"b":260}]},{"name":"COMPRESSION_LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":266,"b":282}]},{"name":"HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":288,"b":293}]},{"name":"BAD_HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":299,"b":308}]},{"name":"PERSISTENT_HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":314,"b":330}]}],"statement":"INSERT INTO situation_settings (\n  outdated,\n  critical_outdated,\n  falling,\n  rising,\n  low,\n  bad_low,\n  compression_low,\n  high,\n  bad_high,\n  persistent_high\n)\nVALUES (\n   :OUTDATED!,\n   :CRITICAL_OUTDATED!,\n   :FALLING!,\n   :RISING!,\n   :LOW!,\n   :BAD_LOW!,\n   :COMPRESSION_LOW!,\n   :HIGH!,\n   :BAD_HIGH!,\n   :PERSISTENT_HIGH!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO situation_settings (
- *   OUTDATED_escalation_after_minutes,
- *   OUTDATED_snooze_minutes,
- *   CRITICAL_OUTDATED_escalation_after_minutes,
- *   CRITICAL_OUTDATED_snooze_minutes,
- *   FALLING_escalation_after_minutes,
- *   FALLING_snooze_minutes,
- *   RISING_escalation_after_minutes,
- *   RISING_snooze_minutes,
- *   LOW_escalation_after_minutes,
- *   LOW_snooze_minutes,
- *   BAD_LOW_escalation_after_minutes,
- *   BAD_LOW_snooze_minutes,
- *   HIGH_escalation_after_minutes,
- *   HIGH_snooze_minutes,
- *   BAD_HIGH_escalation_after_minutes,
- *   BAD_HIGH_snooze_minutes,
- *   PERSISTENT_HIGH_escalation_after_minutes,
- *   PERSISTENT_HIGH_snooze_minutes
+ *   outdated,
+ *   critical_outdated,
+ *   falling,
+ *   rising,
+ *   low,
+ *   bad_low,
+ *   compression_low,
+ *   high,
+ *   bad_high,
+ *   persistent_high
  * )
  * VALUES (
- *    :outdatedEscalationAfterMinutes!,
- *    :outdatedSnoozeMinutes!,
- *    :criticalOutdatedEscalationAfterMinutes!,
- *    :criticalOutdatedSnoozeMinutes!,
- *    :fallingEscalationAfterMinutes!,
- *    :fallingSnoozeMinutes!,
- *    :risingEscalationAfterMinutes!,
- *    :risingSnoozeMinutes!,
- *    :lowEscalationAfterMinutes!,
- *    :lowSnoozeMinutes!,
- *    :badLowEscalationAfterMinutes!,
- *    :badLowSnoozeMinutes!,
- *    :highEscalationAfterMinutes!,
- *    :highSnoozeMinutes!,
- *    :badHighEscalationAfterMinutes!,
- *    :badHighSnoozeMinutes!,
- *    :persistentHighEscalationAfterMinutes!,
- *    :persistentHighSnoozeMinutes!
+ *    :OUTDATED!,
+ *    :CRITICAL_OUTDATED!,
+ *    :FALLING!,
+ *    :RISING!,
+ *    :LOW!,
+ *    :BAD_LOW!,
+ *    :COMPRESSION_LOW!,
+ *    :HIGH!,
+ *    :BAD_HIGH!,
+ *    :PERSISTENT_HIGH!
  * )
  * RETURNING *
  * ```
@@ -282,7 +248,7 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":3149,"b":3159},{"a":3178,"b":3188}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":3220,"b":3230}]}],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.id,\n      json_build_object(\n        'id', situation_settings.id::VARCHAR,\n        'outdatedEscalationAfterMinutes', situation_settings.outdated_escalation_after_minutes,\n        'outdatedSnoozeMinutes', situation_settings.outdated_snooze_minutes,\n        'criticalOutdatedEscalationAfterMinutes', situation_settings.critical_outdated_escalation_after_minutes,\n        'criticalOutdatedSnoozeMinutes', situation_settings.critical_outdated_snooze_minutes,\n        'fallingEscalationAfterMinutes', situation_settings.falling_escalation_after_minutes,\n        'fallingSnoozeMinutes', situation_settings.falling_snooze_minutes,\n        'risingEscalationAfterMinutes', situation_settings.rising_escalation_after_minutes,\n        'risingSnoozeMinutes', situation_settings.rising_snooze_minutes,\n        'lowEscalationAfterMinutes', situation_settings.low_escalation_after_minutes,\n        'lowSnoozeMinutes', situation_settings.low_snooze_minutes,\n        'badLowEscalationAfterMinutes', situation_settings.bad_low_escalation_after_minutes,\n        'badLowSnoozeMinutes', situation_settings.bad_low_snooze_minutes,\n        'highEscalationAfterMinutes', situation_settings.high_escalation_after_minutes,\n        'highSnoozeMinutes', situation_settings.high_snooze_minutes,\n        'badHighEscalationAfterMinutes', situation_settings.bad_high_escalation_after_minutes,\n        'badHighSnoozeMinutes', situation_settings.bad_high_snooze_minutes,\n        'persistentHighEscalationAfterMinutes', situation_settings.persistent_high_escalation_after_minutes,\n        'persistentHighSnoozeMinutes', situation_settings.persistent_high_snooze_minutes\n        ) AS situation_settings\n    FROM situation_settings\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
+const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":2098,"b":2108},{"a":2127,"b":2137}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":2169,"b":2179}]}],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.id,\n      json_build_object(\n        'id', situation_settings.id::VARCHAR,\n        'OUTDATED', situation_settings.outdated,\n        'CRITICAL_OUTDATED', situation_settings.critical_outdated,\n        'FALLING', situation_settings.falling,\n        'RISING', situation_settings.rising,\n        'LOW', situation_settings.low,\n        'BAD_LOW', situation_settings.bad_low,\n        'COMPRESSION_LOW', situation_settings.compression_low,\n        'HIGH', situation_settings.high,\n        'BAD_HIGH', situation_settings.bad_high,\n        'PERSISTENT_HIGH', situation_settings.persistent_high\n        ) AS situation_settings\n    FROM situation_settings\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
 
 /**
  * Query generated from SQL:
@@ -307,24 +273,16 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
  *       situation_settings.id,
  *       json_build_object(
  *         'id', situation_settings.id::VARCHAR,
- *         'outdatedEscalationAfterMinutes', situation_settings.outdated_escalation_after_minutes,
- *         'outdatedSnoozeMinutes', situation_settings.outdated_snooze_minutes,
- *         'criticalOutdatedEscalationAfterMinutes', situation_settings.critical_outdated_escalation_after_minutes,
- *         'criticalOutdatedSnoozeMinutes', situation_settings.critical_outdated_snooze_minutes,
- *         'fallingEscalationAfterMinutes', situation_settings.falling_escalation_after_minutes,
- *         'fallingSnoozeMinutes', situation_settings.falling_snooze_minutes,
- *         'risingEscalationAfterMinutes', situation_settings.rising_escalation_after_minutes,
- *         'risingSnoozeMinutes', situation_settings.rising_snooze_minutes,
- *         'lowEscalationAfterMinutes', situation_settings.low_escalation_after_minutes,
- *         'lowSnoozeMinutes', situation_settings.low_snooze_minutes,
- *         'badLowEscalationAfterMinutes', situation_settings.bad_low_escalation_after_minutes,
- *         'badLowSnoozeMinutes', situation_settings.bad_low_snooze_minutes,
- *         'highEscalationAfterMinutes', situation_settings.high_escalation_after_minutes,
- *         'highSnoozeMinutes', situation_settings.high_snooze_minutes,
- *         'badHighEscalationAfterMinutes', situation_settings.bad_high_escalation_after_minutes,
- *         'badHighSnoozeMinutes', situation_settings.bad_high_snooze_minutes,
- *         'persistentHighEscalationAfterMinutes', situation_settings.persistent_high_escalation_after_minutes,
- *         'persistentHighSnoozeMinutes', situation_settings.persistent_high_snooze_minutes
+ *         'OUTDATED', situation_settings.outdated,
+ *         'CRITICAL_OUTDATED', situation_settings.critical_outdated,
+ *         'FALLING', situation_settings.falling,
+ *         'RISING', situation_settings.rising,
+ *         'LOW', situation_settings.low,
+ *         'BAD_LOW', situation_settings.bad_low,
+ *         'COMPRESSION_LOW', situation_settings.compression_low,
+ *         'HIGH', situation_settings.high,
+ *         'BAD_HIGH', situation_settings.bad_high,
+ *         'PERSISTENT_HIGH', situation_settings.persistent_high
  *         ) AS situation_settings
  *     FROM situation_settings
  *   ),

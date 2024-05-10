@@ -22,9 +22,7 @@ export const getNeededAlarmLevel = (
   const hasBeenValidForMinutes = Math.round(
     getTimeMinusTimeMs(context.timestamp(), validAfter) / MIN_IN_MS,
   );
-  const levelUpTimes = activeProfile.situationSettings.find(
-    situation => situation.situation === currentSituation,
-  )?.escalationAfterMinutes;
+  const levelUpTimes = activeProfile.situationSettings[currentSituation]?.escalationAfterMinutes;
 
   if (!levelUpTimes) {
     return ALARM_FALLBACK_LEVEL;
