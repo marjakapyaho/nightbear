@@ -1,6 +1,6 @@
 import { createTestContext, truncateDb } from 'backend/utils/test';
 import { mockNow } from 'shared/mocks/dates';
-import { mockAnalyserSettings, mockSituationSettings } from 'shared/mocks/profiles';
+import { mockProfileActivations, mockProfiles } from 'shared/mocks/profiles';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/profiles', () => {
@@ -11,37 +11,16 @@ describe('db/profiles', () => {
   });
 
   it('creates profile', async () => {
-    const [analyserSettings] =
-      await context.db.profiles.createAnalyserSettings(mockAnalyserSettings);
+    const createdProfile = context.db.createProfile(mockProfiles[0]);
 
-    const [profileTemplate] = await context.db.profiles.createProfileTemplate({
-      profileName: 'Test profile',
-      alarmsEnabled: true,
-      analyserSettingsId: analyserSettings.id,
-      notificationTargets: ['first', 'second'],
-    });
+    expect(createdProfile.profileName).toBe('Test profile');
+    expect(createdProfile.alarmsEnabled).toBe(true);
+    expect(createdProfile.situationSettings.escalationAfterMinutes).toEqual([10, 10]);
+    expect(createdProfile.situationSettings.snoozeMinutes).toBe(15);
 
-    expect(profileTemplate.profileName).toBe('Test profile');
-    expect(profileTemplate.alarmsEnabled).toBe(true);
+    const [profileActivation] = await context.db.createProfileActivation(mockProfileActivations[0]);
 
-    const [situationSettings] = await Promise.all(
-      mockSituationSettings.map(settings =>
-        context.db.profiles.createSituationSettings({
-          ...settings,
-          profileTemplateId: profileTemplate.id,
-        }),
-      ),
-    );
-
-    expect(situationSettings[0].escalationAfterMinutes).toEqual([10, 10]);
-    expect(situationSettings[0].snoozeMinutes).toBe(15);
-
-    const [profileActivation] = await context.db.profiles.createProfileActivation({
-      profileTemplateId: profileTemplate.id,
-      activatedAt: mockNow,
-    });
-
-    expect(profileActivation.profileTemplateId).toBe(profileTemplate.id);
+    expect(profileActivation.profileTemplateId).toBe(mockProfileActivations[0].id);
     expect(profileActivation.activatedAt).toBe(mockNow);
   });
 });

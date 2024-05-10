@@ -18,18 +18,13 @@ export const checks = (async (context: Context) => {
   const insulinEntries = await context.db.getInsulinEntriesByTimestamp(getRange(context, 24));
   const carbEntries = await context.db.getCarbEntriesByTimestamp(getRange(context, 24));
   const meterEntries = await context.db.getMeterEntriesByTimestamp(getRange(context, 3));
-  const profilesArray = await context.db.profiles.getProfiles();
+  const activeProfile = await context.db.getActiveProfile();
   const alarmsArray = await context.db.alarms.getAlarms(getRange(context, 12));
   const [activeAlarmObj] = await context.db.alarms.getAlarms({ onlyActive: true });
 
   // TODO: FIX THESE
   const alarms = alarmsArray as unknown as Alarm[];
   const activeAlarm = activeAlarmObj as unknown as Alarm;
-  const profiles = profilesArray as Profile[];
-  const activeProfile = getActiveProfile(profiles);
-
-  // TODO: MOVE THIS
-  if (!activeProfile) throw new Error('Could not find active profile in runChecks()');
 
   log(`1. Using profile: ${activeProfile.profileName}`);
 

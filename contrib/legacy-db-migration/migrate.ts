@@ -279,7 +279,7 @@ function toModernModel(x: any): Promise<Model[] | null> {
         {
           alarmLevel: x.level,
           validAfter: x.validAfter || ts,
-          ackedBy: null,
+
           pushoverReceipts: x.pushoverReceipts || [],
         },
       ],

@@ -3,12 +3,14 @@ INSERT INTO profile_templates (
     profile_name,
     alarms_enabled,
     analyser_settings_id,
+    situation_settings_id,
     notification_targets
 )
 VALUES (
   :profileName,
   :alarmsEnabled!,
   :analyserSettingsId!,
+  :situationSettingsId!,
   :notificationTargets!
 )
 RETURNING *;
@@ -34,16 +36,44 @@ RETURNING *;
 
 /* @name createSituationSettings */
 INSERT INTO situation_settings (
-  situation,
-  profile_template_id,
-  escalation_after_minutes,
-  snooze_minutes
+  OUTDATED_escalation_after_minutes,
+  OUTDATED_snooze_minutes,
+  CRITICAL_OUTDATED_escalation_after_minutes,
+  CRITICAL_OUTDATED_snooze_minutes,
+  FALLING_escalation_after_minutes,
+  FALLING_snooze_minutes,
+  RISING_escalation_after_minutes,
+  RISING_snooze_minutes,
+  LOW_escalation_after_minutes,
+  LOW_snooze_minutes,
+  BAD_LOW_escalation_after_minutes,
+  BAD_LOW_snooze_minutes,
+  HIGH_escalation_after_minutes,
+  HIGH_snooze_minutes,
+  BAD_HIGH_escalation_after_minutes,
+  BAD_HIGH_snooze_minutes,
+  PERSISTENT_HIGH_escalation_after_minutes,
+  PERSISTENT_HIGH_snooze_minutes
 )
 VALUES (
-   :situation!,
-   :profileTemplateId!,
-   :escalationAfterMinutes!,
-   :snoozeMinutes!
+   :outdatedEscalationAfterMinutes!,
+   :outdatedSnoozeMinutes!,
+   :criticalOutdatedEscalationAfterMinutes!,
+   :criticalOutdatedSnoozeMinutes!,
+   :fallingEscalationAfterMinutes!,
+   :fallingSnoozeMinutes!,
+   :risingEscalationAfterMinutes!,
+   :risingSnoozeMinutes!,
+   :lowEscalationAfterMinutes!,
+   :lowSnoozeMinutes!,
+   :badLowEscalationAfterMinutes!,
+   :badLowSnoozeMinutes!,
+   :highEscalationAfterMinutes!,
+   :highSnoozeMinutes!,
+   :badHighEscalationAfterMinutes!,
+   :badHighSnoozeMinutes!,
+   :persistentHighEscalationAfterMinutes!,
+   :persistentHighSnoozeMinutes!
 )
 RETURNING *;
 
@@ -82,14 +112,29 @@ WITH
   ),
   situation_settings_query AS (
     SELECT
-      situation_settings.profile_template_id,
-      json_agg(json_build_object(
-         'situation', situation_settings.situation,
-         'escalationAfterMinutes', situation_settings.escalation_after_minutes,
-         'snoozeMinutes', situation_settings.snooze_minutes
-       )) AS situation_settings
+      situation_settings.id,
+      json_build_object(
+        'id', situation_settings.id::VARCHAR,
+        'outdatedEscalationAfterMinutes', situation_settings.outdated_escalation_after_minutes,
+        'outdatedSnoozeMinutes', situation_settings.outdated_snooze_minutes,
+        'criticalOutdatedEscalationAfterMinutes', situation_settings.critical_outdated_escalation_after_minutes,
+        'criticalOutdatedSnoozeMinutes', situation_settings.critical_outdated_snooze_minutes,
+        'fallingEscalationAfterMinutes', situation_settings.falling_escalation_after_minutes,
+        'fallingSnoozeMinutes', situation_settings.falling_snooze_minutes,
+        'risingEscalationAfterMinutes', situation_settings.rising_escalation_after_minutes,
+        'risingSnoozeMinutes', situation_settings.rising_snooze_minutes,
+        'lowEscalationAfterMinutes', situation_settings.low_escalation_after_minutes,
+        'lowSnoozeMinutes', situation_settings.low_snooze_minutes,
+        'badLowEscalationAfterMinutes', situation_settings.bad_low_escalation_after_minutes,
+        'badLowSnoozeMinutes', situation_settings.bad_low_snooze_minutes,
+        'highEscalationAfterMinutes', situation_settings.high_escalation_after_minutes,
+        'highSnoozeMinutes', situation_settings.high_snooze_minutes,
+        'badHighEscalationAfterMinutes', situation_settings.bad_high_escalation_after_minutes,
+        'badHighSnoozeMinutes', situation_settings.bad_high_snooze_minutes,
+        'persistentHighEscalationAfterMinutes', situation_settings.persistent_high_escalation_after_minutes,
+        'persistentHighSnoozeMinutes', situation_settings.persistent_high_snooze_minutes
+        ) AS situation_settings
     FROM situation_settings
-    GROUP BY situation_settings.profile_template_id
   ),
   most_recent_activation_query AS (
     SELECT profile_template_id
@@ -107,8 +152,11 @@ SELECT
   situation_settings_query.situation_settings AS situation_settings
 FROM profile_templates
   INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id
-  INNER JOIN situation_settings_query ON situation_settings_query.profile_template_id = profile_templates.id
-  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id;
+  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id
+  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
+WHERE
+  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR
+  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL));
 
 /*
   @name getRelevantProfileActivations

@@ -22,6 +22,22 @@ import {
   getMeterEntriesByTimestamp,
   upsertMeterEntry,
 } from 'backend/db/meterEntries/meterEntries.queries';
+import {
+  AnalyserSettings,
+  Profile,
+  ProfileActivation,
+  SituationSettings,
+} from 'shared/types/profiles';
+import {
+  createAnalyserSettings,
+  createProfileActivation,
+  createProfileTemplate,
+  createSituationSettings,
+  getProfiles,
+  getRelevantProfileActivations,
+  reactivateProfileActivation,
+} from './profiles/profiles.queries';
+import { z } from 'zod';
 
 export const queries = (pool: Pool) => {
   const { one, many } = bindQueryShorthands(pool);
@@ -77,6 +93,49 @@ export const queries = (pool: Pool) => {
 
     async getMeterEntriesByTimestamp(timeRange: GenParams<typeof getMeterEntriesByTimestamp>) {
       return many(MeterEntry, getMeterEntriesByTimestamp, timeRange);
+    },
+
+    async createProfile(profile: Profile) {
+      const analyserSettings = await one(
+        AnalyserSettings,
+        createAnalyserSettings,
+        profile.analyserSettings,
+      );
+
+      const situationSettings = await one(
+        SituationSettings,
+        createSituationSettings,
+        profile.situationSettings,
+      );
+
+      return one(z.object({ id: z.string() }), createProfileTemplate, {
+        profileName: profile.profileName,
+        alarmsEnabled: profile.alarmsEnabled,
+        notificationTargets: profile.notificationTargets,
+        analyserSettingsId: analyserSettings.id,
+        situationSettingsId: situationSettings.id,
+      });
+    },
+
+    async createProfileActivation(profileActivation: Omit<ProfileActivation, 'id'>) {
+      return one(ProfileActivation, createProfileActivation, profileActivation);
+    },
+
+    async getProfiles() {
+      return many(Profile, getProfiles);
+    },
+
+    async getActiveProfile() {
+      const [activeProfile] = await many(Profile, getProfiles, { onlyActive: true });
+      return activeProfile;
+    },
+
+    async getRelevantProfileActivations() {
+      return many(ProfileActivation, getRelevantProfileActivations);
+    },
+
+    async reactivateProfileActivation(profileActivationId: string) {
+      return one(ProfileActivation, reactivateProfileActivation, profileActivationId);
     },
   };
 };

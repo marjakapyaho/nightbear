@@ -15,9 +15,25 @@ export const AnalyserSettings = z.object({
 export type AnalyserSettings = z.infer<typeof AnalyserSettings>;
 
 export const SituationSettings = z.object({
-  situation: Situation,
-  escalationAfterMinutes: z.array(z.number()),
-  snoozeMinutes: z.number(),
+  id: z.string(),
+  outdatedEscalationAfterMinutes: z.array(z.number()),
+  outdatedSnoozeMinutes: z.number(),
+  criticalOutdatedEscalationAfterMinutes: z.array(z.number()),
+  criticalOutdatedSnoozeMinutes: z.number(),
+  fallingEscalationAfterMinutes: z.array(z.number()),
+  fallingSnoozeMinutes: z.number(),
+  risingEscalationAfterMinutes: z.array(z.number()),
+  risingSnoozeMinutes: z.number(),
+  lowEscalationAfterMinutes: z.array(z.number()),
+  lowSnoozeMinutes: z.number(),
+  badLowEscalationAfterMinutes: z.array(z.number()),
+  badLowSnoozeMinutes: z.number(),
+  highEscalationAfterMinutes: z.array(z.number()),
+  highSnoozeMinutes: z.number(),
+  badHighEscalationAfterMinutes: z.array(z.number()),
+  badHighSnoozeMinutes: z.number(),
+  persistentHighEscalationAfterMinutes: z.array(z.number()),
+  persistentHighSnoozeMinutes: z.number(),
 });
 export type SituationSettings = z.infer<typeof SituationSettings>;
 
@@ -27,7 +43,7 @@ export const Profile = z.object({
   isActive: z.boolean(),
   alarmsEnabled: z.boolean(),
   analyserSettings: AnalyserSettings,
-  situationSettings: z.array(SituationSettings),
+  situationSettings: SituationSettings,
   notificationTargets: z.array(z.string()),
 });
 export type Profile = z.infer<typeof Profile>;

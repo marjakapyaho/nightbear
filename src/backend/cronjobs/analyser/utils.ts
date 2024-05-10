@@ -162,8 +162,6 @@ export const mapSensorAndMeterEntriesToAnalyserEntries = (
     .map(entry => ({
       bloodGlucose: entry.bloodGlucose,
       timestamp: entry.timestamp,
-      slope: null,
-      rawSlope: null,
     }))
     .value();
 
@@ -171,7 +169,7 @@ export const mapSensorAndMeterEntriesToAnalyserEntries = (
     const currentBg = entry.bloodGlucose;
     const currentTimestamp = entry.timestamp;
     const previousEntry = analyserEntries[i - 1];
-    let currentSlope = null;
+    let currentSlope;
 
     if (previousEntry) {
       const previousBg = previousEntry.bloodGlucose;
@@ -290,14 +288,14 @@ export const getRelevantEntries = (
   };
 };
 
-export const slopeIsNegative = (entry: AnalyserEntry) => entry.slope !== null && entry.slope < 0;
-export const slopeIsPositive = (entry: AnalyserEntry) => entry.slope !== null && entry.slope > 0;
+export const slopeIsNegative = (entry: AnalyserEntry) => entry.slope && entry.slope < 0;
+export const slopeIsPositive = (entry: AnalyserEntry) => entry.slope && entry.slope > 0;
 
 export const isSlopeFalling = (entry: AnalyserEntry) =>
-  entry.slope !== null && entry.slope < -slopeLimits.MEDIUM;
+  entry.slope && entry.slope < -slopeLimits.MEDIUM;
 
 export const isSlopeRising = (entry: AnalyserEntry) =>
-  entry.slope !== null && entry.slope > slopeLimits.MEDIUM;
+  entry.slope && entry.slope > slopeLimits.MEDIUM;
 
 export const isThereTooMuchInsulin = (
   requiredCarbsToInsulin: number | null,

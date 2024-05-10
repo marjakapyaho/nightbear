@@ -1,8 +1,8 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
 
-export const getProfiles = async (request: Request, context: Context) => {
-  const profiles = await context.db.profiles.getProfiles();
+export const getProfiles = async (_request: Request, context: Context) => {
+  const profiles = await context.db.getProfiles();
   return createResponse(profiles);
 };
 
@@ -14,7 +14,7 @@ export const activateProfile = async (request: Request, context: Context) => {
     return createResponse('Error');
   }
 
-  const [profileActivation] = await context.db.profiles.createProfileActivation({
+  const profileActivation = await context.db.createProfileActivation({
     profileTemplateId: profile.id,
     activatedAt: context.timestamp(),
   });
@@ -26,25 +26,7 @@ export const createProfile = async (request: Request, context: Context) => {
   // TODO: better casting
   const profile = request.requestBody as Profile;
 
-  const [analyserSettings] = await context.db.profiles.createAnalyserSettings(
-    profile.analyserSettings,
-  );
+  const createdProfile = await context.db.createProfile(profile);
 
-  const [profileTemplate] = await context.db.profiles.createProfileTemplate({
-    profileName: profile.profileName,
-    alarmsEnabled: profile.alarmsEnabled,
-    notificationTargets: profile.notificationTargets,
-    analyserSettingsId: analyserSettings.id,
-  });
-
-  await Promise.all(
-    profile.situationSettings.map(settings =>
-      context.db.profiles.createSituationSettings({
-        ...settings,
-        profileTemplateId: profileTemplate.id,
-      }),
-    ),
-  );
-
-  return createResponse(profileTemplate.id);
+  return createResponse(createdProfile.id);
 };

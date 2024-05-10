@@ -6,7 +6,7 @@ export const AnalyserEntry = z.object({
   timestamp: z.string(),
   bloodGlucose: z.number(),
   slope: z.optional(z.number()),
-  rawSlope: z.number(z.number()),
+  rawSlope: z.optional(z.number()),
 });
 export type AnalyserEntry = z.infer<typeof AnalyserEntry>;
 

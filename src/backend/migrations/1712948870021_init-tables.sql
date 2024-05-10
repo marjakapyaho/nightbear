@@ -35,20 +35,35 @@ CREATE TABLE analyser_settings (
   time_since_bg_minutes INTEGER NOT NULL
 );
 
+CREATE TABLE situation_settings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  OUTDATED_escalation_after_minutes INTEGER[] NOT NULL,
+  OUTDATED_snooze_minutes INTEGER NOT NULL,
+  CRITICAL_OUTDATED_escalation_after_minutes INTEGER[] NOT NULL,
+  CRITICAL_OUTDATED_snooze_minutes INTEGER NOT NULL,
+  FALLING_escalation_after_minutes INTEGER[] NOT NULL,
+  FALLING_snooze_minutes INTEGER NOT NULL,
+  RISING_escalation_after_minutes INTEGER[] NOT NULL,
+  RISING_snooze_minutes INTEGER NOT NULL,
+  LOW_escalation_after_minutes INTEGER[] NOT NULL,
+  LOW_snooze_minutes INTEGER NOT NULL,
+  BAD_LOW_escalation_after_minutes INTEGER[] NOT NULL,
+  BAD_LOW_snooze_minutes INTEGER NOT NULL,
+  HIGH_escalation_after_minutes INTEGER[] NOT NULL,
+  HIGH_snooze_minutes INTEGER NOT NULL,
+  BAD_HIGH_escalation_after_minutes INTEGER[] NOT NULL,
+  BAD_HIGH_snooze_minutes INTEGER NOT NULL,
+  PERSISTENT_HIGH_escalation_after_minutes INTEGER[] NOT NULL,
+  PERSISTENT_HIGH_snooze_minutes INTEGER NOT NULL
+);
+
 CREATE TABLE profile_templates (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_name TEXT,
   alarms_enabled BOOLEAN NOT NULL DEFAULT true,
   analyser_settings_id UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE,
+  situation_settings_id UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
   notification_targets TEXT[] NOT NULL
-);
-
-CREATE TABLE situation_settings (
-  situation situation NOT NULL,
-  profile_template_id UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
-  escalation_after_minutes INTEGER[] NOT NULL,
-  snooze_minutes INTEGER NOT NULL,
-  PRIMARY KEY(situation, profile_template_id)
 );
 
 CREATE TABLE profile_activations (
