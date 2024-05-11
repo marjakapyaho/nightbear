@@ -20,38 +20,44 @@ export const BgGraph = () => {
   const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange);
   const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
     useTimelineEntries(startTimestamp);
-  const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries);
+  const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries, baseConfig.timelineRange);
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const latestPoint = graphPoints.length ? graphPoints[0] : null;
 
   const onChangeCarbs = (newAmount: number) => {
     const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;
-
-    if (hasValueChanged) {
-      const pointToSave = getNewSelectedPointWithCarbs(selectedPoint, latestPoint, newAmount);
-      setSelectedPoint(pointToSave);
-      pointToSave && saveGraphPointData(pointToSave);
-    }
+    const basePoint = selectedPoint || latestPoint;
+    const pointToSave = hasValueChanged
+      ? getNewSelectedPointWithCarbs(basePoint, newAmount)
+      : basePoint
+        ? { ...basePoint, carbEntry: undefined }
+        : null;
+    setSelectedPoint(pointToSave);
+    pointToSave && saveGraphPointData(pointToSave);
   };
 
   const onChangeMeterEntry = (newBg: number) => {
     const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose;
-
-    if (hasValueChanged) {
-      const pointToSave = getNewSelectedPointWithMeterEntry(selectedPoint, latestPoint, newBg);
-      setSelectedPoint(pointToSave);
-      pointToSave && saveGraphPointData(pointToSave);
-    }
+    const basePoint = selectedPoint || latestPoint;
+    const pointToSave = hasValueChanged
+      ? getNewSelectedPointWithMeterEntry(basePoint, newBg)
+      : basePoint
+        ? { ...basePoint, meterEntry: undefined }
+        : null;
+    setSelectedPoint(pointToSave);
+    pointToSave && saveGraphPointData(pointToSave);
   };
 
   const onChangeInsulin = (newAmount: number) => {
     const hasValueChanged = newAmount !== selectedPoint?.insulinEntry?.amount;
-
-    if (hasValueChanged) {
-      const pointToSave = getNewSelectedPointWithInsulin(selectedPoint, latestPoint, newAmount);
-      setSelectedPoint(pointToSave);
-      pointToSave && saveGraphPointData(pointToSave);
-    }
+    const basePoint = selectedPoint || latestPoint;
+    const pointToSave = hasValueChanged
+      ? getNewSelectedPointWithInsulin(basePoint, newAmount)
+      : basePoint
+        ? { ...basePoint, insulinEntry: undefined }
+        : null;
+    setSelectedPoint(pointToSave);
+    pointToSave && saveGraphPointData(pointToSave);
   };
 
   return (

@@ -15,6 +15,12 @@ ON CONFLICT (timestamp) DO UPDATE SET
   amount = EXCLUDED.amount
 RETURNING *;
 
+/*
+  @name deleteInsulinEntry
+*/
+DELETE FROM insulin_entries
+WHERE timestamp = :timestamp!
+RETURNING timestamp;
 
 /*
   @name createInsulinEntries

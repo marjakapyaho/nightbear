@@ -1,13 +1,22 @@
 import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
-import { InsulinEntryType, TimelineEntries } from 'shared/types/timelineEntries';
+import {
+  CarbEntry,
+  InsulinEntry,
+  InsulinEntryType,
+  TimelineEntries,
+} from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'shared/utils/config';
 import {
   getTimeAsISOStr,
   getTimeInMillis,
+  getTimeMinusMinutes,
   isTimeLarger,
   isTimeSmallerOrEqual,
 } from 'shared/utils/time';
+import { fill, groupBy, last } from 'lodash';
+import { DateTime } from 'luxon';
+import { getTimestampFlooredToEveryFiveMinutes } from 'shared/utils/timelineEntries';
 
 export const getFillColor = (bgSensor: number) => {
   if (bgSensor > highLimit) {
@@ -30,7 +39,86 @@ const isTimestampWithinFiveMinutes = (timestampToCheck: string, baseTimestamp: s
   );
 };
 
-export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries): Point[] => {
+export const calculateDailyAmounts = (
+  entries: (InsulinEntry | CarbEntry)[],
+  days: number,
+  now = Date.now(),
+) => {
+  const countOf5MinSlots = rangeInMs / (5 * MIN_IN_MS);
+  const startSlot = getTimestampFlooredToEveryFiveMinutes(getTimeAsISOStr(Date.now()));
+  const slotArray = fill(Array(countOf5MinSlots), null).map((_val, i) => ({
+    timestamp: getTimeMinusMinutes(startSlot, i * 5 * MIN_IN_MS),
+    total: null,
+  }));
+  return slotArray.map(slot => ({
+    timestamp: slot.timestamp,
+    total:
+      day.timestamp && groupedEntries[day.timestamp]
+        ? getTotal(groupedEntries[day.timestamp])
+        : null,
+  }));
+};
+
+export const mapTimelineEntriesToGraphPoints2 = (
+  timelineEntries: TimelineEntries,
+  rangeInMs: number,
+): Point[] => {
+  const { bloodGlucoseEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
+
+  const countOf5MinSlots = rangeInMs / (5 * MIN_IN_MS);
+  const startSlot = getTimestampFlooredToEveryFiveMinutes(getTimeAsISOStr(Date.now()));
+  const slotArray = fill(Array(countOf5MinSlots), null).map((_val, i) => {
+    const timestamp = startSlot && getTimeMinusMinutes(startSlot, i * 5 * MIN_IN_MS);
+
+    const bgEntry = bloodGlucoseEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, timestamp),
+    );
+    const insulinEntry = insulinEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, timestamp),
+    );
+    const meterEntry = meterEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, timestamp),
+    );
+    const carbEntry = carbEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, timestamp),
+    );
+
+    return {
+      timestamp,
+      val: bgEntry.bloodGlucose,
+      color: getFillColor(bgEntry.bloodGlucose),
+      insulinEntry,
+      meterEntry,
+      carbEntry,
+    };
+  });
+
+  return bloodGlucoseEntries.map(entry => {
+    const insulinEntry = insulinEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
+    const meterEntry = meterEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
+    const carbEntry = carbEntries.find(val =>
+      isTimestampWithinFiveMinutes(val.timestamp, entry.timestamp),
+    );
+
+    return {
+      timestamp: entry.timestamp,
+      val: entry.bloodGlucose,
+      color: getFillColor(entry.bloodGlucose),
+      insulinEntry,
+      meterEntry,
+      carbEntry,
+    };
+  });
+};
+
+export const mapTimelineEntriesToGraphPoints = (
+  timelineEntries: TimelineEntries,
+  rangeInMs: number,
+): Point[] => {
   const { bloodGlucoseEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
   return bloodGlucoseEntries.map(entry => {
     const insulinEntry = insulinEntries.find(val =>
@@ -44,7 +132,7 @@ export const mapTimelineEntriesToGraphPoints = (timelineEntries: TimelineEntries
     );
 
     return {
-      timestamp: getTimeInMillis(entry.timestamp),
+      timestamp: entry.timestamp,
       val: entry.bloodGlucose,
       color: getFillColor(entry.bloodGlucose),
       insulinEntry,
@@ -75,75 +163,37 @@ export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
   decimals: 1,
 });
 
-export const getNewSelectedPointWithCarbs = (
-  selectedPoint: Point | null,
-  latestPoint: Point | null,
-  newAmount: number,
-) =>
-  selectedPoint
+export const getNewSelectedPointWithCarbs = (basePoint: Point | null, newAmount: number) =>
+  basePoint
     ? {
-        ...selectedPoint,
+        ...basePoint,
         carbEntry: {
-          timestamp: getTimeAsISOStr(selectedPoint.timestamp),
+          timestamp: basePoint.timestamp,
           amount: newAmount,
           durationFactor: 1,
         },
       }
-    : latestPoint
-      ? {
-          ...latestPoint,
-          carbEntry: {
-            timestamp: getTimeAsISOStr(latestPoint.timestamp),
-            amount: newAmount,
-            durationFactor: 1,
-          },
-        }
-      : null;
+    : null;
 
-export const getNewSelectedPointWithMeterEntry = (
-  selectedPoint: Point | null,
-  latestPoint: Point | null,
-  newBg: number,
-) =>
-  selectedPoint
+export const getNewSelectedPointWithMeterEntry = (basePoint: Point | null, newBg: number) =>
+  basePoint
     ? {
-        ...selectedPoint,
+        ...basePoint,
         meterEntry: {
-          timestamp: getTimeAsISOStr(selectedPoint.timestamp),
+          timestamp: basePoint.timestamp,
           bloodGlucose: newBg,
         },
       }
-    : latestPoint
-      ? {
-          ...latestPoint,
-          meterEntry: {
-            timestamp: getTimeAsISOStr(latestPoint.timestamp),
-            bloodGlucose: newBg,
-          },
-        }
-      : null;
+    : null;
 
-export const getNewSelectedPointWithInsulin = (
-  selectedPoint: Point | null,
-  latestPoint: Point | null,
-  newAmount: number,
-) =>
-  selectedPoint
+export const getNewSelectedPointWithInsulin = (basePoint: Point | null, newAmount: number) =>
+  basePoint
     ? {
-        ...selectedPoint,
+        ...basePoint,
         insulinEntry: {
-          timestamp: getTimeAsISOStr(selectedPoint.timestamp),
+          timestamp: basePoint.timestamp,
           amount: newAmount,
           type: 'FAST' as InsulinEntryType,
         },
       }
-    : latestPoint
-      ? {
-          ...latestPoint,
-          insulinEntry: {
-            timestamp: getTimeAsISOStr(latestPoint.timestamp),
-            amount: newAmount,
-            type: 'FAST' as InsulinEntryType,
-          },
-        }
-      : null;
+    : null;

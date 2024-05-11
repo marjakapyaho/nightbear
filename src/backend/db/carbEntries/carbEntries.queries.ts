@@ -44,6 +44,35 @@ const upsertCarbEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":true,"
 export const upsertCarbEntry = new PreparedQuery<IUpsertCarbEntryParams,IUpsertCarbEntryResult>(upsertCarbEntryIR);
 
 
+/** 'DeleteCarbEntry' parameters type */
+export interface IDeleteCarbEntryParams {
+  timestamp: string | Date;
+}
+
+/** 'DeleteCarbEntry' return type */
+export interface IDeleteCarbEntryResult {
+  timestamp: string;
+}
+
+/** 'DeleteCarbEntry' query type */
+export interface IDeleteCarbEntryQuery {
+  params: IDeleteCarbEntryParams;
+  result: IDeleteCarbEntryResult;
+}
+
+const deleteCarbEntryIR: any = {"usedParamSet":{"timestamp":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":43,"b":53}]}],"statement":"DELETE FROM carb_entries\nWHERE timestamp = :timestamp!\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM carb_entries
+ * WHERE timestamp = :timestamp!
+ * RETURNING timestamp
+ * ```
+ */
+export const deleteCarbEntry = new PreparedQuery<IDeleteCarbEntryParams,IDeleteCarbEntryResult>(deleteCarbEntryIR);
+
+
 /** 'CreateCarbEntries' parameters type */
 export interface ICreateCarbEntriesParams {
   carbEntries: readonly ({

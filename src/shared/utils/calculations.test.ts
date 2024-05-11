@@ -12,7 +12,6 @@ import {
   getBgAverage,
   isDexcomEntryValid,
   roundTo2Decimals,
-  timestampIsUnderMaxAge,
   getPercentOfInsulinRemaining,
   getInsulinOnBoard,
   getPercentOfCarbsRemaining,
@@ -165,16 +164,6 @@ describe('shared/calculations', () => {
     expect(roundTo2Decimals(34.0879)).toEqual(34.09);
     expect(roundTo2Decimals(5.9999)).toEqual(6.0);
     expect(roundTo2Decimals(2.457)).toEqual(2.46);
-  });
-
-  it('timestampIsUnderMaxAge', () => {
-    const currentTimestamp = 1521972451237;
-    expect(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 10 * MIN_IN_MS, 20)).toEqual(
-      true,
-    );
-    expect(timestampIsUnderMaxAge(currentTimestamp, currentTimestamp - 30 * MIN_IN_MS, 20)).toEqual(
-      false,
-    );
   });
 
   it('calculateHba1c', () => {

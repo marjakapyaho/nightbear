@@ -38,22 +38,25 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
 };
 
 export const updateTimelineEntries = async (request: Request, context: Context) => {
+  console.log('---1---');
   const dataPoint = request.requestBody as Point;
-  if (!dataPoint?.timestamp) {
+  const timestamp = dataPoint?.timestamp;
+  console.log({ timestamp });
+  if (!timestamp) {
     return createResponse('error');
   }
 
   const insulinEntry = dataPoint.insulinEntry
     ? await context.db.upsertInsulinEntry(dataPoint.insulinEntry)
-    : null;
+    : await context.db.deleteInsulinEntry(timestamp);
 
   const meterEntry = dataPoint.meterEntry
     ? await context.db.upsertMeterEntry(dataPoint.meterEntry)
-    : null;
+    : await context.db.deleteMeterEntry(timestamp);
 
   const carbEntry = dataPoint.carbEntry
     ? await context.db.upsertCarbEntry(dataPoint.carbEntry)
-    : null;
+    : await context.db.deleteCarbEntry(timestamp);
 
   return createResponse({
     insulinEntry,

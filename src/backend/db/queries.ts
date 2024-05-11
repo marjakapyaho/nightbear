@@ -1,15 +1,18 @@
 import {
   createCarbEntries,
+  deleteCarbEntry,
   getCarbEntriesByTimestamp,
   upsertCarbEntry,
 } from 'backend/db/carbEntries/carbEntries.queries';
 import {
   createInsulinEntries,
+  deleteInsulinEntry,
   getInsulinEntriesByTimestamp,
   upsertInsulinEntry,
 } from 'backend/db/insulinEntries/insulinEntries.queries';
 import {
   createMeterEntries,
+  deleteMeterEntry,
   getMeterEntriesByTimestamp,
   upsertMeterEntry,
 } from 'backend/db/meterEntries/meterEntries.queries';
@@ -24,7 +27,7 @@ import { Pool } from 'pg';
 import { Alarm, AlarmState } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
 import { Profile, ProfileActivation } from 'shared/types/profiles';
-import { IdReturnType } from 'shared/types/shared';
+import { IdReturnType, TimestampReturnType } from 'shared/types/shared';
 import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
 import { ALARM_START_LEVEL } from 'shared/utils/alarms';
 import {
@@ -46,6 +49,7 @@ import {
   getRelevantProfileActivations,
   reactivateProfileActivation,
 } from './profiles/profiles.queries';
+import { z } from 'zod';
 
 export const queries = (pool: Pool) => {
   const { one, many, oneOrNone } = bindQueryShorthands(pool);
@@ -71,6 +75,10 @@ export const queries = (pool: Pool) => {
       return one(InsulinEntry, upsertInsulinEntry, insulinEntry);
     },
 
+    async deleteInsulinEntry(timestamp: string) {
+      return oneOrNone(TimestampReturnType, deleteInsulinEntry, { timestamp });
+    },
+
     async createInsulinEntries(insulinEntries: InsulinEntry[]) {
       return many(InsulinEntry, createInsulinEntries, { insulinEntries });
     },
@@ -83,6 +91,10 @@ export const queries = (pool: Pool) => {
       return one(CarbEntry, upsertCarbEntry, carbEntry);
     },
 
+    async deleteCarbEntry(timestamp: string) {
+      return oneOrNone(TimestampReturnType, deleteCarbEntry, { timestamp });
+    },
+
     async createCarbEntries(carbEntries: CarbEntry[]) {
       return many(CarbEntry, createCarbEntries, { carbEntries });
     },
@@ -93,6 +105,10 @@ export const queries = (pool: Pool) => {
 
     async upsertMeterEntry(meterEntry: MeterEntry) {
       return one(MeterEntry, upsertMeterEntry, meterEntry);
+    },
+
+    async deleteMeterEntry(timestamp: string) {
+      return oneOrNone(TimestampReturnType, deleteMeterEntry, { timestamp });
     },
 
     async createMeterEntries(meterEntries: MeterEntry[]) {

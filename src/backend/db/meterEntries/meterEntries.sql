@@ -14,6 +14,13 @@ ON CONFLICT (timestamp) DO UPDATE SET
 RETURNING *;
 
 /*
+  @name deleteMeterEntry
+*/
+DELETE FROM meter_entries
+WHERE timestamp = :timestamp!
+RETURNING timestamp;
+
+/*
   @name createMeterEntries
   @param meterEntries -> ((
     bloodGlucose!,

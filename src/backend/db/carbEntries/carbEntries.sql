@@ -15,6 +15,12 @@ ON CONFLICT (timestamp) DO UPDATE SET
   amount = EXCLUDED.amount
 RETURNING *;
 
+/*
+  @name deleteCarbEntry
+*/
+DELETE FROM carb_entries
+WHERE timestamp = :timestamp!
+RETURNING timestamp;
 
 /*
   @name createCarbEntries

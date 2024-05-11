@@ -1,6 +1,7 @@
 import { roundTo1Decimals } from 'shared/utils/calculations';
 import { isNotNull } from 'shared/utils/helpers';
 import { CarbEntry, InsulinEntry, MeterEntry } from 'shared/types/timelineEntries';
+import { getTimeInMillis } from 'shared/utils/time';
 
 export type BaseGraphConfig = {
   timelineRange: number; // How many ms worth of graph data are we showing
@@ -31,7 +32,7 @@ export type GraphConfig = BaseGraphConfig & {
 };
 
 export type Point = {
-  timestamp: number;
+  timestamp: string;
   val: number | null;
   color: string;
   insulinEntry?: InsulinEntry;
@@ -63,7 +64,8 @@ export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {
 };
 
 // The CSS left value for rendering the given timestamp
-export const tsToLeft = (c: GraphConfig, ts: number) => {
+export const tsToLeft = (c: GraphConfig, timestamp: string) => {
+  const ts = getTimeInMillis(timestamp);
   return roundTo1Decimals(
     c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs,
   );

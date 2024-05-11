@@ -46,6 +46,35 @@ const upsertInsulinEntryIR: any = {"usedParamSet":{"timestamp":true,"amount":tru
 export const upsertInsulinEntry = new PreparedQuery<IUpsertInsulinEntryParams,IUpsertInsulinEntryResult>(upsertInsulinEntryIR);
 
 
+/** 'DeleteInsulinEntry' parameters type */
+export interface IDeleteInsulinEntryParams {
+  timestamp: string | Date;
+}
+
+/** 'DeleteInsulinEntry' return type */
+export interface IDeleteInsulinEntryResult {
+  timestamp: string;
+}
+
+/** 'DeleteInsulinEntry' query type */
+export interface IDeleteInsulinEntryQuery {
+  params: IDeleteInsulinEntryParams;
+  result: IDeleteInsulinEntryResult;
+}
+
+const deleteInsulinEntryIR: any = {"usedParamSet":{"timestamp":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":56}]}],"statement":"DELETE FROM insulin_entries\nWHERE timestamp = :timestamp!\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM insulin_entries
+ * WHERE timestamp = :timestamp!
+ * RETURNING timestamp
+ * ```
+ */
+export const deleteInsulinEntry = new PreparedQuery<IDeleteInsulinEntryParams,IDeleteInsulinEntryResult>(deleteInsulinEntryIR);
+
+
 /** 'CreateInsulinEntries' parameters type */
 export interface ICreateInsulinEntriesParams {
   insulinEntries: readonly ({

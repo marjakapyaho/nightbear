@@ -40,6 +40,35 @@ const upsertMeterEntryIR: any = {"usedParamSet":{"timestamp":true,"bloodGlucose"
 export const upsertMeterEntry = new PreparedQuery<IUpsertMeterEntryParams,IUpsertMeterEntryResult>(upsertMeterEntryIR);
 
 
+/** 'DeleteMeterEntry' parameters type */
+export interface IDeleteMeterEntryParams {
+  timestamp: string | Date;
+}
+
+/** 'DeleteMeterEntry' return type */
+export interface IDeleteMeterEntryResult {
+  timestamp: string;
+}
+
+/** 'DeleteMeterEntry' query type */
+export interface IDeleteMeterEntryQuery {
+  params: IDeleteMeterEntryParams;
+  result: IDeleteMeterEntryResult;
+}
+
+const deleteMeterEntryIR: any = {"usedParamSet":{"timestamp":true},"params":[{"name":"timestamp","required":true,"transform":{"type":"scalar"},"locs":[{"a":44,"b":54}]}],"statement":"DELETE FROM meter_entries\nWHERE timestamp = :timestamp!\nRETURNING timestamp"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM meter_entries
+ * WHERE timestamp = :timestamp!
+ * RETURNING timestamp
+ * ```
+ */
+export const deleteMeterEntry = new PreparedQuery<IDeleteMeterEntryParams,IDeleteMeterEntryResult>(deleteMeterEntryIR);
+
+
 /** 'CreateMeterEntries' parameters type */
 export interface ICreateMeterEntriesParams {
   meterEntries: readonly ({

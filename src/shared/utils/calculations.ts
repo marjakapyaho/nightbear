@@ -71,15 +71,6 @@ export const roundTo2Decimals = (num: number) => {
   return Math.round(num * 100) / 100;
 };
 
-export const timestampIsUnderMaxAge = (
-  currentTimestamp: number,
-  timestampToCheck: number,
-  maxAgeInMinutes: number,
-): boolean => {
-  const maxAgeInMs = maxAgeInMinutes * MIN_IN_MS;
-  return timestampToCheck > currentTimestamp - maxAgeInMs;
-};
-
 export const calculateHba1c = (entries: BloodGlucoseEntry[]) => {
   const sumOfEntries = reduce(
     entries,
@@ -176,7 +167,7 @@ export const calculateDailyAmounts = (
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: getTimeInMillis(day.timestamp),
+    timestamp: day.timestamp,
     total:
       day.timestamp && groupedEntries[day.timestamp]
         ? getTotal(groupedEntries[day.timestamp])
@@ -195,7 +186,7 @@ export const calculateDailyAverageBgs = (
   }));
   const groupedEntries = groupBy(entries, entry => entry.timestamp);
   return dayArray.map(day => ({
-    timestamp: getTimeInMillis(day.timestamp),
+    timestamp: day.timestamp,
     average:
       day.timestamp && groupedEntries[day.timestamp]
         ? getDailyAverage(groupedEntries[day.timestamp])

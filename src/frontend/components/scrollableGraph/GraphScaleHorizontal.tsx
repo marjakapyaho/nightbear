@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, tsToLeft } from './scrollableGraphUtils';
+import { getTimeAsISOStr } from 'shared/utils/time';
 
 type Props = {
   config: GraphConfig;
@@ -16,7 +17,7 @@ export const GraphScaleHorizontal = ({ config }: Props) => {
       className={styles.graphHorizontalScaleItem}
       key={timestamp}
       style={{
-        left: tsToLeft(config, timestamp),
+        left: tsToLeft(config, getTimeAsISOStr(timestamp)),
         width: config.timeStep * config.pixelsPerMs,
       }}
     >

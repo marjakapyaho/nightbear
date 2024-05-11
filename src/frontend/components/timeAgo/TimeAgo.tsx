@@ -1,14 +1,16 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { getFormattedTs } from './timeAgoUtils';
+import { getTimeInMillis } from 'shared/utils/time';
 
 type Props = {
-  ts: number;
+  timestamp: string;
   verbose?: boolean;
   frequentUpdates?: boolean;
   decimalsForMinutes?: boolean;
 };
 
-export const TimeAgo = ({ ts, verbose, frequentUpdates, decimalsForMinutes }: Props) => {
+export const TimeAgo = ({ timestamp, verbose, frequentUpdates, decimalsForMinutes }: Props) => {
+  const ts = getTimeInMillis(timestamp);
   const [formattedTs, setFormattedTs] = useState(getFormattedTs(ts));
 
   // We opt for useLayoutEffect() instead of useEffect() here so that we get a synchronous re-render when ts changes

@@ -35,7 +35,7 @@ export const generateSeedData = async (context: Context) => {
   await context.db.createMeterEntries([
     {
       timestamp: getTimeMinusTime(now, 30 * MIN_IN_MS),
-      bloodGlucose: 5.8,
+      bloodGlucose: 5.5,
     },
   ]);
 

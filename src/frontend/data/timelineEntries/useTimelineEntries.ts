@@ -10,17 +10,14 @@ export const useTimelineEntries = (
 ) => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, isSuccess } = useQuery<TimelineEntries>({
+  const { data, isLoading, isError, isSuccess, refetch } = useQuery<TimelineEntries>({
     queryKey: ['get-timeline-entries'],
     queryFn: () => callFetch(`/get-timeline-entries?start=${startTimestamp}&end=${endTimestamp}`),
   });
 
   const { mutate: saveGraphPointData } = useMutation({
     mutationFn: (point: Point) => callFetch('/update-timeline-entries', 'PUT', point),
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['update-timeline-entries'] });
-    },
+    onSuccess: refetch,
   });
 
   return {

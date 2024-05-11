@@ -33,7 +33,7 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
 
       {(hasData || isSelected) && (
         <span className={`${styles.textLabel} ${isSelected && styles.selected}`}>
-          <TimeAgo ts={point.timestamp} />
+          <TimeAgo timestamp={point.timestamp} />
         </span>
       )}
 

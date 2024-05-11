@@ -11,7 +11,13 @@ export const StatusBar = ({ graphPoint }: Props) => {
   return (
     <div className={styles.statusBar}>
       <div className={styles.status}>
-        <span>{graphPoint ? <TimeAgo ts={graphPoint.timestamp} decimalsForMinutes frequentUpdates /> : 'n/a'}</span>{' '}
+        <span>
+          {graphPoint ? (
+            <TimeAgo timestamp={graphPoint.timestamp} decimalsForMinutes frequentUpdates />
+          ) : (
+            'n/a'
+          )}
+        </span>{' '}
         <span className={styles.smallerText}>ago</span>
       </div>
     </div>
