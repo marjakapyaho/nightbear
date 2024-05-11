@@ -1,6 +1,6 @@
 import { createTestContext, truncateDb } from 'backend/utils/test';
-import { mockNow } from 'shared/mocks/dates';
 import { mockProfileActivations, mockProfiles } from 'shared/mocks/profiles';
+import { UUID_REGEX } from 'shared/utils/id';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/profiles', () => {
@@ -15,10 +15,15 @@ describe('db/profiles', () => {
     const activation = mockProfileActivations[0];
 
     const createdProfile = await context.db.createProfile(profile);
-    const createdActivation = await context.db.createProfileActivation(activation);
+    const createdActivation = await context.db.createProfileActivation({
+      ...activation,
+      profileTemplateId: createdProfile.id,
+    });
 
-    expect(createdProfile.id).toBe(profile.id);
-    expect(createdActivation.profileTemplateId).toBe(profile.id);
-    expect(createdActivation.activatedAt).toBe(mockNow);
+    expect(createdProfile.id).toMatch(UUID_REGEX);
+
+    const profiles = await context.db.getProfiles();
+
+    console.log({ profiles });
   });
 });

@@ -3,8 +3,6 @@ import { PreparedQuery } from '@pgtyped/runtime';
 
 export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'CRITICAL_OUTDATED' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
 
-export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
-
 /** 'CreateAlarm' parameters type */
 export interface ICreateAlarmParams {
   deactivatedAt?: string | Date | null | void;
@@ -232,7 +230,7 @@ export interface IGetAlarmsParams {
 
 /** 'GetAlarms' return type */
 export interface IGetAlarmsResult {
-  alarmStates: Json | null;
+  alarmStates: any | null;
   deactivatedAt: string | null;
   id: string;
   isActive: boolean;

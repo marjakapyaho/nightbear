@@ -1,4 +1,19 @@
 import {
+  createCarbEntries,
+  getCarbEntriesByTimestamp,
+  upsertCarbEntry,
+} from 'backend/db/carbEntries/carbEntries.queries';
+import {
+  createInsulinEntries,
+  getInsulinEntriesByTimestamp,
+  upsertInsulinEntry,
+} from 'backend/db/insulinEntries/insulinEntries.queries';
+import {
+  createMeterEntries,
+  getMeterEntriesByTimestamp,
+  upsertMeterEntry,
+} from 'backend/db/meterEntries/meterEntries.queries';
+import {
   createSensorEntries,
   createSensorEntry,
   getLatestSensorEntry,
@@ -6,23 +21,21 @@ import {
 } from 'backend/db/sensorEntries/sensorEntries.queries';
 import { GenParams, bindQueryShorthands } from 'backend/utils/db';
 import { Pool } from 'pg';
-import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
-import {
-  createInsulinEntries,
-  getInsulinEntriesByTimestamp,
-  upsertInsulinEntry,
-} from 'backend/db/insulinEntries/insulinEntries.queries';
-import {
-  createCarbEntries,
-  getCarbEntriesByTimestamp,
-  upsertCarbEntry,
-} from 'backend/db/carbEntries/carbEntries.queries';
-import {
-  createMeterEntries,
-  getMeterEntriesByTimestamp,
-  upsertMeterEntry,
-} from 'backend/db/meterEntries/meterEntries.queries';
+import { Alarm, AlarmState } from 'shared/types/alarms';
+import { Situation } from 'shared/types/analyser';
 import { Profile, ProfileActivation } from 'shared/types/profiles';
+import { IdReturnType } from 'shared/types/shared';
+import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
+import { ALARM_START_LEVEL } from 'shared/utils/alarms';
+import {
+  createAlarm,
+  createAlarmState,
+  deactivateAlarm,
+  getAlarmStateByAlarmId,
+  getAlarms,
+  markAlarmAsProcessed,
+  markAllAlarmStatesAsProcessed,
+} from './alarms/alarms.queries';
 import {
   createAnalyserSettings,
   createProfileActivation,
@@ -32,20 +45,6 @@ import {
   getRelevantProfileActivations,
   reactivateProfileActivation,
 } from './profiles/profiles.queries';
-import { z } from 'zod';
-import { Alarm, AlarmState } from 'shared/types/alarms';
-import {
-  createAlarm,
-  createAlarmState,
-  deactivateAlarm,
-  getAlarms,
-  markAlarmAsProcessed,
-  markAllAlarmStatesAsProcessed,
-  getAlarmStateByAlarmId,
-} from './alarms/alarms.queries';
-import { ALARM_START_LEVEL } from 'shared/utils/alarms';
-import { Situation } from 'shared/types/analyser';
-import { IdReturnType } from 'shared/types/shared';
 
 export const queries = (pool: Pool) => {
   const { one, many } = bindQueryShorthands(pool);
@@ -126,7 +125,7 @@ export const queries = (pool: Pool) => {
     },
 
     async createProfileActivation(profileActivation: Omit<ProfileActivation, 'id'>) {
-      return one(ProfileActivation, createProfileActivation, profileActivation);
+      return one(IdReturnType, createProfileActivation, profileActivation);
     },
 
     async getProfiles() {

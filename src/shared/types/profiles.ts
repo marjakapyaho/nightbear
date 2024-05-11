@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Situation } from './analyser';
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -35,7 +34,7 @@ export type SituationSettings = z.infer<typeof SituationSettings>;
 
 export const Profile = z.object({
   id: z.string(),
-  profileName: z.string(),
+  profileName: z.optional(z.string()),
   isActive: z.boolean(),
   alarmsEnabled: z.boolean(),
   analyserSettings: AnalyserSettings,
