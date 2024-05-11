@@ -9,6 +9,8 @@
   "srcDir": "./src/backend/db",
   "camelCaseColumnNames": true,
   "typesOverrides": {
+    "json": "any",
+    "jsonb": "any",
     "numeric": "number",
     "timestamptz": {
       "parameter": "string | Date",
