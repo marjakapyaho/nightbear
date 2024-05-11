@@ -33,7 +33,7 @@ export const SituationSettings = z.object({
 export type SituationSettings = z.infer<typeof SituationSettings>;
 
 export const Profile = z.object({
-  id: z.string(),
+  id: z.optional(z.string()),
   profileName: z.optional(z.string()),
   isActive: z.boolean(),
   alarmsEnabled: z.boolean(),

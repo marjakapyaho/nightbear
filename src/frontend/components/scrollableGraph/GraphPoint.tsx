@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) => {
-  const { val, timestamp } = point;
+  const { val, timestamp, meterEntry } = point;
   const pointWidth = config.dataTimeStep * config.pixelsPerMs;
 
   return (
@@ -25,6 +25,21 @@ export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) =>
             {
               pointerEvents: 'auto',
               fill: point.color,
+              r: isSelected ? 5 : 3.7,
+              zIndex: 100,
+            } as any // Type defs won't accept "r"
+          }
+        />
+      )}
+      {meterEntry && (
+        <circle
+          className={styles.graphPoint}
+          cx={tsToLeft(config, timestamp)}
+          cy={valToTop(config, meterEntry.bloodGlucose)}
+          style={
+            {
+              pointerEvents: 'auto',
+              fill: '#828282',
               r: isSelected ? 5 : 3.7,
               zIndex: 100,
             } as any // Type defs won't accept "r"

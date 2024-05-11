@@ -1,4 +1,4 @@
-import { mockAnalyserSettings, mockProfiles, mockSituationSettings } from 'shared/mocks/profiles';
+import { mockProfiles } from 'shared/mocks/profiles';
 import { Context } from 'backend/utils/api';
 import { generateSensorEntries } from 'shared/utils/test';
 import { getTimeMinusTime } from 'shared/utils/time';

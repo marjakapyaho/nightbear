@@ -14,6 +14,12 @@ export type SensorEntryType = z.infer<typeof SensorEntryType>;
 export const InsulinEntryType = z.enum(['FAST', 'LONG']);
 export type InsulinEntryType = z.infer<typeof InsulinEntryType>;
 
+export const BloodGlucoseEntry = z.object({
+  timestamp: z.string(),
+  bloodGlucose: z.number(),
+});
+export type BloodGlucoseEntry = z.infer<typeof BloodGlucoseEntry>;
+
 export const SensorEntry = z.object({
   timestamp: z.string(),
   bloodGlucose: z.number(),
@@ -42,7 +48,7 @@ export const MeterEntry = z.object({
 export type MeterEntry = z.infer<typeof MeterEntry>;
 
 export const TimelineEntries = z.object({
-  sensorEntries: z.array(SensorEntry),
+  bloodGlucoseEntries: z.array(BloodGlucoseEntry),
   insulinEntries: z.array(InsulinEntry),
   carbEntries: z.array(CarbEntry),
   meterEntries: z.array(MeterEntry),

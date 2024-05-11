@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import styles from './Config.module.scss';
 import { useProfiles } from 'frontend/data/profiles/useProfiles';
 import { useAlarms } from 'frontend/data/alarms/useAlarms';
-import { CreateProfile } from 'frontend/pages/config/CreateProfile';
+import { CreateProfile } from 'frontend/components/createProfile/CreateProfile';
 
 export const Config = () => {
   const { profiles, activeProfile, activateProfile, createProfile } = useProfiles();
   const { activeAlarm, ackActiveAlarm } = useAlarms();
   const [showCreateProfile, setShowCreateProfile] = useState(false);
-
-  // TODO: createProfile UI
-  console.log(activeProfile);
 
   return (
     <div className={styles.config}>
@@ -31,7 +28,7 @@ export const Config = () => {
         >
           + Create new profile
         </div>
-        {showCreateProfile && activeProfile && (
+        {showCreateProfile && (
           <CreateProfile activeProfile={activeProfile} createProfile={createProfile} />
         )}
       </div>

@@ -27,6 +27,7 @@ import { Alarm } from 'shared/types/alarms';
 import { detectSituation } from 'backend/cronjobs/analyser/analyser';
 import { DateTime } from 'luxon';
 import { onlyActive } from 'shared/utils/alarms';
+import { getMergedBgEntries } from 'shared/utils/timelineEntries';
 
 // Critical settings
 export const LOW_LEVEL_BAD = 3.0;
@@ -130,45 +131,16 @@ const smoothSlopesWithNoise = (entries: AnalyserEntry[], noiseArray: number[]) =
   return entries.map(makeWindow(noiseArray)).map(average);
 };
 
-export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
-  const dateTime = DateTime.fromISO(timestamp);
-  const minuteSlot = Math.floor(dateTime.get('minute') / 5);
-  return dateTime
-    .set({ minute: minuteSlot * 5, second: 0, millisecond: 0 })
-    .toUTC()
-    .toISO();
-};
-
-export const getMergedBgEntries = (
-  sensorEntries: SensorEntry[],
-  meterEntries?: MeterEntry[],
-): (SensorEntry | MeterEntry)[] =>
-  chain(meterEntries ? [...sensorEntries, ...meterEntries] : sensorEntries)
-    .sortBy('timestamp')
-    .groupBy(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp))
-    .flatMap((entries, groupTimestamp) => ({
-      bloodGlucose: calculateAverageBg(entries),
-      timestamp: groupTimestamp,
-    }))
-    .value();
-
 export const mapSensorAndMeterEntriesToAnalyserEntries = (
   sensorEntries: SensorEntry[],
   meterEntries?: MeterEntry[],
 ): AnalyserEntry[] => {
   const allEntries = getMergedBgEntries(sensorEntries, meterEntries);
-  const analyserEntries: AnalyserEntry[] = chain(allEntries)
-    .sortBy('timestamp')
-    .map(entry => ({
-      bloodGlucose: entry.bloodGlucose,
-      timestamp: entry.timestamp,
-    }))
-    .value();
 
-  const entriesWithSlopes = analyserEntries.map((entry, i) => {
+  const entriesWithSlopes = allEntries.map((entry, i) => {
     const currentBg = entry.bloodGlucose;
     const currentTimestamp = entry.timestamp;
-    const previousEntry = analyserEntries[i - 1];
+    const previousEntry = allEntries[i - 1];
     let currentSlope;
 
     if (previousEntry) {

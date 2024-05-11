@@ -20,16 +20,14 @@ import { getTimeAsISOStr } from 'shared/utils/time';
 
 export const Stats = () => {
   const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS));
-  const { sensorEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
+  const { bloodGlucoseEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
 
   // Override sensor entries with meter entries where necessary
-  const bgEntries = sensorEntries.map(sensorEntry => {
-    const meterEntry = meterEntries.find(
-      meterEntry => meterEntry.timestamp === sensorEntry.timestamp,
-    );
+  const bgEntries = bloodGlucoseEntries.map(bgEntry => {
+    const meterEntry = meterEntries.find(meterEntry => meterEntry.timestamp === bgEntry.timestamp);
     return meterEntry?.bloodGlucose
-      ? { ...sensorEntry, bloodGlucose: meterEntry.bloodGlucose }
-      : sensorEntry;
+      ? { ...bgEntry, bloodGlucose: meterEntry.bloodGlucose }
+      : bgEntry;
   });
 
   const timeInRange = calculateTimeInRange(bgEntries) || '';

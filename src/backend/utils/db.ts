@@ -104,6 +104,8 @@ export const runQueryAndValidateResult = async <
   const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
   if (one && none) {
     if (mapped.length === 0) {
+      // TODO: fix this
+      // @ts-ignore
       return undefined;
     } else if (mapped.length !== 1) {
       throw new Error(`Expected exactly one result or no results but got ${mapped.length} instead`);

@@ -1,5 +1,6 @@
 import { roundTo1Decimals } from 'shared/utils/calculations';
 import { isNotNull } from 'shared/utils/helpers';
+import { CarbEntry, InsulinEntry, MeterEntry } from 'shared/types/timelineEntries';
 
 export type BaseGraphConfig = {
   timelineRange: number; // How many ms worth of graph data are we showing
@@ -33,9 +34,9 @@ export type Point = {
   timestamp: number;
   val: number | null;
   color: string;
-  valTop?: number;
-  valMiddle?: number;
-  valBottom?: number;
+  insulinEntry?: InsulinEntry;
+  meterEntry?: MeterEntry;
+  carbEntry?: CarbEntry;
 };
 
 export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {
@@ -63,20 +64,30 @@ export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {
 
 // The CSS left value for rendering the given timestamp
 export const tsToLeft = (c: GraphConfig, ts: number) => {
-  return roundTo1Decimals(c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs);
+  return roundTo1Decimals(
+    c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs,
+  );
 };
 
 // Inverse of tsToLeft()
 export const leftToTs = (c: GraphConfig, left: number) => {
-  return roundTo1Decimals((left - c.paddingLeft) / c.pixelsPerMs + (c.timelineRangeEnd - c.timelineRange));
+  return roundTo1Decimals(
+    (left - c.paddingLeft) / c.pixelsPerMs + (c.timelineRangeEnd - c.timelineRange),
+  );
 };
 
 // The CSS top value for rendering the given value
 export const valToTop = (c: GraphConfig, val: number) => {
-  return roundTo1Decimals(c.innerHeight - ((val - c.valMin) / (c.valMax - c.valMin)) * c.innerHeight + c.paddingTop);
+  return roundTo1Decimals(
+    c.innerHeight - ((val - c.valMin) / (c.valMax - c.valMin)) * c.innerHeight + c.paddingTop,
+  );
 };
 
 export const mapGraphPointsForPolyline = (graphPoints: Point[], config: GraphConfig) =>
   graphPoints
-    .map(point => (isNotNull(point.val) ? [tsToLeft(config, point.timestamp), valToTop(config, point.val)].join() : ''))
+    .map(point =>
+      isNotNull(point.val)
+        ? [tsToLeft(config, point.timestamp), valToTop(config, point.val)].join()
+        : '',
+    )
     .join(' ');

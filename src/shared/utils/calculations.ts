@@ -1,5 +1,11 @@
 import { fill, groupBy, reduce } from 'lodash';
-import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared/types/timelineEntries';
+import {
+  BloodGlucoseEntry,
+  CarbEntry,
+  InsulinEntry,
+  MeterEntry,
+  SensorEntry,
+} from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 import { getTimeAsISOStr, getTimeInMillis, getTimeMinusTimeMs, hourToMs } from 'shared/utils/time';
 import { isValidNumber, roundNumberToFixedDecimals } from 'shared/utils/helpers';
@@ -11,10 +17,6 @@ export const HOUR_IN_MS = 60 * MIN_IN_MS;
 export const DAY_IN_MS = 24 * HOUR_IN_MS;
 export const TIME_LIMIT_FOR_SLOPE = 15 * MIN_IN_MS;
 export const NOISE_LEVEL_LIMIT = 4;
-
-export type SensorEntryWithBg = SensorEntry & { bloodGlucose: number };
-
-export const hasBloodGlucose = (e: SensorEntry): e is SensorEntryWithBg => !!e.bloodGlucose;
 
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export const changeBloodGlucoseUnitToMmoll = (glucoseInMgdl: number): number => {
@@ -78,23 +80,22 @@ export const timestampIsUnderMaxAge = (
   return timestampToCheck > currentTimestamp - maxAgeInMs;
 };
 
-export const calculateHba1c = (entries: SensorEntry[]) => {
-  const numericEntries = entries.filter(hasBloodGlucose);
+export const calculateHba1c = (entries: BloodGlucoseEntry[]) => {
   const sumOfEntries = reduce(
-    numericEntries,
+    entries,
     (sum, entry) => {
       return sum + changeBloodGlucoseUnitToMgdl(entry.bloodGlucose);
     },
     0,
   );
 
-  const avgGlucose = sumOfEntries / numericEntries.length;
+  const avgGlucose = sumOfEntries / entries.length;
 
   // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
   return (avgGlucose + 46.7) / 28.7 - 0.6;
 };
 
-export const calculateTimeInRange = (sensorEntries: SensorEntry[]) => {
+export const calculateTimeInRange = (sensorEntries: BloodGlucoseEntry[]) => {
   const totalCount = sensorEntries.length;
   const goodCount = sensorEntries.filter(
     entry =>
@@ -106,7 +107,7 @@ export const calculateTimeInRange = (sensorEntries: SensorEntry[]) => {
   return Math.round((goodCount / totalCount) * 100);
 };
 
-export const calculateTimeLow = (sensorEntries: SensorEntry[]) => {
+export const calculateTimeLow = (sensorEntries: BloodGlucoseEntry[]) => {
   const totalCount = sensorEntries.length;
   const goodCount = sensorEntries.filter(
     entry => entry.bloodGlucose && entry.bloodGlucose < timeInRangeLowLimit,
@@ -115,7 +116,7 @@ export const calculateTimeLow = (sensorEntries: SensorEntry[]) => {
   return Math.round((goodCount / totalCount) * 100);
 };
 
-export const calculateTimeHigh = (sensorEntries: SensorEntry[]) => {
+export const calculateTimeHigh = (sensorEntries: BloodGlucoseEntry[]) => {
   const totalCount = sensorEntries.length;
   const goodCount = sensorEntries.filter(
     entry => entry.bloodGlucose && entry.bloodGlucose > timeInRangeHighLimit,
@@ -125,7 +126,11 @@ export const calculateTimeHigh = (sensorEntries: SensorEntry[]) => {
 };
 
 // Note: if there is e.g. 10 entries over limit in a row, it's categorized as one single occurrence of situation
-export const countSituations = (sensorEntries: SensorEntry[], limit: number, low: boolean) => {
+export const countSituations = (
+  sensorEntries: BloodGlucoseEntry[],
+  limit: number,
+  low: boolean,
+) => {
   let counter = 0;
   let incidentBeingRecorded: boolean;
 
@@ -143,7 +148,7 @@ export const countSituations = (sensorEntries: SensorEntry[], limit: number, low
   return counter;
 };
 
-export const getBgAverage = (sensorEntries: SensorEntry[]) => {
+export const getBgAverage = (sensorEntries: BloodGlucoseEntry[]) => {
   const entriesWithBgs = sensorEntries.filter(entry => entry.bloodGlucose);
   return setOneDecimal(
     entriesWithBgs.reduce((sum, entry) => sum + (entry.bloodGlucose || 0), 0) /
@@ -154,7 +159,7 @@ export const getBgAverage = (sensorEntries: SensorEntry[]) => {
 const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
   dailyAmounts.reduce((prev, current) => prev + current.amount, 0);
 
-const getDailyAverage = (dailySensorEntries: SensorEntry[]) =>
+const getDailyAverage = (dailySensorEntries: BloodGlucoseEntry[]) =>
   dailySensorEntries.length
     ? dailySensorEntries.reduce((prev, current) => prev + current.bloodGlucose, 0) /
       dailySensorEntries.length
@@ -180,7 +185,7 @@ export const calculateDailyAmounts = (
 };
 
 export const calculateDailyAverageBgs = (
-  entries: SensorEntry[],
+  entries: BloodGlucoseEntry[],
   days: number,
   now = Date.now(),
 ) => {

@@ -11,7 +11,7 @@ type Props = {
 };
 
 export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) => {
-  const hasData = point.valTop || point.valBottom;
+  const hasData = point.carbEntry || point.insulinEntry;
 
   return (
     <div
@@ -25,7 +25,10 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
     >
       <div
         className={`${styles.verticalLine} ${hasData && styles.hasData}`}
-        style={{ left: config.pixelsPerTimeStep / 2, borderLeft: isSelected ? `1px solid #bbb` : undefined }}
+        style={{
+          left: config.pixelsPerTimeStep / 2,
+          borderLeft: isSelected ? `1px solid #bbb` : undefined,
+        }}
       />
 
       {(hasData || isSelected) && (
@@ -34,8 +37,10 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
         </span>
       )}
 
-      {point.valTop && <div className={styles.numberBubbleTop}>{point.valTop}</div>}
-      {point.valBottom && <div className={styles.numberBubbleBottom}>{point.valBottom}</div>}
+      {point.insulinEntry && (
+        <div className={styles.numberBubbleTop}>{point.insulinEntry.amount}</div>
+      )}
+      {point.carbEntry && <div className={styles.numberBubbleBottom}>{point.carbEntry.amount}</div>}
     </div>
   );
 };

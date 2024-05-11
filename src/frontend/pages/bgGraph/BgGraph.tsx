@@ -2,7 +2,13 @@ import { ScrollNumberSelector } from 'frontend/components/scrollNumberSelector/S
 import { StatusBar } from 'frontend/components/statusBar/StatusBar';
 import { useState } from 'react';
 import React from 'react';
-import { getBgGraphBaseConfig, mapTimelineEntriesToGraphPoints } from './bgGraphUtils';
+import {
+  getBgGraphBaseConfig,
+  getNewSelectedPointWithCarbs,
+  getNewSelectedPointWithInsulin,
+  getNewSelectedPointWithMeterEntry,
+  mapTimelineEntriesToGraphPoints,
+} from './bgGraphUtils';
 import styles from './BgGraph.module.scss';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableGraph';
@@ -17,6 +23,36 @@ export const BgGraph = () => {
   const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries);
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const latestPoint = graphPoints.length ? graphPoints[0] : null;
+
+  const onChangeCarbs = (newAmount: number) => {
+    const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;
+
+    if (hasValueChanged) {
+      const pointToSave = getNewSelectedPointWithCarbs(selectedPoint, latestPoint, newAmount);
+      setSelectedPoint(pointToSave);
+      pointToSave && saveGraphPointData(pointToSave);
+    }
+  };
+
+  const onChangeMeterEntry = (newBg: number) => {
+    const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose;
+
+    if (hasValueChanged) {
+      const pointToSave = getNewSelectedPointWithMeterEntry(selectedPoint, latestPoint, newBg);
+      setSelectedPoint(pointToSave);
+      pointToSave && saveGraphPointData(pointToSave);
+    }
+  };
+
+  const onChangeInsulin = (newAmount: number) => {
+    const hasValueChanged = newAmount !== selectedPoint?.insulinEntry?.amount;
+
+    if (hasValueChanged) {
+      const pointToSave = getNewSelectedPointWithInsulin(selectedPoint, latestPoint, newAmount);
+      setSelectedPoint(pointToSave);
+      pointToSave && saveGraphPointData(pointToSave);
+    }
+  };
 
   return (
     <div className={styles.bgGraph}>
@@ -37,17 +73,8 @@ export const BgGraph = () => {
 
       <div className={styles.graphBottom}>
         <ScrollNumberSelector
-          value={selectedPoint?.valBottom}
-          onChange={newVal => {
-            const newPoint = selectedPoint
-              ? {
-                  ...selectedPoint,
-                  valBottom: selectedPoint?.valBottom === newVal ? undefined : newVal,
-                }
-              : null;
-            setSelectedPoint(newPoint);
-            newPoint && saveGraphPointData(newPoint);
-          }}
+          value={selectedPoint?.carbEntry?.amount}
+          onChange={onChangeCarbs}
           min={5}
           max={100}
           step={5}
@@ -55,17 +82,8 @@ export const BgGraph = () => {
           color="#9ad5b3"
         />
         <ScrollNumberSelector
-          value={selectedPoint?.valMiddle || undefined}
-          onChange={newVal => {
-            const newPoint = selectedPoint
-              ? {
-                  ...selectedPoint,
-                  valMiddle: selectedPoint.valMiddle === newVal ? undefined : newVal,
-                }
-              : null;
-            setSelectedPoint(newPoint);
-            newPoint && saveGraphPointData(newPoint);
-          }}
+          value={selectedPoint?.meterEntry?.bloodGlucose}
+          onChange={onChangeMeterEntry}
           min={1}
           max={20}
           step={0.5}
@@ -74,14 +92,8 @@ export const BgGraph = () => {
           color="#F8CC6F"
         />
         <ScrollNumberSelector
-          value={selectedPoint?.valTop}
-          onChange={newVal => {
-            const newPoint = selectedPoint
-              ? { ...selectedPoint, valTop: selectedPoint.valTop === newVal ? undefined : newVal }
-              : null;
-            setSelectedPoint(newPoint);
-            newPoint && saveGraphPointData(newPoint);
-          }}
+          value={selectedPoint?.insulinEntry?.amount}
+          onChange={onChangeInsulin}
           min={1}
           max={20}
           step={1}

@@ -25,7 +25,7 @@ export const useTimelineEntries = (
 
   return {
     timelineEntries: {
-      sensorEntries: data ? data.sensorEntries : [],
+      bloodGlucoseEntries: data ? data.bloodGlucoseEntries : [],
       insulinEntries: data ? data.insulinEntries : [],
       carbEntries: data ? data.carbEntries : [],
       meterEntries: data ? data.meterEntries : [],
