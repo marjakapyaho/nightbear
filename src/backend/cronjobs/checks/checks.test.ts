@@ -1,4 +1,4 @@
-import { checkActiveAlarm, createTestContext, truncateDb } from 'backend/utils/test';
+import { createTestContext, truncateDb } from 'backend/utils/test';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { generateSeedData } from 'backend/db/seed';
 import { checks } from './checks';
@@ -21,13 +21,13 @@ describe('cronjobs/checks', () => {
     let alarm: Alarm | undefined;
 
     // Current timestamp = mockNow
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm.situation).toBe('LOW');
 
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Keeps LOW alarm
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm.situation).toBe('LOW');
 
     currentTimestamp = getTimePlusTime(mockNow, 5 * MIN_IN_MS);
@@ -42,7 +42,7 @@ describe('cronjobs/checks', () => {
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Does not yet remove LOW alarm as we're not enough above limit
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm.situation).toBe('LOW');
 
     currentTimestamp = getTimePlusTime(mockNow, 10 * MIN_IN_MS);
@@ -57,7 +57,7 @@ describe('cronjobs/checks', () => {
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Removes LOW alarm that is no longer current
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm).toBeUndefined();
 
     currentTimestamp = getTimePlusTime(mockNow, 35 * MIN_IN_MS);
@@ -71,7 +71,7 @@ describe('cronjobs/checks', () => {
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Adds RISING alarm
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm.situation).toBe('RISING');
     const risingAlarmId = alarm.id;
 
@@ -87,7 +87,7 @@ describe('cronjobs/checks', () => {
     await checks({ ...context, timestamp: () => currentTimestamp });
 
     // Removes RISING alarm and adds new HIGH alarm
-    alarm = await checkActiveAlarm(context);
+    alarm = await context.db.getActiveAlarm();
     expect(alarm.situation).toBe('HIGH');
     expect(alarm.id).not.toEqual(risingAlarmId);
   });

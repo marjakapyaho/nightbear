@@ -93,7 +93,13 @@ export const runQueryAndValidateResult = async <
   schema: Schema,
   method: PreparedQuery<Params, OptionalToNull<Schema>>,
   params?: Params,
-): Promise<One extends true ? z.infer<Schema> | null : z.infer<Schema>[]> => {
+): Promise<
+  One extends true
+    ? None extends true
+      ? z.infer<Schema> | undefined
+      : z.infer<Schema>
+    : z.infer<Schema>[]
+> => {
   const raw = await method.run((params ?? {}) as Params, pool);
   const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
   if (one && none) {
