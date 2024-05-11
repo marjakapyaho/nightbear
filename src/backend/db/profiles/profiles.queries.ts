@@ -230,7 +230,7 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":2098,"b":2108},{"a":2127,"b":2137}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":2169,"b":2179}]}],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'id', analyser_settings.id::VARCHAR,\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.id,\n      json_build_object(\n        'id', situation_settings.id::VARCHAR,\n        'OUTDATED', situation_settings.outdated,\n        'CRITICAL_OUTDATED', situation_settings.critical_outdated,\n        'FALLING', situation_settings.falling,\n        'RISING', situation_settings.rising,\n        'LOW', situation_settings.low,\n        'BAD_LOW', situation_settings.bad_low,\n        'COMPRESSION_LOW', situation_settings.compression_low,\n        'HIGH', situation_settings.high,\n        'BAD_HIGH', situation_settings.bad_high,\n        'PERSISTENT_HIGH', situation_settings.persistent_high\n        ) AS situation_settings\n    FROM situation_settings\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
+const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":2000,"b":2010},{"a":2029,"b":2039}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":2071,"b":2081}]}],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.id,\n      json_build_object(\n        'outdated', situation_settings.outdated,\n        'criticalOutdated', situation_settings.critical_outdated,\n        'falling', situation_settings.falling,\n        'rising', situation_settings.rising,\n        'low', situation_settings.low,\n        'badLow', situation_settings.bad_low,\n        'compressionLow', situation_settings.compression_low,\n        'high', situation_settings.high,\n        'badHigh', situation_settings.bad_high,\n        'persistentHigh', situation_settings.persistent_high\n      ) AS situation_settings\n    FROM situation_settings\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
 
 /**
  * Query generated from SQL:
@@ -240,7 +240,6 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
  *     SELECT
  *       analyser_settings.id,
  *       json_build_object(
- *         'id', analyser_settings.id::VARCHAR,
  *         'highLevelRel', analyser_settings.high_level_rel,
  *         'highLevelAbs', analyser_settings.high_level_abs,
  *         'highLevelBad', analyser_settings.high_level_bad,
@@ -254,18 +253,17 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
  *     SELECT
  *       situation_settings.id,
  *       json_build_object(
- *         'id', situation_settings.id::VARCHAR,
- *         'OUTDATED', situation_settings.outdated,
- *         'CRITICAL_OUTDATED', situation_settings.critical_outdated,
- *         'FALLING', situation_settings.falling,
- *         'RISING', situation_settings.rising,
- *         'LOW', situation_settings.low,
- *         'BAD_LOW', situation_settings.bad_low,
- *         'COMPRESSION_LOW', situation_settings.compression_low,
- *         'HIGH', situation_settings.high,
- *         'BAD_HIGH', situation_settings.bad_high,
- *         'PERSISTENT_HIGH', situation_settings.persistent_high
- *         ) AS situation_settings
+ *         'outdated', situation_settings.outdated,
+ *         'criticalOutdated', situation_settings.critical_outdated,
+ *         'falling', situation_settings.falling,
+ *         'rising', situation_settings.rising,
+ *         'low', situation_settings.low,
+ *         'badLow', situation_settings.bad_low,
+ *         'compressionLow', situation_settings.compression_low,
+ *         'high', situation_settings.high,
+ *         'badHigh', situation_settings.bad_high,
+ *         'persistentHigh', situation_settings.persistent_high
+ *       ) AS situation_settings
  *     FROM situation_settings
  *   ),
  *   most_recent_activation_query AS (

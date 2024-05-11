@@ -15,7 +15,8 @@ describe('db/profiles', () => {
     const activation = mockProfileActivations[0];
 
     const createdProfile = await context.db.createProfile(profile);
-    const createdActivation = await context.db.createProfileActivation({
+
+    await context.db.createProfileActivation({
       ...activation,
       profileTemplateId: createdProfile.id,
     });
@@ -24,6 +25,33 @@ describe('db/profiles', () => {
 
     const profiles = await context.db.getProfiles();
 
-    console.log({ profiles });
+    expect(profiles).toHaveLength(1);
+    expect(profiles[0]).toEqual({
+      id: expect.stringMatching(UUID_REGEX),
+      profileName: 'Day',
+      isActive: true,
+      alarmsEnabled: true,
+      analyserSettings: {
+        highLevelRel: 8,
+        highLevelAbs: 10,
+        highLevelBad: 14,
+        lowLevelRel: 6,
+        lowLevelAbs: 4,
+        timeSinceBgMinutes: 30,
+      },
+      situationSettings: {
+        outdated: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        criticalOutdated: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        falling: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        rising: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        low: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        badLow: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        compressionLow: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        high: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        badHigh: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        persistentHigh: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+      },
+      notificationTargets: ['first', 'second'],
+    });
   });
 });

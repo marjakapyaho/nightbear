@@ -84,7 +84,6 @@ WITH
     SELECT
       analyser_settings.id,
       json_build_object(
-        'id', analyser_settings.id::VARCHAR,
         'highLevelRel', analyser_settings.high_level_rel,
         'highLevelAbs', analyser_settings.high_level_abs,
         'highLevelBad', analyser_settings.high_level_bad,
@@ -98,18 +97,17 @@ WITH
     SELECT
       situation_settings.id,
       json_build_object(
-        'id', situation_settings.id::VARCHAR,
-        'OUTDATED', situation_settings.outdated,
-        'CRITICAL_OUTDATED', situation_settings.critical_outdated,
-        'FALLING', situation_settings.falling,
-        'RISING', situation_settings.rising,
-        'LOW', situation_settings.low,
-        'BAD_LOW', situation_settings.bad_low,
-        'COMPRESSION_LOW', situation_settings.compression_low,
-        'HIGH', situation_settings.high,
-        'BAD_HIGH', situation_settings.bad_high,
-        'PERSISTENT_HIGH', situation_settings.persistent_high
-        ) AS situation_settings
+        'outdated', situation_settings.outdated,
+        'criticalOutdated', situation_settings.critical_outdated,
+        'falling', situation_settings.falling,
+        'rising', situation_settings.rising,
+        'low', situation_settings.low,
+        'badLow', situation_settings.bad_low,
+        'compressionLow', situation_settings.compression_low,
+        'high', situation_settings.high,
+        'badHigh', situation_settings.bad_high,
+        'persistentHigh', situation_settings.persistent_high
+      ) AS situation_settings
     FROM situation_settings
   ),
   most_recent_activation_query AS (
