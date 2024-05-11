@@ -101,7 +101,18 @@ export const runQueryAndValidateResult = async <
     : z.infer<Schema>[]
 > => {
   const raw = await method.run((params ?? {}) as Params, pool);
-  const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
+  const mapped = raw.map(row =>
+    _.fromPairs(
+      _.toPairs(row).map(([key, val]) => {
+        const columnName = _.camelCase(key);
+        const isNulledOptional =
+          schema instanceof z.ZodObject &&
+          columnName in schema.shape &&
+          schema.shape[columnName] instanceof z.ZodOptional;
+        return [columnName, isNulledOptional ? undefined : val];
+      }),
+    ),
+  );
   if (one && none) {
     if (mapped.length === 0) {
       // TODO: fix this
