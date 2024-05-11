@@ -32,7 +32,7 @@ VALUES (
   :lowLevelAbs!,
   :timeSinceBgMinutes!
 )
-RETURNING *;
+RETURNING analyser_settings.id;
 
 /* @name createSituationSettings */
 INSERT INTO situation_settings (
@@ -48,18 +48,18 @@ INSERT INTO situation_settings (
   persistent_high
 )
 VALUES (
-   :OUTDATED!,
-   :CRITICAL_OUTDATED!,
-   :FALLING!,
-   :RISING!,
-   :LOW!,
-   :BAD_LOW!,
-   :COMPRESSION_LOW!,
-   :HIGH!,
-   :BAD_HIGH!,
-   :PERSISTENT_HIGH!
+   :outdated!,
+   :criticalOutdated!,
+   :falling!,
+   :rising!,
+   :low!,
+   :badLow!,
+   :compressionLow!,
+   :high!,
+   :badHigh!,
+   :persistentHigh!
 )
-RETURNING *;
+RETURNING situation_settings.id;
 
 /* @name createProfileActivation */
 INSERT INTO profile_activations (

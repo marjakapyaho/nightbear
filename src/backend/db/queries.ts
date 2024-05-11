@@ -22,12 +22,7 @@ import {
   getMeterEntriesByTimestamp,
   upsertMeterEntry,
 } from 'backend/db/meterEntries/meterEntries.queries';
-import {
-  AnalyserSettings,
-  Profile,
-  ProfileActivation,
-  SituationSettings,
-} from 'shared/types/profiles';
+import { Profile, ProfileActivation } from 'shared/types/profiles';
 import {
   createAnalyserSettings,
   createProfileActivation,
@@ -50,6 +45,7 @@ import {
 } from './alarms/alarms.queries';
 import { ALARM_START_LEVEL } from 'shared/utils/alarms';
 import { Situation } from 'shared/types/analyser';
+import { IdReturnType } from 'shared/types/shared';
 
 export const queries = (pool: Pool) => {
   const { one, many } = bindQueryShorthands(pool);
@@ -109,18 +105,18 @@ export const queries = (pool: Pool) => {
 
     async createProfile(profile: Profile) {
       const analyserSettings = await one(
-        AnalyserSettings,
+        IdReturnType,
         createAnalyserSettings,
         profile.analyserSettings,
       );
 
       const situationSettings = await one(
-        SituationSettings,
+        IdReturnType,
         createSituationSettings,
         profile.situationSettings,
       );
 
-      return one(z.object({ id: z.string() }), createProfileTemplate, {
+      return one(IdReturnType, createProfileTemplate, {
         profileName: profile.profileName,
         alarmsEnabled: profile.alarmsEnabled,
         notificationTargets: profile.notificationTargets,
@@ -148,10 +144,6 @@ export const queries = (pool: Pool) => {
 
     async reactivateProfileActivation(profileActivationId: string) {
       return one(ProfileActivation, reactivateProfileActivation, profileActivationId);
-    },
-
-    async createAlarm(alarm: Omit<Alarm, 'id'>) {
-      return one(Alarm, createAlarm, alarm);
     },
 
     async deactivateAlarm(alarmId: string, currentTimestamp: string) {

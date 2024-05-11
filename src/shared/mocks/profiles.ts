@@ -7,7 +7,6 @@ import {
 } from 'shared/types/profiles';
 
 export const mockAnalyserSettings: AnalyserSettings = {
-  id: '1',
   highLevelRel: 8,
   highLevelAbs: 10,
   highLevelBad: 14,
@@ -22,17 +21,16 @@ export const mockAlarmSettings: AlarmSettings = {
 };
 
 export const mockSituationSettings: SituationSettings = {
-  id: '1',
-  OUTDATED: mockAlarmSettings,
-  CRITICAL_OUTDATED: mockAlarmSettings,
-  FALLING: mockAlarmSettings,
-  RISING: mockAlarmSettings,
-  LOW: mockAlarmSettings,
-  BAD_LOW: mockAlarmSettings,
-  COMPRESSION_LOW: mockAlarmSettings,
-  HIGH: mockAlarmSettings,
-  BAD_HIGH: mockAlarmSettings,
-  PERSISTENT_HIGH: mockAlarmSettings,
+  outdated: mockAlarmSettings,
+  criticalOutdated: mockAlarmSettings,
+  falling: mockAlarmSettings,
+  rising: mockAlarmSettings,
+  low: mockAlarmSettings,
+  badLow: mockAlarmSettings,
+  compressionLow: mockAlarmSettings,
+  high: mockAlarmSettings,
+  badHigh: mockAlarmSettings,
+  persistentHigh: mockAlarmSettings,
 };
 
 export const mockProfiles: Profile[] = [

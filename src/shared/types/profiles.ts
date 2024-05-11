@@ -4,7 +4,6 @@ import { Situation } from './analyser';
 /* eslint-disable @typescript-eslint/no-redeclare */
 
 export const AnalyserSettings = z.object({
-  id: z.string(),
   highLevelRel: z.number(),
   highLevelAbs: z.number(),
   highLevelBad: z.number(),
@@ -21,17 +20,16 @@ export const AlarmSettings = z.object({
 export type AlarmSettings = z.infer<typeof AlarmSettings>;
 
 export const SituationSettings = z.object({
-  id: z.string(),
-  OUTDATED: AlarmSettings,
-  CRITICAL_OUTDATED: AlarmSettings,
-  FALLING: AlarmSettings,
-  RISING: AlarmSettings,
-  LOW: AlarmSettings,
-  BAD_LOW: AlarmSettings,
-  COMPRESSION_LOW: AlarmSettings,
-  HIGH: AlarmSettings,
-  BAD_HIGH: AlarmSettings,
-  PERSISTENT_HIGH: AlarmSettings,
+  outdated: AlarmSettings,
+  criticalOutdated: AlarmSettings,
+  falling: AlarmSettings,
+  rising: AlarmSettings,
+  low: AlarmSettings,
+  badLow: AlarmSettings,
+  compressionLow: AlarmSettings,
+  high: AlarmSettings,
+  badHigh: AlarmSettings,
+  persistentHigh: AlarmSettings,
 });
 export type SituationSettings = z.infer<typeof SituationSettings>;
 

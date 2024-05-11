@@ -67,13 +67,7 @@ export interface ICreateAnalyserSettingsParams {
 
 /** 'CreateAnalyserSettings' return type */
 export interface ICreateAnalyserSettingsResult {
-  highLevelAbs: number;
-  highLevelBad: number;
-  highLevelRel: number;
   id: string;
-  lowLevelAbs: number;
-  lowLevelRel: number;
-  timeSinceBgMinutes: number;
 }
 
 /** 'CreateAnalyserSettings' query type */
@@ -82,7 +76,7 @@ export interface ICreateAnalyserSettingsQuery {
   result: ICreateAnalyserSettingsResult;
 }
 
-const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true},"params":[{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":157,"b":170}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":175,"b":188}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":206}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":211,"b":223}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":240}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":245,"b":264}]}],"statement":"INSERT INTO analyser_settings (\n  high_level_rel,\n  high_level_abs,\n  high_level_bad,\n  low_level_rel,\n  low_level_abs,\n  time_since_bg_minutes\n)\nVALUES (\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!\n)\nRETURNING *"};
+const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true},"params":[{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":157,"b":170}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":175,"b":188}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":206}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":211,"b":223}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":240}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":245,"b":264}]}],"statement":"INSERT INTO analyser_settings (\n  high_level_rel,\n  high_level_abs,\n  high_level_bad,\n  low_level_rel,\n  low_level_abs,\n  time_since_bg_minutes\n)\nVALUES (\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!\n)\nRETURNING analyser_settings.id"};
 
 /**
  * Query generated from SQL:
@@ -103,7 +97,7 @@ const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"high
  *   :lowLevelAbs!,
  *   :timeSinceBgMinutes!
  * )
- * RETURNING *
+ * RETURNING analyser_settings.id
  * ```
  */
 export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsParams,ICreateAnalyserSettingsResult>(createAnalyserSettingsIR);
@@ -111,31 +105,21 @@ export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsP
 
 /** 'CreateSituationSettings' parameters type */
 export interface ICreateSituationSettingsParams {
-  BAD_HIGH: Json;
-  BAD_LOW: Json;
-  COMPRESSION_LOW: Json;
-  CRITICAL_OUTDATED: Json;
-  FALLING: Json;
-  HIGH: Json;
-  LOW: Json;
-  OUTDATED: Json;
-  PERSISTENT_HIGH: Json;
-  RISING: Json;
-}
-
-/** 'CreateSituationSettings' return type */
-export interface ICreateSituationSettingsResult {
   badHigh: Json;
   badLow: Json;
   compressionLow: Json;
   criticalOutdated: Json;
   falling: Json;
   high: Json;
-  id: string;
   low: Json;
   outdated: Json;
   persistentHigh: Json;
   rising: Json;
+}
+
+/** 'CreateSituationSettings' return type */
+export interface ICreateSituationSettingsResult {
+  id: string;
 }
 
 /** 'CreateSituationSettings' query type */
@@ -144,7 +128,7 @@ export interface ICreateSituationSettingsQuery {
   result: ICreateSituationSettingsResult;
 }
 
-const createSituationSettingsIR: any = {"usedParamSet":{"OUTDATED":true,"CRITICAL_OUTDATED":true,"FALLING":true,"RISING":true,"LOW":true,"BAD_LOW":true,"COMPRESSION_LOW":true,"HIGH":true,"BAD_HIGH":true,"PERSISTENT_HIGH":true},"params":[{"name":"OUTDATED","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":185}]},{"name":"CRITICAL_OUTDATED","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":209}]},{"name":"FALLING","required":true,"transform":{"type":"scalar"},"locs":[{"a":215,"b":223}]},{"name":"RISING","required":true,"transform":{"type":"scalar"},"locs":[{"a":229,"b":236}]},{"name":"LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":242,"b":246}]},{"name":"BAD_LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":252,"b":260}]},{"name":"COMPRESSION_LOW","required":true,"transform":{"type":"scalar"},"locs":[{"a":266,"b":282}]},{"name":"HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":288,"b":293}]},{"name":"BAD_HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":299,"b":308}]},{"name":"PERSISTENT_HIGH","required":true,"transform":{"type":"scalar"},"locs":[{"a":314,"b":330}]}],"statement":"INSERT INTO situation_settings (\n  outdated,\n  critical_outdated,\n  falling,\n  rising,\n  low,\n  bad_low,\n  compression_low,\n  high,\n  bad_high,\n  persistent_high\n)\nVALUES (\n   :OUTDATED!,\n   :CRITICAL_OUTDATED!,\n   :FALLING!,\n   :RISING!,\n   :LOW!,\n   :BAD_LOW!,\n   :COMPRESSION_LOW!,\n   :HIGH!,\n   :BAD_HIGH!,\n   :PERSISTENT_HIGH!\n)\nRETURNING *"};
+const createSituationSettingsIR: any = {"usedParamSet":{"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true},"params":[{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":185}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":208}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":214,"b":222}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":235}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":245}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":251,"b":258}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":264,"b":279}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":285,"b":290}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":296,"b":304}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":310,"b":325}]}],"statement":"INSERT INTO situation_settings (\n  outdated,\n  critical_outdated,\n  falling,\n  rising,\n  low,\n  bad_low,\n  compression_low,\n  high,\n  bad_high,\n  persistent_high\n)\nVALUES (\n   :outdated!,\n   :criticalOutdated!,\n   :falling!,\n   :rising!,\n   :low!,\n   :badLow!,\n   :compressionLow!,\n   :high!,\n   :badHigh!,\n   :persistentHigh!\n)\nRETURNING situation_settings.id"};
 
 /**
  * Query generated from SQL:
@@ -162,18 +146,18 @@ const createSituationSettingsIR: any = {"usedParamSet":{"OUTDATED":true,"CRITICA
  *   persistent_high
  * )
  * VALUES (
- *    :OUTDATED!,
- *    :CRITICAL_OUTDATED!,
- *    :FALLING!,
- *    :RISING!,
- *    :LOW!,
- *    :BAD_LOW!,
- *    :COMPRESSION_LOW!,
- *    :HIGH!,
- *    :BAD_HIGH!,
- *    :PERSISTENT_HIGH!
+ *    :outdated!,
+ *    :criticalOutdated!,
+ *    :falling!,
+ *    :rising!,
+ *    :low!,
+ *    :badLow!,
+ *    :compressionLow!,
+ *    :high!,
+ *    :badHigh!,
+ *    :persistentHigh!
  * )
- * RETURNING *
+ * RETURNING situation_settings.id
  * ```
  */
 export const createSituationSettings = new PreparedQuery<ICreateSituationSettingsParams,ICreateSituationSettingsResult>(createSituationSettingsIR);

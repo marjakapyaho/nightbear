@@ -5,7 +5,7 @@ import { getTimeMinusTimeMs } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
 import { Alarm, AlarmState } from 'shared/types/alarms';
 import { findIndex, map, sum, take } from 'lodash';
-import { ALARM_FALLBACK_LEVEL } from 'shared/utils/alarms';
+import { ALARM_FALLBACK_LEVEL, getEscalationAfterMinutes } from 'shared/utils/alarms';
 
 export type AlarmActions = {
   remove?: Alarm;
@@ -22,7 +22,7 @@ export const getNeededAlarmLevel = (
   const hasBeenValidForMinutes = Math.round(
     getTimeMinusTimeMs(context.timestamp(), validAfter) / MIN_IN_MS,
   );
-  const levelUpTimes = activeProfile.situationSettings[currentSituation]?.escalationAfterMinutes;
+  const levelUpTimes = getEscalationAfterMinutes(currentSituation, activeProfile);
 
   if (!levelUpTimes) {
     return ALARM_FALLBACK_LEVEL;
