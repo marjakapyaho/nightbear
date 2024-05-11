@@ -339,6 +339,47 @@ const getRelevantProfileActivationsIR: any = {"usedParamSet":{},"params":[],"sta
 export const getRelevantProfileActivations = new PreparedQuery<IGetRelevantProfileActivationsParams,IGetRelevantProfileActivationsResult>(getRelevantProfileActivationsIR);
 
 
+/** 'GetProfileActivationById' parameters type */
+export interface IGetProfileActivationByIdParams {
+  id: string;
+}
+
+/** 'GetProfileActivationById' return type */
+export interface IGetProfileActivationByIdResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileName: string | null;
+  profileTemplateId: string;
+  repeatTimeInLocalTimezone: string | null;
+}
+
+/** 'GetProfileActivationById' query type */
+export interface IGetProfileActivationByIdQuery {
+  params: IGetProfileActivationByIdParams;
+  result: IGetProfileActivationByIdResult;
+}
+
+const getProfileActivationByIdIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":329,"b":332}]}],"statement":"SELECT\n  profile_activations.id,\n  profile_activations.profile_template_id,\n  profile_templates.profile_name,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\nWHERE profile_activations.id = :id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   profile_activations.id,
+ *   profile_activations.profile_template_id,
+ *   profile_templates.profile_name,
+ *   activated_at,
+ *   repeat_time_in_local_timezone,
+ *   deactivated_at
+ * FROM profile_activations
+ *   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+ * WHERE profile_activations.id = :id!
+ * ```
+ */
+export const getProfileActivationById = new PreparedQuery<IGetProfileActivationByIdParams,IGetProfileActivationByIdResult>(getProfileActivationByIdIR);
+
+
 /** 'ReactivateProfileActivation' parameters type */
 export interface IReactivateProfileActivationParams {
   id: string;

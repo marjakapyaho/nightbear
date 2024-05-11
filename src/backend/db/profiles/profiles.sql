@@ -154,6 +154,20 @@ FROM profile_activations
   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
 WHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL;
 
+/*
+  @name getProfileActivationById
+*/
+SELECT
+  profile_activations.id,
+  profile_activations.profile_template_id,
+  profile_templates.profile_name,
+  activated_at,
+  repeat_time_in_local_timezone,
+  deactivated_at
+FROM profile_activations
+  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+WHERE profile_activations.id = :id!;
+
 /* @name reactivateProfileActivation */
 UPDATE profile_activations SET
   activated_at = CURRENT_TIMESTAMP

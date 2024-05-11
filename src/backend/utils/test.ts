@@ -41,9 +41,6 @@ export const truncateDb = async (context: Context) => {
   }
 };
 
-export const checkActiveAlarm = async (context: Context): Promise<Alarm> =>
-  context.db.getActiveAlarm();
-
 export function createRequest(request: Partial<Request>): Request {
   return {
     requestId: generateUuid(),

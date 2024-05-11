@@ -7,8 +7,21 @@ import {
   mockProfiles,
   mockSituationSettings,
 } from 'shared/mocks/profiles';
-import { createProfileWithActivation } from 'backend/db/profiles/utils';
-import { Profile } from 'shared/types/profiles';
+import { Profile, ProfileActivation } from 'shared/types/profiles';
+import { Context } from 'backend/utils/api';
+
+const createProfileWithActivation = async (
+  profile: Profile,
+  profileActivation: ProfileActivation,
+  context: Context,
+) => {
+  const profileTemplate = await context.db.createProfile(profile);
+  await context.db.createProfileActivation({
+    ...profileActivation,
+    profileTemplateId: profileTemplate.id,
+  });
+  return context.db.getProfileById(profileTemplate.id);
+};
 
 describe('profiles/checkAndUpdateProfileActivations', () => {
   const context = createTestContext();

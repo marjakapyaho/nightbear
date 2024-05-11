@@ -83,17 +83,27 @@ export type GenParams<T> = T extends PreparedQuery<infer P, any> ? P : void;
 
 export const runQueryAndValidateResult = async <
   One extends boolean,
+  None extends boolean,
   Schema extends z.ZodTypeAny,
   Params,
 >(
   pool: Pool,
   one: One,
+  none: None,
   schema: Schema,
   method: PreparedQuery<Params, OptionalToNull<Schema>>,
   params?: Params,
-): Promise<One extends true ? z.infer<Schema> : z.infer<Schema>[]> => {
+): Promise<One extends true ? z.infer<Schema> | null : z.infer<Schema>[]> => {
   const raw = await method.run((params ?? {}) as Params, pool);
   const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
+  if (one && none) {
+    if (mapped.length === 0) {
+      return undefined;
+    } else if (mapped.length !== 1) {
+      throw new Error(`Expected exactly one result or no results but got ${mapped.length} instead`);
+    }
+    return schema.parse(mapped[0]);
+  }
   if (one) {
     if (mapped.length !== 1)
       throw new Error(`Expected exactly one result row but got ${mapped.length} instead`);
@@ -130,7 +140,15 @@ export const bindQueryShorthands = (pool: Pool) => {
     method: PreparedQuery<Params, OptionalToNull<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>> => {
-    return runQueryAndValidateResult(pool, true, schema, method, params as Params);
+    return runQueryAndValidateResult(pool, true, false, schema, method, params as Params);
+  };
+
+  const oneOrNone = async <Schema extends z.ZodTypeAny, Params extends object | void>(
+    schema: Schema,
+    method: PreparedQuery<Params, OptionalToNull<Schema>>,
+    params?: Params extends object ? Params : undefined,
+  ): Promise<z.infer<Schema>> => {
+    return runQueryAndValidateResult(pool, true, true, schema, method, params as Params);
   };
 
   const many = async <Schema extends z.ZodTypeAny, Params extends object | void>(
@@ -138,11 +156,12 @@ export const bindQueryShorthands = (pool: Pool) => {
     method: PreparedQuery<Params, OptionalToNull<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>[]> => {
-    return runQueryAndValidateResult(pool, false, schema, method, params as Params);
+    return runQueryAndValidateResult(pool, false, false, schema, method, params as Params);
   };
 
   return {
     one,
+    oneOrNone,
     many,
   };
 };

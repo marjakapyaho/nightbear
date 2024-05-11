@@ -41,13 +41,14 @@ import {
   createProfileActivation,
   createProfileTemplate,
   createSituationSettings,
+  getProfileActivationById,
   getProfiles,
   getRelevantProfileActivations,
   reactivateProfileActivation,
 } from './profiles/profiles.queries';
 
 export const queries = (pool: Pool) => {
-  const { one, many } = bindQueryShorthands(pool);
+  const { one, many, oneOrNone } = bindQueryShorthands(pool);
 
   return {
     async createSensorEntry(sensorEntry: Omit<SensorEntry, 'timestamp'>) {
@@ -125,11 +126,16 @@ export const queries = (pool: Pool) => {
     },
 
     async createProfileActivation(profileActivation: Omit<ProfileActivation, 'id'>) {
-      return one(IdReturnType, createProfileActivation, profileActivation);
+      const createdActivation = await one(IdReturnType, createProfileActivation, profileActivation);
+      return one(ProfileActivation, getProfileActivationById, { id: createdActivation.id });
     },
 
     async getProfiles() {
       return many(Profile, getProfiles);
+    },
+
+    async getProfileById(templateId: string) {
+      return one(Profile, getProfiles, { templateId });
     },
 
     async getActiveProfile() {
@@ -142,11 +148,11 @@ export const queries = (pool: Pool) => {
     },
 
     async reactivateProfileActivation(profileActivationId: string) {
-      return one(ProfileActivation, reactivateProfileActivation, profileActivationId);
+      return one(IdReturnType, reactivateProfileActivation, { id: profileActivationId });
     },
 
     async deactivateAlarm(alarmId: string, currentTimestamp: string) {
-      return one(Alarm, deactivateAlarm, { alarmId, currentTimestamp });
+      return one(IdReturnType, deactivateAlarm, { id: alarmId, currentTimestamp });
     },
 
     async createAlarmState(
@@ -168,12 +174,12 @@ export const queries = (pool: Pool) => {
     },
 
     async createAlarmWithState(situation: Situation) {
-      const createdAlarm = await one(Alarm, createAlarm, { situation });
+      const createdAlarm = await one(IdReturnType, createAlarm, { situation });
       await one(AlarmState, createAlarmState, {
         alarmId: createdAlarm.id,
         alarmLevel: ALARM_START_LEVEL,
       });
-      return createdAlarm;
+      return one(Alarm, getAlarms, { alarmId: createdAlarm.id });
     },
 
     async markAlarmAsProcessed(alarmState: AlarmState) {
@@ -189,11 +195,11 @@ export const queries = (pool: Pool) => {
     },
 
     async getActiveAlarm() {
-      return one(Alarm, getAlarms, { onlyActive: true });
+      return oneOrNone(Alarm, getAlarms, { onlyActive: true });
     },
 
     async getAlarmStateByAlarmId(alarmId: string) {
-      return one(AlarmState, getAlarmStateByAlarmId, alarmId);
+      return one(AlarmState, getAlarmStateByAlarmId, { alarmId });
     },
   };
 };

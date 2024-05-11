@@ -90,6 +90,7 @@ FROM alarms
   LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id
 WHERE
   (:onlyActive = TRUE AND deactivated_at IS NULL) OR
+  (:alarmId::uuid IS NULL OR :alarmId = alarms.id) OR
   timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP);
 
 /*

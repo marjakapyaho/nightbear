@@ -25,8 +25,6 @@ describe('utils/analyser-utils', () => {
       {
         timestamp: getTimeMinusTime(timestamp, 25 * MIN_IN_MS),
         bloodGlucose: 6,
-        slope: null,
-        rawSlope: null,
       },
       {
         timestamp: getTimeMinusTime(timestamp, 20 * MIN_IN_MS),
