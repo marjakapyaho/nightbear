@@ -3,7 +3,7 @@ import styles from 'frontend/pages/config/Config.module.scss';
 
 type Props = {
   label: string;
-  value: string | number | undefined;
+  value: string | number | undefined | null;
   setValue: (val: string) => void;
 };
 
