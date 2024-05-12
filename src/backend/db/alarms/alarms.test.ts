@@ -14,10 +14,10 @@ describe('db/alarms', () => {
     const alarmState = await context.db.getAlarmStateByAlarmId(alarm.id);
 
     expect(alarm.situation).toBe('LOW');
-    expect(alarm.deactivatedAt).toBe(null);
+    expect(alarm.deactivatedAt).toBeUndefined();
     expect(alarmState.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarmState.alarmLevel).toBe(0);
     expect(alarmState.validAfter).toEqual(mockNow);
-    expect(alarmState.ackedBy).toBeNull();
+    expect(alarmState.ackedBy).toBeUndefined();
   });
 });

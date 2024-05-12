@@ -1,3 +1,4 @@
+import { nullableOptional } from 'shared/utils/types';
 import { z } from 'zod';
 
 /* eslint-disable @typescript-eslint/no-redeclare */
@@ -5,8 +6,8 @@ import { z } from 'zod';
 export const AnalyserEntry = z.object({
   timestamp: z.string(),
   bloodGlucose: z.number(),
-  slope: z.optional(z.number()),
-  rawSlope: z.optional(z.number()),
+  slope: nullableOptional(z.number()),
+  rawSlope: nullableOptional(z.number()),
 });
 export type AnalyserEntry = z.infer<typeof AnalyserEntry>;
 

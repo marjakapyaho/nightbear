@@ -101,18 +101,7 @@ export const runQueryAndValidateResult = async <
     : z.infer<Schema>[]
 > => {
   const raw = await method.run((params ?? {}) as Params, pool);
-  const mapped = raw.map(row =>
-    _.fromPairs(
-      _.toPairs(row).map(([key, val]) => {
-        const columnName = _.camelCase(key);
-        const isNulledOptional =
-          schema instanceof z.ZodObject &&
-          columnName in schema.shape &&
-          schema.shape[columnName] instanceof z.ZodOptional;
-        return [columnName, isNulledOptional ? undefined : val];
-      }),
-    ),
-  );
+  const mapped = raw.map(row => _.mapKeys(row as object, (_val, key) => _.camelCase(key)));
   if (one && none) {
     if (mapped.length === 0) {
       // TODO: fix this
@@ -136,12 +125,18 @@ export const runQueryAndValidateResult = async <
  * Our convention is to define optional model properties as:
  *
  *     z.object({
- *       profileName: z.optional(z.string()),
+ *       profileName: nullableOptional(z.string()),
  *     });
  *
- * But also our optional properties are NULL-able in Postgres.
+ * The resulting type is:
  *
- * This type papers over that difference (which we also account for runtime), and maps to:
+ *     {
+ *       profileName?: string | undefined;
+ *     }
+ *
+ * But also, our optional properties are NULL-able in Postgres.
+ *
+ * This type papers over that difference (which nullableOptional() handles runtime), and maps to:
  *
  *     {
  *       profileName: string | null;
