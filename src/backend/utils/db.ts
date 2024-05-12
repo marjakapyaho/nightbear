@@ -91,7 +91,7 @@ export const runQueryAndValidateResult = async <
   one: One,
   none: None,
   schema: Schema,
-  method: PreparedQuery<Params, OptionalToNull<Schema>>,
+  method: PreparedQuery<Params, z.infer<Schema>>,
   params?: Params,
 ): Promise<
   One extends true
@@ -121,37 +121,10 @@ export const runQueryAndValidateResult = async <
   }
 };
 
-/**
- * Our convention is to define optional model properties as:
- *
- *     z.object({
- *       profileName: nullableOptional(z.string()),
- *     });
- *
- * The resulting type is:
- *
- *     {
- *       profileName?: string | undefined;
- *     }
- *
- * But also, our optional properties are NULL-able in Postgres.
- *
- * This type papers over that difference (which nullableOptional() handles runtime), and maps to:
- *
- *     {
- *       profileName: string | null;
- *     }
- */
-type OptionalToNull<T> = T extends z.ZodObject<infer U>
-  ? {
-      [P in keyof U]: U[P] extends z.ZodOptional<infer I> ? z.infer<I> | null : z.infer<U[P]>;
-    }
-  : never;
-
 export const bindQueryShorthands = (pool: Pool) => {
   const one = async <Schema extends z.ZodTypeAny, Params extends object | void>(
     schema: Schema,
-    method: PreparedQuery<Params, OptionalToNull<Schema>>,
+    method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>> => {
     return runQueryAndValidateResult(pool, true, false, schema, method, params as Params);
@@ -159,7 +132,7 @@ export const bindQueryShorthands = (pool: Pool) => {
 
   const oneOrNone = async <Schema extends z.ZodTypeAny, Params extends object | void>(
     schema: Schema,
-    method: PreparedQuery<Params, OptionalToNull<Schema>>,
+    method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>> => {
     return runQueryAndValidateResult(pool, true, true, schema, method, params as Params);
@@ -167,7 +140,7 @@ export const bindQueryShorthands = (pool: Pool) => {
 
   const many = async <Schema extends z.ZodTypeAny, Params extends object | void>(
     schema: Schema,
-    method: PreparedQuery<Params, OptionalToNull<Schema>>,
+    method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>[]> => {
     return runQueryAndValidateResult(pool, false, false, schema, method, params as Params);
