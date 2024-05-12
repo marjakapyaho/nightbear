@@ -16,7 +16,7 @@ import styles from './Stats.module.scss';
 import { StatLine } from 'frontend/pages/stats/StatLine';
 import { StatGraph } from 'frontend/pages/stats/StatGraph';
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
-import { getTimeAsISOStr } from 'shared/utils/time';
+import { getTimeAsISOStr, getTimeInMillis } from 'shared/utils/time';
 
 export const Stats = () => {
   const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS));
@@ -37,17 +37,20 @@ export const Stats = () => {
 
   const daysToShow = 60;
   const dailyInsulins = calculateDailyAmounts(insulinEntries, daysToShow).map(val => ({
-    timestamp: val.timestamp,
+    isoTimestamp: val.timestamp,
+    timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#EE776E',
   }));
   const dailyCarbs = calculateDailyAmounts(carbEntries, daysToShow).map(val => ({
-    timestamp: val.timestamp,
+    isoTimestamp: val.timestamp,
+    timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#9AD5B3',
   }));
   const dailyAverageBgs = calculateDailyAverageBgs(bgEntries, daysToShow).map(val => ({
-    timestamp: val.timestamp,
+    isoTimestamp: val.timestamp,
+    timestamp: getTimeInMillis(val.timestamp),
     val: val.average,
     color: '#777',
   }));

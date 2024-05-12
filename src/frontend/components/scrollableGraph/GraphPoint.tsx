@@ -1,6 +1,7 @@
 import styles from './ScrollableGraph.module.scss';
 import React from 'react';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
+import { getTimeInMillis } from 'shared/utils/time';
 
 type Props = {
   point: Point;

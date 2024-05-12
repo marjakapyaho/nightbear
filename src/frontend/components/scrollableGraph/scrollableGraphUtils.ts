@@ -32,7 +32,8 @@ export type GraphConfig = BaseGraphConfig & {
 };
 
 export type Point = {
-  timestamp: string;
+  isoTimestamp: string;
+  timestamp: number;
   val: number | null;
   color: string;
   insulinEntry?: InsulinEntry;
@@ -64,8 +65,7 @@ export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {
 };
 
 // The CSS left value for rendering the given timestamp
-export const tsToLeft = (c: GraphConfig, timestamp: string) => {
-  const ts = getTimeInMillis(timestamp);
+export const tsToLeft = (c: GraphConfig, ts: number) => {
   return roundTo1Decimals(
     c.paddingLeft + (ts - (c.timelineRangeEnd - c.timelineRange)) * c.pixelsPerMs,
   );

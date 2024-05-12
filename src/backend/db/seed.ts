@@ -3,9 +3,10 @@ import { Context } from 'backend/utils/api';
 import { generateSensorEntries } from 'shared/utils/test';
 import { getTimeMinusTime } from 'shared/utils/time';
 import { MIN_IN_MS } from 'shared/utils/calculations';
+import { getTimestampFlooredToEveryFiveMinutes } from 'shared/utils/timelineEntries';
 
 export const generateSeedData = async (context: Context) => {
-  const now = getTimeMinusTime(context.timestamp(), MIN_IN_MS);
+  const now = getTimestampFlooredToEveryFiveMinutes(context.timestamp()) || context.timestamp();
 
   // Create timeline entries
   await context.db.createSensorEntries(

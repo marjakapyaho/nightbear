@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, tsToLeft } from './scrollableGraphUtils';
-import { getTimeAsISOStr } from 'shared/utils/time';
+import { getTimeAsISOStr, humanReadableShortTime } from 'shared/utils/time';
 
 type Props = {
   config: GraphConfig;
@@ -12,24 +12,26 @@ type Props = {
 export const GraphScaleHorizontal = ({ config }: Props) => {
   const timeStepLines = range(config.flooredHourStart, config.timelineRangeEnd, config.timeStep);
 
-  return timeStepLines.map((timestamp, i) => (
-    <div
-      className={styles.graphHorizontalScaleItem}
-      key={timestamp}
-      style={{
-        left: tsToLeft(config, getTimeAsISOStr(timestamp)),
-        width: config.timeStep * config.pixelsPerMs,
-      }}
-    >
-      <span
-        className={styles.graphScaleTime}
+  return timeStepLines.map((timestamp, i) => {
+    return (
+      <div
+        className={styles.graphHorizontalScaleItem}
+        key={timestamp}
         style={{
-          left: config.pixelsPerTimeStep / -2,
-          display: i % config.showEveryNthTimeLabel === 0 ? 'initial' : 'none',
+          left: tsToLeft(config, timestamp),
+          width: config.timeStep * config.pixelsPerMs,
         }}
       >
-        {DateTime.fromMillis(timestamp).toFormat(config.timeFormat)}
-      </span>
-    </div>
-  ));
+        <span
+          className={styles.graphScaleTime}
+          style={{
+            left: -20, // Should correlate with graphScaleTime width
+            display: i % config.showEveryNthTimeLabel === 0 ? 'initial' : 'none',
+          }}
+        >
+          {humanReadableShortTime(timestamp)}
+        </span>
+      </div>
+    );
+  });
 };

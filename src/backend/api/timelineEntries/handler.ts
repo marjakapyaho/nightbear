@@ -38,10 +38,8 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
 };
 
 export const updateTimelineEntries = async (request: Request, context: Context) => {
-  console.log('---1---');
   const dataPoint = request.requestBody as Point;
-  const timestamp = dataPoint?.timestamp;
-  console.log({ timestamp });
+  const timestamp = dataPoint?.isoTimestamp;
   if (!timestamp) {
     return createResponse('error');
   }

@@ -7,20 +7,24 @@ import {
   getNewSelectedPointWithCarbs,
   getNewSelectedPointWithInsulin,
   getNewSelectedPointWithMeterEntry,
-  mapTimelineEntriesToGraphPoints,
 } from './bgGraphUtils';
 import styles from './BgGraph.module.scss';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableGraph';
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
 import { getTimeAsISOStr } from 'shared/utils/time';
+import { mapTimelineEntriesToGraphPoints } from 'shared/utils/timelineEntries';
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
   const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange);
   const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
     useTimelineEntries(startTimestamp);
-  const graphPoints = mapTimelineEntriesToGraphPoints(timelineEntries, baseConfig.timelineRange);
+  const graphPoints = mapTimelineEntriesToGraphPoints(
+    timelineEntries,
+    baseConfig.timelineRange,
+    getTimeAsISOStr(Date.now()),
+  );
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
   const latestPoint = graphPoints.length ? graphPoints[0] : null;
 
