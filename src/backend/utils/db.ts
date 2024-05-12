@@ -113,8 +113,9 @@ export const runQueryAndValidateResult = async <
     return schema.parse(mapped[0]);
   }
   if (one) {
-    if (mapped.length !== 1)
+    if (mapped.length !== 1) {
       throw new Error(`Expected exactly one result row but got ${mapped.length} instead`);
+    }
     return schema.parse(mapped[0]);
   } else {
     return z.array(schema).parse(mapped);

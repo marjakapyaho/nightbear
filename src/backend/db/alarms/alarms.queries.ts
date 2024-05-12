@@ -245,7 +245,7 @@ export interface IGetAlarmsQuery {
   result: IGetAlarmsResult;
 }
 
-const getAlarmsIR: any = {"usedParamSet":{"onlyActive":true,"alarmId":true,"from":true,"to":true},"params":[{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":946,"b":956}]},{"name":"alarmId","required":false,"transform":{"type":"scalar"},"locs":[{"a":999,"b":1006},{"a":1025,"b":1032}]},{"name":"from","required":false,"transform":{"type":"scalar"},"locs":[{"a":1065,"b":1069}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":1097,"b":1099}]}],"statement":"WITH\n  alarm_states_query AS (\n    SELECT\n      alarm_states.alarm_id,\n      json_agg(json_build_object(\n        'id', alarm_states.id::VARCHAR,\n        'timestamp', alarm_states.timestamp,\n        'alarmLevel', alarm_states.alarm_level,\n        'validAfter', alarm_states.valid_after,\n        'ackedBy', alarm_states.acked_by,\n        'notificationTarget', alarm_states.notification_target,\n        'notificationReceipt', alarm_states.notification_receipt,\n        'notificationProcessedAt', alarm_states.notification_processed_at\n        ) ORDER BY alarm_states.timestamp) AS alarm_states\n    FROM alarm_states\n    GROUP BY alarm_states.alarm_id\n  )\nSELECT\n  alarms.id AS id,\n  timestamp,\n  situation,\n  (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS \"is_active!\",\n  deactivated_at,\n  alarm_states_query.alarm_states AS alarm_states\nFROM alarms\n  LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id\nWHERE\n  (:onlyActive = TRUE AND deactivated_at IS NULL) OR\n  (:alarmId::uuid IS NULL OR :alarmId = alarms.id) OR\n  timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)"};
+const getAlarmsIR: any = {"usedParamSet":{"onlyActive":true,"alarmId":true,"from":true,"to":true},"params":[{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":946,"b":956},{"a":976,"b":986}]},{"name":"alarmId","required":false,"transform":{"type":"scalar"},"locs":[{"a":1031,"b":1038},{"a":1057,"b":1064}]},{"name":"from","required":false,"transform":{"type":"scalar"},"locs":[{"a":1086,"b":1090},{"a":1130,"b":1134}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":1162,"b":1164}]}],"statement":"WITH\n  alarm_states_query AS (\n    SELECT\n      alarm_states.alarm_id,\n      json_agg(json_build_object(\n        'id', alarm_states.id::VARCHAR,\n        'timestamp', alarm_states.timestamp,\n        'alarmLevel', alarm_states.alarm_level,\n        'validAfter', alarm_states.valid_after,\n        'ackedBy', alarm_states.acked_by,\n        'notificationTarget', alarm_states.notification_target,\n        'notificationReceipt', alarm_states.notification_receipt,\n        'notificationProcessedAt', alarm_states.notification_processed_at\n        ) ORDER BY alarm_states.timestamp) AS alarm_states\n    FROM alarm_states\n    GROUP BY alarm_states.alarm_id\n  )\nSELECT\n  alarms.id AS id,\n  timestamp,\n  situation,\n  (CASE WHEN deactivated_at IS NULL THEN true ELSE false END) AS \"is_active!\",\n  deactivated_at,\n  alarm_states_query.alarm_states AS alarm_states\nFROM alarms\n  LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id\nWHERE\n  (:onlyActive::bool IS NULL OR (:onlyActive = TRUE AND deactivated_at IS NULL)) AND\n  (:alarmId::uuid IS NULL OR :alarmId = alarms.id) AND\n  (:from::timestamptz IS NULL OR (timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)))"};
 
 /**
  * Query generated from SQL:
@@ -277,9 +277,9 @@ const getAlarmsIR: any = {"usedParamSet":{"onlyActive":true,"alarmId":true,"from
  * FROM alarms
  *   LEFT JOIN alarm_states_query ON alarm_states_query.alarm_id = alarms.id
  * WHERE
- *   (:onlyActive = TRUE AND deactivated_at IS NULL) OR
- *   (:alarmId::uuid IS NULL OR :alarmId = alarms.id) OR
- *   timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)
+ *   (:onlyActive::bool IS NULL OR (:onlyActive = TRUE AND deactivated_at IS NULL)) AND
+ *   (:alarmId::uuid IS NULL OR :alarmId = alarms.id) AND
+ *   (:from::timestamptz IS NULL OR (timestamp >= :from AND timestamp <= COALESCE(:to, CURRENT_TIMESTAMP)))
  * ```
  */
 export const getAlarms = new PreparedQuery<IGetAlarmsParams,IGetAlarmsResult>(getAlarmsIR);

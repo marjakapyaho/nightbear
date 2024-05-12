@@ -44,7 +44,6 @@ describe('profiles/checkAndUpdateProfileActivations', () => {
       mockProfileActivations[1],
       context,
     );
-
     const activeProfile = await checkAndUpdateProfileActivations(
       context,
       '2024-04-27T12:30:00.000Z',

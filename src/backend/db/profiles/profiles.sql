@@ -129,7 +129,7 @@ FROM profile_templates
   INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id
   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
 WHERE
-  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) OR
+  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND
   (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL));
 
 /*

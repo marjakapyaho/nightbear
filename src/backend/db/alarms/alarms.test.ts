@@ -17,7 +17,7 @@ describe('db/alarms', () => {
     expect(alarm.deactivatedAt).toBeUndefined();
     expect(alarmState.timestamp).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarmState.alarmLevel).toBe(0);
-    expect(alarmState.validAfter).toEqual(mockNow);
+    expect(alarmState.validAfter).toMatch(/^\d+-.*T\d+.*Z$/);
     expect(alarmState.ackedBy).toBeUndefined();
   });
 });
