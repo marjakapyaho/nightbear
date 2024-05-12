@@ -37,7 +37,7 @@ export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
   decimals: 1,
 });
 
-export const getNewSelectedPointWithCarbs = (basePoint: Point | null, newAmount: number) =>
+export const getNewSelectedPointWithCarbs = (newAmount: number, basePoint?: Point) =>
   basePoint
     ? {
         ...basePoint,
@@ -49,7 +49,7 @@ export const getNewSelectedPointWithCarbs = (basePoint: Point | null, newAmount:
       }
     : null;
 
-export const getNewSelectedPointWithMeterEntry = (basePoint: Point | null, newBg: number) =>
+export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint?: Point) =>
   basePoint
     ? {
         ...basePoint,
@@ -60,7 +60,7 @@ export const getNewSelectedPointWithMeterEntry = (basePoint: Point | null, newBg
       }
     : null;
 
-export const getNewSelectedPointWithInsulin = (basePoint: Point | null, newAmount: number) =>
+export const getNewSelectedPointWithInsulin = (newAmount: number, basePoint?: Point) =>
   basePoint
     ? {
         ...basePoint,

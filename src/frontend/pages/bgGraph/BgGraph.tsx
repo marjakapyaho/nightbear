@@ -14,6 +14,7 @@ import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableG
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
 import { getTimeAsISOStr } from 'shared/utils/time';
 import { mapTimelineEntriesToGraphPoints } from 'shared/utils/timelineEntries';
+import { last } from 'lodash';
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
@@ -26,13 +27,13 @@ export const BgGraph = () => {
     getTimeAsISOStr(Date.now()),
   );
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const latestPoint = graphPoints.length ? graphPoints[0] : null;
+  const latestPoint = last(graphPoints);
 
   const onChangeCarbs = (newAmount: number) => {
     const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;
     const basePoint = selectedPoint || latestPoint;
     const pointToSave = hasValueChanged
-      ? getNewSelectedPointWithCarbs(basePoint, newAmount)
+      ? getNewSelectedPointWithCarbs(newAmount, basePoint)
       : basePoint
         ? { ...basePoint, carbEntry: undefined }
         : null;
@@ -44,7 +45,7 @@ export const BgGraph = () => {
     const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose;
     const basePoint = selectedPoint || latestPoint;
     const pointToSave = hasValueChanged
-      ? getNewSelectedPointWithMeterEntry(basePoint, newBg)
+      ? getNewSelectedPointWithMeterEntry(newBg, basePoint)
       : basePoint
         ? { ...basePoint, meterEntry: undefined }
         : null;
@@ -56,7 +57,7 @@ export const BgGraph = () => {
     const hasValueChanged = newAmount !== selectedPoint?.insulinEntry?.amount;
     const basePoint = selectedPoint || latestPoint;
     const pointToSave = hasValueChanged
-      ? getNewSelectedPointWithInsulin(basePoint, newAmount)
+      ? getNewSelectedPointWithInsulin(newAmount, basePoint)
       : basePoint
         ? { ...basePoint, insulinEntry: undefined }
         : null;

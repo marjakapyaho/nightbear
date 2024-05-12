@@ -4,7 +4,7 @@ import styles from './StatusBar.module.scss';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 
 type Props = {
-  graphPoint: Point | null;
+  graphPoint?: Point;
 };
 
 export const StatusBar = ({ graphPoint }: Props) => {
