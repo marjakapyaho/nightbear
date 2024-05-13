@@ -15,7 +15,7 @@ export const StatusBar = ({ graphPoint }: Props) => {
           {graphPoint ? (
             <TimeAgo timestamp={graphPoint.timestamp} decimalsForMinutes frequentUpdates />
           ) : (
-            'n/a'
+            '-'
           )}
         </span>{' '}
         <span className={styles.smallerText}>ago</span>

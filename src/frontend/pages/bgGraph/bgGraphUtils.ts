@@ -2,6 +2,7 @@ import { BaseGraphConfig, Point } from 'frontend/components/scrollableGraph/scro
 import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 import { InsulinEntryType } from 'shared/types/timelineEntries';
 import { highLimit, lowLimit } from 'shared/utils/config';
+import { chain } from 'lodash';
 
 export const getFillColor = (bg: number | null) => {
   if (!bg) {
@@ -71,3 +72,9 @@ export const getNewSelectedPointWithInsulin = (newAmount: number, basePoint?: Po
         },
       }
     : null;
+
+export const findLatestPointWithBloodGlucose = (points: Point[]) =>
+  chain(points)
+    .filter(point => Boolean(point.val))
+    .last()
+    .value();

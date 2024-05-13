@@ -3,6 +3,7 @@ import { StatusBar } from 'frontend/components/statusBar/StatusBar';
 import { useState } from 'react';
 import React from 'react';
 import {
+  findLatestPointWithBloodGlucose,
   getBgGraphBaseConfig,
   getNewSelectedPointWithCarbs,
   getNewSelectedPointWithInsulin,
@@ -14,7 +15,6 @@ import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableG
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
 import { getTimeAsISOStr } from 'shared/utils/time';
 import { mapTimelineEntriesToGraphPoints } from 'shared/utils/timelineEntries';
-import { last } from 'lodash';
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
@@ -27,7 +27,7 @@ export const BgGraph = () => {
     getTimeAsISOStr(Date.now()),
   );
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const latestPoint = last(graphPoints);
+  const latestPoint = findLatestPointWithBloodGlucose(graphPoints);
 
   const onChangeCarbs = (newAmount: number) => {
     const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;

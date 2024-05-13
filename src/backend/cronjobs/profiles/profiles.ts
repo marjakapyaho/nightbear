@@ -5,8 +5,6 @@ import {
   shouldRepeatingActivationBeSwitched,
 } from 'backend/cronjobs/profiles/utils';
 import { Context } from 'backend/utils/api';
-import { getActiveProfile } from 'shared/utils/profiles';
-import { Profile } from 'shared/types/profiles';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 

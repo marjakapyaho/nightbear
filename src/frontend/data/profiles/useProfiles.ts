@@ -4,33 +4,33 @@ import { Profile } from 'shared/types/profiles';
 import { getActiveProfile } from 'shared/utils/profiles';
 
 export const useProfiles = () => {
-  const queryClient = useQueryClient();
-
   const {
     data: profiles,
     isLoading,
     isError,
     isSuccess,
+    refetch,
   } = useQuery<Profile[]>({
     queryKey: ['get-profiles'],
     queryFn: () => callFetch('/get-profiles'),
   });
 
-  const { mutate: activateProfile } = useMutation({
+  const { mutate: activateProfileMutation } = useMutation({
     mutationFn: (profile: Profile) => callFetch('/activate-profile', 'POST', profile),
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['get-profiles'] });
-    },
   });
+  const activateProfile = (profile: Profile) =>
+    activateProfileMutation(profile, {
+      onSuccess: refetch,
+      onError: () => console.log('Error'),
+    });
 
-  const { mutate: createProfile } = useMutation({
+  const { mutate: createProfileMutation } = useMutation({
     mutationFn: (profile: Profile) => callFetch('/create-profile', 'POST', profile),
-    onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['get-profiles'] });
-    },
   });
+  const createProfile = (profile: Profile) =>
+    createProfileMutation(profile, {
+      onSuccess: refetch,
+    });
 
   return {
     profiles: profiles || [],

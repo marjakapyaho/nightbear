@@ -1,6 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { getFormattedTs } from './timeAgoUtils';
-import { getTimeInMillis } from 'shared/utils/time';
 
 type Props = {
   timestamp: number;
