@@ -14,6 +14,15 @@ export const humanReadableLongTime = (utcISOStr: string) => {
   return DateTime.fromISO(utcISOStr).setZone(TZ).toFormat('yyyy-MM-dd HH:mm:ss');
 };
 
+// @example "2020-01-31"
+export const getDateWithoutTime = (utcISOStr: string) => {
+  return DateTime.fromISO(utcISOStr).toFormat('yyyy-MM-dd');
+};
+
+export const getDateWithoutTimeMs = (timestampMs: number) => {
+  return DateTime.fromMillis(timestampMs).toFormat('yyyy-MM-dd');
+};
+
 // Returns the timestamp (in milliseconds UTC) of the given hours/minutes/seconds combo for the current day.
 // Note that this may be in the past or in the future, relevant to Date.now().
 export function getActivationTimestamp(spec: {

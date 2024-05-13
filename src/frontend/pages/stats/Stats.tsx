@@ -23,19 +23,12 @@ export const Stats = () => {
   const { bloodGlucoseEntries, insulinEntries, carbEntries, meterEntries } = timelineEntries;
 
   // Override sensor entries with meter entries where necessary
-  const bgEntries = bloodGlucoseEntries.map(bgEntry => {
-    const meterEntry = meterEntries.find(meterEntry => meterEntry.timestamp === bgEntry.timestamp);
-    return meterEntry?.bloodGlucose
-      ? { ...bgEntry, bloodGlucose: meterEntry.bloodGlucose }
-      : bgEntry;
-  });
+  const timeInRange = calculateTimeInRange(bloodGlucoseEntries) || '';
+  const timeLow = calculateTimeLow(bloodGlucoseEntries) || '';
+  const timeHigh = calculateTimeHigh(bloodGlucoseEntries) || '';
+  const hba1c = setOneDecimal(calculateHba1c(bloodGlucoseEntries)) || '';
 
-  const timeInRange = calculateTimeInRange(bgEntries) || '';
-  const timeLow = calculateTimeLow(bgEntries) || '';
-  const timeHigh = calculateTimeHigh(bgEntries) || '';
-  const hba1c = setOneDecimal(calculateHba1c(bgEntries)) || '';
-
-  const daysToShow = 60;
+  const daysToShow = 28;
   const dailyInsulins = calculateDailyAmounts(insulinEntries, daysToShow).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
@@ -48,7 +41,7 @@ export const Stats = () => {
     val: val.total,
     color: '#9AD5B3',
   }));
-  const dailyAverageBgs = calculateDailyAverageBgs(bgEntries, daysToShow).map(val => ({
+  const dailyAverageBgs = calculateDailyAverageBgs(bloodGlucoseEntries, daysToShow).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.average,
@@ -100,26 +93,26 @@ export const Stats = () => {
       <StatLine
         title="Avg BG"
         subtitle="for 7 days"
-        figure={getBgAverage(bgEntries)}
+        figure={getBgAverage(bloodGlucoseEntries)}
         color="#54c87e"
       />
       <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color="#54c87e" />
       <StatLine
         title="LOW"
         subtitle="below 3.7"
-        figure={countSituations(bgEntries, 3.7, true)}
+        figure={countSituations(bloodGlucoseEntries, 3.7, true)}
         color="#ee5a36"
       />
       <StatLine
         title="LOW"
         subtitle="below 3.0"
-        figure={countSituations(bgEntries, reallyLowLimit, true)}
+        figure={countSituations(bloodGlucoseEntries, reallyLowLimit, true)}
         color="#ee5a36"
       />
       <StatLine
         title="HIGH"
         subtitle={`over ${reallyHighLimit}`}
-        figure={countSituations(bgEntries, reallyHighLimit, false)}
+        figure={countSituations(bloodGlucoseEntries, reallyHighLimit, false)}
         color="#F8CC6F"
       />
     </div>

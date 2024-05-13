@@ -18,10 +18,22 @@ import {
   getCarbsOnBoard,
   calculateCurrentCarbsToInsulinRatio,
   calculateRequiredCarbsToInsulinRatio,
+  HOUR_IN_MS,
+  calculateDailyAmounts,
+  calculateDailyAverageBgs,
 } from 'shared/utils/calculations';
-import { getTimeMinusHours, getTimeMinusMinutes, getTimeMinusTime } from 'shared/utils/time';
+import {
+  getDateWithoutTime,
+  getDateWithoutTimeMs,
+  getTimeAsISOStr,
+  getTimeInMillis,
+  getTimeMinusHours,
+  getTimeMinusMinutes,
+  getTimeMinusTime,
+} from 'shared/utils/time';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from 'shared/mocks/dates';
+import { mockBloodGlucoseEntries, mockCarbEntries } from 'shared/mocks/timelineEntries';
 
 const currentTimestamp = 1508672249758;
 
@@ -197,20 +209,23 @@ describe('shared/calculations', () => {
   });
 
   // TODO: check these
-  /*  it('calculateDailyAmounts', () => {
+  it('calculateDailyAmounts', () => {
     expect(calculateDailyAmounts(mockCarbEntries, 2, getTimeInMillis(mockNow))).toEqual([
-      { timestamp: mockNow, total: 40 },
-      { timestamp: getTimeAsISOStr(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS), total: null },
+      { timestamp: getDateWithoutTimeMs(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS), total: null },
+      { timestamp: getDateWithoutTime(mockNow), total: 40 },
     ]);
-  });*/
+  });
 
   // TODO: check these
-  /*  it('calculateDailyAverageBgs', () => {
-    expect(calculateDailyAverageBgs(mockSensorEntries, 2, getTimeInMillis(mockNow))).toEqual([
-      { average: 5.5, timestamp: mockNow },
-      { average: null, timestamp: getTimeAsISOStr(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS) },
+  it('calculateDailyAverageBgs', () => {
+    expect(calculateDailyAverageBgs(mockBloodGlucoseEntries, 2, getTimeInMillis(mockNow))).toEqual([
+      {
+        timestamp: getDateWithoutTimeMs(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS),
+        average: null,
+      },
+      { timestamp: getDateWithoutTime(mockNow), average: 4.855555555555555 },
     ]);
-  });*/
+  });
 
   it('getPercentOfInsulinRemaining', () => {
     expect(getPercentOfInsulinRemaining(mockNow, mockNow)).toEqual(1);

@@ -7,7 +7,14 @@ import {
   SensorEntry,
 } from 'shared/types/timelineEntries';
 import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
-import { getTimeAsISOStr, getTimeInMillis, getTimeMinusTimeMs, hourToMs } from 'shared/utils/time';
+import {
+  getDateWithoutTime,
+  getDateWithoutTimeMs,
+  getTimeAsISOStr,
+  getTimeInMillis,
+  getTimeMinusTimeMs,
+  hourToMs,
+} from 'shared/utils/time';
 import { isValidNumber, roundNumberToFixedDecimals } from 'shared/utils/helpers';
 import { getEntriesBeforeMs } from 'backend/cronjobs/checks/utils';
 
@@ -162,17 +169,19 @@ export const calculateDailyAmounts = (
   now = Date.now(),
 ) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
-    timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
+    timestamp: getDateWithoutTimeMs(now - DAY_IN_MS * i),
     total: null,
   }));
-  const groupedEntries = groupBy(entries, entry => entry.timestamp);
-  return dayArray.map(day => ({
-    timestamp: day.timestamp,
-    total:
-      day.timestamp && groupedEntries[day.timestamp]
-        ? getTotal(groupedEntries[day.timestamp])
-        : null,
-  }));
+  const groupedEntries = groupBy(entries, entry => getDateWithoutTime(entry.timestamp));
+  return dayArray
+    .map(day => ({
+      timestamp: day.timestamp,
+      total:
+        day.timestamp && groupedEntries[day.timestamp]
+          ? getTotal(groupedEntries[day.timestamp])
+          : null,
+    }))
+    .reverse();
 };
 
 export const calculateDailyAverageBgs = (
@@ -181,17 +190,19 @@ export const calculateDailyAverageBgs = (
   now = Date.now(),
 ) => {
   const dayArray = fill(Array(days), null).map((_val, i) => ({
-    timestamp: getTimeAsISOStr(now - DAY_IN_MS * i),
+    timestamp: getDateWithoutTimeMs(now - DAY_IN_MS * i),
     average: null,
   }));
-  const groupedEntries = groupBy(entries, entry => entry.timestamp);
-  return dayArray.map(day => ({
-    timestamp: day.timestamp,
-    average:
-      day.timestamp && groupedEntries[day.timestamp]
-        ? getDailyAverage(groupedEntries[day.timestamp])
-        : null,
-  }));
+  const groupedEntries = groupBy(entries, entry => getDateWithoutTime(entry.timestamp));
+  return dayArray
+    .map(day => ({
+      timestamp: day.timestamp,
+      average:
+        day.timestamp && groupedEntries[day.timestamp]
+          ? getDailyAverage(groupedEntries[day.timestamp])
+          : null,
+    }))
+    .reverse();
 };
 
 export const calculateAverageBg = (entries: (SensorEntry | MeterEntry)[]) => {
