@@ -2,7 +2,6 @@ import { NO_PUSHOVER } from 'backend/cronjobs/alarms/pushoverClient';
 import { NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcom-share-client';
 import { NO_LOGGING } from 'backend/utils/logging';
 import { mockNow } from 'shared/mocks/dates';
-import { Alarm } from 'shared/types/alarms';
 import { generateUuid } from 'shared/utils/id';
 import { Context, Request } from './api';
 import { createDbClient } from './db';

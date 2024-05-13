@@ -1,4 +1,8 @@
-import { PushoverClient, createPushoverClient } from 'backend/cronjobs/alarms/pushoverClient';
+import {
+  PushoverClient,
+  createPushoverClient,
+  NO_PUSHOVER,
+} from 'backend/cronjobs/alarms/pushoverClient';
 import {
   DexcomShareClient,
   NO_DEXCOM_SHARE,
@@ -56,6 +60,7 @@ export function createNodeContext(): Context {
     DEXCOM_SHARE_USERNAME,
     DEXCOM_SHARE_PASSWORD,
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
+    PUSHOVER_DISABLED,
   } = process.env;
 
   if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
@@ -79,7 +84,9 @@ export function createNodeContext(): Context {
     log,
     db: createDbClient(DATABASE_URL),
     storage: null, // TODO
-    pushover: createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
+    pushover: PUSHOVER_DISABLED
+      ? NO_PUSHOVER
+      : createPushoverClient(PUSHOVER_USER, PUSHOVER_TOKEN, PUSHOVER_CALLBACK, log),
     dexcomShare:
       DEXCOM_SHARE_USERNAME && DEXCOM_SHARE_PASSWORD
         ? createDexcomShareClient(DEXCOM_SHARE_USERNAME, DEXCOM_SHARE_PASSWORD, log)

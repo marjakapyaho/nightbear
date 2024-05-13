@@ -28,11 +28,7 @@ export function startExpressServer(
             response => {
               const { responseBody, responseStatus } = response;
               res.status(responseStatus);
-              if (typeof responseBody === 'string') {
-                res.send(responseBody);
-              } else {
-                res.json(responseBody);
-              }
+              res.json(responseBody);
             },
             () =>
               res.status(500).json({
