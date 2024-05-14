@@ -1,5 +1,5 @@
-import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
-import { mapDexcomShareResponseToSensorEntry } from 'backend/cronjobs/dexcom/dexcom-share-utils';
+import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcomShareClient';
+import { mapDexcomShareResponseToSensorEntry } from 'backend/cronjobs/dexcom/utils';
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Cronjob } from 'backend/utils/cronjobs';
 import { isArray } from 'lodash';

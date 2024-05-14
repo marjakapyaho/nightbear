@@ -1,5 +1,5 @@
 import { changeBloodGlucoseUnitToMmoll } from 'shared/utils/calculations';
-import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcom-share-client';
+import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcomShareClient';
 import { SensorEntry } from 'shared/types/timelineEntries';
 import { getTimeAsISOStr } from 'shared/utils/time';
 

@@ -7,9 +7,10 @@ import { EditableProfileRow } from 'frontend/components/createProfile/EditablePr
 type Props = {
   activeProfile?: Profile;
   createProfile: (profile: Profile) => void;
+  profiles: Profile[];
 };
 
-export const CreateProfile = ({ activeProfile, createProfile }: Props) => {
+export const CreateProfile = ({ activeProfile, createProfile, profiles }: Props) => {
   const [localProfile, setLocalProfile] = useState<Profile>(activeProfile || PROFILE_BASE);
 
   const setAnalyserSetting = (val: number, settingKey: string) =>
@@ -23,6 +24,30 @@ export const CreateProfile = ({ activeProfile, createProfile }: Props) => {
 
   return (
     <div className={styles.createProfile}>
+      <div className={styles.row}>
+        <div className={styles.label}>Base profile</div>
+        <div className={styles.field}>
+          <select
+            className={styles.profileSelector}
+            name="profiles"
+            id="baseProfileSelect"
+            onChange={event => {
+              const selectedBaseProfile = profiles.find(
+                profile => profile.id === event.target.value,
+              );
+              selectedBaseProfile && setLocalProfile(selectedBaseProfile);
+            }}
+          >
+            {profiles.map((profile: Profile) =>
+              profile.id ? (
+                <option key={profile.id} value={profile.id}>
+                  {profile.profileName}
+                </option>
+              ) : null,
+            )}
+          </select>
+        </div>
+      </div>
       <EditableProfileRow
         label="Profile name"
         value={localProfile.profileName}
@@ -54,7 +79,7 @@ export const CreateProfile = ({ activeProfile, createProfile }: Props) => {
         setValue={val => setAnalyserSetting(parseFloat(val), 'lowLevelAbs')}
       />
       <EditableProfileRow
-        label="Time since bg minutes"
+        label="Time since bg min"
         value={localProfile.analyserSettings.timeSinceBgMinutes}
         setValue={val => setAnalyserSetting(parseFloat(val), 'timeSinceBgMinutes')}
       />

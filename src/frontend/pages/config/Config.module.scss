@@ -1,10 +1,12 @@
 @import '../../styles/common.scss';
 
 .config {
-  height: 100vh;
+  min-height: 100vh;
   padding: 30px;
   display: grid;
   flex-direction: column;
+  overflow-y: scroll;
+  gap: 30px;
 
   .section {
     display: flex;
@@ -24,6 +26,7 @@
       display: flex;
       align-items: center;
       border: 1px solid #eeeeee;
+      font-weight: normal;
 
       &.active {
         background: #7a7a7a;
@@ -40,6 +43,7 @@
 
     .createProfileButton {
       cursor: pointer;
+      text-align: right;
     }
 
     .alarm {
@@ -76,12 +80,22 @@
 
   .row {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 1.5fr;
     gap: 10px;
     align-items: center;
 
     .label {
       font-size: 16px;
+    }
+
+    .profileSelector {
+      border: 1px solid #d5d5d5;
+      border-radius: 6px;
+      color: #666;
+      font-weight: lighter;
+      height: 34px;
+      padding: 0 5px;
+      width: 100%;
     }
 
     .input {

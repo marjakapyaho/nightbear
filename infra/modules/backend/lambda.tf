@@ -43,7 +43,7 @@ resource "aws_lambda_function" "this" {
       NIGHTBEAR_DB_URL      = "TODO: Remove once not expected by createNodeContext()"
       PUSHOVER_USER         = "TODO: Add correct value once we re-enable the integration"
       PUSHOVER_TOKEN        = "TODO: Add correct value once we re-enable the integration"
-      PUSHOVER_CALLBACK     = "TODO: Add correct value once we re-enable the integration"
+      PUSHOVER_CALLBACK     = "TODO: [FILL_THIS]/ack-active-alarm"
       DEXCOM_SHARE_USERNAME = var.secrets.dexcom_share_username
       DEXCOM_SHARE_PASSWORD = var.secrets.dexcom_share_password
     }

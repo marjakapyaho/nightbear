@@ -7,7 +7,9 @@ export const getActiveAlarm = async (_request: Request, context: Context) => {
   return createResponse(activeAlarm);
 };
 
-export const ackActiveAlarm = async (_request: Request, context: Context) => {
+export const ackActiveAlarm = async (request: Request, context: Context) => {
+  const { ackedBy } = request.requestParams;
+
   // Get active alarm
   const activeAlarm = await context.db.getActiveAlarm();
 
@@ -23,6 +25,7 @@ export const ackActiveAlarm = async (_request: Request, context: Context) => {
   await context.db.createAlarmState(
     activeAlarm.id,
     getTimePlusMinutes(context.timestamp(), snoozeMinutes),
+    ackedBy,
   );
 
   // Mark all alarm states as processed (in case there were any notification receipts missing)

@@ -1,5 +1,4 @@
 import axios from 'axios';
-// @ts-ignore
 import Pushover from 'pushover-notifications';
 import { Situation } from 'shared/types/analyser';
 import { Logger, extendLogger } from 'backend/utils/logging';
@@ -7,26 +6,21 @@ import { Logger, extendLogger } from 'backend/utils/logging';
 export type PushoverClient = ReturnType<typeof createPushoverClient>;
 
 export const NO_PUSHOVER: PushoverClient = {
-  sendAlarm: () => Promise.resolve(''),
-  ackAlarms: () => Promise.resolve(null),
+  sendAlarm: async () => undefined,
+  ackAlarms: async () => [],
 };
 
-export function createPushoverClient(
+export const createPushoverClient = (
   user: string,
   token: string,
   callbackUrl: string,
   logger: Logger,
-) {
+) => {
   const api = new Pushover({ user, token });
   const log = extendLogger(logger, 'pushover');
 
-  // TODO: remove null when db returns only undefined
   return {
-    sendAlarm(situation: Situation, recipient?: string | null): Promise<string | undefined> {
-      if (!recipient) {
-        return Promise.resolve(undefined);
-      }
-
+    async sendAlarm(situation: Situation, recipient: string) {
       const message = {
         title: 'Nightbear alarm',
         sound: 'persistent',
@@ -35,32 +29,34 @@ export function createPushoverClient(
         priority: 2,
         retry: 30,
         expire: 10800,
-        callback: callbackUrl,
+        callback: `${callbackUrl}?ackedBy=pushover:${recipient}`,
       };
 
-      return new Promise((resolve, reject) => {
-        api.send(message, (err: object, result: string) => {
-          if (err) {
-            log('Could not send alarm:', err);
-            return reject(err);
-          }
-          const receipt: string = JSON.parse(result).receipt;
-          log('Alarm sent with receipt:', receipt);
-          resolve(receipt);
-        });
+      return api.send(message, (err: object, result: string) => {
+        if (err) {
+          log('Could not send alarm:', err);
+          return err;
+        }
+
+        const receipt: string = JSON.parse(result).receipt;
+        log('Alarm sent with receipt:', receipt);
+
+        return receipt;
       });
     },
 
-    ackAlarms(receipts: string[] = []): Promise<null> {
+    async ackAlarms(receipts: string[] = []) {
       return Promise.all(
         receipts.map(receipt => {
+          log('Acking alarm with receipt:', receipt);
+
           return axios.post(
             'https://api.pushover.net/1/receipts/' + receipt + '/cancel.json',
             'token=' + encodeURIComponent(token),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
           );
         }),
-      ).then(() => null);
+      );
     },
   };
-}
+};

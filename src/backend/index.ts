@@ -1,6 +1,6 @@
 import { consoleLogStream } from 'backend/utils/logging';
 import debug from 'debug';
-import { dexcomShare } from 'backend/cronjobs/dexcom/dexcom-share';
+import { dexcomShare } from 'backend/cronjobs/dexcom/dexcomShare';
 import { startExpressServer } from 'backend/utils/express';
 import { runCronJobs } from 'backend/utils/cronjobs';
 import { profiles } from 'backend/cronjobs/profiles/profiles';

@@ -174,6 +174,7 @@ export const queries = (pool: Pool) => {
     async createAlarmState(
       alarmId: string,
       validAfter?: string,
+      ackedBy?: string,
       alarmLevel?: number,
       notificationTarget?: string,
       notificationReceipt?: string,
@@ -183,6 +184,7 @@ export const queries = (pool: Pool) => {
         alarmLevel: alarmLevel || ALARM_START_LEVEL,
         alarmId,
         validAfter,
+        ackedBy,
         notificationTarget,
         notificationReceipt,
         notificationProcessedAt,

@@ -1,5 +1,5 @@
 import { NO_PUSHOVER } from 'backend/cronjobs/alarms/pushoverClient';
-import { NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcom-share-client';
+import { NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcomShareClient';
 import { NO_LOGGING } from 'backend/utils/logging';
 import { mockNow } from 'shared/mocks/dates';
 import { generateUuid } from 'shared/utils/id';

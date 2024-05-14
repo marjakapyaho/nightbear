@@ -26,10 +26,14 @@ export const Config = () => {
           className={styles.createProfileButton}
           onClick={() => setShowCreateProfile(!showCreateProfile)}
         >
-          + Create new profile
+          {showCreateProfile ? 'Hide' : '+ Create new profile'}
         </div>
         {showCreateProfile && (
-          <CreateProfile activeProfile={activeProfile} createProfile={createProfile} />
+          <CreateProfile
+            activeProfile={activeProfile}
+            createProfile={createProfile}
+            profiles={profiles}
+          />
         )}
       </div>
       <div className={styles.section}>

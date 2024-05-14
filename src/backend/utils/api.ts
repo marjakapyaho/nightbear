@@ -7,7 +7,7 @@ import {
   DexcomShareClient,
   NO_DEXCOM_SHARE,
   createDexcomShareClient,
-} from 'backend/cronjobs/dexcom/dexcom-share-client';
+} from 'backend/cronjobs/dexcom/dexcomShareClient';
 import { Logger, createLogger } from 'backend/utils/logging';
 import { readFileSync } from 'fs';
 import { map } from 'lodash';

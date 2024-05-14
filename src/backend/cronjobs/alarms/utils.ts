@@ -51,7 +51,9 @@ export const retryNotifications = async (
 ) =>
   Promise.all(
     states.map(async state => {
-      const receipt = await context.pushover.sendAlarm(situation, state.notificationTarget);
+      const receipt = state.notificationTarget
+        ? await context.pushover.sendAlarm(situation, state.notificationTarget)
+        : undefined;
 
       // Update alarm state to have receipt if we got it
       if (receipt) {

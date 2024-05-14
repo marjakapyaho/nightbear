@@ -122,6 +122,7 @@ const updateAlarm = async (
   await context.db.createAlarmState(
     activeAlarm.id,
     context.timestamp(),
+    undefined,
     neededLevel,
     pushoverRecipient,
     receipt,

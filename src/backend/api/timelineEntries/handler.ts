@@ -1,7 +1,7 @@
 import { Context, createResponse, Request } from 'backend/utils/api';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
-import { getTimeAsISOStr, getTimeMinusTime } from 'shared/utils/time';
+import { getTimeMinusTime } from 'shared/utils/time';
 import { getMergedBgEntries } from 'shared/utils/timelineEntries';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
