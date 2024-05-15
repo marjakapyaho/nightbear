@@ -15,6 +15,7 @@ import { ScrollableGraph } from 'frontend/components/scrollableGraph/ScrollableG
 import { useTimelineEntries } from 'frontend/data/timelineEntries/useTimelineEntries';
 import { getTimeAsISOStr } from 'shared/utils/time';
 import { mapTimelineEntriesToGraphPoints } from 'shared/utils/timelineEntries';
+import { last } from 'lodash';
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig();
@@ -27,7 +28,8 @@ export const BgGraph = () => {
     getTimeAsISOStr(Date.now()),
   );
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const latestPoint = findLatestPointWithBloodGlucose(graphPoints);
+  const latestPoint = last(graphPoints);
+  const latestPointWithBg = findLatestPointWithBloodGlucose(graphPoints);
 
   const onChangeCarbs = (newAmount: number) => {
     const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;
@@ -67,7 +69,7 @@ export const BgGraph = () => {
 
   return (
     <div className={styles.bgGraph}>
-      <StatusBar graphPoint={latestPoint} />
+      <StatusBar graphPoint={latestPointWithBg} />
 
       <div style={{ height: baseConfig.outerHeight }}>
         {isSuccess && (
