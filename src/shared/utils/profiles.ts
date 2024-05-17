@@ -29,6 +29,7 @@ export const PROFILE_BASE = {
     high: DEFAULT_ALARM_SETTINGS,
     badHigh: DEFAULT_ALARM_SETTINGS,
     persistentHigh: DEFAULT_ALARM_SETTINGS,
+    missingDayInsulin: DEFAULT_ALARM_SETTINGS,
   },
   notificationTargets: DEFAULT_TARGETS,
 };

@@ -17,6 +17,7 @@ export const situationsToSituationSettings: Record<Situation, keyof SituationSet
   HIGH: 'high',
   BAD_HIGH: 'badHigh',
   PERSISTENT_HIGH: 'persistentHigh',
+  MISSING_DAY_INSULIN: 'missingDayInsulin',
 };
 
 export const onlyActive = (alarms: Alarm[]) => alarms.filter(alarm => alarm.isActive);

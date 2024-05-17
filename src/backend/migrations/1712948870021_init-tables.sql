@@ -22,40 +22,32 @@ CREATE TYPE situation AS ENUM (
   'COMPRESSION_LOW',
   'HIGH',
   'BAD_HIGH',
-  'PERSISTENT_HIGH'
-);
-
-CREATE TABLE analyser_settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  high_level_rel NUMERIC(3, 1) NOT NULL,
-  high_level_abs NUMERIC(3, 1) NOT NULL,
-  high_level_bad NUMERIC(3, 1) NOT NULL,
-  low_level_rel NUMERIC(3, 1) NOT NULL,
-  low_level_abs NUMERIC(3, 1) NOT NULL,
-  time_since_bg_minutes INTEGER NOT NULL
-);
-
-CREATE TABLE situation_settings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  outdated JSONB NOT NULL,
-  critical_outdated JSONB NOT NULL,
-  falling JSONB NOT NULL,
-  rising JSONB NOT NULL,
-  low JSONB NOT NULL,
-  bad_low JSONB NOT NULL,
-  compression_low JSONB NOT NULL,
-  high JSONB NOT NULL,
-  bad_high JSONB NOT NULL,
-  persistent_high JSONB NOT NULL
+  'PERSISTENT_HIGH',
+  'MISSING_DAY_INSULIN'
 );
 
 CREATE TABLE profile_templates (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_name TEXT,
   alarms_enabled BOOLEAN NOT NULL DEFAULT true,
-  analyser_settings_id UUID NOT NULL REFERENCES analyser_settings(id) ON DELETE CASCADE,
-  situation_settings_id UUID NOT NULL REFERENCES situation_settings(id) ON DELETE CASCADE,
-  notification_targets TEXT[] NOT NULL
+  notification_targets TEXT[] NOT NULL,
+  analyser_high_level_rel NUMERIC(3, 1) NOT NULL,
+  analyser_high_level_abs NUMERIC(3, 1) NOT NULL,
+  analyser_high_level_bad NUMERIC(3, 1) NOT NULL,
+  analyser_low_level_rel NUMERIC(3, 1) NOT NULL,
+  analyser_low_level_abs NUMERIC(3, 1) NOT NULL,
+  analyser_time_since_bg_minutes INTEGER NOT NULL,
+  situation_outdated JSONB NOT NULL,
+  situation_critical_outdated JSONB NOT NULL,
+  situation_falling JSONB NOT NULL,
+  situation_rising JSONB NOT NULL,
+  situation_low JSONB NOT NULL,
+  situation_bad_low JSONB NOT NULL,
+  situation_compression_low JSONB NOT NULL,
+  situation_high JSONB NOT NULL,
+  situation_bad_high JSONB NOT NULL,
+  situation_persistent_high JSONB NOT NULL,
+  situation_missing_day_insulin JSONB NOT NULL
 );
 
 CREATE TABLE profile_activations (

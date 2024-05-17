@@ -1,6 +1,6 @@
-import { chain } from 'lodash';
 import {
   findRepeatingActivationToActivate,
+  getLatestProfileActivation,
   shouldNonRepeatingActivationBeDeactivated,
   shouldRepeatingActivationBeSwitched,
 } from 'backend/cronjobs/profiles/utils';
@@ -28,7 +28,8 @@ export const checkAndUpdateProfileActivations = async (
 ) => {
   const { log } = context;
   const profileActivations = await context.db.getRelevantProfileActivations();
-  const latestActivation = chain(profileActivations).sortBy('activatedAt').last().value();
+  const latestActivation = getLatestProfileActivation(profileActivations);
+
   const activationToActivate = findRepeatingActivationToActivate(
     profileActivations,
     currentTimestamp,

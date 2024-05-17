@@ -30,6 +30,7 @@ export const SituationSettings = z.object({
   high: AlarmSettings,
   badHigh: AlarmSettings,
   persistentHigh: AlarmSettings,
+  missingDayInsulin: AlarmSettings,
 });
 export type SituationSettings = z.infer<typeof SituationSettings>;
 
@@ -38,9 +39,9 @@ export const Profile = z.object({
   profileName: nullableOptional(z.string()),
   isActive: z.boolean(),
   alarmsEnabled: z.boolean(),
+  notificationTargets: z.array(z.string()),
   analyserSettings: AnalyserSettings,
   situationSettings: SituationSettings,
-  notificationTargets: z.array(z.string()),
 });
 export type Profile = z.infer<typeof Profile>;
 

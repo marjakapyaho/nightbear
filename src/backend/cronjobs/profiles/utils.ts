@@ -70,3 +70,11 @@ export const shouldNonRepeatingActivationBeDeactivated = (
 ) =>
   currentActivation.deactivatedAt &&
   isTimeSmallerOrEqual(currentActivation.deactivatedAt, currentTimestamp);
+
+export const getLatestProfileActivation = (profileActivations: ProfileActivation[]) => {
+  const latestActivation = chain(profileActivations).sortBy('activatedAt').last().value();
+  if (!latestActivation) {
+    throw new Error('Could not find any profile activations');
+  }
+  return latestActivation;
+};

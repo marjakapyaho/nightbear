@@ -1,7 +1,7 @@
 /** Types generated for queries found in "src/backend/db/alarms/alarms.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'CRITICAL_OUTDATED' | 'FALLING' | 'HIGH' | 'LOW' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
+export type situation = 'BAD_HIGH' | 'BAD_LOW' | 'COMPRESSION_LOW' | 'CRITICAL_OUTDATED' | 'FALLING' | 'HIGH' | 'LOW' | 'MISSING_DAY_INSULIN' | 'OUTDATED' | 'PERSISTENT_HIGH' | 'RISING';
 
 /** 'CreateAlarm' parameters type */
 export interface ICreateAlarmParams {

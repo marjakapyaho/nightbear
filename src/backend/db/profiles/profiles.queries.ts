@@ -6,20 +6,50 @@ export type stringArray = (string)[];
 /** 'CreateProfileTemplate' parameters type */
 export interface ICreateProfileTemplateParams {
   alarmsEnabled: boolean;
-  analyserSettingsId: string;
+  badHigh: any;
+  badLow: any;
+  compressionLow: any;
+  criticalOutdated: any;
+  falling: any;
+  high: any;
+  highLevelAbs: number;
+  highLevelBad: number;
+  highLevelRel: number;
+  low: any;
+  lowLevelAbs: number;
+  lowLevelRel: number;
+  missingDayInsulin: any;
   notificationTargets: stringArray;
+  outdated: any;
+  persistentHigh: any;
   profileName?: string | null | void;
-  situationSettingsId: string;
+  rising: any;
+  timeSinceBgMinutes: number;
 }
 
 /** 'CreateProfileTemplate' return type */
 export interface ICreateProfileTemplateResult {
   alarmsEnabled: boolean;
-  analyserSettingsId: string;
+  analyserHighLevelAbs: number;
+  analyserHighLevelBad: number;
+  analyserHighLevelRel: number;
+  analyserLowLevelAbs: number;
+  analyserLowLevelRel: number;
+  analyserTimeSinceBgMinutes: number;
   id: string;
   notificationTargets: stringArray;
   profileName: string | null;
-  situationSettingsId: string;
+  situationBadHigh: any;
+  situationBadLow: any;
+  situationCompressionLow: any;
+  situationCriticalOutdated: any;
+  situationFalling: any;
+  situationHigh: any;
+  situationLow: any;
+  situationMissingDayInsulin: any;
+  situationOutdated: any;
+  situationPersistentHigh: any;
+  situationRising: any;
 }
 
 /** 'CreateProfileTemplate' query type */
@@ -28,24 +58,54 @@ export interface ICreateProfileTemplateQuery {
   result: ICreateProfileTemplateResult;
 }
 
-const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"analyserSettingsId":true,"situationSettingsId":true,"notificationTargets":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":161,"b":172}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":177,"b":191}]},{"name":"analyserSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":196,"b":215}]},{"name":"situationSettingsId","required":true,"transform":{"type":"scalar"},"locs":[{"a":220,"b":240}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":245,"b":265}]}],"statement":"INSERT INTO profile_templates (\n    profile_name,\n    alarms_enabled,\n    analyser_settings_id,\n    situation_settings_id,\n    notification_targets\n)\nVALUES (\n  :profileName,\n  :alarmsEnabled!,\n  :analyserSettingsId!,\n  :situationSettingsId!,\n  :notificationTargets!\n)\nRETURNING *"};
+const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":532,"b":543}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":548,"b":562}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":567,"b":587}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":592,"b":605}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":610,"b":623}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":628,"b":641}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":646,"b":658}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":663,"b":675}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":680,"b":699}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":704,"b":713}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":718,"b":735}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":740,"b":748}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":753,"b":760}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":765,"b":769}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":774,"b":781}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":786,"b":801}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":806,"b":811}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":816,"b":824}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":829,"b":844}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":849,"b":867}]}],"statement":"INSERT INTO profile_templates (\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  analyser_high_level_rel,\n  analyser_high_level_abs,\n  analyser_high_level_bad,\n  analyser_low_level_rel,\n  analyser_low_level_abs,\n  analyser_time_since_bg_minutes,\n  situation_outdated,\n  situation_critical_outdated,\n  situation_falling,\n  situation_rising,\n  situation_low,\n  situation_bad_low,\n  situation_compression_low,\n  situation_high,\n  situation_bad_high,\n  situation_persistent_high,\n  situation_missing_day_insulin\n)\nVALUES (\n  :profileName,\n  :alarmsEnabled!,\n  :notificationTargets!,\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!,\n  :outdated!,\n  :criticalOutdated!,\n  :falling!,\n  :rising!,\n  :low!,\n  :badLow!,\n  :compressionLow!,\n  :high!,\n  :badHigh!,\n  :persistentHigh!,\n  :missingDayInsulin!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO profile_templates (
- *     profile_name,
- *     alarms_enabled,
- *     analyser_settings_id,
- *     situation_settings_id,
- *     notification_targets
+ *   profile_name,
+ *   alarms_enabled,
+ *   notification_targets,
+ *   analyser_high_level_rel,
+ *   analyser_high_level_abs,
+ *   analyser_high_level_bad,
+ *   analyser_low_level_rel,
+ *   analyser_low_level_abs,
+ *   analyser_time_since_bg_minutes,
+ *   situation_outdated,
+ *   situation_critical_outdated,
+ *   situation_falling,
+ *   situation_rising,
+ *   situation_low,
+ *   situation_bad_low,
+ *   situation_compression_low,
+ *   situation_high,
+ *   situation_bad_high,
+ *   situation_persistent_high,
+ *   situation_missing_day_insulin
  * )
  * VALUES (
  *   :profileName,
  *   :alarmsEnabled!,
- *   :analyserSettingsId!,
- *   :situationSettingsId!,
- *   :notificationTargets!
+ *   :notificationTargets!,
+ *   :highLevelRel!,
+ *   :highLevelAbs!,
+ *   :highLevelBad!,
+ *   :lowLevelRel!,
+ *   :lowLevelAbs!,
+ *   :timeSinceBgMinutes!,
+ *   :outdated!,
+ *   :criticalOutdated!,
+ *   :falling!,
+ *   :rising!,
+ *   :low!,
+ *   :badLow!,
+ *   :compressionLow!,
+ *   :high!,
+ *   :badHigh!,
+ *   :persistentHigh!,
+ *   :missingDayInsulin!
  * )
  * RETURNING *
  * ```
@@ -53,112 +113,93 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
 export const createProfileTemplate = new PreparedQuery<ICreateProfileTemplateParams,ICreateProfileTemplateResult>(createProfileTemplateIR);
 
 
-/** 'CreateAnalyserSettings' parameters type */
-export interface ICreateAnalyserSettingsParams {
-  highLevelAbs: number;
-  highLevelBad: number;
-  highLevelRel: number;
-  lowLevelAbs: number;
-  lowLevelRel: number;
-  timeSinceBgMinutes: number;
-}
-
-/** 'CreateAnalyserSettings' return type */
-export interface ICreateAnalyserSettingsResult {
-  id: string;
-}
-
-/** 'CreateAnalyserSettings' query type */
-export interface ICreateAnalyserSettingsQuery {
-  params: ICreateAnalyserSettingsParams;
-  result: ICreateAnalyserSettingsResult;
-}
-
-const createAnalyserSettingsIR: any = {"usedParamSet":{"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true},"params":[{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":157,"b":170}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":175,"b":188}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":206}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":211,"b":223}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":240}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":245,"b":264}]}],"statement":"INSERT INTO analyser_settings (\n  high_level_rel,\n  high_level_abs,\n  high_level_bad,\n  low_level_rel,\n  low_level_abs,\n  time_since_bg_minutes\n)\nVALUES (\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!\n)\nRETURNING analyser_settings.id"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO analyser_settings (
- *   high_level_rel,
- *   high_level_abs,
- *   high_level_bad,
- *   low_level_rel,
- *   low_level_abs,
- *   time_since_bg_minutes
- * )
- * VALUES (
- *   :highLevelRel!,
- *   :highLevelAbs!,
- *   :highLevelBad!,
- *   :lowLevelRel!,
- *   :lowLevelAbs!,
- *   :timeSinceBgMinutes!
- * )
- * RETURNING analyser_settings.id
- * ```
- */
-export const createAnalyserSettings = new PreparedQuery<ICreateAnalyserSettingsParams,ICreateAnalyserSettingsResult>(createAnalyserSettingsIR);
-
-
-/** 'CreateSituationSettings' parameters type */
-export interface ICreateSituationSettingsParams {
+/** 'EditProfileTemplate' parameters type */
+export interface IEditProfileTemplateParams {
+  alarmsEnabled: boolean;
   badHigh: any;
   badLow: any;
   compressionLow: any;
   criticalOutdated: any;
   falling: any;
   high: any;
+  highLevelAbs: number;
+  highLevelBad: number;
+  highLevelRel: number;
+  id: string;
   low: any;
+  lowLevelAbs: number;
+  lowLevelRel: number;
+  missingDayInsulin: any;
+  notificationTargets: stringArray;
   outdated: any;
   persistentHigh: any;
+  profileName?: string | null | void;
   rising: any;
+  timeSinceBgMinutes: number;
 }
 
-/** 'CreateSituationSettings' return type */
-export interface ICreateSituationSettingsResult {
+/** 'EditProfileTemplate' return type */
+export interface IEditProfileTemplateResult {
+  alarmsEnabled: boolean;
+  analyserHighLevelAbs: number;
+  analyserHighLevelBad: number;
+  analyserHighLevelRel: number;
+  analyserLowLevelAbs: number;
+  analyserLowLevelRel: number;
+  analyserTimeSinceBgMinutes: number;
   id: string;
+  notificationTargets: stringArray;
+  profileName: string | null;
+  situationBadHigh: any;
+  situationBadLow: any;
+  situationCompressionLow: any;
+  situationCriticalOutdated: any;
+  situationFalling: any;
+  situationHigh: any;
+  situationLow: any;
+  situationMissingDayInsulin: any;
+  situationOutdated: any;
+  situationPersistentHigh: any;
+  situationRising: any;
 }
 
-/** 'CreateSituationSettings' query type */
-export interface ICreateSituationSettingsQuery {
-  params: ICreateSituationSettingsParams;
-  result: ICreateSituationSettingsResult;
+/** 'EditProfileTemplate' query type */
+export interface IEditProfileTemplateQuery {
+  params: IEditProfileTemplateParams;
+  result: IEditProfileTemplateResult;
 }
 
-const createSituationSettingsIR: any = {"usedParamSet":{"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true},"params":[{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":185}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":208}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":214,"b":222}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":228,"b":235}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":245}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":251,"b":258}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":264,"b":279}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":285,"b":290}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":296,"b":304}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":310,"b":325}]}],"statement":"INSERT INTO situation_settings (\n  outdated,\n  critical_outdated,\n  falling,\n  rising,\n  low,\n  bad_low,\n  compression_low,\n  high,\n  bad_high,\n  persistent_high\n)\nVALUES (\n   :outdated!,\n   :criticalOutdated!,\n   :falling!,\n   :rising!,\n   :low!,\n   :badLow!,\n   :compressionLow!,\n   :high!,\n   :badHigh!,\n   :persistentHigh!\n)\nRETURNING situation_settings.id"};
+const editProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true,"id":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":57}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":79,"b":93}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":121,"b":141}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":172,"b":185}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":216,"b":229}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":260,"b":273}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":303,"b":315}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":345,"b":357}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":395,"b":414}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":440,"b":449}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":484,"b":501}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":526,"b":534}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":558,"b":565}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":586,"b":590}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":615,"b":622}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":655,"b":670}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":692,"b":697}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":723,"b":731}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":764,"b":779}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":816,"b":834}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":847,"b":850}]}],"statement":"UPDATE profile_templates SET\n  profile_name = :profileName,\n  alarms_enabled = :alarmsEnabled!,\n  notification_targets = :notificationTargets!,\n  analyser_high_level_rel = :highLevelRel!,\n  analyser_high_level_abs = :highLevelAbs!,\n  analyser_high_level_bad = :highLevelBad!,\n  analyser_low_level_rel = :lowLevelRel!,\n  analyser_low_level_abs = :lowLevelAbs!,\n  analyser_time_since_bg_minutes = :timeSinceBgMinutes!,\n  situation_outdated = :outdated!,\n  situation_critical_outdated = :criticalOutdated!,\n  situation_falling = :falling!,\n  situation_rising = :rising!,\n  situation_low = :low!,\n  situation_bad_low = :badLow!,\n  situation_compression_low = :compressionLow!,\n  situation_high = :high!,\n  situation_bad_high = :badHigh!,\n  situation_persistent_high = :persistentHigh!,\n  situation_missing_day_insulin = :missingDayInsulin!\nWHERE id = :id!\nRETURNING *"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO situation_settings (
- *   outdated,
- *   critical_outdated,
- *   falling,
- *   rising,
- *   low,
- *   bad_low,
- *   compression_low,
- *   high,
- *   bad_high,
- *   persistent_high
- * )
- * VALUES (
- *    :outdated!,
- *    :criticalOutdated!,
- *    :falling!,
- *    :rising!,
- *    :low!,
- *    :badLow!,
- *    :compressionLow!,
- *    :high!,
- *    :badHigh!,
- *    :persistentHigh!
- * )
- * RETURNING situation_settings.id
+ * UPDATE profile_templates SET
+ *   profile_name = :profileName,
+ *   alarms_enabled = :alarmsEnabled!,
+ *   notification_targets = :notificationTargets!,
+ *   analyser_high_level_rel = :highLevelRel!,
+ *   analyser_high_level_abs = :highLevelAbs!,
+ *   analyser_high_level_bad = :highLevelBad!,
+ *   analyser_low_level_rel = :lowLevelRel!,
+ *   analyser_low_level_abs = :lowLevelAbs!,
+ *   analyser_time_since_bg_minutes = :timeSinceBgMinutes!,
+ *   situation_outdated = :outdated!,
+ *   situation_critical_outdated = :criticalOutdated!,
+ *   situation_falling = :falling!,
+ *   situation_rising = :rising!,
+ *   situation_low = :low!,
+ *   situation_bad_low = :badLow!,
+ *   situation_compression_low = :compressionLow!,
+ *   situation_high = :high!,
+ *   situation_bad_high = :badHigh!,
+ *   situation_persistent_high = :persistentHigh!,
+ *   situation_missing_day_insulin = :missingDayInsulin!
+ * WHERE id = :id!
+ * RETURNING *
  * ```
  */
-export const createSituationSettings = new PreparedQuery<ICreateSituationSettingsParams,ICreateSituationSettingsResult>(createSituationSettingsIR);
+export const editProfileTemplate = new PreparedQuery<IEditProfileTemplateParams,IEditProfileTemplateResult>(editProfileTemplateIR);
 
 
 /** 'CreateProfileActivation' parameters type */
@@ -230,42 +271,12 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":2000,"b":2010},{"a":2029,"b":2039}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":2072,"b":2082}]}],"statement":"WITH\n  analyser_settings_query AS (\n    SELECT\n      analyser_settings.id,\n      json_build_object(\n        'highLevelRel', analyser_settings.high_level_rel,\n        'highLevelAbs', analyser_settings.high_level_abs,\n        'highLevelBad', analyser_settings.high_level_bad,\n        'lowLevelRel', analyser_settings.low_level_rel,\n        'lowLevelAbs', analyser_settings.low_level_abs,\n        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes\n      ) AS analyser_settings\n    FROM analyser_settings\n  ),\n  situation_settings_query AS (\n    SELECT\n      situation_settings.id,\n      json_build_object(\n        'outdated', situation_settings.outdated,\n        'criticalOutdated', situation_settings.critical_outdated,\n        'falling', situation_settings.falling,\n        'rising', situation_settings.rising,\n        'low', situation_settings.low,\n        'badLow', situation_settings.bad_low,\n        'compressionLow', situation_settings.compression_low,\n        'high', situation_settings.high,\n        'badHigh', situation_settings.bad_high,\n        'persistentHigh', situation_settings.persistent_high\n      ) AS situation_settings\n    FROM situation_settings\n  ),\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  analyser_settings_query.analyser_settings AS analyser_settings,\n  situation_settings_query.situation_settings AS situation_settings\nFROM profile_templates\n  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id\n  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
+const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":1273,"b":1283},{"a":1302,"b":1312}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":1345,"b":1355}]}],"statement":"WITH\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  json_build_object(\n    'highLevelRel', analyser_high_level_rel,\n    'highLevelAbs', analyser_high_level_abs,\n    'highLevelBad', analyser_high_level_bad,\n    'lowLevelRel', analyser_low_level_rel,\n    'lowLevelAbs', analyser_low_level_abs,\n    'timeSinceBgMinutes', analyser_time_since_bg_minutes\n  ) AS analyser_settings,\n  json_build_object(\n    'outdated', situation_outdated,\n    'criticalOutdated', situation_critical_outdated,\n    'falling', situation_falling,\n    'rising', situation_rising,\n    'low', situation_low,\n    'badLow', situation_bad_low,\n    'compressionLow', situation_compression_low,\n    'high', situation_high,\n    'badHigh', situation_bad_high,\n    'persistentHigh', situation_persistent_high,\n    'missingDayInsulin', situation_missing_day_insulin\n  ) AS situation_settings\nFROM profile_templates\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
 
 /**
  * Query generated from SQL:
  * ```
  * WITH
- *   analyser_settings_query AS (
- *     SELECT
- *       analyser_settings.id,
- *       json_build_object(
- *         'highLevelRel', analyser_settings.high_level_rel,
- *         'highLevelAbs', analyser_settings.high_level_abs,
- *         'highLevelBad', analyser_settings.high_level_bad,
- *         'lowLevelRel', analyser_settings.low_level_rel,
- *         'lowLevelAbs', analyser_settings.low_level_abs,
- *         'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes
- *       ) AS analyser_settings
- *     FROM analyser_settings
- *   ),
- *   situation_settings_query AS (
- *     SELECT
- *       situation_settings.id,
- *       json_build_object(
- *         'outdated', situation_settings.outdated,
- *         'criticalOutdated', situation_settings.critical_outdated,
- *         'falling', situation_settings.falling,
- *         'rising', situation_settings.rising,
- *         'low', situation_settings.low,
- *         'badLow', situation_settings.bad_low,
- *         'compressionLow', situation_settings.compression_low,
- *         'high', situation_settings.high,
- *         'badHigh', situation_settings.bad_high,
- *         'persistentHigh', situation_settings.persistent_high
- *       ) AS situation_settings
- *     FROM situation_settings
- *   ),
  *   most_recent_activation_query AS (
  *     SELECT profile_template_id
  *     FROM profile_activations
@@ -278,11 +289,28 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
  *   alarms_enabled,
  *   notification_targets,
  *   most_recent_activation_query.profile_template_id IS NOT NULL AS "is_active!",
- *   analyser_settings_query.analyser_settings AS analyser_settings,
- *   situation_settings_query.situation_settings AS situation_settings
+ *   json_build_object(
+ *     'highLevelRel', analyser_high_level_rel,
+ *     'highLevelAbs', analyser_high_level_abs,
+ *     'highLevelBad', analyser_high_level_bad,
+ *     'lowLevelRel', analyser_low_level_rel,
+ *     'lowLevelAbs', analyser_low_level_abs,
+ *     'timeSinceBgMinutes', analyser_time_since_bg_minutes
+ *   ) AS analyser_settings,
+ *   json_build_object(
+ *     'outdated', situation_outdated,
+ *     'criticalOutdated', situation_critical_outdated,
+ *     'falling', situation_falling,
+ *     'rising', situation_rising,
+ *     'low', situation_low,
+ *     'badLow', situation_bad_low,
+ *     'compressionLow', situation_compression_low,
+ *     'high', situation_high,
+ *     'badHigh', situation_bad_high,
+ *     'persistentHigh', situation_persistent_high,
+ *     'missingDayInsulin', situation_missing_day_insulin
+ *   ) AS situation_settings
  * FROM profile_templates
- *   INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id
- *   INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id
  *   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
  * WHERE
  *   (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND

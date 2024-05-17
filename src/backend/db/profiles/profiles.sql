@@ -1,65 +1,74 @@
 /* @name createProfileTemplate */
 INSERT INTO profile_templates (
-    profile_name,
-    alarms_enabled,
-    analyser_settings_id,
-    situation_settings_id,
-    notification_targets
+  profile_name,
+  alarms_enabled,
+  notification_targets,
+  analyser_high_level_rel,
+  analyser_high_level_abs,
+  analyser_high_level_bad,
+  analyser_low_level_rel,
+  analyser_low_level_abs,
+  analyser_time_since_bg_minutes,
+  situation_outdated,
+  situation_critical_outdated,
+  situation_falling,
+  situation_rising,
+  situation_low,
+  situation_bad_low,
+  situation_compression_low,
+  situation_high,
+  situation_bad_high,
+  situation_persistent_high,
+  situation_missing_day_insulin
 )
 VALUES (
   :profileName,
   :alarmsEnabled!,
-  :analyserSettingsId!,
-  :situationSettingsId!,
-  :notificationTargets!
-)
-RETURNING *;
-
-/* @name createAnalyserSettings */
-INSERT INTO analyser_settings (
-  high_level_rel,
-  high_level_abs,
-  high_level_bad,
-  low_level_rel,
-  low_level_abs,
-  time_since_bg_minutes
-)
-VALUES (
+  :notificationTargets!,
   :highLevelRel!,
   :highLevelAbs!,
   :highLevelBad!,
   :lowLevelRel!,
   :lowLevelAbs!,
-  :timeSinceBgMinutes!
+  :timeSinceBgMinutes!,
+  :outdated!,
+  :criticalOutdated!,
+  :falling!,
+  :rising!,
+  :low!,
+  :badLow!,
+  :compressionLow!,
+  :high!,
+  :badHigh!,
+  :persistentHigh!,
+  :missingDayInsulin!
 )
-RETURNING analyser_settings.id;
+RETURNING *;
 
-/* @name createSituationSettings */
-INSERT INTO situation_settings (
-  outdated,
-  critical_outdated,
-  falling,
-  rising,
-  low,
-  bad_low,
-  compression_low,
-  high,
-  bad_high,
-  persistent_high
-)
-VALUES (
-   :outdated!,
-   :criticalOutdated!,
-   :falling!,
-   :rising!,
-   :low!,
-   :badLow!,
-   :compressionLow!,
-   :high!,
-   :badHigh!,
-   :persistentHigh!
-)
-RETURNING situation_settings.id;
+/* @name editProfileTemplate */
+UPDATE profile_templates SET
+  profile_name = :profileName,
+  alarms_enabled = :alarmsEnabled!,
+  notification_targets = :notificationTargets!,
+  analyser_high_level_rel = :highLevelRel!,
+  analyser_high_level_abs = :highLevelAbs!,
+  analyser_high_level_bad = :highLevelBad!,
+  analyser_low_level_rel = :lowLevelRel!,
+  analyser_low_level_abs = :lowLevelAbs!,
+  analyser_time_since_bg_minutes = :timeSinceBgMinutes!,
+  situation_outdated = :outdated!,
+  situation_critical_outdated = :criticalOutdated!,
+  situation_falling = :falling!,
+  situation_rising = :rising!,
+  situation_low = :low!,
+  situation_bad_low = :badLow!,
+  situation_compression_low = :compressionLow!,
+  situation_high = :high!,
+  situation_bad_high = :badHigh!,
+  situation_persistent_high = :persistentHigh!,
+  situation_missing_day_insulin = :missingDayInsulin!
+WHERE id = :id!
+RETURNING *;
 
 /* @name createProfileActivation */
 INSERT INTO profile_activations (
@@ -80,36 +89,6 @@ RETURNING *;
   @name getProfiles
 */
 WITH
-  analyser_settings_query AS (
-    SELECT
-      analyser_settings.id,
-      json_build_object(
-        'highLevelRel', analyser_settings.high_level_rel,
-        'highLevelAbs', analyser_settings.high_level_abs,
-        'highLevelBad', analyser_settings.high_level_bad,
-        'lowLevelRel', analyser_settings.low_level_rel,
-        'lowLevelAbs', analyser_settings.low_level_abs,
-        'timeSinceBgMinutes', analyser_settings.time_since_bg_minutes
-      ) AS analyser_settings
-    FROM analyser_settings
-  ),
-  situation_settings_query AS (
-    SELECT
-      situation_settings.id,
-      json_build_object(
-        'outdated', situation_settings.outdated,
-        'criticalOutdated', situation_settings.critical_outdated,
-        'falling', situation_settings.falling,
-        'rising', situation_settings.rising,
-        'low', situation_settings.low,
-        'badLow', situation_settings.bad_low,
-        'compressionLow', situation_settings.compression_low,
-        'high', situation_settings.high,
-        'badHigh', situation_settings.bad_high,
-        'persistentHigh', situation_settings.persistent_high
-      ) AS situation_settings
-    FROM situation_settings
-  ),
   most_recent_activation_query AS (
     SELECT profile_template_id
     FROM profile_activations
@@ -122,11 +101,28 @@ SELECT
   alarms_enabled,
   notification_targets,
   most_recent_activation_query.profile_template_id IS NOT NULL AS "is_active!",
-  analyser_settings_query.analyser_settings AS analyser_settings,
-  situation_settings_query.situation_settings AS situation_settings
+  json_build_object(
+    'highLevelRel', analyser_high_level_rel,
+    'highLevelAbs', analyser_high_level_abs,
+    'highLevelBad', analyser_high_level_bad,
+    'lowLevelRel', analyser_low_level_rel,
+    'lowLevelAbs', analyser_low_level_abs,
+    'timeSinceBgMinutes', analyser_time_since_bg_minutes
+  ) AS analyser_settings,
+  json_build_object(
+    'outdated', situation_outdated,
+    'criticalOutdated', situation_critical_outdated,
+    'falling', situation_falling,
+    'rising', situation_rising,
+    'low', situation_low,
+    'badLow', situation_bad_low,
+    'compressionLow', situation_compression_low,
+    'high', situation_high,
+    'badHigh', situation_bad_high,
+    'persistentHigh', situation_persistent_high,
+    'missingDayInsulin', situation_missing_day_insulin
+  ) AS situation_settings
 FROM profile_templates
-  INNER JOIN analyser_settings_query ON analyser_settings_query.id = profile_templates.analyser_settings_id
-  INNER JOIN situation_settings_query ON situation_settings_query.id = profile_templates.situation_settings_id
   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
 WHERE
   (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND

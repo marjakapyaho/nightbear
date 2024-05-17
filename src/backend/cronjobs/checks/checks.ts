@@ -2,10 +2,6 @@ import { runAlarmChecks } from 'backend/cronjobs/alarms/alarms';
 import { runAnalysis } from 'backend/cronjobs/analyser/analyser';
 import { Context } from 'backend/utils/api';
 import { Cronjob } from 'backend/utils/cronjobs';
-import { Alarm } from 'shared/types/alarms';
-import { Profile } from 'shared/types/profiles';
-import { SensorEntry } from 'shared/types/timelineEntries';
-import { getActiveProfile } from 'shared/utils/profiles';
 import { getRange } from './utils';
 
 export const checks = (async (context: Context) => {

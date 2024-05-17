@@ -1,21 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from 'frontend/pages/config/Config.module.scss';
+import { Profile } from 'shared/types/profiles';
+import { InputNumber } from 'frontend/components/inputNumber/InputNumber';
+import { InputText } from 'frontend/components/inputText/InputText';
 
 type Props = {
   label: string;
-  value: string | number | undefined | null;
-  setValue: (val: string) => void;
+  children: React.ReactNode;
 };
 
-export const EditableProfileRow = ({ label, value, setValue }: Props) => (
-  <div className={styles.row}>
-    <div className={styles.label}>{label}</div>
-    <div className={styles.field}>
-      <input
-        className={styles.input}
-        value={value || ''}
-        onChange={event => setValue(event.target.value)}
-      />
+export const EditableProfileRow = ({ label, children }: Props) => {
+  return (
+    <div className={styles.row}>
+      <div className={styles.label}>{label}</div>
+      <div className={styles.field}>{children}</div>
     </div>
-  </div>
-);
+  );
+};

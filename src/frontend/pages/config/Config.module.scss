@@ -19,7 +19,7 @@
     }
 
     .profile {
-      padding: 20px;
+      padding: 15px 20px;
       background: whitesmoke;
       cursor: pointer;
       border-radius: 6px;
@@ -77,6 +77,25 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  .editOrCreateSelection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    .selection {
+      background: white;
+      padding: 10px 20px;
+      text-align: center;
+      border-radius: 6px;
+
+      &.selected {
+        background: #7a7a7a;
+        color: whitesmoke;
+        border: 1px solid #7a7a7a;
+      }
+    }
+  }
 
   .row {
     display: grid;

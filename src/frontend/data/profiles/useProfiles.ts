@@ -25,10 +25,22 @@ export const useProfiles = () => {
     });
 
   const { mutate: createProfileMutation } = useMutation({
-    mutationFn: (profile: Profile) => callFetch('/create-profile', 'POST', profile),
+    mutationFn: (payload: { profile: Profile; validityInMs: number }) =>
+      callFetch('/create-profile', 'POST', payload),
   });
-  const createProfile = (profile: Profile) =>
-    createProfileMutation(profile, {
+  const createProfile = (profile: Profile, validityInMs: number) =>
+    createProfileMutation(
+      { profile, validityInMs },
+      {
+        onSuccess: refetch,
+      },
+    );
+
+  const { mutate: editProfileMutation } = useMutation({
+    mutationFn: (profile: Profile) => callFetch('/edit-profile', 'PUT', profile),
+  });
+  const editProfile = (profile: Profile) =>
+    editProfileMutation(profile, {
       onSuccess: refetch,
     });
 
@@ -37,6 +49,7 @@ export const useProfiles = () => {
     activeProfile: getActiveProfile(profiles),
     activateProfile,
     createProfile,
+    editProfile,
     isLoading,
     isError,
     isSuccess,

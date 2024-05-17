@@ -31,6 +31,7 @@ export const mockSituationSettings: SituationSettings = {
   high: mockAlarmSettings,
   badHigh: mockAlarmSettings,
   persistentHigh: mockAlarmSettings,
+  missingDayInsulin: mockAlarmSettings,
 };
 
 export const mockProfiles: Profile[] = [

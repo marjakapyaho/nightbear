@@ -22,5 +22,6 @@ export const Situation = z.enum([
   'FALLING',
   'RISING',
   'PERSISTENT_HIGH',
+  'MISSING_DAY_INSULIN',
 ]);
 export type Situation = z.infer<typeof Situation>;

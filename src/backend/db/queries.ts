@@ -40,16 +40,14 @@ import {
   markAllAlarmStatesAsProcessed,
 } from './alarms/alarms.queries';
 import {
-  createAnalyserSettings,
   createProfileActivation,
   createProfileTemplate,
-  createSituationSettings,
+  editProfileTemplate,
   getProfileActivationById,
   getProfiles,
   getRelevantProfileActivations,
   reactivateProfileActivation,
 } from './profiles/profiles.queries';
-import { z } from 'zod';
 
 export const queries = (pool: Pool) => {
   const { one, many, oneOrNone } = bindQueryShorthands(pool);
@@ -120,24 +118,23 @@ export const queries = (pool: Pool) => {
     },
 
     async createProfile(profile: Profile) {
-      const analyserSettings = await one(
-        IdReturnType,
-        createAnalyserSettings,
-        profile.analyserSettings,
-      );
-
-      const situationSettings = await one(
-        IdReturnType,
-        createSituationSettings,
-        profile.situationSettings,
-      );
-
       return one(IdReturnType, createProfileTemplate, {
         profileName: profile.profileName,
         alarmsEnabled: profile.alarmsEnabled,
         notificationTargets: profile.notificationTargets,
-        analyserSettingsId: analyserSettings.id,
-        situationSettingsId: situationSettings.id,
+        ...profile.analyserSettings,
+        ...profile.situationSettings,
+      });
+    },
+
+    async editProfile(profile: Profile, id: string) {
+      return one(IdReturnType, editProfileTemplate, {
+        id,
+        profileName: profile.profileName,
+        alarmsEnabled: profile.alarmsEnabled,
+        notificationTargets: profile.notificationTargets,
+        ...profile.analyserSettings,
+        ...profile.situationSettings,
       });
     },
 
@@ -156,6 +153,9 @@ export const queries = (pool: Pool) => {
 
     async getActiveProfile() {
       const [activeProfile] = await many(Profile, getProfiles, { onlyActive: true });
+      if (!activeProfile) {
+        throw new Error('Could not find active profile');
+      }
       return activeProfile;
     },
 
