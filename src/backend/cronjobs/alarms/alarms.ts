@@ -1,10 +1,10 @@
+import { Context } from 'backend/utils/api';
 import { Alarm } from 'shared/types/alarms';
 import { Situation } from 'shared/types/analyser';
-import { ALARM_START_LEVEL, getAlarmState } from 'shared/utils/alarms';
-import { Context } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
+import { getAlarmState } from 'shared/utils/alarms';
+import { isNotNullish } from 'shared/utils/helpers';
 import { isTimeSmaller } from 'shared/utils/time';
-import { isNotNull } from 'shared/utils/helpers';
 import {
   AlarmActions,
   getNeededAlarmLevel,
@@ -76,7 +76,7 @@ export const detectAlarmActions = (
 const deactivateAlarm = async (alarm: Alarm, context: Context) => {
   // TODO: Let's not wait for these?
   context.pushover.ackAlarms(
-    alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNull),
+    alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNullish),
   );
 
   await context.db.deactivateAlarm(alarm.id, context.timestamp());

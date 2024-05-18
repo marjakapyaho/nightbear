@@ -1,7 +1,7 @@
 import {
+  NO_PUSHOVER,
   PushoverClient,
   createPushoverClient,
-  NO_PUSHOVER,
 } from 'backend/cronjobs/alarms/pushoverClient';
 import {
   DexcomShareClient,
@@ -12,8 +12,8 @@ import { Logger, createLogger } from 'backend/utils/logging';
 import { readFileSync } from 'fs';
 import { map } from 'lodash';
 import { parseNumber } from 'shared/utils/helpers';
-import { DbClient, createDbClient } from './db';
 import { getTimeAsISOStr } from 'shared/utils/time';
+import { DbClient, createDbClient } from './db';
 
 export type Headers = {
   [header: string]: string | string[];
@@ -45,6 +45,7 @@ export type Context = {
   dexcomShare: DexcomShareClient;
   config: {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES?: number;
+    DEV_DATA_IMPORT_FROM_COUCHDB?: string;
   };
 };
 
@@ -61,6 +62,7 @@ export function createNodeContext(): Context {
     DEXCOM_SHARE_PASSWORD,
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
     PUSHOVER_DISABLED,
+    DEV_DATA_IMPORT_FROM_COUCHDB,
   } = process.env;
 
   if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
@@ -73,6 +75,7 @@ export function createNodeContext(): Context {
   const config = {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES:
       parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // Default to 3 hours
+    DEV_DATA_IMPORT_FROM_COUCHDB,
   };
 
   log(`Starting Nightbear version ${getDeployedVersion()}`);

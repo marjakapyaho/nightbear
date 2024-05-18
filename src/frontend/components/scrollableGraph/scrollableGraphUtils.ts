@@ -1,7 +1,6 @@
-import { roundTo1Decimals } from 'shared/utils/calculations';
-import { isNotNull } from 'shared/utils/helpers';
 import { CarbEntry, InsulinEntry, MeterEntry } from 'shared/types/timelineEntries';
-import { getTimeInMillis } from 'shared/utils/time';
+import { roundTo1Decimals } from 'shared/utils/calculations';
+import { isNotNullish } from 'shared/utils/helpers';
 
 export type BaseGraphConfig = {
   timelineRange: number; // How many ms worth of graph data are we showing
@@ -88,7 +87,7 @@ export const valToTop = (c: GraphConfig, val: number) => {
 export const mapGraphPointsForPolyline = (graphPoints: Point[], config: GraphConfig) =>
   graphPoints
     .map(point =>
-      isNotNull(point.val)
+      isNotNullish(point.val)
         ? [tsToLeft(config, point.timestamp), valToTop(config, point.val)].join()
         : '',
     )
