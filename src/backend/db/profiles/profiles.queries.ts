@@ -23,6 +23,7 @@ export interface ICreateProfileTemplateParams {
   outdated: any;
   persistentHigh: any;
   profileName?: string | null | void;
+  repeatTimeInLocalTimezone?: string | null | void;
   rising: any;
   timeSinceBgMinutes: number;
 }
@@ -39,6 +40,7 @@ export interface ICreateProfileTemplateResult {
   id: string;
   notificationTargets: stringArray;
   profileName: string | null;
+  repeatTimeInLocalTimezone: string | null;
   situationBadHigh: any;
   situationBadLow: any;
   situationCompressionLow: any;
@@ -58,7 +60,7 @@ export interface ICreateProfileTemplateQuery {
   result: ICreateProfileTemplateResult;
 }
 
-const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":532,"b":543}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":548,"b":562}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":567,"b":587}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":592,"b":605}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":610,"b":623}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":628,"b":641}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":646,"b":658}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":663,"b":675}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":680,"b":699}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":704,"b":713}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":718,"b":735}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":740,"b":748}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":753,"b":760}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":765,"b":769}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":774,"b":781}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":786,"b":801}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":806,"b":811}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":816,"b":824}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":829,"b":844}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":849,"b":867}]}],"statement":"INSERT INTO profile_templates (\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  analyser_high_level_rel,\n  analyser_high_level_abs,\n  analyser_high_level_bad,\n  analyser_low_level_rel,\n  analyser_low_level_abs,\n  analyser_time_since_bg_minutes,\n  situation_outdated,\n  situation_critical_outdated,\n  situation_falling,\n  situation_rising,\n  situation_low,\n  situation_bad_low,\n  situation_compression_low,\n  situation_high,\n  situation_bad_high,\n  situation_persistent_high,\n  situation_missing_day_insulin\n)\nVALUES (\n  :profileName,\n  :alarmsEnabled!,\n  :notificationTargets!,\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!,\n  :outdated!,\n  :criticalOutdated!,\n  :falling!,\n  :rising!,\n  :low!,\n  :badLow!,\n  :compressionLow!,\n  :high!,\n  :badHigh!,\n  :persistentHigh!,\n  :missingDayInsulin!\n)\nRETURNING *"};
+const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"repeatTimeInLocalTimezone":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":565,"b":576}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":581,"b":595}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":600,"b":625}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":630,"b":650}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":655,"b":668}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":673,"b":686}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":691,"b":704}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":709,"b":721}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":726,"b":738}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":743,"b":762}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":767,"b":776}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":781,"b":798}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":803,"b":811}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":816,"b":823}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":828,"b":832}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":837,"b":844}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":849,"b":864}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":869,"b":874}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":879,"b":887}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":892,"b":907}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":912,"b":930}]}],"statement":"INSERT INTO profile_templates (\n  profile_name,\n  alarms_enabled,\n  repeat_time_in_local_timezone,\n  notification_targets,\n  analyser_high_level_rel,\n  analyser_high_level_abs,\n  analyser_high_level_bad,\n  analyser_low_level_rel,\n  analyser_low_level_abs,\n  analyser_time_since_bg_minutes,\n  situation_outdated,\n  situation_critical_outdated,\n  situation_falling,\n  situation_rising,\n  situation_low,\n  situation_bad_low,\n  situation_compression_low,\n  situation_high,\n  situation_bad_high,\n  situation_persistent_high,\n  situation_missing_day_insulin\n)\nVALUES (\n  :profileName,\n  :alarmsEnabled!,\n  :repeatTimeInLocalTimezone,\n  :notificationTargets!,\n  :highLevelRel!,\n  :highLevelAbs!,\n  :highLevelBad!,\n  :lowLevelRel!,\n  :lowLevelAbs!,\n  :timeSinceBgMinutes!,\n  :outdated!,\n  :criticalOutdated!,\n  :falling!,\n  :rising!,\n  :low!,\n  :badLow!,\n  :compressionLow!,\n  :high!,\n  :badHigh!,\n  :persistentHigh!,\n  :missingDayInsulin!\n)\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -66,6 +68,7 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
  * INSERT INTO profile_templates (
  *   profile_name,
  *   alarms_enabled,
+ *   repeat_time_in_local_timezone,
  *   notification_targets,
  *   analyser_high_level_rel,
  *   analyser_high_level_abs,
@@ -88,6 +91,7 @@ const createProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarms
  * VALUES (
  *   :profileName,
  *   :alarmsEnabled!,
+ *   :repeatTimeInLocalTimezone,
  *   :notificationTargets!,
  *   :highLevelRel!,
  *   :highLevelAbs!,
@@ -134,6 +138,7 @@ export interface IEditProfileTemplateParams {
   outdated: any;
   persistentHigh: any;
   profileName?: string | null | void;
+  repeatTimeInLocalTimezone?: string | null | void;
   rising: any;
   timeSinceBgMinutes: number;
 }
@@ -150,6 +155,7 @@ export interface IEditProfileTemplateResult {
   id: string;
   notificationTargets: stringArray;
   profileName: string | null;
+  repeatTimeInLocalTimezone: string | null;
   situationBadHigh: any;
   situationBadLow: any;
   situationCompressionLow: any;
@@ -169,7 +175,7 @@ export interface IEditProfileTemplateQuery {
   result: IEditProfileTemplateResult;
 }
 
-const editProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true,"id":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":57}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":79,"b":93}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":121,"b":141}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":172,"b":185}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":216,"b":229}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":260,"b":273}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":303,"b":315}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":345,"b":357}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":395,"b":414}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":440,"b":449}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":484,"b":501}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":526,"b":534}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":558,"b":565}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":586,"b":590}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":615,"b":622}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":655,"b":670}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":692,"b":697}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":723,"b":731}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":764,"b":779}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":816,"b":834}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":847,"b":850}]}],"statement":"UPDATE profile_templates SET\n  profile_name = :profileName,\n  alarms_enabled = :alarmsEnabled!,\n  notification_targets = :notificationTargets!,\n  analyser_high_level_rel = :highLevelRel!,\n  analyser_high_level_abs = :highLevelAbs!,\n  analyser_high_level_bad = :highLevelBad!,\n  analyser_low_level_rel = :lowLevelRel!,\n  analyser_low_level_abs = :lowLevelAbs!,\n  analyser_time_since_bg_minutes = :timeSinceBgMinutes!,\n  situation_outdated = :outdated!,\n  situation_critical_outdated = :criticalOutdated!,\n  situation_falling = :falling!,\n  situation_rising = :rising!,\n  situation_low = :low!,\n  situation_bad_low = :badLow!,\n  situation_compression_low = :compressionLow!,\n  situation_high = :high!,\n  situation_bad_high = :badHigh!,\n  situation_persistent_high = :persistentHigh!,\n  situation_missing_day_insulin = :missingDayInsulin!\nWHERE id = :id!\nRETURNING *"};
+const editProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEnabled":true,"repeatTimeInLocalTimezone":true,"notificationTargets":true,"highLevelRel":true,"highLevelAbs":true,"highLevelBad":true,"lowLevelRel":true,"lowLevelAbs":true,"timeSinceBgMinutes":true,"outdated":true,"criticalOutdated":true,"falling":true,"rising":true,"low":true,"badLow":true,"compressionLow":true,"high":true,"badHigh":true,"persistentHigh":true,"missingDayInsulin":true,"id":true},"params":[{"name":"profileName","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":57}]},{"name":"alarmsEnabled","required":true,"transform":{"type":"scalar"},"locs":[{"a":79,"b":93}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":130,"b":155}]},{"name":"notificationTargets","required":true,"transform":{"type":"scalar"},"locs":[{"a":183,"b":203}]},{"name":"highLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":234,"b":247}]},{"name":"highLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":278,"b":291}]},{"name":"highLevelBad","required":true,"transform":{"type":"scalar"},"locs":[{"a":322,"b":335}]},{"name":"lowLevelRel","required":true,"transform":{"type":"scalar"},"locs":[{"a":365,"b":377}]},{"name":"lowLevelAbs","required":true,"transform":{"type":"scalar"},"locs":[{"a":407,"b":419}]},{"name":"timeSinceBgMinutes","required":true,"transform":{"type":"scalar"},"locs":[{"a":457,"b":476}]},{"name":"outdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":502,"b":511}]},{"name":"criticalOutdated","required":true,"transform":{"type":"scalar"},"locs":[{"a":546,"b":563}]},{"name":"falling","required":true,"transform":{"type":"scalar"},"locs":[{"a":588,"b":596}]},{"name":"rising","required":true,"transform":{"type":"scalar"},"locs":[{"a":620,"b":627}]},{"name":"low","required":true,"transform":{"type":"scalar"},"locs":[{"a":648,"b":652}]},{"name":"badLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":677,"b":684}]},{"name":"compressionLow","required":true,"transform":{"type":"scalar"},"locs":[{"a":717,"b":732}]},{"name":"high","required":true,"transform":{"type":"scalar"},"locs":[{"a":754,"b":759}]},{"name":"badHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":785,"b":793}]},{"name":"persistentHigh","required":true,"transform":{"type":"scalar"},"locs":[{"a":826,"b":841}]},{"name":"missingDayInsulin","required":true,"transform":{"type":"scalar"},"locs":[{"a":878,"b":896}]},{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":909,"b":912}]}],"statement":"UPDATE profile_templates SET\n  profile_name = :profileName,\n  alarms_enabled = :alarmsEnabled!,\n  repeat_time_in_local_timezone = :repeatTimeInLocalTimezone,\n  notification_targets = :notificationTargets!,\n  analyser_high_level_rel = :highLevelRel!,\n  analyser_high_level_abs = :highLevelAbs!,\n  analyser_high_level_bad = :highLevelBad!,\n  analyser_low_level_rel = :lowLevelRel!,\n  analyser_low_level_abs = :lowLevelAbs!,\n  analyser_time_since_bg_minutes = :timeSinceBgMinutes!,\n  situation_outdated = :outdated!,\n  situation_critical_outdated = :criticalOutdated!,\n  situation_falling = :falling!,\n  situation_rising = :rising!,\n  situation_low = :low!,\n  situation_bad_low = :badLow!,\n  situation_compression_low = :compressionLow!,\n  situation_high = :high!,\n  situation_bad_high = :badHigh!,\n  situation_persistent_high = :persistentHigh!,\n  situation_missing_day_insulin = :missingDayInsulin!\nWHERE id = :id!\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -177,6 +183,7 @@ const editProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEn
  * UPDATE profile_templates SET
  *   profile_name = :profileName,
  *   alarms_enabled = :alarmsEnabled!,
+ *   repeat_time_in_local_timezone = :repeatTimeInLocalTimezone,
  *   notification_targets = :notificationTargets!,
  *   analyser_high_level_rel = :highLevelRel!,
  *   analyser_high_level_abs = :highLevelAbs!,
@@ -202,52 +209,6 @@ const editProfileTemplateIR: any = {"usedParamSet":{"profileName":true,"alarmsEn
 export const editProfileTemplate = new PreparedQuery<IEditProfileTemplateParams,IEditProfileTemplateResult>(editProfileTemplateIR);
 
 
-/** 'CreateProfileActivation' parameters type */
-export interface ICreateProfileActivationParams {
-  activatedAt: string | Date;
-  deactivatedAt?: string | Date | null | void;
-  profileTemplateId: string;
-  repeatTimeInLocalTimezone?: string | null | void;
-}
-
-/** 'CreateProfileActivation' return type */
-export interface ICreateProfileActivationResult {
-  activatedAt: string;
-  deactivatedAt: string | null;
-  id: string;
-  profileTemplateId: string;
-  repeatTimeInLocalTimezone: string | null;
-}
-
-/** 'CreateProfileActivation' query type */
-export interface ICreateProfileActivationQuery {
-  params: ICreateProfileActivationParams;
-  result: ICreateProfileActivationResult;
-}
-
-const createProfileActivationIR: any = {"usedParamSet":{"profileTemplateId":true,"activatedAt":true,"repeatTimeInLocalTimezone":true,"deactivatedAt":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":137,"b":155}]},{"name":"activatedAt","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":173}]},{"name":"repeatTimeInLocalTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":179,"b":204}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":210,"b":223}]}],"statement":"INSERT INTO profile_activations (\n  profile_template_id,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\n)\nVALUES (\n   :profileTemplateId!,\n   :activatedAt!,\n   :repeatTimeInLocalTimezone,\n   :deactivatedAt\n )\nRETURNING *"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO profile_activations (
- *   profile_template_id,
- *   activated_at,
- *   repeat_time_in_local_timezone,
- *   deactivated_at
- * )
- * VALUES (
- *    :profileTemplateId!,
- *    :activatedAt!,
- *    :repeatTimeInLocalTimezone,
- *    :deactivatedAt
- *  )
- * RETURNING *
- * ```
- */
-export const createProfileActivation = new PreparedQuery<ICreateProfileActivationParams,ICreateProfileActivationResult>(createProfileActivationIR);
-
-
 /** 'GetProfiles' parameters type */
 export interface IGetProfilesParams {
   onlyActive?: boolean | null | void;
@@ -262,6 +223,7 @@ export interface IGetProfilesResult {
   isActive: boolean;
   notificationTargets: stringArray;
   profileName: string | null;
+  repeatTimeInLocalTimezone: string | null;
   situationSettings: any | null;
 }
 
@@ -271,7 +233,7 @@ export interface IGetProfilesQuery {
   result: IGetProfilesResult;
 }
 
-const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":1273,"b":1283},{"a":1302,"b":1312}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":1345,"b":1355}]}],"statement":"WITH\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  json_build_object(\n    'highLevelRel', analyser_high_level_rel,\n    'highLevelAbs', analyser_high_level_abs,\n    'highLevelBad', analyser_high_level_bad,\n    'lowLevelRel', analyser_low_level_rel,\n    'lowLevelAbs', analyser_low_level_abs,\n    'timeSinceBgMinutes', analyser_time_since_bg_minutes\n  ) AS analyser_settings,\n  json_build_object(\n    'outdated', situation_outdated,\n    'criticalOutdated', situation_critical_outdated,\n    'falling', situation_falling,\n    'rising', situation_rising,\n    'low', situation_low,\n    'badLow', situation_bad_low,\n    'compressionLow', situation_compression_low,\n    'high', situation_high,\n    'badHigh', situation_bad_high,\n    'persistentHigh', situation_persistent_high,\n    'missingDayInsulin', situation_missing_day_insulin\n  ) AS situation_settings\nFROM profile_templates\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
+const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true},"params":[{"name":"templateId","required":false,"transform":{"type":"scalar"},"locs":[{"a":1306,"b":1316},{"a":1335,"b":1345}]},{"name":"onlyActive","required":false,"transform":{"type":"scalar"},"locs":[{"a":1378,"b":1388}]}],"statement":"WITH\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_templates.id AS id,\n  profile_name,\n  alarms_enabled,\n  repeat_time_in_local_timezone,\n  notification_targets,\n  most_recent_activation_query.profile_template_id IS NOT NULL AS \"is_active!\",\n  json_build_object(\n    'highLevelRel', analyser_high_level_rel,\n    'highLevelAbs', analyser_high_level_abs,\n    'highLevelBad', analyser_high_level_bad,\n    'lowLevelRel', analyser_low_level_rel,\n    'lowLevelAbs', analyser_low_level_abs,\n    'timeSinceBgMinutes', analyser_time_since_bg_minutes\n  ) AS analyser_settings,\n  json_build_object(\n    'outdated', situation_outdated,\n    'criticalOutdated', situation_critical_outdated,\n    'falling', situation_falling,\n    'rising', situation_rising,\n    'low', situation_low,\n    'badLow', situation_bad_low,\n    'compressionLow', situation_compression_low,\n    'high', situation_high,\n    'badHigh', situation_bad_high,\n    'persistentHigh', situation_persistent_high,\n    'missingDayInsulin', situation_missing_day_insulin\n  ) AS situation_settings\nFROM profile_templates\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE\n  (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND\n  (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL))"};
 
 /**
  * Query generated from SQL:
@@ -287,6 +249,7 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
  *   profile_templates.id AS id,
  *   profile_name,
  *   alarms_enabled,
+ *   repeat_time_in_local_timezone,
  *   notification_targets,
  *   most_recent_activation_query.profile_template_id IS NOT NULL AS "is_active!",
  *   json_build_object(
@@ -320,51 +283,84 @@ const getProfilesIR: any = {"usedParamSet":{"templateId":true,"onlyActive":true}
 export const getProfiles = new PreparedQuery<IGetProfilesParams,IGetProfilesResult>(getProfilesIR);
 
 
-/** 'GetRelevantProfileActivations' parameters type */
-export type IGetRelevantProfileActivationsParams = void;
+/** 'CreateProfileActivation' parameters type */
+export interface ICreateProfileActivationParams {
+  activatedAt: string | Date;
+  deactivatedAt?: string | Date | null | void;
+  profileTemplateId: string;
+}
 
-/** 'GetRelevantProfileActivations' return type */
-export interface IGetRelevantProfileActivationsResult {
+/** 'CreateProfileActivation' return type */
+export interface ICreateProfileActivationResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileTemplateId: string;
+}
+
+/** 'CreateProfileActivation' query type */
+export interface ICreateProfileActivationQuery {
+  params: ICreateProfileActivationParams;
+  result: ICreateProfileActivationResult;
+}
+
+const createProfileActivationIR: any = {"usedParamSet":{"profileTemplateId":true,"activatedAt":true,"deactivatedAt":true},"params":[{"name":"profileTemplateId","required":true,"transform":{"type":"scalar"},"locs":[{"a":102,"b":120}]},{"name":"activatedAt","required":true,"transform":{"type":"scalar"},"locs":[{"a":124,"b":136}]},{"name":"deactivatedAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":140,"b":153}]}],"statement":"INSERT INTO profile_activations (\n  profile_template_id,\n  activated_at,\n  deactivated_at\n)\nVALUES (\n :profileTemplateId!,\n :activatedAt!,\n :deactivatedAt\n)\nRETURNING *"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO profile_activations (
+ *   profile_template_id,
+ *   activated_at,
+ *   deactivated_at
+ * )
+ * VALUES (
+ *  :profileTemplateId!,
+ *  :activatedAt!,
+ *  :deactivatedAt
+ * )
+ * RETURNING *
+ * ```
+ */
+export const createProfileActivation = new PreparedQuery<ICreateProfileActivationParams,ICreateProfileActivationResult>(createProfileActivationIR);
+
+
+/** 'GetLatestProfileActivation' parameters type */
+export type IGetLatestProfileActivationParams = void;
+
+/** 'GetLatestProfileActivation' return type */
+export interface IGetLatestProfileActivationResult {
   activatedAt: string;
   deactivatedAt: string | null;
   id: string;
   profileName: string | null;
   profileTemplateId: string;
-  repeatTimeInLocalTimezone: string | null;
 }
 
-/** 'GetRelevantProfileActivations' query type */
-export interface IGetRelevantProfileActivationsQuery {
-  params: IGetRelevantProfileActivationsParams;
-  result: IGetRelevantProfileActivationsResult;
+/** 'GetLatestProfileActivation' query type */
+export interface IGetLatestProfileActivationQuery {
+  params: IGetLatestProfileActivationParams;
+  result: IGetLatestProfileActivationResult;
 }
 
-const getRelevantProfileActivationsIR: any = {"usedParamSet":{},"params":[],"statement":"WITH\n  most_recent_activation_query AS (\n    SELECT profile_template_id\n    FROM profile_activations\n    ORDER BY activated_at DESC\n    LIMIT 1\n  )\nSELECT\n  profile_activations.id,\n  profile_activations.profile_template_id,\n  profile_templates.profile_name,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\n  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id\nWHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL"};
+const getLatestProfileActivationIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\n  profile_activations.id,\n  profile_template_id,\n  activated_at,\n  deactivated_at,\n  profile_templates.profile_name\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\nORDER BY activated_at DESC\nLIMIT 1"};
 
 /**
  * Query generated from SQL:
  * ```
- * WITH
- *   most_recent_activation_query AS (
- *     SELECT profile_template_id
- *     FROM profile_activations
- *     ORDER BY activated_at DESC
- *     LIMIT 1
- *   )
  * SELECT
  *   profile_activations.id,
- *   profile_activations.profile_template_id,
- *   profile_templates.profile_name,
+ *   profile_template_id,
  *   activated_at,
- *   repeat_time_in_local_timezone,
- *   deactivated_at
+ *   deactivated_at,
+ *   profile_templates.profile_name
  * FROM profile_activations
  *   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
- *   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
- * WHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL
+ * ORDER BY activated_at DESC
+ * LIMIT 1
  * ```
  */
-export const getRelevantProfileActivations = new PreparedQuery<IGetRelevantProfileActivationsParams,IGetRelevantProfileActivationsResult>(getRelevantProfileActivationsIR);
+export const getLatestProfileActivation = new PreparedQuery<IGetLatestProfileActivationParams,IGetLatestProfileActivationResult>(getLatestProfileActivationIR);
 
 
 /** 'GetProfileActivationById' parameters type */
@@ -379,7 +375,6 @@ export interface IGetProfileActivationByIdResult {
   id: string;
   profileName: string | null;
   profileTemplateId: string;
-  repeatTimeInLocalTimezone: string | null;
 }
 
 /** 'GetProfileActivationById' query type */
@@ -388,57 +383,22 @@ export interface IGetProfileActivationByIdQuery {
   result: IGetProfileActivationByIdResult;
 }
 
-const getProfileActivationByIdIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":329,"b":332}]}],"statement":"SELECT\n  profile_activations.id,\n  profile_activations.profile_template_id,\n  profile_templates.profile_name,\n  activated_at,\n  repeat_time_in_local_timezone,\n  deactivated_at\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\nWHERE profile_activations.id = :id!"};
+const getProfileActivationByIdIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":276,"b":279}]}],"statement":"SELECT\n  profile_activations.id,\n  profile_template_id,\n  activated_at,\n  deactivated_at,\n  profile_templates.profile_name\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\nWHERE profile_activations.id = :id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT
  *   profile_activations.id,
- *   profile_activations.profile_template_id,
- *   profile_templates.profile_name,
+ *   profile_template_id,
  *   activated_at,
- *   repeat_time_in_local_timezone,
- *   deactivated_at
+ *   deactivated_at,
+ *   profile_templates.profile_name
  * FROM profile_activations
  *   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
  * WHERE profile_activations.id = :id!
  * ```
  */
 export const getProfileActivationById = new PreparedQuery<IGetProfileActivationByIdParams,IGetProfileActivationByIdResult>(getProfileActivationByIdIR);
-
-
-/** 'ReactivateProfileActivation' parameters type */
-export interface IReactivateProfileActivationParams {
-  id: string;
-}
-
-/** 'ReactivateProfileActivation' return type */
-export interface IReactivateProfileActivationResult {
-  activatedAt: string;
-  deactivatedAt: string | null;
-  id: string;
-  profileTemplateId: string;
-  repeatTimeInLocalTimezone: string | null;
-}
-
-/** 'ReactivateProfileActivation' query type */
-export interface IReactivateProfileActivationQuery {
-  params: IReactivateProfileActivationParams;
-  result: IReactivateProfileActivationResult;
-}
-
-const reactivateProfileActivationIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":80}]}],"statement":"UPDATE profile_activations SET\n  activated_at = CURRENT_TIMESTAMP\nWHERE id = :id!\nRETURNING *"};
-
-/**
- * Query generated from SQL:
- * ```
- * UPDATE profile_activations SET
- *   activated_at = CURRENT_TIMESTAMP
- * WHERE id = :id!
- * RETURNING *
- * ```
- */
-export const reactivateProfileActivation = new PreparedQuery<IReactivateProfileActivationParams,IReactivateProfileActivationResult>(reactivateProfileActivationIR);
 
 

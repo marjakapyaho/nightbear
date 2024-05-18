@@ -16,13 +16,16 @@ export const useProfiles = () => {
   });
 
   const { mutate: activateProfileMutation } = useMutation({
-    mutationFn: (profile: Profile) => callFetch('/activate-profile', 'POST', profile),
+    mutationFn: (payload: { profile: Profile; validityInMs: number }) =>
+      callFetch('/activate-profile', 'POST', payload),
   });
-  const activateProfile = (profile: Profile) =>
-    activateProfileMutation(profile, {
-      onSuccess: refetch,
-      onError: () => console.log('Error'),
-    });
+  const activateProfile = (profile: Profile, validityInMs: number) =>
+    activateProfileMutation(
+      { profile, validityInMs },
+      {
+        onSuccess: refetch,
+      },
+    );
 
   const { mutate: createProfileMutation } = useMutation({
     mutationFn: (payload: { profile: Profile; validityInMs: number }) =>

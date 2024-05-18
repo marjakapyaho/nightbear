@@ -1,6 +1,5 @@
 import {
-  findRepeatingActivationToActivate,
-  getLatestProfileActivation,
+  findRepeatingTemplateToActivate,
   shouldNonRepeatingActivationBeDeactivated,
   shouldRepeatingActivationBeSwitched,
 } from 'backend/cronjobs/profiles/utils';
@@ -27,14 +26,14 @@ export const checkAndUpdateProfileActivations = async (
   timezone = 'TZ',
 ) => {
   const { log } = context;
-  const profileActivations = await context.db.getRelevantProfileActivations();
-  const latestActivation = getLatestProfileActivation(profileActivations);
+  const profiles = await context.db.getProfiles();
+  const latestActivation = await context.db.getLatestProfileActivation();
 
-  const activationToActivate = findRepeatingActivationToActivate(
-    profileActivations,
-    currentTimestamp,
-    timezone,
-  );
+  const profileToActivate = findRepeatingTemplateToActivate(profiles, currentTimestamp, timezone);
+
+  if (!profileToActivate) {
+    throw new Error('Could not find repeating profile to activate');
+  }
 
   /**
    * Check if we should reactivate a repeating profile activation in either of two cases:
@@ -42,11 +41,14 @@ export const checkAndUpdateProfileActivations = async (
    * 2. We are using a non-repeating activation that has reached its deactivation time
    */
   if (
-    shouldRepeatingActivationBeSwitched(latestActivation, activationToActivate) ||
+    shouldRepeatingActivationBeSwitched(latestActivation, profileToActivate) ||
     shouldNonRepeatingActivationBeDeactivated(latestActivation, currentTimestamp)
   ) {
-    log(`2. Activating repeating activation with id: ${activationToActivate.id}`);
-    await context.db.reactivateProfileActivation(activationToActivate.id);
+    log(`2. Activating repeating profile with id: ${profileToActivate.id}`);
+    await context.db.createProfileActivation({
+      profileTemplateId: profileToActivate.id,
+      activatedAt: context.timestamp(),
+    });
   } else {
     log('2. No activations needed.');
   }

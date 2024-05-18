@@ -6,11 +6,14 @@ import { EditableProfileRow } from 'frontend/components/createProfile/EditablePr
 import { InputText } from 'frontend/components/inputText/InputText';
 import { InputNumber } from 'frontend/components/inputNumber/InputNumber';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
+import { ProfileEditorMode } from 'frontend/components/profileEditor/ProfileEditor';
 
 type Props = {
+  mode: ProfileEditorMode;
   activeProfile?: Profile;
-  createProfile: (profile: Profile, validityInMs: number) => void;
+  activateProfile: (profile: Profile, validityInMs: number) => void;
   editProfile: (profile: Profile) => void;
+  createProfile: (profile: Profile, validityInMs: number) => void;
   profiles: Profile[];
 };
 
@@ -20,11 +23,17 @@ type EditableAnalyserSetting = {
   decimals: number;
 };
 
-export const CreateProfile = ({ activeProfile, createProfile, editProfile, profiles }: Props) => {
+export const CreateProfile = ({
+  mode,
+  activeProfile,
+  activateProfile,
+  createProfile,
+  editProfile,
+  profiles,
+}: Props) => {
   const baseProfile = activeProfile ? activeProfile : PROFILE_BASE;
   const [localProfile, setLocalProfile] = useState<Profile>(baseProfile);
   const [validityInHours, setValidityInHours] = useState(1);
-  const [mode, setMode] = useState('edit');
 
   const setAnalyserSetting = (val: number, settingKey: string) =>
     setLocalProfile({
@@ -46,20 +55,6 @@ export const CreateProfile = ({ activeProfile, createProfile, editProfile, profi
 
   return (
     <div className={styles.createProfile}>
-      <div className={styles.editOrCreateSelection}>
-        <div
-          className={`${styles.selection} ${mode === 'edit' ? styles.selected : ''}`}
-          onClick={() => setMode('edit')}
-        >
-          Edit profile
-        </div>
-        <div
-          className={`${styles.selection} ${mode === 'create' ? styles.selected : ''}`}
-          onClick={() => setMode('create')}
-        >
-          Create profile
-        </div>
-      </div>
       <div className={styles.row}>
         <div className={styles.label}>{mode === 'create' ? 'Base profile' : 'Profile'}</div>
         <div className={styles.field}>
@@ -91,12 +86,14 @@ export const CreateProfile = ({ activeProfile, createProfile, editProfile, profi
           setValue={val => setLocalProfile({ ...localProfile, profileName: val || undefined })}
         />
       </EditableProfileRow>
-      {/*      <EditableProfileRow label="Repeat time">
+      <EditableProfileRow label="Repeat time">
         <InputText
-          value={localProfile.profileName || ''}
-          setValue={val => setLocalProfile({ ...localProfile, profileName: val || undefined })}
+          value={localProfile.repeatTimeInLocalTimezone || ''}
+          setValue={val =>
+            setLocalProfile({ ...localProfile, repeatTimeInLocalTimezone: val || undefined })
+          }
         />
-      </EditableProfileRow>*/}
+      </EditableProfileRow>
       {mode === 'create' && (
         <EditableProfileRow label="Valid (h)">
           <InputNumber value={validityInHours} setValue={setValidityInHours} decimals={0} />
@@ -112,16 +109,25 @@ export const CreateProfile = ({ activeProfile, createProfile, editProfile, profi
         </EditableProfileRow>
       ))}
       <div>
-        {mode === 'create' ? (
+        {mode === 'activate' && (
+          <button
+            className={styles.createButton}
+            onClick={() => activateProfile(localProfile, validityInHours * HOUR_IN_MS)}
+          >
+            Activate
+          </button>
+        )}
+        {mode === 'edit' && (
+          <button className={styles.createButton} onClick={() => editProfile(localProfile)}>
+            Edit
+          </button>
+        )}
+        {mode === 'create' && (
           <button
             className={styles.createButton}
             onClick={() => createProfile(localProfile, validityInHours * HOUR_IN_MS)}
           >
             Create
-          </button>
-        ) : (
-          <button className={styles.createButton} onClick={() => editProfile(localProfile)}>
-            Edit
           </button>
         )}
       </div>

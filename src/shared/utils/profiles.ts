@@ -8,6 +8,7 @@ export const DEFAULT_ALARM_SETTINGS = {
 export const DEFAULT_TARGETS = ['bear-phone', 'marjan_iphone', 'jrwNexus5'];
 
 export const PROFILE_BASE = {
+  id: 'NEW',
   isActive: true,
   alarmsEnabled: true,
   analyserSettings: {

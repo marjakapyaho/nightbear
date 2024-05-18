@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon';
 import { isTimeSmallerOrEqual } from 'shared/utils/time';
 import { DAY_IN_MS } from 'shared/utils/calculations';
-import { ProfileActivation } from 'shared/types/profiles';
+import { Profile, ProfileActivation } from 'shared/types/profiles';
 import { chain } from 'lodash';
 
-type PotentialActivation = {
+type PotentialProfile = {
   id: string;
   activationTimestamp: string | null;
 };
@@ -30,39 +30,38 @@ export const getActivationAsUTCTimestamp = (
   return timeInLocalTimezone.toUTC().toISO();
 };
 
-export const findRepeatingActivationToActivate = (
-  profileActivations: ProfileActivation[],
+export const findRepeatingTemplateToActivate = (
+  profiles: Profile[],
   currentTimestamp: string,
   timezone: string,
-) =>
-  chain(profileActivations)
-    .map(activation =>
-      activation.repeatTimeInLocalTimezone
+): PotentialProfile | null =>
+  chain(profiles)
+    .map(profile =>
+      profile.repeatTimeInLocalTimezone
         ? {
-            id: activation.id,
+            id: profile.id,
             activationTimestamp: getActivationAsUTCTimestamp(
-              activation.repeatTimeInLocalTimezone,
+              profile.repeatTimeInLocalTimezone,
               currentTimestamp,
               timezone,
             ),
           }
         : null,
     )
-    .filter(activation => Boolean(activation && activation.activationTimestamp))
+    .filter(mappedProfile => Boolean(mappedProfile && mappedProfile.activationTimestamp))
     .sortBy('activationTimestamp')
     .last()
     .value();
 
-export const isActivationRepeating = (activation: ProfileActivation) =>
-  activation.repeatTimeInLocalTimezone && !activation.deactivatedAt;
+export const isActivationRepeating = (activation: ProfileActivation) => !activation.deactivatedAt;
 
 export const shouldRepeatingActivationBeSwitched = (
   currentActivation: ProfileActivation,
-  potentialActivation: PotentialActivation,
+  potentialProfileTemplate: PotentialProfile,
 ) =>
   isActivationRepeating(currentActivation) &&
-  potentialActivation &&
-  potentialActivation.id !== currentActivation.id;
+  potentialProfileTemplate &&
+  potentialProfileTemplate.id !== currentActivation.profileTemplateId;
 
 export const shouldNonRepeatingActivationBeDeactivated = (
   currentActivation: ProfileActivation,

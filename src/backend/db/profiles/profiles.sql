@@ -2,6 +2,7 @@
 INSERT INTO profile_templates (
   profile_name,
   alarms_enabled,
+  repeat_time_in_local_timezone,
   notification_targets,
   analyser_high_level_rel,
   analyser_high_level_abs,
@@ -24,6 +25,7 @@ INSERT INTO profile_templates (
 VALUES (
   :profileName,
   :alarmsEnabled!,
+  :repeatTimeInLocalTimezone,
   :notificationTargets!,
   :highLevelRel!,
   :highLevelAbs!,
@@ -49,6 +51,7 @@ RETURNING *;
 UPDATE profile_templates SET
   profile_name = :profileName,
   alarms_enabled = :alarmsEnabled!,
+  repeat_time_in_local_timezone = :repeatTimeInLocalTimezone,
   notification_targets = :notificationTargets!,
   analyser_high_level_rel = :highLevelRel!,
   analyser_high_level_abs = :highLevelAbs!,
@@ -70,24 +73,7 @@ UPDATE profile_templates SET
 WHERE id = :id!
 RETURNING *;
 
-/* @name createProfileActivation */
-INSERT INTO profile_activations (
-  profile_template_id,
-  activated_at,
-  repeat_time_in_local_timezone,
-  deactivated_at
-)
-VALUES (
-   :profileTemplateId!,
-   :activatedAt!,
-   :repeatTimeInLocalTimezone,
-   :deactivatedAt
- )
-RETURNING *;
-
-/*
-  @name getProfiles
-*/
+/* @name getProfiles */
 WITH
   most_recent_activation_query AS (
     SELECT profile_template_id
@@ -99,6 +85,7 @@ SELECT
   profile_templates.id AS id,
   profile_name,
   alarms_enabled,
+  repeat_time_in_local_timezone,
   notification_targets,
   most_recent_activation_query.profile_template_id IS NOT NULL AS "is_active!",
   json_build_object(
@@ -128,44 +115,38 @@ WHERE
   (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND
   (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL));
 
-/*
-  @name getRelevantProfileActivations
-*/
-WITH
-  most_recent_activation_query AS (
-    SELECT profile_template_id
-    FROM profile_activations
-    ORDER BY activated_at DESC
-    LIMIT 1
-  )
+/* @name createProfileActivation */
+INSERT INTO profile_activations (
+  profile_template_id,
+  activated_at,
+  deactivated_at
+)
+VALUES (
+ :profileTemplateId!,
+ :activatedAt!,
+ :deactivatedAt
+)
+RETURNING *;
+
+/* @name getLatestProfileActivation */
 SELECT
   profile_activations.id,
-  profile_activations.profile_template_id,
-  profile_templates.profile_name,
+  profile_template_id,
   activated_at,
-  repeat_time_in_local_timezone,
-  deactivated_at
+  deactivated_at,
+  profile_templates.profile_name
 FROM profile_activations
   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
-  LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
-WHERE repeat_time_in_local_timezone IS NOT NULL OR most_recent_activation_query.profile_template_id IS NOT NULL;
+ORDER BY activated_at DESC
+LIMIT 1;
 
-/*
-  @name getProfileActivationById
-*/
+/* @name getProfileActivationById */
 SELECT
   profile_activations.id,
-  profile_activations.profile_template_id,
-  profile_templates.profile_name,
+  profile_template_id,
   activated_at,
-  repeat_time_in_local_timezone,
-  deactivated_at
+  deactivated_at,
+  profile_templates.profile_name
 FROM profile_activations
   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
 WHERE profile_activations.id = :id!;
-
-/* @name reactivateProfileActivation */
-UPDATE profile_activations SET
-  activated_at = CURRENT_TIMESTAMP
-WHERE id = :id!
-RETURNING *;

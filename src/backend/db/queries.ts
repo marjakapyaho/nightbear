@@ -43,10 +43,9 @@ import {
   createProfileActivation,
   createProfileTemplate,
   editProfileTemplate,
+  getLatestProfileActivation,
   getProfileActivationById,
   getProfiles,
-  getRelevantProfileActivations,
-  reactivateProfileActivation,
 } from './profiles/profiles.queries';
 
 export const queries = (pool: Pool) => {
@@ -138,11 +137,6 @@ export const queries = (pool: Pool) => {
       });
     },
 
-    async createProfileActivation(profileActivation: Omit<ProfileActivation, 'id'>) {
-      const createdActivation = await one(IdReturnType, createProfileActivation, profileActivation);
-      return one(ProfileActivation, getProfileActivationById, { id: createdActivation.id });
-    },
-
     async getProfiles() {
       return many(Profile, getProfiles);
     },
@@ -159,12 +153,13 @@ export const queries = (pool: Pool) => {
       return activeProfile;
     },
 
-    async getRelevantProfileActivations() {
-      return many(ProfileActivation, getRelevantProfileActivations);
+    async createProfileActivation(profileActivation: Omit<ProfileActivation, 'id'>) {
+      const createdActivation = await one(IdReturnType, createProfileActivation, profileActivation);
+      return one(ProfileActivation, getProfileActivationById, { id: createdActivation.id });
     },
 
-    async reactivateProfileActivation(profileActivationId: string) {
-      return one(IdReturnType, reactivateProfileActivation, { id: profileActivationId });
+    async getLatestProfileActivation() {
+      return one(ProfileActivation, getLatestProfileActivation);
     },
 
     async deactivateAlarm(alarmId: string, currentTimestamp: string) {

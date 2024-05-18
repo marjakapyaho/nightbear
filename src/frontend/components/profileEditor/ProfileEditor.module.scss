@@ -1,0 +1,28 @@
+.profileEditor {
+  background: whitesmoke;
+  border: 1px solid #eeeeee;
+  padding: 20px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+
+    .tab {
+      background: white;
+      padding: 10px 20px;
+      text-align: center;
+      border-radius: 6px;
+
+      &.selected {
+        background: #7a7a7a;
+        color: whitesmoke;
+        border: 1px solid #7a7a7a;
+      }
+    }
+  }
+}

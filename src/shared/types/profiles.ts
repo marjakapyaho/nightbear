@@ -35,10 +35,11 @@ export const SituationSettings = z.object({
 export type SituationSettings = z.infer<typeof SituationSettings>;
 
 export const Profile = z.object({
-  id: nullableOptional(z.string()),
+  id: z.string(),
   profileName: nullableOptional(z.string()),
   isActive: z.boolean(),
   alarmsEnabled: z.boolean(),
+  repeatTimeInLocalTimezone: nullableOptional(z.string()),
   notificationTargets: z.array(z.string()),
   analyserSettings: AnalyserSettings,
   situationSettings: SituationSettings,
@@ -50,7 +51,6 @@ export const ProfileActivation = z.object({
   profileTemplateId: z.string(),
   profileName: nullableOptional(z.string()),
   activatedAt: z.string(),
-  repeatTimeInLocalTimezone: nullableOptional(z.string()),
   deactivatedAt: nullableOptional(z.string()),
 });
 export type ProfileActivation = z.infer<typeof ProfileActivation>;

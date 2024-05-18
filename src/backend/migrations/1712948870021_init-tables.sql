@@ -29,6 +29,7 @@ CREATE TYPE situation AS ENUM (
 CREATE TABLE profile_templates (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_name TEXT,
+  repeat_time_in_local_timezone TEXT,
   alarms_enabled BOOLEAN NOT NULL DEFAULT true,
   notification_targets TEXT[] NOT NULL,
   analyser_high_level_rel NUMERIC(3, 1) NOT NULL,
@@ -54,7 +55,6 @@ CREATE TABLE profile_activations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   profile_template_id UUID NOT NULL REFERENCES profile_templates(id) ON DELETE CASCADE,
   activated_at TIMESTAMPTZ NOT NULL,
-  repeat_time_in_local_timezone TEXT,
   deactivated_at TIMESTAMPTZ
 );
 

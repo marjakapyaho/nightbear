@@ -2,6 +2,7 @@ import { Context, createResponse, Request } from 'backend/utils/api';
 import { Profile } from 'shared/types/profiles';
 import { mockProfiles } from 'shared/mocks/profiles';
 import { getTimePlusTime } from 'shared/utils/time';
+import { HOUR_IN_MS } from 'shared/utils/calculations';
 
 export const getProfiles = async (_request: Request, context: Context) => {
   const profiles = await context.db.getProfiles();
@@ -10,16 +11,19 @@ export const getProfiles = async (_request: Request, context: Context) => {
 
 export const activateProfile = async (request: Request, context: Context) => {
   // TODO: better casting
-  const profile = request.requestBody as Profile;
+  const body = request.requestBody as object;
+  const profile = 'profile' in body ? (body.profile as Profile) : null;
+  const validityInMs = 'validityInMs' in body ? (body.validityInMs as number) : 0;
 
   // TODO: error handling
-  if (!profile?.id) {
+  if (!profile) {
     return createResponse('Error');
   }
 
   const profileActivation = await context.db.createProfileActivation({
     profileTemplateId: profile.id,
     activatedAt: context.timestamp(),
+    deactivatedAt: getTimePlusTime(context.timestamp(), validityInMs),
   });
 
   return createResponse(profileActivation.id);
