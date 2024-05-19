@@ -1,7 +1,4 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build",
-  "routes": [
-    { "src": "/asd", "dest": "api/test.js" }
-  ]
+  "buildCommand": "npm run back:build"
 }
