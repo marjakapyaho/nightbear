@@ -33,6 +33,7 @@
     "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
     "db:types": "pgtyped --config pgtyped-config.json",
     "\n==================== UTILS ====================": "",
+    "build": "npm run front:build && mv build front-build && npm run back:build && rm -rf build/{frontend,*.js} && mv front-build build/frontend",
     "ts-node": "NODE_PATH=src DATABASE_URL=$(contrib/db/env dev) ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
   "lambdaDependencies": [
