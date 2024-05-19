@@ -13,9 +13,21 @@
     flex-direction: column;
     gap: 10px;
 
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .heading {
-      font-size: 16px;
+      font-size: 20px;
       font-weight: bold;
+    }
+
+    .activeProfile {
+      font-size: 14px;
+      padding-top: 2px;
+      color: #7a7a7a;
     }
 
     .alarm {

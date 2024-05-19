@@ -31,6 +31,15 @@
     flex-direction: column;
     gap: 15px;
 
+    .validitySelections {
+      display: flex;
+      gap: 15px;
+
+      > * {
+        flex: 1;
+      }
+    }
+
     .actionButton {
       display: flex;
       margin-left: auto;

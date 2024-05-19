@@ -11,7 +11,14 @@ export const Config = () => {
   return (
     <div className={styles.config}>
       <div className={styles.section}>
-        <h1 className={styles.heading}>Profiles</h1>
+        <div className={styles.header}>
+          <h1 className={styles.heading}>Profiles</h1>
+          <div className={styles.activeProfile}>
+            <span>Active profile: </span>
+            <strong>{activeProfile?.profileName}</strong>
+          </div>
+        </div>
+
         <ProfileEditor
           activeProfile={activeProfile}
           activateProfile={activateProfile}

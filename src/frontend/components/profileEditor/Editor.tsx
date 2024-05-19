@@ -9,8 +9,10 @@ import { ModeSettings } from './ProfileEditor';
 
 type Props = {
   modeSettings: ModeSettings;
-  profile: Profile;
-  setProfile: (profile: Profile) => void;
+  selectedProfile: Profile;
+  updateSelectedProfile: (profile: Profile) => void;
+  localProfile: Profile;
+  setLocalProfile: (profile: Profile) => void;
   validityInHours: number;
   setValidityInHours: (hours: number) => void;
   profiles: Profile[];
@@ -25,14 +27,23 @@ type EditableAnalyserSetting = {
 
 export const Editor = ({
   modeSettings,
-  profile,
-  setProfile,
+  selectedProfile,
+  updateSelectedProfile,
+  localProfile,
+  setLocalProfile,
   validityInHours,
   setValidityInHours,
   profiles,
 }: Props) => {
-  const { label, buttonAction, profileName, repeatTime, validHours, analyserSettings } =
-    modeSettings;
+  const {
+    label,
+    profileSelectionLabel,
+    buttonAction,
+    profileName,
+    repeatTime,
+    validHours,
+    analyserSettings,
+  } = modeSettings;
 
   const editableAnalyserSettings: EditableAnalyserSetting[] = [
     { key: 'highLevelRel', label: 'High relative', decimals: 1 },
@@ -44,56 +55,62 @@ export const Editor = ({
   ];
 
   const setAnalyserSetting = (val: number, settingKey: string) =>
-    setProfile({
-      ...profile,
+    setLocalProfile({
+      ...localProfile,
       analyserSettings: {
-        ...profile.analyserSettings,
+        ...localProfile.analyserSettings,
         [settingKey]: val,
       },
     });
 
   return (
     <div className={styles.editor}>
-      <FieldWithLabel label="Select profile">
-        <ProfileSelector profile={profile} setProfile={setProfile} profiles={profiles} />
+      <FieldWithLabel label={profileSelectionLabel}>
+        <ProfileSelector
+          profile={selectedProfile}
+          setProfile={updateSelectedProfile}
+          profiles={profiles}
+        />
       </FieldWithLabel>
 
       {profileName && (
         <FieldWithLabel label="Profile name">
           <InputText
-            value={profile.profileName || ''}
-            setValue={val => setProfile({ ...profile, profileName: val || undefined })}
+            value={localProfile.profileName || ''}
+            setValue={val => setLocalProfile({ ...localProfile, profileName: val || undefined })}
           />
         </FieldWithLabel>
       )}
 
-      {validHours && (
-        <FieldWithLabel label="Valid for" unit="h">
-          <InputNumber value={validityInHours} setValue={setValidityInHours} decimals={0} />
-        </FieldWithLabel>
-      )}
+      <div className={styles.validitySelections}>
+        {validHours && (
+          <FieldWithLabel label="Valid for" unit="h">
+            <InputNumber value={validityInHours} setValue={setValidityInHours} decimals={0} />
+          </FieldWithLabel>
+        )}
+
+        {repeatTime && (
+          <FieldWithLabel label="Repeat time">
+            <InputText
+              value={localProfile.repeatTimeInLocalTimezone || ''}
+              setValue={val =>
+                setLocalProfile({ ...localProfile, repeatTimeInLocalTimezone: val || undefined })
+              }
+            />
+          </FieldWithLabel>
+        )}
+      </div>
 
       {analyserSettings &&
         editableAnalyserSettings.map(setting => (
           <FieldWithLabel key={setting.key} label={setting.label} unit={setting.unit}>
             <InputNumber
-              value={profile.analyserSettings[setting.key]}
+              value={localProfile.analyserSettings[setting.key]}
               setValue={val => setAnalyserSetting(val, setting.key)}
               decimals={setting.decimals}
             />
           </FieldWithLabel>
         ))}
-
-      {repeatTime && (
-        <FieldWithLabel label="Repeat time" unit="12:00">
-          <InputText
-            value={profile.repeatTimeInLocalTimezone || ''}
-            setValue={val =>
-              setProfile({ ...profile, repeatTimeInLocalTimezone: val || undefined })
-            }
-          />
-        </FieldWithLabel>
-      )}
 
       <div>
         <button className={styles.actionButton} onClick={buttonAction}>

@@ -5,10 +5,12 @@ import { Profile } from 'shared/types/profiles';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
 import { PROFILE_BASE } from 'shared/utils/profiles';
 import { map } from 'lodash';
+import { getProfileWithCorrectName } from 'frontend/components/profileEditor/utils';
 
-export type ProfileEditorMode = 'activate' | 'edit' | 'create';
+export type ProfileEditorMode = 'activate' | 'create' | 'edit';
 export type ModeSettings = {
   label: string;
+  profileSelectionLabel: string;
   buttonAction: () => void;
   profileName?: boolean;
   repeatTime?: boolean;
@@ -34,29 +36,43 @@ export const ProfileEditor = ({
   const [mode, setMode] = useState<ProfileEditorMode>('activate');
   const baseProfile = activeProfile ? activeProfile : PROFILE_BASE;
   const [localProfile, setLocalProfile] = useState<Profile>(baseProfile);
+  const [selectedProfile, setSelectedProfile] = useState<Profile>(baseProfile);
   const [validityInHours, setValidityInHours] = useState(1);
 
   const editorTabs: Record<ProfileEditorMode, ModeSettings> = {
     activate: {
       label: 'Activate',
+      profileSelectionLabel: 'Profile to activate',
       buttonAction: () => activateProfile(localProfile, validityInHours * HOUR_IN_MS),
       validHours: true,
     },
-    edit: {
-      label: 'Edit',
-      buttonAction: () => editProfile(localProfile),
-      profileName: true,
-      repeatTime: true,
-      analyserSettings: true,
-    },
     create: {
       label: 'Create',
+      profileSelectionLabel: 'Based on profile',
       buttonAction: () => createProfile(localProfile, validityInHours * HOUR_IN_MS),
       profileName: true,
       repeatTime: true,
       validHours: true,
       analyserSettings: true,
     },
+    edit: {
+      label: 'Edit',
+      profileSelectionLabel: 'Profile to edit',
+      buttonAction: () => editProfile(localProfile),
+      profileName: true,
+      repeatTime: true,
+      analyserSettings: true,
+    },
+  };
+
+  const updateSelectedProfile = (selectedProfile: Profile) => {
+    setSelectedProfile(selectedProfile);
+    setLocalProfile(getProfileWithCorrectName(selectedProfile, mode));
+  };
+
+  const updateMode = (mode: ProfileEditorMode) => {
+    setMode(mode);
+    setLocalProfile(getProfileWithCorrectName(selectedProfile, mode));
   };
 
   return (
@@ -66,7 +82,7 @@ export const ProfileEditor = ({
           <div
             key={key}
             className={`${styles.tab} ${mode === key ? styles.selected : ''}`}
-            onClick={() => setMode(key)}
+            onClick={() => updateMode(key)}
           >
             {settings.label}
           </div>
@@ -74,8 +90,10 @@ export const ProfileEditor = ({
       </div>
       <Editor
         modeSettings={editorTabs[mode]}
-        profile={localProfile}
-        setProfile={setLocalProfile}
+        selectedProfile={selectedProfile}
+        updateSelectedProfile={updateSelectedProfile}
+        localProfile={localProfile}
+        setLocalProfile={setLocalProfile}
         validityInHours={validityInHours}
         setValidityInHours={setValidityInHours}
         profiles={profiles}
