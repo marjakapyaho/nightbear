@@ -33,12 +33,12 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
   let [journal] = await context.db.cronjobsJournal.load();
 
   for (const jobName of jobNames) {
+    const jobContext = extendLogger(context, kebabCase(jobName));
     try {
-      const logger = extendLogger(context, kebabCase(jobName));
-      const journalUpdates = await cronjobs[jobName](logger, journal);
+      const journalUpdates = await cronjobs[jobName](jobContext, journal);
       journal = { ...journal, ...journalUpdates }; // if a job provided updates to the journal, merge those in
     } catch (err) {
-      context.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`);
+      jobContext.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`);
     }
   }
 
