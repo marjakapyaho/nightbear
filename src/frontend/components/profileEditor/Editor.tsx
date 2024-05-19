@@ -20,6 +20,7 @@ type EditableAnalyserSetting = {
   key: keyof AnalyserSettings;
   label: string;
   decimals: number;
+  unit?: string;
 };
 
 export const Editor = ({
@@ -34,12 +35,12 @@ export const Editor = ({
     modeSettings;
 
   const editableAnalyserSettings: EditableAnalyserSetting[] = [
-    { key: 'highLevelRel', label: 'High level rel', decimals: 1 },
-    { key: 'highLevelAbs', label: 'High level abs', decimals: 1 },
-    { key: 'highLevelBad', label: 'High level bad', decimals: 1 },
-    { key: 'lowLevelRel', label: 'Low level rel', decimals: 1 },
-    { key: 'lowLevelAbs', label: 'Low level abs', decimals: 1 },
-    { key: 'timeSinceBgMinutes', label: 'Time since bg min', decimals: 0 },
+    { key: 'highLevelRel', label: 'High relative', decimals: 1 },
+    { key: 'highLevelAbs', label: 'High absolute', decimals: 1 },
+    { key: 'highLevelBad', label: 'High bad', decimals: 1 },
+    { key: 'lowLevelRel', label: 'Low relative', decimals: 1 },
+    { key: 'lowLevelAbs', label: 'Low absolute', decimals: 1 },
+    { key: 'timeSinceBgMinutes', label: 'Outdated after', decimals: 0, unit: 'min' },
   ];
 
   const setAnalyserSetting = (val: number, settingKey: string) =>
@@ -66,8 +67,25 @@ export const Editor = ({
         </FieldWithLabel>
       )}
 
+      {validHours && (
+        <FieldWithLabel label="Valid for" unit="h">
+          <InputNumber value={validityInHours} setValue={setValidityInHours} decimals={0} />
+        </FieldWithLabel>
+      )}
+
+      {analyserSettings &&
+        editableAnalyserSettings.map(setting => (
+          <FieldWithLabel key={setting.key} label={setting.label} unit={setting.unit}>
+            <InputNumber
+              value={profile.analyserSettings[setting.key]}
+              setValue={val => setAnalyserSetting(val, setting.key)}
+              decimals={setting.decimals}
+            />
+          </FieldWithLabel>
+        ))}
+
       {repeatTime && (
-        <FieldWithLabel label="Repeat time">
+        <FieldWithLabel label="Repeat time" unit="12:00">
           <InputText
             value={profile.repeatTimeInLocalTimezone || ''}
             setValue={val =>
@@ -76,23 +94,6 @@ export const Editor = ({
           />
         </FieldWithLabel>
       )}
-
-      {validHours && (
-        <FieldWithLabel label="Repeat time">
-          <InputNumber value={validityInHours} setValue={setValidityInHours} decimals={0} />
-        </FieldWithLabel>
-      )}
-
-      {analyserSettings &&
-        editableAnalyserSettings.map(setting => (
-          <FieldWithLabel key={setting.key} label="Repeat time">
-            <InputNumber
-              value={profile.analyserSettings[setting.key]}
-              setValue={val => setAnalyserSetting(val, setting.key)}
-              decimals={setting.decimals}
-            />
-          </FieldWithLabel>
-        ))}
 
       <div>
         <button className={styles.actionButton} onClick={buttonAction}>

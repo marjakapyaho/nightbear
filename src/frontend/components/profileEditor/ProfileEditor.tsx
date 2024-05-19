@@ -31,7 +31,7 @@ export const ProfileEditor = ({
   editProfile,
   profiles,
 }: Props) => {
-  const [mode, setMode] = useState<ProfileEditorMode>('edit');
+  const [mode, setMode] = useState<ProfileEditorMode>('activate');
   const baseProfile = activeProfile ? activeProfile : PROFILE_BASE;
   const [localProfile, setLocalProfile] = useState<Profile>(baseProfile);
   const [validityInHours, setValidityInHours] = useState(1);

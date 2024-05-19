@@ -1,4 +1,6 @@
 .fieldWithLabel {
+  position: relative;
+
   .label {
     display: block;
     font-size: 13px;
@@ -8,5 +10,12 @@
 
   .field {
     display: block;
+    font-size: 16px;
+  }
+
+  .unit {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
   }
 }
