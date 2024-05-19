@@ -1,6 +1,8 @@
 {
+  "installCommand": "npm install",
+  "buildCommand": "npm run back:build",
   "builds": [
-    { "src": "src/backend/api/*.ts", "use": "@vercel/node" }
+    { "src": "src/backend/api/test.js", "use": "@vercel/node" }
   ],
   "rewrites": [
     { "source": "/api/:method", "destination": "src/backend/api/test.js" }
