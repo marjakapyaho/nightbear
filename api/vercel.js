@@ -23,7 +23,7 @@ module.exports = (req, res) => {
       const files = fs.readdirSync(currentDir);
 
       // Log the contents of the directory
-      console.log('Contents of the directory:', path);
+      console.log('Contents of the directory:', currentDir);
       files.forEach(file => {
           console.log(file);
       });

@@ -1,6 +1,6 @@
 // TODO: import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-module.exports = (req: any, res: any) => {
+module.exports = (req, res) => {
   const { name = 'World' } = req.query;
   console.log('Hello from TS', {
     body: req.body,
