@@ -118,9 +118,7 @@ export const queries = (pool: Pool) => {
 
     async createProfile(profile: Profile) {
       return one(IdReturnType, createProfileTemplate, {
-        profileName: profile.profileName,
-        alarmsEnabled: profile.alarmsEnabled,
-        notificationTargets: profile.notificationTargets,
+        ...profile,
         ...profile.analyserSettings,
         ...profile.situationSettings,
       });
