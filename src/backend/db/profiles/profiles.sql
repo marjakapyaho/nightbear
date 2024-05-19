@@ -112,6 +112,7 @@ SELECT
 FROM profile_templates
   LEFT JOIN most_recent_activation_query ON most_recent_activation_query.profile_template_id = profile_templates.id
 WHERE
+  (profile_name IS NOT NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL)) AND
   (:templateId::uuid IS NULL OR :templateId = profile_templates.id) AND
   (:onlyActive::bool IS NULL OR (most_recent_activation_query.profile_template_id IS NOT NULL));
 

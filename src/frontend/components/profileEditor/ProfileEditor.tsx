@@ -5,7 +5,7 @@ import { Profile } from 'shared/types/profiles';
 import { HOUR_IN_MS } from 'shared/utils/calculations';
 import { PROFILE_BASE } from 'shared/utils/profiles';
 import { map } from 'lodash';
-import { getProfileWithCorrectName } from 'frontend/components/profileEditor/utils';
+import { getProfileWithResets } from 'frontend/components/profileEditor/utils';
 
 export type ProfileEditorMode = 'activate' | 'create' | 'edit';
 export type ModeSettings = {
@@ -19,7 +19,7 @@ export type ModeSettings = {
 };
 
 type Props = {
-  activeProfile?: Profile;
+  activeProfile: Profile;
   activateProfile: (profile: Profile, validityInMs: number) => void;
   editProfile: (profile: Profile) => void;
   createProfile: (profile: Profile, validityInMs: number) => void;
@@ -67,12 +67,12 @@ export const ProfileEditor = ({
 
   const updateSelectedProfile = (selectedProfile: Profile) => {
     setSelectedProfile(selectedProfile);
-    setLocalProfile(getProfileWithCorrectName(selectedProfile, mode));
+    setLocalProfile(getProfileWithResets(selectedProfile, mode));
   };
 
   const updateMode = (mode: ProfileEditorMode) => {
     setMode(mode);
-    setLocalProfile(getProfileWithCorrectName(selectedProfile, mode));
+    setLocalProfile(getProfileWithResets(selectedProfile, mode));
   };
 
   return (

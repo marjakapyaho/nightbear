@@ -24,7 +24,7 @@ export const ProfileSelector = ({ profile, setProfile, profiles }: Props) => {
     >
       {profiles.map(profile => (
         <option key={profile.id} value={profile.id}>
-          {profile.profileName}
+          {profile.profileName || 'Temporary'}
         </option>
       ))}
     </select>

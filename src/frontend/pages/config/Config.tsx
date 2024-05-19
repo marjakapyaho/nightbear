@@ -15,17 +15,18 @@ export const Config = () => {
           <h1 className={styles.heading}>Profiles</h1>
           <div className={styles.activeProfile}>
             <span>Active profile: </span>
-            <strong>{activeProfile?.profileName}</strong>
+            <strong>{activeProfile?.profileName || 'Temporary'}</strong>
           </div>
         </div>
-
-        <ProfileEditor
-          activeProfile={activeProfile}
-          activateProfile={activateProfile}
-          editProfile={editProfile}
-          createProfile={createProfile}
-          profiles={profiles}
-        />
+        {activeProfile && (
+          <ProfileEditor
+            activeProfile={activeProfile}
+            activateProfile={activateProfile}
+            editProfile={editProfile}
+            createProfile={createProfile}
+            profiles={profiles}
+          />
+        )}
       </div>
       <div className={styles.section}>
         <h1 className={styles.heading}>Active alarms</h1>
