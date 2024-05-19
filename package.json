@@ -36,7 +36,7 @@
     "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
     "db:types": "pgtyped --config pgtyped-config.json",
     "\n==================== UTILS ====================": "",
-    "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
+    "ts-node": "NODE_PATH=src DATABASE_URL=$(contrib/db/env dev) ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
   "lambdaDependencies": [
     "@pgtyped/runtime",
