@@ -11,8 +11,6 @@
     "npm": "9.5.1"
   },
   "scripts": {
-    "\n==================== GLOBAL HOOKS ====================": "",
-    "preinstall": "if [ -f ./node_modules/.bin/check-node-version ]; then check-node-version --package; fi",
     "\n==================== GLOBAL QA ====================": "",
     "test": "vitest",
     "lint": "concurrently npm:lint-node npm:lint-tsc npm:lint-eslint npm:lint-prettier",

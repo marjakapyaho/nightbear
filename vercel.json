@@ -1,6 +1,3 @@
 {
-  "git": {
-    "productionBranch": "next"
-  },
   "buildCommand": "echo Hello World"
 }
