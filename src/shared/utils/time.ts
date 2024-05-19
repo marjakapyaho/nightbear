@@ -1,17 +1,17 @@
 import { DateTime } from 'luxon';
 import { HOUR_IN_MS, MIN_IN_MS } from 'shared/utils/calculations';
 
-// TODO: Make this configurable via env (or just use env.TZ as-is)
-export const TZ = 'Europe/Helsinki';
+// TODO: Make this configurable via env (or just use env.DEFAULT_TIMEZONE as-is)
+export const DEFAULT_TIMEZONE = 'Europe/Helsinki';
 
 // @example "12:34"
 export const humanReadableShortTime = (msUtc: number = Date.now()) => {
-  return DateTime.fromMillis(msUtc).setZone(TZ).toFormat('HH:mm');
+  return DateTime.fromMillis(msUtc).setZone(DEFAULT_TIMEZONE).toFormat('HH:mm');
 };
 
 // @example "2020-01-31 12:34:56"
 export const humanReadableLongTime = (utcISOStr: string) => {
-  return DateTime.fromISO(utcISOStr).setZone(TZ).toFormat('yyyy-MM-dd HH:mm:ss');
+  return DateTime.fromISO(utcISOStr).setZone(DEFAULT_TIMEZONE).toFormat('yyyy-MM-dd HH:mm:ss');
 };
 
 // @example "2020-01-31"

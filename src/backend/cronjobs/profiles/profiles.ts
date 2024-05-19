@@ -6,6 +6,7 @@ import {
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Context } from 'backend/utils/api';
 import { Cronjob } from 'backend/utils/cronjobs';
+import { DEFAULT_TIMEZONE } from 'shared/utils/time';
 
 export const profiles: Cronjob = async (
   context,
@@ -23,7 +24,7 @@ export const profiles: Cronjob = async (
 export const checkAndUpdateProfileActivations = async (
   context: Context,
   currentTimestamp: string,
-  timezone = 'TZ',
+  timezone = DEFAULT_TIMEZONE,
 ) => {
   const { log } = context;
   const profiles = await context.db.getProfiles();

@@ -3,7 +3,7 @@ import { extendLogger } from 'backend/utils/logging';
 import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
 import { SEC_IN_MS } from 'shared/utils/calculations';
-import { TZ } from 'shared/utils/time';
+import { DEFAULT_TIMEZONE } from 'shared/utils/time';
 import { Context } from './api';
 
 export type Cronjob = (
@@ -26,7 +26,7 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
   const now = Date.now();
   const jobNames = Object.keys(cronjobs);
 
-  log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${TZ}"`);
+  log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${DEFAULT_TIMEZONE}"`);
   log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '));
 
   let [journal] = await context.db.cronjobsJournal.load();
