@@ -1,4 +1,4 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "npm install",
   "buildCommand": "echo Hello World"
 }
