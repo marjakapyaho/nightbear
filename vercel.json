@@ -1,7 +1,7 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build && ls -la build/backend/api",
+  "buildCommand": "npm run back:build && mkdir -p api && cp build/backend/api/test.js api",
   "rewrites": [
-    { "source": "/api/:method", "destination": "build/backend/api/test" }
+    { "source": "/api/:method", "destination": "api/test" }
   ]
 }

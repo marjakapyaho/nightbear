@@ -1,4 +1,4 @@
-// TOOD: import type { VercelRequest, VercelResponse } from '@vercel/node';
+// TODO: import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 module.exports = (req: any, res: any) => {
   const { name = 'World' } = req.query;
