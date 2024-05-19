@@ -1,4 +1,7 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build && mkdir -p api && cp build/backend/api/test.js api"
+  "buildCommand": "npm run back:build",
+  "rewrites": [
+    { "source": "/api/:method", "destination": "api/vercel" }
+  ]
 }
