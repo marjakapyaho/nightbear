@@ -1,12 +1,7 @@
 {
   "installCommand": "npm install",
   "buildCommand": "npm run back:build && mkdir -p api && cp build/backend/api/test.js api",
-  "rewrites": [
-    { "source": "/api/:method", "destination": "api/test" }
-  ],
-  "functions": {
-    "build/backend/api/test.js": {
-      "maxDuration": 30
-    }
-  }
+  "routes": [
+    { "src": "/api/test", "dest": "/build/backend/api/test.js" }
+  ]
 }
