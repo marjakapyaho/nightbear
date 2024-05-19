@@ -8,8 +8,6 @@ CREATE TABLE cronjobs_journal (
   dexcom_share_login_attempt_at TIMESTAMPTZ
 );
 
-INSERT INTO cronjobs_journal DEFAULT VALUES;
-
 -- PROFILES
 
 CREATE TYPE situation AS ENUM (
