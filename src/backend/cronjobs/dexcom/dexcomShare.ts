@@ -1,4 +1,4 @@
-import { DexcomShareResponse } from 'backend/cronjobs/dexcom/dexcomShareClient';
+import { DexcomShareResponse, NO_DEXCOM_SHARE } from 'backend/cronjobs/dexcom/dexcomShareClient';
 import { mapDexcomShareResponseToSensorEntry } from 'backend/cronjobs/dexcom/utils';
 import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Cronjob } from 'backend/utils/cronjobs';
@@ -16,6 +16,12 @@ export const dexcomShare: Cronjob = async (
   journal,
 ): Promise<Partial<CronjobsJournal> | void> => {
   const { log, dexcomShare, config } = context;
+
+  if (dexcomShare === NO_DEXCOM_SHARE) {
+    log(`Dexcom share not enabled`);
+    return;
+  }
+
   const { dexcomShareSessionId, dexcomShareLoginAttemptAt } = journal;
   const dexcomShareLoginAttemptTimestamp =
     dexcomShareLoginAttemptAt && getTimeInMillis(dexcomShareLoginAttemptAt);
