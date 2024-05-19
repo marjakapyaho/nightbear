@@ -1,15 +1,16 @@
+import { ackActiveAlarm, getActiveAlarm } from 'backend/api/alarms/handler';
+import { checks } from 'backend/cronjobs/checks/checks';
+import { devDataImport } from 'backend/cronjobs/devDataImport/devDataImport';
+import { dexcomShare } from 'backend/cronjobs/dexcom/dexcomShare';
+import { profiles } from 'backend/cronjobs/profiles/profiles';
+import { temp } from 'backend/cronjobs/temp';
+import { runCronJobs, startCronJobs } from 'backend/utils/cronjobs';
+import { startExpressServer } from 'backend/utils/express';
 import { consoleLogStream } from 'backend/utils/logging';
 import debug from 'debug';
-import { dexcomShare } from 'backend/cronjobs/dexcom/dexcomShare';
-import { startExpressServer } from 'backend/utils/express';
-import { runCronJobs } from 'backend/utils/cronjobs';
-import { profiles } from 'backend/cronjobs/profiles/profiles';
-import { checks } from 'backend/cronjobs/checks/checks';
-import { temp } from 'backend/cronjobs/temp';
-import { createNodeContext } from './utils/api';
-import { ackActiveAlarm, getActiveAlarm } from 'backend/api/alarms/handler';
 import { activateProfile, createProfile, editProfile, getProfiles } from './api/profiles/handler';
 import { getTimelineEntries, updateTimelineEntries } from './api/timelineEntries/handler';
+import { createNodeContext } from './utils/api';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
@@ -31,9 +32,10 @@ startExpressServer(
 );
 
 // Start running periodic tasks
-runCronJobs(context, {
+startCronJobs(context, {
   dexcomShare, // run this before checks()
   profiles,
+  devDataImport,
   checks, // run this after dexcomShare()
 });
 

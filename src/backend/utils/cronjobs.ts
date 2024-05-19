@@ -3,7 +3,6 @@ import { extendLogger } from 'backend/utils/logging';
 import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
 import { SEC_IN_MS } from 'shared/utils/calculations';
-import { generateUuid } from 'shared/utils/id';
 import { TZ } from 'shared/utils/time';
 import { Context } from './api';
 
@@ -47,12 +46,10 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
   log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`);
 };
 
-export function getDefaultJournalContent(): unknown /* TODO: Replace with new type */ {
-  return {
-    modelType: 'CronjobsJournal',
-    modelUuid: generateUuid(),
-    previousExecutionTimestamp: null,
-    dexcomShareSessionId: null,
-    dexcomShareLoginAttemptTimestamp: null,
-  };
-}
+/**
+ * Same as runCronJobs(), but keeps them running.
+ */
+export const startCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
+  await runCronJobs(context, cronjobs); // run once right away
+  setInterval(() => runCronJobs(context, cronjobs), 60 * 1000);
+};
