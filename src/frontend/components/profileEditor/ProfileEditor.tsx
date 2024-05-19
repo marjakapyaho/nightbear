@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import styles from 'frontend/components/profileEditor/ProfileEditor.module.scss';
-import { CreateProfile } from 'frontend/components/createProfile/CreateProfile';
+import { Editor } from 'frontend/components/profileEditor/Editor';
 import { Profile } from 'shared/types/profiles';
+import { HOUR_IN_MS } from 'shared/utils/calculations';
+import { PROFILE_BASE } from 'shared/utils/profiles';
+import { map } from 'lodash';
 
 export type ProfileEditorMode = 'activate' | 'edit' | 'create';
+export type ModeSettings = {
+  label: string;
+  buttonAction: () => void;
+  profileName?: boolean;
+  repeatTime?: boolean;
+  validHours?: boolean;
+  analyserSettings?: boolean;
+};
 
 type Props = {
   activeProfile?: Profile;
@@ -21,35 +32,54 @@ export const ProfileEditor = ({
   profiles,
 }: Props) => {
   const [mode, setMode] = useState<ProfileEditorMode>('edit');
-  const editorTabs: { key: ProfileEditorMode; label: string }[] = [
-    { key: 'activate', label: 'Activate' },
-    { key: 'edit', label: 'Edit' },
-    { key: 'create', label: 'Create' },
-  ];
+  const baseProfile = activeProfile ? activeProfile : PROFILE_BASE;
+  const [localProfile, setLocalProfile] = useState<Profile>(baseProfile);
+  const [validityInHours, setValidityInHours] = useState(1);
+
+  const editorTabs: Record<ProfileEditorMode, ModeSettings> = {
+    activate: {
+      label: 'Activate',
+      buttonAction: () => activateProfile(localProfile, validityInHours * HOUR_IN_MS),
+      validHours: true,
+    },
+    edit: {
+      label: 'Edit',
+      buttonAction: () => editProfile(localProfile),
+      profileName: true,
+      repeatTime: true,
+      analyserSettings: true,
+    },
+    create: {
+      label: 'Create',
+      buttonAction: () => createProfile(localProfile, validityInHours * HOUR_IN_MS),
+      profileName: true,
+      repeatTime: true,
+      validHours: true,
+      analyserSettings: true,
+    },
+  };
 
   return (
     <div className={styles.profileEditor}>
       <div className={styles.tabs}>
-        {editorTabs.map(tab => (
+        {map(editorTabs, (settings: ModeSettings, key: ProfileEditorMode) => (
           <div
-            key={tab.key}
-            className={`${styles.tab} ${mode === tab.key ? styles.selected : ''}`}
-            onClick={() => setMode(tab.key)}
+            key={key}
+            className={`${styles.tab} ${mode === key ? styles.selected : ''}`}
+            onClick={() => setMode(key)}
           >
-            {tab.label}
+            {settings.label}
           </div>
         ))}
       </div>
-      <div className={styles.tabContent}>
-        <CreateProfile
-          mode={mode}
-          activeProfile={activeProfile}
-          activateProfile={activateProfile}
-          createProfile={createProfile}
-          editProfile={editProfile}
-          profiles={profiles}
-        />
-      </div>
+      <Editor
+        modeSettings={editorTabs[mode]}
+        profile={localProfile}
+        setProfile={setLocalProfile}
+        validityInHours={validityInHours}
+        setValidityInHours={setValidityInHours}
+        profiles={profiles}
+      />
     </div>
   );
 };

@@ -5,7 +5,7 @@
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 
   .tabs {
     display: grid;
@@ -23,6 +23,22 @@
         color: whitesmoke;
         border: 1px solid #7a7a7a;
       }
+    }
+  }
+
+  .editor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .actionButton {
+      margin-top: 5px;
+      display: flex;
+      margin-left: auto;
+      background: grey;
+      border-radius: 6px;
+      color: white;
+      padding: 8px 16px;
     }
   }
 }
