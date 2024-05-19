@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { Profile } from 'shared/types/profiles';
 import { getActiveProfile } from 'shared/utils/profiles';

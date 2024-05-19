@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
 import { setDecimals } from 'shared/utils/calculations';
-import { getTimeInMillis, getTimeMinusMinutes, isTimeLarger } from 'shared/utils/time';
+import { getTimeMinusMinutes, isTimeLarger } from 'shared/utils/time';
 
 type Props = {
   latestPoint: Point | null;

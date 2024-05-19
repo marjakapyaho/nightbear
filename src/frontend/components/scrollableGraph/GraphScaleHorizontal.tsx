@@ -1,9 +1,8 @@
 import { range } from 'lodash';
-import { DateTime } from 'luxon';
 import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, tsToLeft } from './scrollableGraphUtils';
-import { getTimeAsISOStr, humanReadableShortTime } from 'shared/utils/time';
+import { humanReadableShortTime } from 'shared/utils/time';
 
 type Props = {
   config: GraphConfig;

@@ -10,8 +10,6 @@ import { timeInRangeHighLimit, timeInRangeLowLimit } from 'shared/utils/config';
 import {
   getDateWithoutTime,
   getDateWithoutTimeMs,
-  getTimeAsISOStr,
-  getTimeInMillis,
   getTimeMinusTimeMs,
   hourToMs,
 } from 'shared/utils/time';

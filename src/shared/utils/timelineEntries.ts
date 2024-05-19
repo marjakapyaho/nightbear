@@ -14,7 +14,7 @@ import { getTimeInMillis, getTimeMinusMinutes } from 'shared/utils/time';
 import { getFillColor } from 'frontend/pages/bgGraph/bgGraphUtils';
 import { ProfileActivation } from 'shared/types/profiles';
 import { Alarm } from 'shared/types/alarms';
-import { getAlarmState, getFirstAlarmState } from 'shared/utils/alarms';
+import { getFirstAlarmState } from 'shared/utils/alarms';
 
 export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
   const dateTime = DateTime.fromISO(timestamp);
