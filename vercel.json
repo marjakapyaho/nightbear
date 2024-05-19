@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build && ls -la build",
+  "buildCommand": "npm run back:build && ls -la build/backend/api",
   "rewrites": [
     { "source": "/api/:method", "destination": "build/backend/api/test" }
   ]
