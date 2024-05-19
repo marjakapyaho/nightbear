@@ -6,5 +6,31 @@ module.exports = (req, res) => {
       query: req.query,
       url: req.url,
   });
-  res.status(200).send(JSON.stringify(require('shared/mocks/alarms'), null, 2));
+
+  // TODO: require('shared/mocks/alarms')
+
+  const fs = require('fs');
+  const path = require('path');
+
+  // Get the current working directory
+  const currentDir = process.cwd();
+
+  // Log the current working directory
+  console.log('Current working directory:', currentDir);
+
+  try {
+      // Read the contents of the current directory
+      const files = fs.readdirSync(currentDir);
+
+      // Log the contents of the directory
+      console.log('Contents of the directory:', path);
+      files.forEach(file => {
+          console.log(file);
+      });
+  } catch (err) {
+      console.error('Unable to scan directory:', err);
+  }
+
+  res.status(200).send(JSON.stringify({hello: 'world'}, null, 2));
+
 };
