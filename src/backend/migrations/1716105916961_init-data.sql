@@ -97,3 +97,14 @@ INSERT INTO profile_templates (
   '{"snoozeMinutes": 120, "escalationAfterMinutes": [5, 20, 20]}',
   '{"snoozeMinutes": 10, "escalationAfterMinutes": [15, 30, 30]}'
 );
+
+-- Leave day as the currently active profile:
+INSERT INTO profile_activations (
+  profile_template_id,
+  activated_at,
+  deactivated_at
+) VALUES (
+  (SELECT id FROM profile_templates WHERE profile_name = 'Day'),
+  '1970-01-01 00:00:00.000000 +00:00',
+  NULL
+);
