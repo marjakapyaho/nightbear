@@ -35,7 +35,6 @@
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && npm run db:migrate",
     "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
     "db:types": "pgtyped --config pgtyped-config.json",
-    "db:seed": "DATABASE_URL=$(contrib/db/env dev) npm run ts-node src/backend/scripts/dbSeed.ts",
     "\n==================== UTILS ====================": "",
     "ts-node": "NODE_PATH=src ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },

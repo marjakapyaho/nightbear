@@ -1,12 +1,11 @@
-import { createTestContext, truncateDb } from 'backend/utils/test';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { generateSeedData } from 'backend/db/seed';
-import { checks } from './checks';
-import { generateSensorEntries } from 'shared/utils/test';
-import { getTimePlusTime } from 'shared/utils/time';
-import { MIN_IN_MS } from 'shared/utils/calculations';
+import { createTestContext, generateSeedData, truncateDb } from 'backend/utils/test';
 import { mockNow } from 'shared/mocks/dates';
 import { Alarm } from 'shared/types/alarms';
+import { MIN_IN_MS } from 'shared/utils/calculations';
+import { generateSensorEntries } from 'shared/utils/test';
+import { getTimePlusTime } from 'shared/utils/time';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { checks } from './checks';
 
 describe('cronjobs/checks', () => {
   const context = createTestContext();

@@ -3,9 +3,9 @@ import {
   shouldNonRepeatingActivationBeDeactivated,
   shouldRepeatingActivationBeSwitched,
 } from 'backend/cronjobs/profiles/utils';
+import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 import { Context } from 'backend/utils/api';
 import { Cronjob } from 'backend/utils/cronjobs';
-import { CronjobsJournal } from 'backend/db/cronjobsJournal/types';
 
 export const profiles: Cronjob = async (
   context,
