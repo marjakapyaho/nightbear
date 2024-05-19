@@ -2,6 +2,6 @@
   "installCommand": "npm install",
   "buildCommand": "npm run back:build",
   "rewrites": [
-    { "source": "/api/:method", "destination": "/api/test" }
+    { "source": "/api/:method", "destination": "backend/api/test" }
   ]
 }
