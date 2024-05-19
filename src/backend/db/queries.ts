@@ -45,6 +45,7 @@ import {
   editProfileTemplate,
   getLatestProfileActivation,
   getProfileActivationById,
+  getProfileActivationsByTimestamp,
   getProfiles,
 } from './profiles/profiles.queries';
 
@@ -160,6 +161,12 @@ export const queries = (pool: Pool) => {
       return one(ProfileActivation, getLatestProfileActivation);
     },
 
+    async getProfileActivationsByTimestamp(
+      timeRange: GenParams<typeof getProfileActivationsByTimestamp>,
+    ) {
+      return many(ProfileActivation, getProfileActivationsByTimestamp, timeRange);
+    },
+
     async deactivateAlarm(alarmId: string, currentTimestamp: string) {
       return one(IdReturnType, deactivateAlarm, { id: alarmId, currentTimestamp });
     },
@@ -201,6 +208,7 @@ export const queries = (pool: Pool) => {
       return many(AlarmState, markAllAlarmStatesAsProcessed, { alarmId });
     },
 
+    // TODO: this is only for alarm start time, should include any states inside time range
     async getAlarms(timeRange: GenParams<typeof getAlarms>) {
       return many(Alarm, getAlarms, timeRange);
     },

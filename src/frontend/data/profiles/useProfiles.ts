@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetch } from 'frontend/data/fetch';
 import { Profile } from 'shared/types/profiles';
 import { getActiveProfile } from 'shared/utils/profiles';
+import { MIN_IN_MS } from 'shared/utils/calculations';
 
 export const useProfiles = () => {
   const {
@@ -13,6 +14,7 @@ export const useProfiles = () => {
   } = useQuery<Profile[]>({
     queryKey: ['get-profiles'],
     queryFn: () => callFetch('/get-profiles'),
+    refetchInterval: MIN_IN_MS,
   });
 
   const { mutate: activateProfileMutation } = useMutation({

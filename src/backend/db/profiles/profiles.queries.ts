@@ -403,3 +403,43 @@ const getProfileActivationByIdIR: any = {"usedParamSet":{"id":true},"params":[{"
 export const getProfileActivationById = new PreparedQuery<IGetProfileActivationByIdParams,IGetProfileActivationByIdResult>(getProfileActivationByIdIR);
 
 
+/** 'GetProfileActivationsByTimestamp' parameters type */
+export interface IGetProfileActivationsByTimestampParams {
+  from: string | Date;
+  to?: string | Date | null | void;
+}
+
+/** 'GetProfileActivationsByTimestamp' return type */
+export interface IGetProfileActivationsByTimestampResult {
+  activatedAt: string;
+  deactivatedAt: string | null;
+  id: string;
+  profileName: string | null;
+  profileTemplateId: string;
+}
+
+/** 'GetProfileActivationsByTimestamp' query type */
+export interface IGetProfileActivationsByTimestampQuery {
+  params: IGetProfileActivationsByTimestampParams;
+  result: IGetProfileActivationsByTimestampResult;
+}
+
+const getProfileActivationsByTimestampIR: any = {"usedParamSet":{"from":true,"to":true},"params":[{"name":"from","required":true,"transform":{"type":"scalar"},"locs":[{"a":267,"b":272}]},{"name":"to","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":305}]}],"statement":"SELECT\n  profile_activations.id,\n  profile_template_id,\n  activated_at,\n  deactivated_at,\n  profile_templates.profile_name\nFROM profile_activations\n  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id\nWHERE activated_at >= :from! AND activated_at <= COALESCE(:to, CURRENT_TIMESTAMP)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *   profile_activations.id,
+ *   profile_template_id,
+ *   activated_at,
+ *   deactivated_at,
+ *   profile_templates.profile_name
+ * FROM profile_activations
+ *   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+ * WHERE activated_at >= :from! AND activated_at <= COALESCE(:to, CURRENT_TIMESTAMP)
+ * ```
+ */
+export const getProfileActivationsByTimestamp = new PreparedQuery<IGetProfileActivationsByTimestampParams,IGetProfileActivationsByTimestampResult>(getProfileActivationsByTimestampIR);
+
+

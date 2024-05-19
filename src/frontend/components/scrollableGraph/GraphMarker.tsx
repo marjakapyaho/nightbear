@@ -41,6 +41,13 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
         <div className={styles.numberBubbleTop}>{point.insulinEntry.amount}</div>
       )}
       {point.carbEntry && <div className={styles.numberBubbleBottom}>{point.carbEntry.amount}</div>}
+
+      {point.profileActivations?.length ? (
+        <div className={styles.profileName}>{point.profileActivations[0].profileName}</div>
+      ) : (
+        ''
+      )}
+      {point.alarms?.length ? <div className={styles.alarm}>{point.alarms[0].situation}</div> : ''}
     </div>
   );
 };

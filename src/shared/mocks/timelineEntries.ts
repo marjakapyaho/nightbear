@@ -6,6 +6,8 @@ import {
   MeterEntry,
 } from 'shared/types/timelineEntries';
 import { getTimeMinusMinutes } from 'shared/utils/time';
+import { mockProfileActivations } from 'shared/mocks/profiles';
+import { mockAlarms } from 'shared/mocks/alarms';
 
 export const mockBloodGlucoseEntries: BloodGlucoseEntry[] = [
   { bloodGlucose: 4.6, timestamp: getTimeMinusMinutes(mockNowSlot, 40) },
@@ -47,4 +49,6 @@ export const mockTimelineEntries = {
   insulinEntries: mockInsulinEntries,
   carbEntries: mockCarbEntries,
   meterEntries: mockMeterEntries,
+  profileActivations: mockProfileActivations,
+  alarms: mockAlarms,
 };

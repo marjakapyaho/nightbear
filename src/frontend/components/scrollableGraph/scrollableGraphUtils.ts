@@ -1,6 +1,8 @@
 import { CarbEntry, InsulinEntry, MeterEntry } from 'shared/types/timelineEntries';
 import { roundTo1Decimals } from 'shared/utils/calculations';
 import { isNotNullish } from 'shared/utils/helpers';
+import { ProfileActivation } from 'shared/types/profiles';
+import { Alarm } from 'shared/types/alarms';
 
 export type BaseGraphConfig = {
   timelineRange: number; // How many ms worth of graph data are we showing
@@ -38,6 +40,8 @@ export type Point = {
   insulinEntry?: InsulinEntry;
   meterEntry?: MeterEntry;
   carbEntry?: CarbEntry;
+  profileActivations?: ProfileActivation[];
+  alarms?: Alarm[];
 };
 
 export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {

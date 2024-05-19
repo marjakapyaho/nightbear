@@ -12,6 +12,9 @@ import { calculateAverageBg, MIN_IN_MS } from 'shared/utils/calculations';
 import { Point } from 'frontend/components/scrollableGraph/scrollableGraphUtils';
 import { getTimeInMillis, getTimeMinusMinutes } from 'shared/utils/time';
 import { getFillColor } from 'frontend/pages/bgGraph/bgGraphUtils';
+import { ProfileActivation } from 'shared/types/profiles';
+import { Alarm } from 'shared/types/alarms';
+import { getAlarmState, getFirstAlarmState } from 'shared/utils/alarms';
 
 export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
   const dateTime = DateTime.fromISO(timestamp);
@@ -47,12 +50,25 @@ const getAndValidateEntry = <T extends BloodGlucoseEntry | InsulinEntry | MeterE
 const isEntryInThisSlot = <T extends { timestamp: string }>(entry: T, timestamp: string) =>
   getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp;
 
+const isActivationInThisSlot = (profileActivation: ProfileActivation, timestamp: string) =>
+  getTimestampFlooredToEveryFiveMinutes(profileActivation.activatedAt) === timestamp;
+
+const isAlarmInThisSlot = (alarm: Alarm, timestamp: string) =>
+  getTimestampFlooredToEveryFiveMinutes(getFirstAlarmState(alarm).timestamp) === timestamp;
+
 export const mapTimelineEntriesToGraphPoints = (
   timelineEntries: TimelineEntries,
   rangeInMs: number,
   currentTimestamp: string,
 ): Point[] => {
-  const { bloodGlucoseEntries, insulinEntries, meterEntries, carbEntries } = timelineEntries;
+  const {
+    bloodGlucoseEntries,
+    insulinEntries,
+    meterEntries,
+    carbEntries,
+    profileActivations,
+    alarms,
+  } = timelineEntries;
 
   const countOfFiveMinSlots = rangeInMs / (5 * MIN_IN_MS);
   const startSlotTimestamp = getTimestampFlooredToEveryFiveMinutes(currentTimestamp);
@@ -79,6 +95,11 @@ export const mapTimelineEntriesToGraphPoints = (
         carbEntries.filter(entry => isEntryInThisSlot(entry, timestamp)),
       );
 
+      const profileActivationsInSlot = profileActivations?.filter(activation =>
+        isActivationInThisSlot(activation, timestamp),
+      );
+      const alarmsInSlot = alarms?.filter(alarm => isAlarmInThisSlot(alarm, timestamp));
+
       const val = bgEntry ? bgEntry.bloodGlucose : null;
       const color = getFillColor(val);
 
@@ -90,6 +111,8 @@ export const mapTimelineEntriesToGraphPoints = (
         ...(insulinEntry && { insulinEntry }),
         ...(meterEntry && { meterEntry }),
         ...(carbEntry && { carbEntry }),
+        ...(profileActivationsInSlot && { profileActivations: profileActivationsInSlot }),
+        ...(alarmsInSlot && { alarms: alarmsInSlot }),
       };
     })
     .reverse();

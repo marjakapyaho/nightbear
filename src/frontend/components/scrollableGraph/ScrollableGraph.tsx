@@ -12,9 +12,16 @@ type Props = {
   baseConfig: BaseGraphConfig;
   selectedPoint: Point | null;
   setSelectedPoint: (point: Point | null) => void;
+  latestPointWithBg?: Point;
 };
 
-export const ScrollableGraph = ({ graphPoints, selectedPoint, setSelectedPoint, baseConfig }: Props) => {
+export const ScrollableGraph = ({
+  graphPoints,
+  selectedPoint,
+  setSelectedPoint,
+  baseConfig,
+  latestPointWithBg,
+}: Props) => {
   const scrollingRef = useRef<HTMLDivElement | null>(null);
   const config = getGraphConfig(baseConfig);
   const { innerWidth, outerHeight } = config;
@@ -47,7 +54,7 @@ export const ScrollableGraph = ({ graphPoints, selectedPoint, setSelectedPoint, 
             config={config}
           />
           <GraphScaleHorizontal config={config} />
-          <GraphLatestValue latestPoint={latestPoint} config={config} />
+          <GraphLatestValue latestPoint={latestPointWithBg || latestPoint} config={config} />
         </div>
       </div>
     </div>

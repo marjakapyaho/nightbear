@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { ProfileActivation } from 'shared/types/profiles';
+import { Alarm } from 'shared/types/alarms';
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -52,5 +54,7 @@ export const TimelineEntries = z.object({
   insulinEntries: z.array(InsulinEntry),
   carbEntries: z.array(CarbEntry),
   meterEntries: z.array(MeterEntry),
+  profileActivations: z.array(ProfileActivation),
+  alarms: z.array(Alarm),
 });
 export type TimelineEntries = z.infer<typeof TimelineEntries>;

@@ -29,11 +29,23 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
     to: end || context.timestamp(),
   });
 
+  const profileActivations = await context.db.getProfileActivationsByTimestamp({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
+  const alarms = await context.db.getAlarms({
+    from: start || defaultFrom,
+    to: end || context.timestamp(),
+  });
+
   return createResponse({
     bloodGlucoseEntries,
     insulinEntries,
     carbEntries,
     meterEntries,
+    profileActivations,
+    alarms,
   });
 };
 

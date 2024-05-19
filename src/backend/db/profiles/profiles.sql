@@ -151,3 +151,14 @@ SELECT
 FROM profile_activations
   INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
 WHERE profile_activations.id = :id!;
+
+/* @name getProfileActivationsByTimestamp */
+SELECT
+  profile_activations.id,
+  profile_template_id,
+  activated_at,
+  deactivated_at,
+  profile_templates.profile_name
+FROM profile_activations
+  INNER JOIN profile_templates ON profile_templates.id = profile_activations.profile_template_id
+WHERE activated_at >= :from! AND activated_at <= COALESCE(:to, CURRENT_TIMESTAMP);

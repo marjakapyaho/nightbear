@@ -78,6 +78,7 @@ export const BgGraph = () => {
             selectedPoint={selectedPoint}
             setSelectedPoint={setSelectedPoint}
             baseConfig={baseConfig}
+            latestPointWithBg={latestPointWithBg}
           />
         )}
         {isLoading && <div className={styles.loading}>Loading...</div>}
