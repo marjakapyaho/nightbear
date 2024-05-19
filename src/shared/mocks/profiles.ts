@@ -73,6 +73,7 @@ export const mockProfileActivations: ProfileActivation[] = [
 ];
 
 export const actualNightProfile = {
+  profileName: 'Night',
   isActive: true,
   alarmsEnabled: true,
   repeatTimeInLocalTimezone: '23:00',
@@ -134,6 +135,7 @@ export const actualNightProfile = {
 };
 
 export const actualDayProfile = {
+  profileName: 'Day',
   isActive: true,
   alarmsEnabled: true,
   repeatTimeInLocalTimezone: '8:00',
