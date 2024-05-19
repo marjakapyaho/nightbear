@@ -1,7 +1,4 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build",
-  "routes": [
-    { "src": "/api/test", "dest": "/backend/api/test.js" }
-  ]
+  "buildCommand": "npm run back:build && mkdir -p api && cp build/backend/api/test.js api"
 }
