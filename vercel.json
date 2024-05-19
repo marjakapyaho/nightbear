@@ -1,4 +1,7 @@
 {
   "installCommand": "npm install",
-  "buildCommand": "npm run back:build"
+  "buildCommand": "npm run back:build",
+  "rewrites": [
+    { "source": "/api/:method", "destination": "/api/test" }
+  ]
 }
