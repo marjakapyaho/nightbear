@@ -1,6 +1,6 @@
 {
   "builds": [
-    { "src": "src/backend/api/test.js", "use": "@vercel/node" }
+    { "src": "src/backend/api/*.ts", "use": "@vercel/node" }
   ],
   "rewrites": [
     { "source": "/api/:method", "destination": "src/backend/api/test.js" }
