@@ -1,5 +1,4 @@
 import { range } from 'lodash';
-import React from 'react';
 import { useEffect, useRef } from 'react';
 import scrollIntoView from 'scroll-into-view';
 import styles from './ScrollNumberSelector.module.scss';

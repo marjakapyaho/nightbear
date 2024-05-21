@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './ProfileSelector.module.scss';
 import { Profile } from '@nightbear/shared';
 

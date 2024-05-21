@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
 import { setDecimals, getTimeMinusMinutes, isTimeLarger } from '@nightbear/shared';

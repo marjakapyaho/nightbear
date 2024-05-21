@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './ProfileEditor.module.scss';
 import { AnalyserSettings, Profile } from '@nightbear/shared';
 import { InputText } from '../inputText/InputText';

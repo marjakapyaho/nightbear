@@ -1,4 +1,3 @@
-import React from 'react';
 import { TimeAgo } from '../timeAgo/TimeAgo';
 import styles from './StatusBar.module.scss';
 import { Point } from '../scrollableGraph/scrollableGraphUtils';

@@ -1,5 +1,4 @@
 import styles from './ScrollableGraph.module.scss';
-import React from 'react';
 import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
 
 type Props = {

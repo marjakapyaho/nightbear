@@ -1,4 +1,3 @@
-import React from 'react';
 import { TimeAgo } from '../timeAgo/TimeAgo';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, Point, tsToLeft } from './scrollableGraphUtils';

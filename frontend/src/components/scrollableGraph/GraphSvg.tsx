@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import  { useRef } from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, mapGraphPointsForPolyline, Point } from './scrollableGraphUtils';
 import { GraphPoint } from './GraphPoint';

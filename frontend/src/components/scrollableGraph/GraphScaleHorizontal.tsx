@@ -1,5 +1,4 @@
 import { range } from 'lodash';
-import React from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, tsToLeft } from './scrollableGraphUtils';
 import { humanReadableShortTime } from '@nightbear/shared';

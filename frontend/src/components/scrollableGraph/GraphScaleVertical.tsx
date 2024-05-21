@@ -1,5 +1,4 @@
 import { range } from 'lodash';
-import React from 'react';
 import { highLimit } from '@nightbear/shared';
 import styles from './ScrollableGraph.module.scss';
 import { GraphConfig, valToTop } from './scrollableGraphUtils';

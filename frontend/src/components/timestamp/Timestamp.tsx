@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-import React from 'react';
 import { useEffect, useState } from 'react';
 import { getFormattedTs } from './timestampUtils';
 

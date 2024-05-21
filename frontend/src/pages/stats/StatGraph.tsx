@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DAY_IN_MS } from '@nightbear/shared';
 import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph';
 import styles from './Stats.module.scss';

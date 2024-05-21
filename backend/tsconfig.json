@@ -16,7 +16,7 @@
     "target": "ES2021",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": ["*.ts"],
   "exclude": ["node_modules"],
   "ts-node": {
     "files": true

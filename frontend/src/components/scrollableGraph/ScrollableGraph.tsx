@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import  { useEffect, useRef } from 'react';
 import styles from './ScrollableGraph.module.scss';
 import { Point, BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils';
 import { GraphScaleVertical } from './GraphScaleVertical';

@@ -19,8 +19,6 @@ module.exports = {
   ignorePatterns: [
     '**/*.queries.ts',
     '.eslintrc.cjs',
-    '**/jest.config.js',
-    '**/file-storage-client/**',
   ],
   rules: {
     'prettier/prettier': ['error'],
@@ -48,13 +46,6 @@ module.exports = {
   overrides: [
     {
       files: ['test/**/*.ts', '*.test.ts'],
-      rules: {
-        'jest/no-disabled-tests': 'warn',
-        'jest/no-focused-tests': 'warn',
-        'jest/no-identical-title': 'error',
-        'jest/prefer-to-have-length': 'warn',
-        'jest/valid-expect': 'error',
-      },
     },
   ],
   root: true,

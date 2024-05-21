@@ -1,6 +1,5 @@
 import react from '@vitejs/plugin-react'
 import autoprefixer from 'autoprefixer'
-import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default {
@@ -20,11 +19,6 @@ export default {
   server: {
     proxy: {
       '/api': 'http://localhost:4000',
-    },
-  },
-  resolve: {
-    alias: {
-      frontend: resolve(__dirname, './src/frontend'),
     },
   },
   test: {
