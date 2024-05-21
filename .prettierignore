@@ -1,0 +1,7 @@
+# artifacts
+build
+coverage
+legacy
+docs
+dist
+node_modules

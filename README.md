@@ -8,25 +8,23 @@ Nightbear repository includes code for:
 * React UI
 * Pebble watchface and alarm app (deprecated)
 
-Add to your environment:
 
-```
-export DATABASE_URL=postgres://nightbear:nightbear@localhost:25432/nightbear_test
-```
+# Nightbear Server
 
-Start test DB:
+## Dev env setup
 
-```
-docker-compose up -d
-./contrib/migrate/test
-```
+Create a local dev DB:
 
-To look around in the DB:
+1. Run `docker run -d -p 5984:5984 --name nightbear-dev-couchdb couchdb:2.3.1`
+1. Visit http://localhost:5984/_utils/#/setup
+1. Create a single node, with credentials `admin:admin`
+1. Config -> CORS -> Enable CORS for all domains
+1. Config -> Main config -> `couch_httpd_auth` -> `timeout` -> set value to 31556926 (a year in seconds)
+1. Create a new DB called `dev` (Databases > Create Database)
+1. Run `export NIGHTBEAR_DB_URL=http://admin:admin@localhost:5984/dev`
+1. Run `export NIGHTBEAR_TEST_DB_URL=http://admin:admin@localhost:5984/`
+1. Run `npm test` to see that everything works
 
-```
-$ docker exec -it -e PGPASSWORD=nightbear nightbear-test-db psql -U nightbear -d nightbear_test
-psql (16.2 (Debian 16.2-1.pgdg120+2))
-Type "help" for help.
+## Starting docker process if it has stopped
 
-nightbear_test=# \d
-```
+`docker start nightbear-dev-couchdb`
