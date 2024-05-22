@@ -1,4 +1,4 @@
-import { runAnalysis } from '../../cronjobs/analyser/analyser';
+import { runAnalysis } from '../analyser';
 import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
 import { describe, expect, it } from 'vitest';
 import { mockNow } from '@nightbear/shared';
