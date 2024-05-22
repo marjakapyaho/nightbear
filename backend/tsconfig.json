@@ -11,13 +11,12 @@
     "lib": ["ES2021", "DOM"],
     "esModuleInterop": true,
     "module": "commonjs",
-    "outDir": "./dist",
+    "outDir": "./build",
     "sourceMap": true,
     "target": "ES2021",
     "resolveJsonModule": true
   },
-  "include": ["*.ts"],
-  "exclude": ["node_modules"],
+  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts"],
   "ts-node": {
     "files": true
   }
