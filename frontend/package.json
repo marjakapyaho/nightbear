@@ -11,6 +11,7 @@
     "preview": "yarn build && vite preview --port 3000"
   },
   "dependencies": {
+    "@nightbear/shared": "file:../shared",
     "@tanstack/react-query": "5.24.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

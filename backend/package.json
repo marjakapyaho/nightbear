@@ -30,6 +30,7 @@
     "zod"
   ],
   "dependencies": {
+    "@nightbear/shared": "file:../shared",
     "@pgtyped/cli": "2.3.0",
     "@pgtyped/runtime": "2.3.0",
     "@types/body-parser": "1.19.5",
