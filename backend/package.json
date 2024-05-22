@@ -7,7 +7,7 @@
   },
   "main": "index.ts",
   "scripts": {
-    "dev": "yarn db:types && yarn ts:node ./index.ts",
+    "dev": "yarn db:types && yarn ts:node ./api/index.ts",
     "build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
     "test": "vitest",
     "lint": "eslint src --ext ts,tsx && tsc",
