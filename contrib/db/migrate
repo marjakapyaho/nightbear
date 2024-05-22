@@ -10,5 +10,5 @@ node_modules/.bin/node-pg-migrate \
   --database-url-var DATABASE_URL \
   --migrations-table migrations \
   --migration-file-language sql \
-  --migrations-dir src/backend/migrations \
+  --migrations-dir api/migrations \
   up

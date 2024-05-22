@@ -1,4 +1,4 @@
-import { createTestContext, truncateDb } from './utils/test';
+import { createTestContext, truncateDb } from '../../utils/test';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/alarms', () => {

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleLambdaEvent = void 0;
-const handler_1 = require("./api/alarms/handler");
+const handler_1 = require("./routes/alarms/handler");
 const checks_1 = require("./cronjobs/checks/checks");
 const devDataImport_1 = require("./cronjobs/devDataImport/devDataImport");
 const dexcomShare_1 = require("./cronjobs/dexcom/dexcomShare");
@@ -14,8 +14,8 @@ const cronjobs_1 = require("./utils/cronjobs");
 const express_1 = require("./utils/express");
 const logging_1 = require("./utils/logging");
 const debug_1 = __importDefault(require("debug"));
-const handler_2 = require("./api/profiles/handler");
-const handler_3 = require("./api/timelineEntries/handler");
+const handler_2 = require("./routes/profiles/handler");
+const handler_3 = require("./routes/timelineEntries/handler");
 const api_1 = require("./utils/api");
 // Direct log output to where we want it
 debug_1.default.log = logging_1.consoleLogStream;

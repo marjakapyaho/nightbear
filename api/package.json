@@ -1,10 +1,11 @@
 {
-  "name": "backend",
+  "name": "api",
   "version": "1.0.0",
   "license": "AGPL-3.0",
   "engines": {
     "node": "18.x"
   },
+  "main": "index.ts",
   "scripts": {
     "dev": "yarn db:types && yarn ts:node ./index.ts",
     "build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",

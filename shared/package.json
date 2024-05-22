@@ -11,8 +11,8 @@
     "build": "rm -rf dist && tsc -p tsconfig-build.json",
     "test": "vitest",
     "lint": "eslint src --ext ts,tsx && tsc",
-    "link:shared": "yarn link && yarn --cwd ../backend/ link @nightbear/shared && yarn --cwd ../frontend_old/ link @nightbear/shared",
-    "unlinking": "yarn --cwd ../backend/ unlink @nightbear/shared && yarn --cwd ../frontend_old/ unlink @nightbear/shared && yarn unlink"
+    "link:shared": "yarn link && yarn --cwd ../api/ link @nightbear/shared && yarn --cwd ../frontend_old/ link @nightbear/shared",
+    "unlinking": "yarn --cwd ../api/ unlink @nightbear/shared && yarn --cwd ../frontend_old/ unlink @nightbear/shared && yarn unlink"
   },
   "dependencies": {
     "@types/lodash": "4.14.202",
