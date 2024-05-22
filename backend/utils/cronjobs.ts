@@ -2,7 +2,7 @@ import { CronjobsJournal } from '../db/cronjobsJournal/types';
 import { extendLogger } from './logging';
 import { kebabCase } from 'lodash';
 import { DateTime } from 'luxon';
-import { SEC_IN_MS } from '@nightbear/shared';
+import { MIN_IN_MS, SEC_IN_MS } from '@nightbear/shared';
 import { DEFAULT_TIMEZONE } from '@nightbear/shared';
 import { Context } from './api';
 
@@ -51,5 +51,5 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
  */
 export const startCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
   await runCronJobs(context, cronjobs); // run once right away
-  setInterval(() => runCronJobs(context, cronjobs), 60 * 1000);
+  setInterval(() => runCronJobs(context, cronjobs), 5 * MIN_IN_MS);
 };

@@ -37,6 +37,7 @@ export function startExpressServer(
           );
       });
     });
+
     const server = app.listen(context.httpPort, () => {
       const address = server.address();
       if (address && typeof address !== 'string') {
