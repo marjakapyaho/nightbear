@@ -2,7 +2,7 @@ import axios from 'axios';
 import { CronjobsJournal } from '../../db/cronjobsJournal/types';
 import { Context } from '../../utils/api';
 import { Cronjob } from '../../utils/cronjobs';
-import { subMinutes } from 'date-fns';
+import { DateTime } from 'luxon';
 import _ from 'lodash';
 import { SensorEntry } from '@nightbear/shared';
 import { isNotNullish, isNullish } from '@nightbear/shared';
@@ -48,7 +48,7 @@ const fetchTimelineEntries = async (context: Context, minutes: number) => {
   const { log, config } = context;
 
   const encode = (x: string) => encodeURIComponent(JSON.stringify(x));
-  const startKey = encode(`timeline/${subMinutes(new Date(), minutes).toISOString()}`);
+  const startKey = encode(`timeline/${DateTime.fromJSDate(new Date()).minus({minutes}).toISO()}`);
   const endKey = encode(`timeline/_`);
   const url = `${config.DEV_DATA_IMPORT_FROM_COUCHDB}/_all_docs?startkey=${startKey}&endkey=${endKey}&include_docs=true`;
 
