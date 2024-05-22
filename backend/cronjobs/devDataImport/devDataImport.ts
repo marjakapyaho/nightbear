@@ -48,6 +48,7 @@ const fetchTimelineEntries = async (context: Context, minutes: number) => {
   const { log, config } = context;
 
   const encode = (x: string) => encodeURIComponent(JSON.stringify(x));
+  // TODO: is this correct?
   const startKey = encode(`timeline/${DateTime.fromJSDate(new Date()).minus({minutes}).toISO()}`);
   const endKey = encode(`timeline/_`);
   const url = `${config.DEV_DATA_IMPORT_FROM_COUCHDB}/_all_docs?startkey=${startKey}&endkey=${endKey}&include_docs=true`;

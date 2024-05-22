@@ -54,7 +54,6 @@ export type RequestHandler = (request: Request, context: Context) => Promise<Res
 export function createNodeContext(): Context {
   const {
     DATABASE_URL,
-    NIGHTBEAR_DB_URL,
     PUSHOVER_USER,
     PUSHOVER_TOKEN,
     PUSHOVER_CALLBACK,
@@ -66,7 +65,6 @@ export function createNodeContext(): Context {
   } = process.env;
 
   if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`);
-  if (!NIGHTBEAR_DB_URL) throw new Error(`Missing required env-var: NIGHTBEAR_DB_URL`);
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`);
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`);
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`);
