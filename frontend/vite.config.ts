@@ -20,14 +20,5 @@ export default {
     proxy: {
       '/api': 'http://localhost:4000',
     },
-  },
-  test: {
-    include: ['**/*.test.ts'],
-    globals: true,
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
-  },
+  }
 }

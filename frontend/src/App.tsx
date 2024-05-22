@@ -11,16 +11,16 @@ type Props = {};
 
 export default (() => {
   return (
-      <QueryClientProvider client={queryClient}>
-        <div className="nb-App">
-          <Router>
-            <Routes>
-              <Route path="/" element={<BgGraph />} />
-              <Route path="/config" element={<Config />} />
-              <Route path="/stats" element={<Stats />} />
-            </Routes>
-          </Router>
-        </div>
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <div className="nb-App">
+        <Router>
+          <Routes>
+            <Route path="/" element={<BgGraph />} />
+            <Route path="/config" element={<Config />} />
+            <Route path="/stats" element={<Stats />} />
+          </Routes>
+        </Router>
+      </div>
+    </QueryClientProvider>
   );
 }) as React.FC<Props>;
