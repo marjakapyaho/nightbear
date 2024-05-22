@@ -6,6 +6,8 @@ npm-debug.log
 .DS_Store
 /.history
 .vscode
-/build
 /couchdb-prod-dump-rows.json
-build
+
+shared/dist
+frontend/dist
+backend/build
