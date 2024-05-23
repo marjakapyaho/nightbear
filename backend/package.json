@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "yarn db:types && yarn ts:node ./api/index.ts",
-    "build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
+    "build": "rm -rf build && tsc",
     "test": "vitest",
     "lint": "eslint src --ext ts,tsx && tsc",
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && yarn db:migrate",
