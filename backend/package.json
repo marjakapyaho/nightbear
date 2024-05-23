@@ -13,19 +13,6 @@
     "db:types": "pgtyped --config pgtyped-config.json",
     "ts:node": "ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
-  "lambdaDependencies": [
-    "@pgtyped/runtime",
-    "axios",
-    "body-parser",
-    "cors",
-    "debug",
-    "express",
-    "lodash",
-    "luxon",
-    "pg",
-    "pushover-notifications",
-    "zod"
-  ],
   "dependencies": {
     "@nightbear/shared": "file:../shared/src",
     "@pgtyped/cli": "2.3.0",
