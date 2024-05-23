@@ -14,9 +14,19 @@
     "outDir": "./build",
     "sourceMap": true,
     "target": "ES2021",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@nightbear/shared": ["../shared/src"]
+    }
   },
-  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts", "../shared/**/*.ts"],
+  "include": [
+    "api/**/*.ts",
+    "cronjobs/**/*.ts",
+    "db/**/*.ts",
+    "migrations/**/*.ts",
+    "utils/**/*.ts",
+    "../shared/**/*.ts"
+  ],
   "ts-node": {
     "files": true,
     "require": ["tsconfig-paths/register"]
