@@ -16,8 +16,9 @@
     "target": "ES2021",
     "resolveJsonModule": true
   },
-  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts", "../shared/src/**/*.ts"],
+  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts", "../shared/**/*.ts"],
   "ts-node": {
-    "files": true
+    "files": true,
+    "require": ["tsconfig-paths/register"]
   }
 }
