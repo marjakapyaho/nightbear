@@ -16,7 +16,7 @@
     "target": "ES2021",
     "resolveJsonModule": true
   },
-  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts"],
+  "include": ["api/**/*.ts", "cronjobs/**/*.ts", "db/**/*.ts", "migrations/**/*.ts", "utils/**/*.ts", "../shared/src/**/*.ts"],
   "ts-node": {
     "files": true
   }
