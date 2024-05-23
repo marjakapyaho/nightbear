@@ -27,7 +27,7 @@
     "zod"
   ],
   "dependencies": {
-    "@nightbear/shared": "file:./shared/src",
+    "@nightbear/shared": "file:../shared/src",
     "@pgtyped/cli": "2.3.0",
     "@pgtyped/runtime": "2.3.0",
     "axios": "1.6.2",
