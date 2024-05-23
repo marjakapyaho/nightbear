@@ -1,9 +1,4 @@
 {
   "version": 2,
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
-  "functions": {
-    "api/**/*.ts": {
-      "includeFiles": "../shared/**/*"
-    }
-  }
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }

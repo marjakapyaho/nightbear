@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
-import { isTimeSmallerOrEqual } from '@nightbear/shared';
-import { DAY_IN_MS } from '@nightbear/shared';
-import { Profile, ProfileActivation } from '@nightbear/shared';
+import { isTimeSmallerOrEqual } from 'shared';
+import { DAY_IN_MS } from 'shared';
+import { Profile, ProfileActivation } from 'shared';
 import { chain } from 'lodash';
 
 type PotentialProfile = {

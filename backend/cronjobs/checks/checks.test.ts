@@ -1,9 +1,9 @@
 import { createTestContext, generateSeedData, truncateDb } from '../../utils/test';
-import { mockNow } from '@nightbear/shared';
-import { Alarm } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
-import { generateSensorEntries } from '@nightbear/shared';
-import { getTimePlusTime } from '@nightbear/shared';
+import { mockNow } from 'shared';
+import { Alarm } from 'shared';
+import { MIN_IN_MS } from 'shared';
+import { generateSensorEntries } from 'shared';
+import { getTimePlusTime } from 'shared';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { checks } from './checks';
 

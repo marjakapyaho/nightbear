@@ -1,8 +1,8 @@
 import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
+import { generateSensorEntries, getMockActiveProfile } from 'shared';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { mockNow } from 'shared';
+import { getTimeMinusMinutes } from 'shared';
 
 describe('analyser/rising', () => {
   it('detects RISING', () => {

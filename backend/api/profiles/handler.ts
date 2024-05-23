@@ -1,6 +1,6 @@
 import { Context, createResponse, Request } from '../../utils/api';
-import { Profile } from '@nightbear/shared';
-import { getTimePlusTime } from '@nightbear/shared';
+import { Profile } from 'shared';
+import { getTimePlusTime } from 'shared';
 
 export const getProfiles = async (_request: Request, context: Context) => {
   const profiles = await context.db.getProfiles();

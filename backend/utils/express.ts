@@ -1,11 +1,11 @@
 import * as bodyParser from 'body-parser';
-import { generateUuid } from '@nightbear/shared';
+import { generateUuid } from 'shared';
 import { extendLogger, Logger } from './logging';
 import cors from 'cors';
 import express, {  Request as ExpressRequest } from 'express';
 import { isString, pickBy } from 'lodash';
 import { Context, RequestHandler, Request, Headers } from './api';
-import { getTimeMinusTimeMs } from '@nightbear/shared';
+import { getTimeMinusTimeMs } from 'shared';
 
 export type HttpMethod = 'get' | 'post' | 'put';
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler];

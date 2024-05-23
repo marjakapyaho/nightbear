@@ -1,11 +1,11 @@
-import { HOUR_IN_MS } from '@nightbear/shared';
+import { HOUR_IN_MS } from 'shared';
 import { Context } from '../../utils/api';
 import {
   getTimeMinusTime,
   getTimeMinusTimeMs,
   isTimeLargerOrEqual,
   isTimeSmaller,
-} from '@nightbear/shared';
+} from 'shared';
 
 export const getRange = (context: Context, hours: number) => ({
   from: getTimeMinusTime(context.timestamp(), hours * HOUR_IN_MS),

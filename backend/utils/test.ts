@@ -1,13 +1,13 @@
 import { NO_PUSHOVER } from '../cronjobs/alarms/pushoverClient';
 import { NO_DEXCOM_SHARE } from '../cronjobs/dexcom/dexcomShareClient';
 import { NO_LOGGING } from './logging';
-import { mockNow } from '@nightbear/shared';
-import { mockProfiles } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
-import { generateUuid } from '@nightbear/shared';
-import { generateSensorEntries } from '@nightbear/shared';
-import { getTimeMinusTime } from '@nightbear/shared';
-import { getTimestampFlooredToEveryFiveMinutes } from '@nightbear/shared';
+import { mockNow } from 'shared';
+import { mockProfiles } from 'shared';
+import { MIN_IN_MS } from 'shared';
+import { generateUuid } from 'shared';
+import { generateSensorEntries } from 'shared';
+import { getTimeMinusTime } from 'shared';
+import { getTimestampFlooredToEveryFiveMinutes } from 'shared';
 import { Context, Request } from './api';
 import { createDbClient } from './db';
 

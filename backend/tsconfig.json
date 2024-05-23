@@ -25,6 +25,6 @@
     "db/**/*.ts",
     "migrations/**/*.ts",
     "utils/**/*.ts",
-    "../shared/**/*.ts"
+    "shared/**/*.ts"
   ]
 }

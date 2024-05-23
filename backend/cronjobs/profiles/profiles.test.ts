@@ -6,8 +6,8 @@ import {
   mockProfileActivations,
   mockProfiles,
   mockSituationSettings,
-} from '@nightbear/shared';
-import { Profile, ProfileActivation } from '@nightbear/shared';
+} from 'shared';
+import { Profile, ProfileActivation } from 'shared';
 import { Context } from '../../utils/api';
 
 const createProfileWithActivation = async (

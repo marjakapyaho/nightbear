@@ -3,13 +3,13 @@ import { mapDexcomShareResponseToSensorEntry } from './utils';
 import { CronjobsJournal } from '../../db/cronjobsJournal/types';
 import { Cronjob } from '../../utils/cronjobs';
 import { isArray } from 'lodash';
-import { MIN_IN_MS } from '@nightbear/shared';
+import { MIN_IN_MS } from 'shared';
 import {
   getTimeAsISOStr,
   getTimeInMillis,
   humanReadableLongTime,
   isTimeLarger,
-} from '@nightbear/shared';
+} from 'shared';
 
 export const dexcomShare: Cronjob = async (
   context,

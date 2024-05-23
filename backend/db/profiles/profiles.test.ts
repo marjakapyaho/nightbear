@@ -1,6 +1,6 @@
 import { createTestContext, truncateDb } from '../../utils/test';
-import { mockProfileActivations, mockProfiles } from '@nightbear/shared';
-import { UUID_REGEX } from '@nightbear/shared';
+import { mockProfileActivations, mockProfiles } from 'shared';
+import { UUID_REGEX } from 'shared';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('db/profiles', () => {

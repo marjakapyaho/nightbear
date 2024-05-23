@@ -1,11 +1,11 @@
-import { Situation } from '@nightbear/shared';
-import { Profile } from '@nightbear/shared';
+import { Situation } from 'shared';
+import { Profile } from 'shared';
 import { Context } from '../../utils/api';
-import { getTimeMinusTimeMs } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
-import { Alarm, AlarmState } from '@nightbear/shared';
+import { getTimeMinusTimeMs } from 'shared';
+import { MIN_IN_MS } from 'shared';
+import { Alarm, AlarmState } from 'shared';
 import { findIndex, map, sum, take } from 'lodash';
-import { ALARM_FALLBACK_LEVEL, getEscalationAfterMinutes } from '@nightbear/shared';
+import { ALARM_FALLBACK_LEVEL, getEscalationAfterMinutes } from 'shared';
 
 export type AlarmActions = {
   remove?: Alarm;

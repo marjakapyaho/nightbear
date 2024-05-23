@@ -1,6 +1,6 @@
 import { detectAlarmActions, runAlarmChecks } from './alarms';
 import { createTestContext, truncateDb } from '../../utils/test';
-import { getMockActiveProfile } from '@nightbear/shared';
+import { getMockActiveProfile } from 'shared';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('cronjobs/alarms', () => {
