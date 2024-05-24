@@ -24,12 +24,12 @@ import {
 } from './sensorEntries/sensorEntries.queries';
 import { GenParams, bindQueryShorthands } from '../utils/db';
 import { Pool } from 'pg';
-import { Alarm, AlarmState } from 'shared';
-import { Situation } from 'shared';
-import { Profile, ProfileActivation } from 'shared';
-import { IdReturnType, TimestampReturnType } from 'shared';
-import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from 'shared';
-import { ALARM_START_LEVEL } from 'shared';
+import { Alarm, AlarmState } from '../shared';
+import { Situation } from '../shared';
+import { Profile, ProfileActivation } from '../shared';
+import { IdReturnType, TimestampReturnType } from '../shared';
+import { CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from '../shared';
+import { ALARM_START_LEVEL } from '../shared';
 import {
   createAlarm,
   createAlarmState,

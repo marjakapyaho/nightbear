@@ -1,7 +1,7 @@
 import { Context, createResponse, Request } from '../../utils/api';
-import { HOUR_IN_MS, Point } from 'shared';
-import { getTimeMinusTime } from 'shared';
-import { getMergedBgEntries } from 'shared';
+import { HOUR_IN_MS, Point } from '../../shared';
+import { getTimeMinusTime } from '../../shared';
+import { getMergedBgEntries } from '../../shared';
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams;

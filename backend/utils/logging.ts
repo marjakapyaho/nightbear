@@ -1,4 +1,4 @@
-import { humanReadableShortTime } from 'shared';
+import { humanReadableShortTime } from '../shared';
 import debug, { Debugger } from 'debug';
 import { noop } from 'lodash';
 import { Context } from './api';

@@ -6,7 +6,7 @@ import {
 import { CronjobsJournal } from '../../db/cronjobsJournal/types';
 import { Context } from '../../utils/api';
 import { Cronjob } from '../../utils/cronjobs';
-import { DEFAULT_TIMEZONE } from 'shared';
+import { DEFAULT_TIMEZONE } from '../../shared';
 
 export const profiles: Cronjob = async (
   context,

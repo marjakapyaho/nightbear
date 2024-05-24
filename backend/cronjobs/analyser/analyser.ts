@@ -6,10 +6,10 @@ import {
   isThereTooMuchInsulin,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from './utils';
-import { CarbEntry, InsulinEntry } from 'shared';
-import { AnalyserEntry, Situation } from 'shared';
-import { Alarm } from 'shared';
-import { Profile } from 'shared';
+import { CarbEntry, InsulinEntry } from '../../shared';
+import { AnalyserEntry, Situation } from '../../shared';
+import { Alarm } from '../../shared';
+import { Profile } from '../../shared';
 import {
   detectBadHigh,
   detectBadLow,
@@ -27,9 +27,9 @@ import {
   calculateRequiredCarbsToInsulinRatio,
   getCarbsOnBoard,
   getInsulinOnBoard,
-} from 'shared';
+} from '../../shared';
 import { getEntriesWithinTimeRange } from '../checks/utils';
-import { hourToMs } from 'shared';
+import { hourToMs } from '../../shared';
 
 export const runAnalysis = ({
   currentTimestamp,

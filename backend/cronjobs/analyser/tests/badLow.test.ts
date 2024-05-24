@@ -1,8 +1,8 @@
 import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from 'shared';
+import { generateSensorEntries, getMockActiveProfile } from '../../../shared';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from 'shared';
-import { getTimeMinusMinutes } from 'shared';
+import { mockNow } from '../../../shared';
+import { getTimeMinusMinutes } from '../../../shared';
 
 describe('analyser/badLow', () => {
   it('detects BAD_LOW', () => {

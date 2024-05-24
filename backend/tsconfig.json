@@ -14,10 +14,7 @@
     "outDir": "./build",
     "sourceMap": true,
     "target": "ES2021",
-    "resolveJsonModule": true,
-    "paths": {
-      "@nightbear/shared": ["../shared/src"]
-    }
+    "resolveJsonModule": true
   },
   "include": [
     "api/**/*.ts",

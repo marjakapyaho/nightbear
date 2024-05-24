@@ -2,7 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "license": "AGPL-3.0",
-  "main": "index.ts",
+  "main": "shared/index.ts",
   "scripts": {
     "dev": "yarn db:types && yarn ts:node ./api/index.ts",
     "build": "rm -rf build && tsc && tsc-alias -p tsconfig.json",
@@ -14,7 +14,6 @@
     "ts:node": "ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
   "dependencies": {
-    "@nightbear/shared": "file:../shared/src",
     "@pgtyped/cli": "2.3.0",
     "@pgtyped/runtime": "2.3.0",
     "axios": "1.6.2",

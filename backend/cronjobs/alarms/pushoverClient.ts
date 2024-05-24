@@ -4,7 +4,7 @@
 import axios from 'axios';
 // @ts-ignore
 import Pushover from 'pushover-notifications';
-import { Situation } from 'shared';
+import { Situation } from '../../shared';
 import { Logger, extendLogger } from '../../utils/logging';
 
 export type PushoverClient = ReturnType<typeof createPushoverClient>;

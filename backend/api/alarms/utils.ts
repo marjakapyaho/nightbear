@@ -1,6 +1,6 @@
-import { isTimeSmaller } from 'shared';
-import { getAlarmState, getSnoozeMinutes } from 'shared';
-import { Alarm } from 'shared';
+import { isTimeSmaller } from '../../shared';
+import { getAlarmState, getSnoozeMinutes } from '../../shared';
+import { Alarm } from '../../shared';
 import { Context } from '../../utils/api';
 
 export const isThereNothingToAck = (activeAlarm: Alarm, context: Context) =>
