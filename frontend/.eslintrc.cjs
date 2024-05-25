@@ -1,7 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
 const base = require('../eslintrc.base.js')
 
-// eslint-disable-next-line no-undef
 module.exports = {
   ...base,
   root: true,
@@ -11,7 +9,7 @@ module.exports = {
   },
   env: { browser: true, es2020: true },
   extends: [...base.extends, 'plugin:react-hooks/recommended', 'plugin:prettier/recommended'],
-  plugins: ['prettier', 'react-refresh', 'jest'],
+  plugins: ['prettier', 'react-refresh'],
   rules: {
     ...base.rules,
     'react-refresh/only-export-components': 'warn',

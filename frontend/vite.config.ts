@@ -6,11 +6,6 @@ export default {
   plugins: [
     react()
   ],
-  build: {
-    rollupOptions: {
-      external: ['node:fs', 'node:path', 'node:os', 'node:crypto', 'os', 'crypto', 'fs', 'path'],
-    },
-  },
   css: {
     postcss: {
       plugins: [autoprefixer()],

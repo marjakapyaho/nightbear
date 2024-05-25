@@ -13,12 +13,7 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/typescript',
   ],
-  ignorePatterns: [
-    '**/*.queries.ts',
-    '.eslintrc.cjs',
-    '**/jest.config.js',
-    '**/file-storage-client/**',
-  ],
+  ignorePatterns: ['**/*.queries.ts', '.eslintrc.cjs'],
   rules: {
     'prettier/prettier': ['error'],
     eqeqeq: ['error', 'allow-null'],
@@ -30,7 +25,10 @@ module.exports = {
       },
     ],
     '@typescript-eslint/consistent-type-imports': 'error',
-    '@typescript-eslint/restrict-template-expressions': [2, { allowNumber: true, allowBoolean: true, allowNullish: true }],
+    '@typescript-eslint/restrict-template-expressions': [
+      2,
+      { allowNumber: true, allowBoolean: true, allowNullish: true },
+    ],
     'no-console': ['warn'],
     'no-var': 'error',
     'import/order': [
@@ -40,16 +38,4 @@ module.exports = {
       },
     ],
   },
-  overrides: [
-    {
-      files: ['test/**/*.ts', '*.test.ts'],
-      rules: {
-        'jest/no-disabled-tests': 'warn',
-        'jest/no-focused-tests': 'warn',
-        'jest/no-identical-title': 'error',
-        'jest/prefer-to-have-length': 'warn',
-        'jest/valid-expect': 'error',
-      },
-    },
-  ],
-}
+};

@@ -4,28 +4,16 @@
   "license": "AGPL-3.0",
   "main": "index.ts",
   "scripts": {
-    "dev": "yarn db:types && yarn ts:node ./api/index.ts",
+    "dev": "yarn db:types && yarn ts:node ./index.ts",
     "build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "lint": "eslint src --ext ts,tsx && tsc",
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && yarn db:migrate",
     "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
     "db:types": "pgtyped --config pgtyped-config.json",
     "ts:node": "ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },
-  "lambdaDependencies": [
-    "@pgtyped/runtime",
-    "axios",
-    "body-parser",
-    "cors",
-    "debug",
-    "express",
-    "lodash",
-    "luxon",
-    "pg",
-    "pushover-notifications",
-    "zod"
-  ],
   "dependencies": {
     "@netlify/functions": "2.7.0",
     "@nightbear/shared": "file:../shared",

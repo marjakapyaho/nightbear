@@ -29,6 +29,7 @@ describe('db/profiles', () => {
     expect(profiles[0]).toEqual({
       id: expect.stringMatching(UUID_REGEX),
       profileName: 'Day',
+      repeatTimeInLocalTimezone: '8:00',
       isActive: true,
       alarmsEnabled: true,
       analyserSettings: {
@@ -50,6 +51,7 @@ describe('db/profiles', () => {
         high: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
         badHigh: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
         persistentHigh: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
+        missingDayInsulin: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
       },
       notificationTargets: ['first', 'second'],
     });
