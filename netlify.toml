@@ -1,6 +1,6 @@
 [functions]
     node_bundler = "esbuild"
-    directory = "backend/api"
+    directory = "backend/entrypoints"
 
     [functions."netlify-cronjobs"]
         schedule = "*/3 * * * *" # once every 3 minutes
