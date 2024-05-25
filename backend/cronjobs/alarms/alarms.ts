@@ -1,6 +1,6 @@
 import { Context } from '../../utils/api';
-import { Alarm, Situation, Profile } from '../../shared';
-import { getAlarmState, isNotNullish, isTimeSmaller } from '../../shared';
+import { Alarm, Situation, Profile } from '@nightbear/shared';
+import { getAlarmState, isNotNullish, isTimeSmaller } from '@nightbear/shared';
 import {
   AlarmActions,
   getNeededAlarmLevel,

@@ -2,7 +2,7 @@ import {
   MIN_IN_MS,
   roundTo2Decimals,
   TIME_LIMIT_FOR_SLOPE,
-} from '../../shared';
+} from '@nightbear/shared';
 import { reduce, slice, sum, chain, find } from 'lodash';
 import {
   CarbEntry,
@@ -10,8 +10,8 @@ import {
   MeterEntry,
   SensorEntry,
   SensorEntryType,
-} from '../../shared';
-import { AnalyserEntry, Situation } from '../../shared';
+} from '@nightbear/shared';
+import { AnalyserEntry, Situation } from '@nightbear/shared';
 import {
   getTimeMinusTimeMs,
   getTimePlusTime,
@@ -19,13 +19,13 @@ import {
   isTimeLargerOrEqual,
   isTimeLarger,
   minToMs,
-} from '../../shared';
+} from '@nightbear/shared';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
-import { Profile } from '../../shared';
-import { Alarm } from '../../shared';
+import { Profile } from '@nightbear/shared';
+import { Alarm } from '@nightbear/shared';
 import { detectSituation } from './analyser';
-import { onlyActive } from '../../shared';
-import { getMergedBgEntries } from '../../shared';
+import { onlyActive } from '@nightbear/shared';
+import { getMergedBgEntries } from '@nightbear/shared';
 
 // Critical settings
 export const LOW_LEVEL_BAD = 3.0;

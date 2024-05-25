@@ -1,9 +1,9 @@
 import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '../../../shared';
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from '../../../shared';
-import { getTimeMinusMinutes, getTimeMinusTime } from '../../../shared';
-import { MIN_IN_MS } from '../../../shared';
+import { mockNow } from '@nightbear/shared';
+import { getTimeMinusMinutes, getTimeMinusTime } from '@nightbear/shared';
+import { MIN_IN_MS } from '@nightbear/shared';
 
 describe('analyser/high', () => {
   it('detects HIGH above high limit', () => {

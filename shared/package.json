@@ -1,0 +1,38 @@
+{
+  "name": "@nightbear/shared",
+  "version": "1.0.0",
+  "license": "AGPL-3.0",
+  "main": "./dist/index.js",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "private": true,
+  "scripts": {
+    "dev": "tsc -w --preserveWatchOutput",
+    "build": "rm -rf dist && tsc -p tsconfig-build.json",
+    "test": "vitest",
+    "lint": "eslint src --ext ts,tsx && tsc",
+    "link:shared": "yarn link && yarn --cwd ../backend/ link @nightbear/shared && yarn --cwd ../frontend_old/ link @nightbear/shared",
+    "unlinking": "yarn --cwd ../backend/ unlink @nightbear/shared && yarn --cwd ../frontend_old/ unlink @nightbear/shared && yarn unlink"
+  },
+  "dependencies": {
+    "@types/lodash": "4.14.202",
+    "@types/luxon": "3.3.7",
+    "@types/jest": "27.0.1",
+    "@types/node": "16.7.13",
+    "lodash": "4.17.21",
+    "luxon": "1.28.1",
+    "react": "18.3.1",
+    "typescript": "5.3.3",
+    "zod": "3.23.6"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.6.0",
+    "@typescript-eslint/parser": "6.6.0",
+    "eslint": "8.48.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-react": "7.33.2",
+    "prettier": "3.1.0",
+    "vitest": "1.5.0"
+  }
+}

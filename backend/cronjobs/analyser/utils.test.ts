@@ -2,11 +2,11 @@ import {
   getRelevantEntries,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from '../../cronjobs/analyser/utils';
-import { generateSensorEntries } from '../../shared';
-import { MIN_IN_MS } from '../../shared';
+import { generateSensorEntries } from '@nightbear/shared';
+import { MIN_IN_MS } from '@nightbear/shared';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from '../../shared';
-import { getTimeMinusTime } from '../../shared';
+import { mockNow } from '@nightbear/shared';
+import { getTimeMinusTime } from '@nightbear/shared';
 
 describe('utils/analyser-utils', () => {
   it('calculates correct slopes for analyser entries', () => {

@@ -1,6 +1,6 @@
 import { createTestContext, truncateDb } from '../../utils/test';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { mockNow } from '../../shared';
+import { mockNow } from '@nightbear/shared';
 
 describe('db/meterEntries', () => {
   const context = createTestContext();

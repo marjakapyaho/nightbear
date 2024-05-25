@@ -1,7 +1,7 @@
-import { AnalyserEntry, Situation } from '../../shared';
-import { Profile } from '../../shared';
-import { Alarm } from '../../shared';
-import { getTimeMinusTimeMs, minToMs } from '../../shared';
+import { AnalyserEntry, Situation } from '@nightbear/shared';
+import { Profile } from '@nightbear/shared';
+import { Alarm } from '@nightbear/shared';
+import { getTimeMinusTimeMs, minToMs } from '@nightbear/shared';
 import {
   getRelevantEntries,
   isBloodGlucoseRelativeHigh,
@@ -29,7 +29,7 @@ import {
   LOW_LEVEL_BAD,
 } from './utils';
 import { find } from 'lodash';
-import { CarbEntry } from '../../shared';
+import { CarbEntry } from '@nightbear/shared';
 import { getEntriesWithinTimeRange } from '../checks/utils';
 
 export const detectCriticalOutdated = (

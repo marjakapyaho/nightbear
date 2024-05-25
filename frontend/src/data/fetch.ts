@@ -1,5 +1,7 @@
+const API_ROOT = 'http://localhost:4000';
+
 export const callFetch = async <T>(route: string, method = 'GET', bodyObj?: T) => {
-  return fetch(`${import.meta.env.VITE_API_ROOT}${route}`, {
+  return fetch(`${API_ROOT}${route}`, {
     method,
     headers: bodyObj ? { 'Content-Type': 'application/json' } : undefined,
     body: JSON.stringify(bodyObj),

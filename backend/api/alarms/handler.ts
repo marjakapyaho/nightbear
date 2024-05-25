@@ -1,5 +1,5 @@
 import { Context, createResponse, Request } from '../../utils/api';
-import { getTimePlusMinutes } from '../../shared';
+import { getTimePlusMinutes } from '@nightbear/shared';
 import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from './utils';
 
 export const getActiveAlarm = async (_request: Request, context: Context) => {

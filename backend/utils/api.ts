@@ -11,9 +11,9 @@ import {
 import { Logger, createLogger } from './logging';
 import { readFileSync } from 'fs';
 import { map } from 'lodash';
+import { parseNumber } from '@nightbear/shared';
+import { getTimeAsISOStr } from '@nightbear/shared';
 import { DbClient, createDbClient } from './db';
-import { parseNumber } from '../shared';
-import { getTimeAsISOStr } from '../shared';
 
 export type Headers = {
   [header: string]: string | string[];

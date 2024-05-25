@@ -4,8 +4,8 @@ import { Context } from '../../utils/api';
 import { Cronjob } from '../../utils/cronjobs';
 import { DateTime } from 'luxon';
 import _ from 'lodash';
-import { SensorEntry } from '../../shared';
-import { isNotNullish, isNullish } from '../../shared';
+import { SensorEntry } from '@nightbear/shared';
+import { isNotNullish, isNullish } from '@nightbear/shared';
 
 export const devDataImport: Cronjob = async (
   context,

@@ -1,7 +1,7 @@
 import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '../../../shared';
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
 import { describe, expect, it } from 'vitest';
-import { mockNow } from '../../../shared';
+import { mockNow } from '@nightbear/shared';
 
 describe('analyser/noSituation', () => {
   it('detects no situation', () => {
