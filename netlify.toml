@@ -9,4 +9,4 @@
     force = true
     from = "/api/*"
     status = 200
-    to = "/.netlify/functions/api/netlify-api" # can also use ":splat" to refer to what "*" matched
+    to = "/.netlify/functions/netlify-api" # can also use ":splat" to refer to what "*" matched
