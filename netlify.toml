@@ -4,7 +4,7 @@
     directory = "backend/api"
 
     [functions."netlify-cronjobs"]
-        schedule = "*/5 * * * *"
+        schedule = "*/1 * * * *"
 
 [[redirects]]
     force = true
