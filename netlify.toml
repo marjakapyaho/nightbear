@@ -3,7 +3,7 @@
     directory = "backend/api"
 
     [functions."netlify-cronjobs"]
-        schedule = "*/1 * * * *"
+        schedule = "*/3 * * * *" # once every 3 minutes
 
 [[redirects]]
     force = true
