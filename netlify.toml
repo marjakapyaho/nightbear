@@ -2,6 +2,10 @@
     external_node_modules = ["express"]
     node_bundler = "esbuild"
     directory = "backend/api"
+
+    [functions."netlify-cronjobs"]
+        schedule = "*/5 * * * *"
+
 [[redirects]]
     force = true
     from = "/api/*"
