@@ -51,7 +51,7 @@ export function startExpressServer(
   });
 }
 
-function normalizeRequest(requestId: string, req: ExpressRequest): Request {
+export function normalizeRequest(requestId: string, req: ExpressRequest): Request {
   return {
     requestId,
     requestMethod: req.method,
@@ -63,7 +63,7 @@ function normalizeRequest(requestId: string, req: ExpressRequest): Request {
 }
 
 // Wraps the given handler with logging for input/output
-function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
+export function handlerWithLogging(handler: RequestHandler, log: Logger): RequestHandler {
   return (request, context) => {
     const debug = extendLogger(log, getLoggingNamespace('req', request.requestId), true);
     const then = context.timestamp();
