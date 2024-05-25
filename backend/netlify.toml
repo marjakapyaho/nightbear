@@ -4,6 +4,6 @@
     directory = "backend/api"
 [[redirects]]
     force = true
-    from = "/*"
+    from = "/api/*"
     status = 200
-    to = "/backend/api/:splat"
+    to = "/.netlify/functions/api/:splat"
