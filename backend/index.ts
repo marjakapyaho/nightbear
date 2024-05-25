@@ -1,15 +1,15 @@
-import { ackActiveAlarm, getActiveAlarm } from './alarms/handler';
-import { checks } from '../cronjobs/checks/checks';
-import { devDataImport } from '../cronjobs/devDataImport/devDataImport';
-import { dexcomShare } from '../cronjobs/dexcom/dexcomShare';
-import { profiles } from '../cronjobs/profiles/profiles';
-import { startCronJobs } from '../utils/cronjobs';
-import { startExpressServer } from '../utils/express';
-import { consoleLogStream } from '../utils/logging';
+import { ackActiveAlarm, getActiveAlarm } from './api/alarms/handler';
+import { activateProfile, createProfile, editProfile, getProfiles } from './api/profiles/handler';
+import { getTimelineEntries, updateTimelineEntries } from './api/timelineEntries/handler';
+import { checks } from './cronjobs/checks/checks';
+import { devDataImport } from './cronjobs/devDataImport/devDataImport';
+import { dexcomShare } from './cronjobs/dexcom/dexcomShare';
+import { profiles } from './cronjobs/profiles/profiles';
+import { startCronJobs } from './utils/cronjobs';
+import { startExpressServer } from './utils/express';
+import { consoleLogStream } from './utils/logging';
 import debug from 'debug';
-import { activateProfile, createProfile, editProfile, getProfiles } from './profiles/handler';
-import { getTimelineEntries, updateTimelineEntries } from './timelineEntries/handler';
-import { createNodeContext } from '../utils/api';
+import { createNodeContext } from './utils/api';
 
 // Direct log output to where we want it
 debug.log = consoleLogStream;
