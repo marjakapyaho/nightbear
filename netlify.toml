@@ -1,7 +1,7 @@
 [functions]
     external_node_modules = ["express"]
     node_bundler = "esbuild"
-    directory = "backend/testi"
+    directory = "backend/api"
 [[redirects]]
     force = true
     from = "/api/*"
