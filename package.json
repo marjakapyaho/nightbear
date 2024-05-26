@@ -1,11 +1,11 @@
 {
   "name": "nightbear",
+  "version": "1.0.0",
   "author": "Marja Käpyaho <marja.kapyaho@iki.fi>",
   "contributors": [
     "Jarno Rantanen <jarno@jrw.fi>"
   ],
   "license": "AGPL-3.0",
-  "version": "1.0.0",
   "repository": "https://github.com/marjakapyaho/nightbear-apps",
   "scripts": {
     "conc": "concurrently --names \"SHARED,BACK,FRONT\" -c \"blue,magenta,yellow\"",
