@@ -24,7 +24,7 @@
     "build": "yarn conc 'yarn build:shared' 'yarn build:back' 'yarn build:front' && yarn build:back:shared",
     "build:shared": "yarn --cwd shared/ build",
     "build:back": "yarn --cwd backend/ build",
-    "build:back:shared": "mkdir -p backend/build/node_modules/@nightbear && cp -r shared/dist backend/build/node_modules/@nightbear/shared",
+    "build:back:shared": "rm -rf backend/node_modules/@nightbear/shared && cp -r shared/dist backend/node_modules/@nightbear/shared",
     "build:front": "yarn --cwd frontend/ build",
     "\n==================== LINT ====================": "",
     "lint": "yarn conc \"yarn lint:shared\" \"yarn lint:back\" \"yarn lint:front\"",
