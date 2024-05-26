@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { callFetch } from '../fetch'
-import { TimelineEntries } from '@nightbear/shared'
+import { TimelineEntries, getTimeAsISOStr, SEC_IN_MS } from '@nightbear/shared'
 import { Point } from '../../components/scrollableGraph/scrollableGraphUtils'
-import { getTimeAsISOStr, SEC_IN_MS } from '@nightbear/shared'
 
 export const useTimelineEntries = (
   startTimestamp: string,

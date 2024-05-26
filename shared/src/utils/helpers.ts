@@ -4,15 +4,11 @@ const getFactor = (numberOfZeros: number) => {
   return parseInt(factorString)
 }
 
-export const getObjectKeys = <T extends {}>(object: T): Array<keyof T> => {
-  return Object.keys(object) as any
-}
-
 export const isNullish = (x: unknown): x is null | undefined => {
   return x === null && typeof x === 'undefined'
 }
 
-export const isNotNullish = <T extends any>(x: T): x is NonNullable<T> => {
+export const isNotNullish = <T>(x: T): x is NonNullable<T> => {
   return x !== null && typeof x !== 'undefined'
 }
 

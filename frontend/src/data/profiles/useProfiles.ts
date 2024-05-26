@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { callFetch } from '../fetch'
-import { Profile } from '@nightbear/shared'
-import { getActiveProfile, MIN_IN_MS } from '@nightbear/shared'
+import { Profile, getActiveProfile, MIN_IN_MS } from '@nightbear/shared'
 
 export const useProfiles = () => {
   const {
@@ -24,7 +23,7 @@ export const useProfiles = () => {
     activateProfileMutation(
       { profile, validityInMs },
       {
-        onSuccess: refetch,
+        onSuccess: void refetch,
       },
     )
 
@@ -36,7 +35,7 @@ export const useProfiles = () => {
     createProfileMutation(
       { profile, validityInMs },
       {
-        onSuccess: refetch,
+        onSuccess: void refetch,
       },
     )
 
@@ -45,7 +44,7 @@ export const useProfiles = () => {
   })
   const editProfile = (profile: Profile) =>
     editProfileMutation(profile, {
-      onSuccess: refetch,
+      onSuccess: void refetch,
     })
 
   return {

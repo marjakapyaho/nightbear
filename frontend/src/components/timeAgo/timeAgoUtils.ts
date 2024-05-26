@@ -26,16 +26,16 @@ export const getFormattedTs = (
     }
   } else {
     if (days) {
-      return roundTo1Decimals(d.shiftTo('days').days) + ' days'
+      return String(roundTo1Decimals(d.shiftTo('days').days)) + ' days'
     } else if (hours) {
-      return roundTo1Decimals(d.shiftTo('hours').hours) + ' h'
+      return String(roundTo1Decimals(d.shiftTo('hours').hours)) + ' h'
     } else if (minutes) {
       if (decimalsForMinutes) {
-        return roundTo1Decimals(d.shiftTo('minutes').minutes) + ' min'
+        return String(roundTo1Decimals(d.shiftTo('minutes').minutes)) + ' min'
       }
-      return roundTo0Decimals(d.shiftTo('minutes').minutes) + ' min'
+      return String(roundTo0Decimals(d.shiftTo('minutes').minutes)) + ' min'
     } else {
-      return seconds + ' s'
+      return String(seconds) + ' s'
     }
   }
 }

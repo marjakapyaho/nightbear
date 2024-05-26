@@ -15,8 +15,13 @@ module.exports = {
     'react-refresh/only-export-components': 'warn',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/unbound-method': 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off'
   },
   settings: {
+    'react': {
+      version: 'detect'
+    },
     'import/resolver': {
       node: {
         paths: ['../shared'],

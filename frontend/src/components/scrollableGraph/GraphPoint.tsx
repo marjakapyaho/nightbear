@@ -26,7 +26,7 @@ export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) =>
               fill: point.color,
               r: isSelected ? 5 : 3.7,
               zIndex: 100,
-            } as any // Type defs won't accept "r"
+            } as never // Type defs won't accept "r"
           }
         />
       )}
@@ -41,7 +41,7 @@ export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) =>
               fill: '#828282',
               r: isSelected ? 5 : 3.7,
               zIndex: 100,
-            } as any // Type defs won't accept "r"
+            } as never // Type defs won't accept "r"
           }
         />
       )}

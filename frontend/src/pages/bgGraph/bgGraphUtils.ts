@@ -1,6 +1,12 @@
 import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils'
-import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS, highLimit, lowLimit } from '@nightbear/shared'
-import { InsulinEntryType } from '@nightbear/shared'
+import {
+  DAY_IN_MS,
+  HOUR_IN_MS,
+  MIN_IN_MS,
+  highLimit,
+  lowLimit,
+  InsulinEntryType,
+} from '@nightbear/shared'
 import { chain } from 'lodash'
 
 export const getFillColor = (bg: number | null) => {

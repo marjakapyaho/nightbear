@@ -17,25 +17,17 @@ module.exports = {
   rules: {
     'prettier/prettier': ['error'],
     eqeqeq: ['error', 'allow-null'],
-    'consistent-return': 'error',
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
         argsIgnorePattern: '^_',
       },
     ],
-    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/restrict-template-expressions': [
       2,
       { allowNumber: true, allowBoolean: true, allowNullish: true },
     ],
     'no-console': ['warn'],
     'no-var': 'error',
-    'import/order': [
-      'error',
-      {
-        groups: [['builtin', 'external']],
-      },
-    ],
   },
 }

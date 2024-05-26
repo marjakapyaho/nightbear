@@ -1,5 +1,6 @@
-import { reallyHighLimit, reallyLowLimit } from '@nightbear/shared'
 import {
+  reallyHighLimit,
+  reallyLowLimit,
   calculateHba1c,
   countSituations,
   calculateTimeHigh,

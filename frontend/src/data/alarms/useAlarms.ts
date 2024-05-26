@@ -21,7 +21,7 @@ export const useAlarms = () => {
     mutationFn: () => callFetch(`/ack-active-alarm?ackedBy=${getUserKeyFromUrlParams()}`, 'PUT'),
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['get-active-alarm'] })
+      void queryClient.invalidateQueries({ queryKey: ['get-active-alarm'] })
     },
   })
 
