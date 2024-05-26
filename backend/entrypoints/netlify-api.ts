@@ -18,6 +18,14 @@ const log = extendLogger(context.log, 'http')
 export default async (netlifyRequest: Request, netlifyContext: NetlifyContext) => {
   const req = await normalizeRequest(netlifyRequest, netlifyContext)
 
+  if (Boolean(req)) {
+    // TODO: Add support for API key
+    return new Response(`Unauthorized`, {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    })
+  }
+
   if (!req.requestPath.startsWith(prefix)) {
     return new Response(`Request path doesn't match API route prefix "${prefix}"`, {
       status: 404,
