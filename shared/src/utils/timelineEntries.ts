@@ -1,5 +1,5 @@
-import { chain, fill } from 'lodash';
-import { DateTime } from 'luxon';
+import { chain, fill } from 'lodash'
+import { DateTime } from 'luxon'
 import {
   BloodGlucoseEntry,
   CarbEntry,
@@ -7,49 +7,49 @@ import {
   MeterEntry,
   SensorEntry,
   TimelineEntries,
-} from '../types';
-import { calculateAverageBg, MIN_IN_MS } from './calculations';
-import { getTimeInMillis, getTimeMinusMinutes } from './time';
-import { ProfileActivation } from '../types';
-import { Alarm } from '../types';
-import { getFirstAlarmState } from './alarms';
-import { highLimit, lowLimit } from './config';
+} from '../types'
+import { calculateAverageBg, MIN_IN_MS } from './calculations'
+import { getTimeInMillis, getTimeMinusMinutes } from './time'
+import { ProfileActivation } from '../types'
+import { Alarm } from '../types'
+import { getFirstAlarmState } from './alarms'
+import { highLimit, lowLimit } from './config'
 
 // TODO
 export const getFillColor = (bg: number | null) => {
-    if (!bg) {
-        return 'white';
-    }
-    if (bg > highLimit) {
-        return '#F8CC6F';
-    }
-    if (bg < lowLimit) {
-        return '#ee5a36';
-    }
-    return '#54c87e';
-};
+  if (!bg) {
+    return 'white'
+  }
+  if (bg > highLimit) {
+    return '#F8CC6F'
+  }
+  if (bg < lowLimit) {
+    return '#ee5a36'
+  }
+  return '#54c87e'
+}
 
 // TODO
 export type Point = {
-    isoTimestamp: string;
-    timestamp: number;
-    val: number | null;
-    color: string;
-    insulinEntry?: InsulinEntry;
-    meterEntry?: MeterEntry;
-    carbEntry?: CarbEntry;
-    profileActivations?: ProfileActivation[];
-    alarms?: Alarm[];
-};
+  isoTimestamp: string
+  timestamp: number
+  val: number | null
+  color: string
+  insulinEntry?: InsulinEntry
+  meterEntry?: MeterEntry
+  carbEntry?: CarbEntry
+  profileActivations?: ProfileActivation[]
+  alarms?: Alarm[]
+}
 
 export const getTimestampFlooredToEveryFiveMinutes = (timestamp: string) => {
-  const dateTime = DateTime.fromISO(timestamp);
-  const minuteSlot = Math.floor(dateTime.get('minute') / 5);
+  const dateTime = DateTime.fromISO(timestamp)
+  const minuteSlot = Math.floor(dateTime.get('minute') / 5)
   return dateTime
     .set({ minute: minuteSlot * 5, second: 0, millisecond: 0 })
     .toUTC()
-    .toISO();
-};
+    .toISO()
+}
 
 export const getMergedBgEntries = (
   sensorEntries: SensorEntry[],
@@ -62,16 +62,16 @@ export const getMergedBgEntries = (
       bloodGlucose: calculateAverageBg(entries),
       timestamp: groupTimestamp,
     }))
-    .value();
+    .value()
 
 const getAndValidateEntry = <T extends BloodGlucoseEntry | InsulinEntry | MeterEntry | CarbEntry>(
   entries: T[],
 ): T | undefined => {
   if (entries.length > 1) {
-    throw new Error('Multiple entries of type in slot.');
+    throw new Error('Multiple entries of type in slot.')
   }
-  return entries.length === 1 ? entries[0] : undefined;
-};
+  return entries.length === 1 ? entries[0] : undefined
+}
 
 export const mapTimelineEntriesToGraphPoints = (
   timelineEntries: TimelineEntries,
@@ -85,40 +85,51 @@ export const mapTimelineEntriesToGraphPoints = (
     carbEntries,
     profileActivations,
     alarms,
-  } = timelineEntries;
+  } = timelineEntries
 
-  const countOfFiveMinSlots = rangeInMs / (5 * MIN_IN_MS);
-  const startSlotTimestamp = getTimestampFlooredToEveryFiveMinutes(currentTimestamp);
-  const slotArray = fill(Array(countOfFiveMinSlots), null);
+  const countOfFiveMinSlots = rangeInMs / (5 * MIN_IN_MS)
+  const startSlotTimestamp = getTimestampFlooredToEveryFiveMinutes(currentTimestamp)
+  const slotArray = fill(Array(countOfFiveMinSlots), null)
 
   return slotArray
     .map((_val, i): Point => {
-      const timestamp = startSlotTimestamp && getTimeMinusMinutes(startSlotTimestamp, i * 5);
+      const timestamp = startSlotTimestamp && getTimeMinusMinutes(startSlotTimestamp, i * 5)
 
       if (!timestamp) {
-        throw new Error('Could not calculate timestamp for slot');
+        throw new Error('Could not calculate timestamp for slot')
       }
 
       const bgEntry = getAndValidateEntry(
-        bloodGlucoseEntries.filter(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp),
-      );
+        bloodGlucoseEntries.filter(
+          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
+        ),
+      )
       const insulinEntry = getAndValidateEntry(
-        insulinEntries.filter(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp),
-      );
+        insulinEntries.filter(
+          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
+        ),
+      )
       const meterEntry = getAndValidateEntry(
-        meterEntries.filter(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp),
-      );
+        meterEntries.filter(
+          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
+        ),
+      )
       const carbEntry = getAndValidateEntry(
-        carbEntries.filter(entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp),
-      );
+        carbEntries.filter(
+          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
+        ),
+      )
 
-      const profileActivationsInSlot = profileActivations?.filter(activation =>
-          getTimestampFlooredToEveryFiveMinutes(activation.activatedAt) === timestamp
-      );
-      const alarmsInSlot = alarms?.filter(alarm => getTimestampFlooredToEveryFiveMinutes(getFirstAlarmState(alarm).timestamp) === timestamp);
+      const profileActivationsInSlot = profileActivations?.filter(
+        activation => getTimestampFlooredToEveryFiveMinutes(activation.activatedAt) === timestamp,
+      )
+      const alarmsInSlot = alarms?.filter(
+        alarm =>
+          getTimestampFlooredToEveryFiveMinutes(getFirstAlarmState(alarm).timestamp) === timestamp,
+      )
 
-      const val = bgEntry ? bgEntry.bloodGlucose : null;
-      const color = getFillColor(val);
+      const val = bgEntry ? bgEntry.bloodGlucose : null
+      const color = getFillColor(val)
 
       return {
         isoTimestamp: timestamp,
@@ -130,7 +141,7 @@ export const mapTimelineEntriesToGraphPoints = (
         ...(carbEntry && { carbEntry }),
         ...(profileActivationsInSlot && { profileActivations: profileActivationsInSlot }),
         ...(alarmsInSlot && { alarms: alarmsInSlot }),
-      };
+      }
     })
-    .reverse();
-};
+    .reverse()
+}

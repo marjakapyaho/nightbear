@@ -1,13 +1,13 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 const persistentHighValues = [
   9.5, 9.5, 9.4, 9.6, 9.6, 9.4, 9.6, 9.6, 9.4, 9.6, 9.6, 9.5, 9.5, 9.5, 9.4, 9.6, 9.6, 9.5, 9.4,
   9.5, 9.5, 9.4, 9.6, 9.6, 9.6, 9.6, 9.6, 9.6, 9.6, 9.6,
-];
+]
 
 describe('analyser/persistentHigh', () => {
   it('detects PERSISTENT_HIGH', () => {
@@ -24,8 +24,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('PERSISTENT_HIGH');
-  });
+    ).toEqual('PERSISTENT_HIGH')
+  })
 
   it('detects PERSISTENT_HIGH without caring about values outside PERSISTENT_HIGH_TIME_WINDOW', () => {
     expect(
@@ -41,8 +41,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('PERSISTENT_HIGH');
-  });
+    ).toEqual('PERSISTENT_HIGH')
+  })
 
   it('does not detect PERSISTENT_HIGH with too few entries', () => {
     expect(
@@ -58,8 +58,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect PERSISTENT_HIGH when there is even one HIGH value', () => {
     expect(
@@ -75,8 +75,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect PERSISTENT_HIGH when there is even one normal value', () => {
     expect(
@@ -92,8 +92,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -115,8 +115,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects PERSISTENT_HIGH when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -138,8 +138,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('PERSISTENT_HIGH');
-  });
+    ).toEqual('PERSISTENT_HIGH')
+  })
 
   it('does not detect PERSISTENT_HIGH when slope of last value is down', () => {
     expect(
@@ -155,8 +155,8 @@ describe('analyser/persistentHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
     expect(
@@ -190,6 +190,6 @@ describe('analyser/persistentHigh', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('PERSISTENT_HIGH');
-  });
-});
+    ).toEqual('PERSISTENT_HIGH')
+  })
+})

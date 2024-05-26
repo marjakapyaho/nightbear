@@ -1,12 +1,12 @@
 import {
   getRelevantEntries,
   mapSensorAndMeterEntriesToAnalyserEntries,
-} from '../../cronjobs/analyser/utils';
-import { generateSensorEntries } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusTime } from '@nightbear/shared';
+} from '../../cronjobs/analyser/utils'
+import { generateSensorEntries } from '@nightbear/shared'
+import { MIN_IN_MS } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusTime } from '@nightbear/shared'
 
 describe('utils/analyser-utils', () => {
   it('calculates correct slopes for analyser entries', () => {
@@ -14,10 +14,10 @@ describe('utils/analyser-utils', () => {
       currentTimestamp: mockNow,
       bloodGlucoseHistory: [6, 8.5, 7, 7, 8],
       latestEntryAge: 5,
-    });
+    })
 
     // Mapping function also changes entry timestamps to 5 minutes slots
-    const timestamp = '2024-04-27T14:15:00.000Z';
+    const timestamp = '2024-04-27T14:15:00.000Z'
     expect(mapSensorAndMeterEntriesToAnalyserEntries(entriesBefore)).toEqual([
       {
         timestamp: getTimeMinusTime(timestamp, 25 * MIN_IN_MS),
@@ -47,8 +47,8 @@ describe('utils/analyser-utils', () => {
         slope: 1,
         rawSlope: 1,
       },
-    ]);
-  });
+    ])
+  })
 
   it('hasEnoughData', () => {
     expect(
@@ -62,7 +62,7 @@ describe('utils/analyser-utils', () => {
         ),
         30,
       ).hasEnoughData,
-    ).toBeTruthy();
+    ).toBeTruthy()
 
     expect(
       getRelevantEntries(
@@ -75,7 +75,7 @@ describe('utils/analyser-utils', () => {
         ),
         30,
       ).hasEnoughData,
-    ).toBeFalsy();
+    ).toBeFalsy()
 
     expect(
       getRelevantEntries(
@@ -88,6 +88,6 @@ describe('utils/analyser-utils', () => {
         ),
         30,
       ).hasEnoughData,
-    ).toBeFalsy();
-  });
-});
+    ).toBeFalsy()
+  })
+})

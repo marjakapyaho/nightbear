@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/falling', () => {
   it('detects FALLING', () => {
@@ -19,8 +19,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('FALLING');
-  });
+    ).toEqual('FALLING')
+  })
 
   it('does not detect FALLING above relative low limit', () => {
     expect(
@@ -36,8 +36,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect FALLING below absolute low limit (detects LOW)', () => {
     expect(
@@ -53,8 +53,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect FALLING if slope is too small and predicted situation is not bad', () => {
     expect(
@@ -70,8 +70,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects FALLING if slope is too small but predicted situation is bad', () => {
     expect(
@@ -87,8 +87,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('FALLING');
-  });
+    ).toEqual('FALLING')
+  })
 
   it('does not detect FALLING if slope is too small and predicted situation is bad but latest entry slope is not negative', () => {
     expect(
@@ -104,8 +104,8 @@ describe('analyser/falling', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect FALLING if there are correction carbs within LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
@@ -127,8 +127,8 @@ describe('analyser/falling', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects FALLING if there are correction carbs outside LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
@@ -150,8 +150,8 @@ describe('analyser/falling', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('FALLING');
-  });
+    ).toEqual('FALLING')
+  })
 
   it('detects FALLING if there are correction carbs inside LOW_CORRECTION_SUPPRESSION_WINDOW but too much insulin', () => {
     expect(
@@ -185,6 +185,6 @@ describe('analyser/falling', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('FALLING');
-  });
-});
+    ).toEqual('FALLING')
+  })
+})

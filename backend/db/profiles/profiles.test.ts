@@ -1,31 +1,31 @@
-import { createTestContext, truncateDb } from '../../utils/test';
-import { mockProfileActivations, mockProfiles } from '@nightbear/shared';
-import { UUID_REGEX } from '@nightbear/shared';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { createTestContext, truncateDb } from '../../utils/test'
+import { mockProfileActivations, mockProfiles } from '@nightbear/shared'
+import { UUID_REGEX } from '@nightbear/shared'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('db/profiles', () => {
-  const context = createTestContext();
+  const context = createTestContext()
 
   beforeEach(async () => {
-    await truncateDb(context);
-  });
+    await truncateDb(context)
+  })
 
   it('creates profile', async () => {
-    const profile = mockProfiles[0];
-    const activation = mockProfileActivations[0];
+    const profile = mockProfiles[0]
+    const activation = mockProfileActivations[0]
 
-    const createdProfile = await context.db.createProfile(profile);
+    const createdProfile = await context.db.createProfile(profile)
 
     await context.db.createProfileActivation({
       ...activation,
       profileTemplateId: createdProfile.id,
-    });
+    })
 
-    expect(createdProfile.id).toMatch(UUID_REGEX);
+    expect(createdProfile.id).toMatch(UUID_REGEX)
 
-    const profiles = await context.db.getProfiles();
+    const profiles = await context.db.getProfiles()
 
-    expect(profiles).toHaveLength(1);
+    expect(profiles).toHaveLength(1)
     expect(profiles[0]).toEqual({
       id: expect.stringMatching(UUID_REGEX),
       profileName: 'Day',
@@ -54,6 +54,6 @@ describe('db/profiles', () => {
         missingDayInsulin: { escalationAfterMinutes: [10, 10], snoozeMinutes: 15 },
       },
       notificationTargets: ['first', 'second'],
-    });
-  });
-});
+    })
+  })
+})

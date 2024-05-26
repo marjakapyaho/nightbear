@@ -1,6 +1,6 @@
-import { nullableOptional } from '../utils';
-import { z } from 'zod';
-import { Situation } from './analyser';
+import { nullableOptional } from '../utils'
+import { z } from 'zod'
+import { Situation } from './analyser'
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -13,8 +13,8 @@ export const AlarmState = z.object({
   notificationTarget: nullableOptional(z.string()),
   notificationReceipt: nullableOptional(z.string()),
   notificationProcessedAt: nullableOptional(z.string()),
-});
-export type AlarmState = z.infer<typeof AlarmState>;
+})
+export type AlarmState = z.infer<typeof AlarmState>
 
 export const Alarm = z.object({
   id: z.string(),
@@ -22,5 +22,5 @@ export const Alarm = z.object({
   isActive: z.boolean(),
   deactivatedAt: nullableOptional(z.string()),
   alarmStates: z.array(AlarmState),
-});
-export type Alarm = z.infer<typeof Alarm>;
+})
+export type Alarm = z.infer<typeof Alarm>

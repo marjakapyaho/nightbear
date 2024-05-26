@@ -1,69 +1,69 @@
-import { ScrollNumberSelector } from '../../components/scrollNumberSelector/ScrollNumberSelector';
-import { StatusBar } from '../../components/statusBar/StatusBar';
-import { useState } from 'react';
+import { ScrollNumberSelector } from '../../components/scrollNumberSelector/ScrollNumberSelector'
+import { StatusBar } from '../../components/statusBar/StatusBar'
+import { useState } from 'react'
 import {
   findLatestPointWithBloodGlucose,
   getBgGraphBaseConfig,
   getNewSelectedPointWithCarbs,
   getNewSelectedPointWithInsulin,
   getNewSelectedPointWithMeterEntry,
-} from './bgGraphUtils';
+} from './bgGraphUtils'
 import styles from './BgGraph.module.scss'
-import { Point } from '../../components/scrollableGraph/scrollableGraphUtils';
-import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph';
-import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries';
-import { getTimeAsISOStr, mapTimelineEntriesToGraphPoints } from '@nightbear/shared';
-import { last } from 'lodash';
+import { Point } from '../../components/scrollableGraph/scrollableGraphUtils'
+import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph'
+import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
+import { getTimeAsISOStr, mapTimelineEntriesToGraphPoints } from '@nightbear/shared'
+import { last } from 'lodash'
 
 export const BgGraph = () => {
-  const baseConfig = getBgGraphBaseConfig();
-  const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange);
+  const baseConfig = getBgGraphBaseConfig()
+  const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange)
   const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
-    useTimelineEntries(startTimestamp);
+    useTimelineEntries(startTimestamp)
   const graphPoints = mapTimelineEntriesToGraphPoints(
     timelineEntries,
     baseConfig.timelineRange,
     getTimeAsISOStr(Date.now()),
-  );
-  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
-  const latestPoint = last(graphPoints);
-  const latestPointWithBg = findLatestPointWithBloodGlucose(graphPoints);
+  )
+  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
+  const latestPoint = last(graphPoints)
+  const latestPointWithBg = findLatestPointWithBloodGlucose(graphPoints)
 
   const onChangeCarbs = (newAmount: number) => {
-    const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount;
-    const basePoint = selectedPoint || latestPoint;
+    const hasValueChanged = newAmount !== selectedPoint?.carbEntry?.amount
+    const basePoint = selectedPoint || latestPoint
     const pointToSave = hasValueChanged
       ? getNewSelectedPointWithCarbs(newAmount, basePoint)
       : basePoint
         ? { ...basePoint, carbEntry: undefined }
-        : null;
-    setSelectedPoint(pointToSave);
-    pointToSave && saveGraphPointData(pointToSave);
-  };
+        : null
+    setSelectedPoint(pointToSave)
+    pointToSave && saveGraphPointData(pointToSave)
+  }
 
   const onChangeMeterEntry = (newBg: number) => {
-    const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose;
-    const basePoint = selectedPoint || latestPoint;
+    const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose
+    const basePoint = selectedPoint || latestPoint
     const pointToSave = hasValueChanged
       ? getNewSelectedPointWithMeterEntry(newBg, basePoint)
       : basePoint
         ? { ...basePoint, meterEntry: undefined }
-        : null;
-    setSelectedPoint(pointToSave);
-    pointToSave && saveGraphPointData(pointToSave);
-  };
+        : null
+    setSelectedPoint(pointToSave)
+    pointToSave && saveGraphPointData(pointToSave)
+  }
 
   const onChangeInsulin = (newAmount: number) => {
-    const hasValueChanged = newAmount !== selectedPoint?.insulinEntry?.amount;
-    const basePoint = selectedPoint || latestPoint;
+    const hasValueChanged = newAmount !== selectedPoint?.insulinEntry?.amount
+    const basePoint = selectedPoint || latestPoint
     const pointToSave = hasValueChanged
       ? getNewSelectedPointWithInsulin(newAmount, basePoint)
       : basePoint
         ? { ...basePoint, insulinEntry: undefined }
-        : null;
-    setSelectedPoint(pointToSave);
-    pointToSave && saveGraphPointData(pointToSave);
-  };
+        : null
+    setSelectedPoint(pointToSave)
+    pointToSave && saveGraphPointData(pointToSave)
+  }
 
   return (
     <div className={styles.bgGraph}>
@@ -114,5 +114,5 @@ export const BgGraph = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}

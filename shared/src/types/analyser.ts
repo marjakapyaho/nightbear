@@ -1,5 +1,5 @@
-import { nullableOptional } from '../utils';
-import { z } from 'zod';
+import { nullableOptional } from '../utils'
+import { z } from 'zod'
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -8,8 +8,8 @@ export const AnalyserEntry = z.object({
   bloodGlucose: z.number(),
   slope: nullableOptional(z.number()),
   rawSlope: nullableOptional(z.number()),
-});
-export type AnalyserEntry = z.infer<typeof AnalyserEntry>;
+})
+export type AnalyserEntry = z.infer<typeof AnalyserEntry>
 
 export const Situation = z.enum([
   'CRITICAL_OUTDATED',
@@ -23,5 +23,5 @@ export const Situation = z.enum([
   'RISING',
   'PERSISTENT_HIGH',
   'MISSING_DAY_INSULIN',
-]);
-export type Situation = z.infer<typeof Situation>;
+])
+export type Situation = z.infer<typeof Situation>

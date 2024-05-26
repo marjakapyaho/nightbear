@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/badHigh', () => {
   it('detects BAD_HIGH', () => {
@@ -19,8 +19,8 @@ describe('analyser/badHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('BAD_HIGH');
-  });
+    ).toEqual('BAD_HIGH')
+  })
 
   it('detects BAD_HIGH even when data is outdated if there was no critical outdated', () => {
     expect(
@@ -36,6 +36,6 @@ describe('analyser/badHigh', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('BAD_HIGH');
-  });
-});
+    ).toEqual('BAD_HIGH')
+  })
+})

@@ -1,11 +1,11 @@
-import React from 'react';
-import styles from './FieldWithLabel.module.scss';
+import React from 'react'
+import styles from './FieldWithLabel.module.scss'
 
 type Props = {
-  label: string;
-  children: React.ReactNode;
-  unit?: string;
-};
+  label: string
+  children: React.ReactNode
+  unit?: string
+}
 
 export const FieldWithLabel = ({ label, children, unit }: Props) => {
   return (
@@ -14,5 +14,5 @@ export const FieldWithLabel = ({ label, children, unit }: Props) => {
       <span className={styles.field}>{children}</span>
       {unit && <span className={styles.unit}>{unit}</span>}
     </label>
-  );
-};
+  )
+}

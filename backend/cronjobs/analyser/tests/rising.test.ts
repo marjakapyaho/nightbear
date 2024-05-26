@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/rising', () => {
   it('detects RISING', () => {
@@ -19,8 +19,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('RISING');
-  });
+    ).toEqual('RISING')
+  })
 
   it('does not detect RISING when below relative high', () => {
     expect(
@@ -36,8 +36,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect RISING when above absolute high (detects HIGH)', () => {
     expect(
@@ -53,8 +53,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('HIGH');
-  });
+    ).toEqual('HIGH')
+  })
 
   it('detects RISING when slope is too small but predicted situation is HIGH', () => {
     expect(
@@ -70,8 +70,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('RISING');
-  });
+    ).toEqual('RISING')
+  })
 
   it('does not detect RISING when slope is too small and predicted situation is HIGH but latest slope is not positive', () => {
     expect(
@@ -87,8 +87,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect RISING when you can not calculate slope', () => {
     expect(
@@ -104,8 +104,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect RISING if insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -127,8 +127,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects RISING when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -150,8 +150,8 @@ describe('analyser/rising', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('RISING');
-  });
+    ).toEqual('RISING')
+  })
 
   it('detects RISING even if insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH if carbs to insulin ratio is off', () => {
     expect(
@@ -187,6 +187,6 @@ describe('analyser/rising', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('RISING');
-  });
-});
+    ).toEqual('RISING')
+  })
+})

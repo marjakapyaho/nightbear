@@ -1,11 +1,11 @@
-import styles from './Config.module.scss';
-import { useProfiles } from '../../data/profiles/useProfiles';
-import { useAlarms } from '../../data/alarms/useAlarms';
-import { ProfileEditor } from '../../components/profileEditor/ProfileEditor';
+import styles from './Config.module.scss'
+import { useProfiles } from '../../data/profiles/useProfiles'
+import { useAlarms } from '../../data/alarms/useAlarms'
+import { ProfileEditor } from '../../components/profileEditor/ProfileEditor'
 
 export const Config = () => {
-  const { profiles, activeProfile, activateProfile, createProfile, editProfile } = useProfiles();
-  const { activeAlarm, ackActiveAlarm } = useAlarms();
+  const { profiles, activeProfile, activateProfile, createProfile, editProfile } = useProfiles()
+  const { activeAlarm, ackActiveAlarm } = useAlarms()
 
   return (
     <div className={styles.config}>
@@ -38,5 +38,5 @@ export const Config = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}

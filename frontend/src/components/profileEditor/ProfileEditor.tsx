@@ -1,28 +1,28 @@
-import { useState } from 'react';
-import styles from './ProfileEditor.module.scss';
-import { Editor } from './Editor';
-import { Profile, HOUR_IN_MS, PROFILE_BASE } from '@nightbear/shared';
-import { map } from 'lodash';
-import { getProfileWithResets } from './utils';
+import { useState } from 'react'
+import styles from './ProfileEditor.module.scss'
+import { Editor } from './Editor'
+import { Profile, HOUR_IN_MS, PROFILE_BASE } from '@nightbear/shared'
+import { map } from 'lodash'
+import { getProfileWithResets } from './utils'
 
-export type ProfileEditorMode = 'activate' | 'create' | 'edit';
+export type ProfileEditorMode = 'activate' | 'create' | 'edit'
 export type ModeSettings = {
-  label: string;
-  profileSelectionLabel: string;
-  buttonAction: () => void;
-  profileName?: boolean;
-  repeatTime?: boolean;
-  validHours?: boolean;
-  analyserSettings?: boolean;
-};
+  label: string
+  profileSelectionLabel: string
+  buttonAction: () => void
+  profileName?: boolean
+  repeatTime?: boolean
+  validHours?: boolean
+  analyserSettings?: boolean
+}
 
 type Props = {
-  activeProfile: Profile;
-  activateProfile: (profile: Profile, validityInMs: number) => void;
-  editProfile: (profile: Profile) => void;
-  createProfile: (profile: Profile, validityInMs: number) => void;
-  profiles: Profile[];
-};
+  activeProfile: Profile
+  activateProfile: (profile: Profile, validityInMs: number) => void
+  editProfile: (profile: Profile) => void
+  createProfile: (profile: Profile, validityInMs: number) => void
+  profiles: Profile[]
+}
 
 export const ProfileEditor = ({
   activeProfile,
@@ -31,11 +31,11 @@ export const ProfileEditor = ({
   editProfile,
   profiles,
 }: Props) => {
-  const [mode, setMode] = useState<ProfileEditorMode>('activate');
-  const baseProfile = activeProfile ? activeProfile : PROFILE_BASE;
-  const [localProfile, setLocalProfile] = useState<Profile>(baseProfile);
-  const [selectedProfile, setSelectedProfile] = useState<Profile>(baseProfile);
-  const [validityInHours, setValidityInHours] = useState(1);
+  const [mode, setMode] = useState<ProfileEditorMode>('activate')
+  const baseProfile = activeProfile ? activeProfile : PROFILE_BASE
+  const [localProfile, setLocalProfile] = useState<Profile>(baseProfile)
+  const [selectedProfile, setSelectedProfile] = useState<Profile>(baseProfile)
+  const [validityInHours, setValidityInHours] = useState(1)
 
   const editorTabs: Record<ProfileEditorMode, ModeSettings> = {
     activate: {
@@ -61,17 +61,17 @@ export const ProfileEditor = ({
       repeatTime: true,
       analyserSettings: true,
     },
-  };
+  }
 
   const updateSelectedProfile = (selectedProfile: Profile) => {
-    setSelectedProfile(selectedProfile);
-    setLocalProfile(getProfileWithResets(selectedProfile, mode));
-  };
+    setSelectedProfile(selectedProfile)
+    setLocalProfile(getProfileWithResets(selectedProfile, mode))
+  }
 
   const updateMode = (mode: ProfileEditorMode) => {
-    setMode(mode);
-    setLocalProfile(getProfileWithResets(selectedProfile, mode));
-  };
+    setMode(mode)
+    setLocalProfile(getProfileWithResets(selectedProfile, mode))
+  }
 
   return (
     <div className={styles.profileEditor}>
@@ -97,5 +97,5 @@ export const ProfileEditor = ({
         profiles={profiles}
       />
     </div>
-  );
-};
+  )
+}

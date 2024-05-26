@@ -1,18 +1,18 @@
-import  { useRef } from 'react';
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, mapGraphPointsForPolyline, Point } from './scrollableGraphUtils';
-import { GraphPoint } from './GraphPoint';
+import { useRef } from 'react'
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, mapGraphPointsForPolyline, Point } from './scrollableGraphUtils'
+import { GraphPoint } from './GraphPoint'
 
 type Props = {
-  graphPoints: Point[];
-  selectedPoint: Point | null;
-  setSelectedPoint: (point: Point | null) => void;
-  config: GraphConfig;
-};
+  graphPoints: Point[]
+  selectedPoint: Point | null
+  setSelectedPoint: (point: Point | null) => void
+  config: GraphConfig
+}
 
 export const GraphSvg = ({ graphPoints, selectedPoint, setSelectedPoint, config }: Props) => {
-  const { innerWidth, outerHeight } = config;
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const { innerWidth, outerHeight } = config
+  const svgRef = useRef<SVGSVGElement | null>(null)
 
   return (
     <svg
@@ -22,18 +22,21 @@ export const GraphSvg = ({ graphPoints, selectedPoint, setSelectedPoint, config 
       style={{ width: innerWidth, height: outerHeight }}
       ref={svgRef}
     >
-      <polyline className={styles.graphLine} points={mapGraphPointsForPolyline(graphPoints, config)} />
+      <polyline
+        className={styles.graphLine}
+        points={mapGraphPointsForPolyline(graphPoints, config)}
+      />
       {graphPoints.map(point => (
         <GraphPoint
           key={point.timestamp}
           point={point}
           isSelected={selectedPoint?.timestamp === point.timestamp}
           setSelected={point => {
-            setSelectedPoint(point.timestamp === selectedPoint?.timestamp ? null : point);
+            setSelectedPoint(point.timestamp === selectedPoint?.timestamp ? null : point)
           }}
           config={config}
         />
       ))}
     </svg>
-  );
-};
+  )
+}

@@ -1,11 +1,11 @@
-import styles from './Stats.module.scss';
+import styles from './Stats.module.scss'
 
 type Props = {
-  title: string;
-  subtitle: string;
-  figure: number | string;
-  color: string;
-};
+  title: string
+  subtitle: string
+  figure: number | string
+  color: string
+}
 
 export const StatLine = ({ title, subtitle, figure, color }: Props) => {
   return (
@@ -18,5 +18,5 @@ export const StatLine = ({ title, subtitle, figure, color }: Props) => {
         {figure}
       </span>
     </div>
-  );
-};
+  )
+}

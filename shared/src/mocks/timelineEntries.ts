@@ -1,13 +1,8 @@
-import { mockNowSlot } from './dates';
-import {
-  BloodGlucoseEntry,
-  CarbEntry,
-  InsulinEntry,
-  MeterEntry,
-} from '../types';
-import { getTimeMinusMinutes } from '../utils';
-import { mockProfileActivations } from './profiles';
-import { mockAlarms } from './alarms';
+import { mockNowSlot } from './dates'
+import { BloodGlucoseEntry, CarbEntry, InsulinEntry, MeterEntry } from '../types'
+import { getTimeMinusMinutes } from '../utils'
+import { mockProfileActivations } from './profiles'
+import { mockAlarms } from './alarms'
 
 export const mockBloodGlucoseEntries: BloodGlucoseEntry[] = [
   { bloodGlucose: 4.6, timestamp: getTimeMinusMinutes(mockNowSlot, 40) },
@@ -19,7 +14,7 @@ export const mockBloodGlucoseEntries: BloodGlucoseEntry[] = [
   { bloodGlucose: 5.9, timestamp: getTimeMinusMinutes(mockNowSlot, 10) },
   { bloodGlucose: 5.3, timestamp: getTimeMinusMinutes(mockNowSlot, 5) },
   { bloodGlucose: 6, timestamp: mockNowSlot },
-];
+]
 
 export const mockInsulinEntries: InsulinEntry[] = [
   {
@@ -27,7 +22,7 @@ export const mockInsulinEntries: InsulinEntry[] = [
     amount: 7,
     type: 'FAST',
   },
-];
+]
 
 export const mockCarbEntries: CarbEntry[] = [
   {
@@ -35,14 +30,14 @@ export const mockCarbEntries: CarbEntry[] = [
     amount: 40,
     durationFactor: 1,
   },
-];
+]
 
 export const mockMeterEntries: MeterEntry[] = [
   {
     timestamp: getTimeMinusMinutes(mockNowSlot, 25),
     bloodGlucose: 6.5,
   },
-];
+]
 
 export const mockTimelineEntries = {
   bloodGlucoseEntries: mockBloodGlucoseEntries,
@@ -51,4 +46,4 @@ export const mockTimelineEntries = {
   meterEntries: mockMeterEntries,
   profileActivations: mockProfileActivations,
   alarms: mockAlarms,
-};
+}

@@ -1,17 +1,17 @@
-import styles from './ProfileSelector.module.scss';
-import { Profile } from '@nightbear/shared';
+import styles from './ProfileSelector.module.scss'
+import { Profile } from '@nightbear/shared'
 
 type Props = {
-  profile: Profile;
-  setProfile: (profile: Profile) => void;
-  profiles: Profile[];
-};
+  profile: Profile
+  setProfile: (profile: Profile) => void
+  profiles: Profile[]
+}
 
 export const ProfileSelector = ({ profile, setProfile, profiles }: Props) => {
   const onChangeProfile = (profileId: string) => {
-    const selectedBaseProfile = profiles.find(profile => profile.id === profileId);
-    selectedBaseProfile && setProfile(selectedBaseProfile);
-  };
+    const selectedBaseProfile = profiles.find(profile => profile.id === profileId)
+    selectedBaseProfile && setProfile(selectedBaseProfile)
+  }
 
   return (
     <select
@@ -27,5 +27,5 @@ export const ProfileSelector = ({ profile, setProfile, profiles }: Props) => {
         </option>
       ))}
     </select>
-  );
-};
+  )
+}

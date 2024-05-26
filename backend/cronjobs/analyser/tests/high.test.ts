@@ -1,9 +1,9 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes, getTimeMinusTime } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes, getTimeMinusTime } from '@nightbear/shared'
+import { MIN_IN_MS } from '@nightbear/shared'
 
 describe('analyser/high', () => {
   it('detects HIGH above high limit', () => {
@@ -20,8 +20,8 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('HIGH');
-  });
+    ).toEqual('HIGH')
+  })
 
   it('does not clear HIGH above HIGH_CLEARING_THRESHOLD when there is active HIGH alarm', () => {
     expect(
@@ -51,8 +51,8 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual('HIGH');
-  });
+    ).toEqual('HIGH')
+  })
 
   it('clears HIGH below HIGH_CLEARING_THRESHOLD even if there is active HIGH alarm', () => {
     expect(
@@ -82,11 +82,11 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect HIGH after BAD_HIGH when we are inside BAD_HIGH_QUARANTINE_WINDOW', () => {
-    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
+    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS)
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -115,11 +115,11 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects HIGH after BAD_HIGH when we are outside BAD_HIGH_QUARANTINE_WINDOW', () => {
-    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS);
+    const timestamp30minAgo = getTimeMinusTime(mockNow, 30 * MIN_IN_MS)
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -148,8 +148,8 @@ describe('analyser/high', () => {
           },
         ],
       }),
-    ).toEqual('HIGH');
-  });
+    ).toEqual('HIGH')
+  })
 
   it('does not detect HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -171,8 +171,8 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects HIGH when insulin on board is below RELEVANT_IOB_LIMIT_FOR_HIGH', () => {
     expect(
@@ -194,8 +194,8 @@ describe('analyser/high', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('HIGH');
-  });
+    ).toEqual('HIGH')
+  })
 
   it('detects HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too little insulin for carbs', () => {
     expect(
@@ -229,6 +229,6 @@ describe('analyser/high', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('HIGH');
-  });
-});
+    ).toEqual('HIGH')
+  })
+})

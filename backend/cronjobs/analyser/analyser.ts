@@ -5,11 +5,11 @@ import {
   isThereTooLittleInsulin,
   isThereTooMuchInsulin,
   mapSensorAndMeterEntriesToAnalyserEntries,
-} from './utils';
-import { CarbEntry, InsulinEntry } from '@nightbear/shared';
-import { AnalyserEntry, Situation } from '@nightbear/shared';
-import { Alarm } from '@nightbear/shared';
-import { Profile } from '@nightbear/shared';
+} from './utils'
+import { CarbEntry, InsulinEntry } from '@nightbear/shared'
+import { AnalyserEntry, Situation } from '@nightbear/shared'
+import { Alarm } from '@nightbear/shared'
+import { Profile } from '@nightbear/shared'
 import {
   detectBadHigh,
   detectBadLow,
@@ -21,15 +21,15 @@ import {
   detectOutdated,
   detectPersistentHigh,
   detectRising,
-} from './situations';
+} from './situations'
 import {
   calculateCurrentCarbsToInsulinRatio,
   calculateRequiredCarbsToInsulinRatio,
   getCarbsOnBoard,
   getInsulinOnBoard,
-} from '@nightbear/shared';
-import { getEntriesWithinTimeRange } from '../checks/utils';
-import { hourToMs } from '@nightbear/shared';
+} from '@nightbear/shared'
+import { getEntriesWithinTimeRange } from '../checks/utils'
+import { hourToMs } from '@nightbear/shared'
 
 export const runAnalysis = ({
   currentTimestamp,
@@ -40,18 +40,18 @@ export const runAnalysis = ({
   carbEntries,
   alarms,
 }: AnalyserData): Situation | 'NO_SITUATION' => {
-  const analyserEntries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries);
+  const analyserEntries = mapSensorAndMeterEntriesToAnalyserEntries(sensorEntries, meterEntries)
   const requiredCarbsToInsulin = calculateRequiredCarbsToInsulinRatio(
     currentTimestamp,
     carbEntries,
     insulinEntries,
-  );
+  )
   const relevantInsulinEntries = getEntriesWithinTimeRange(
     currentTimestamp,
     insulinEntries,
     hourToMs(6),
-  );
-  const relevantCarbEntries = getEntriesWithinTimeRange(currentTimestamp, carbEntries, hourToMs(6));
+  )
+  const relevantCarbEntries = getEntriesWithinTimeRange(currentTimestamp, carbEntries, hourToMs(6))
 
   const predictedSituation = getPredictedSituation(
     activeProfile,
@@ -60,7 +60,7 @@ export const runAnalysis = ({
     relevantCarbEntries,
     alarms,
     requiredCarbsToInsulin,
-  );
+  )
 
   return detectSituation(
     currentTimestamp,
@@ -71,8 +71,8 @@ export const runAnalysis = ({
     alarms,
     requiredCarbsToInsulin,
     predictedSituation,
-  );
-};
+  )
+}
 
 export const detectSituation = (
   currentTimestamp: string,
@@ -84,18 +84,15 @@ export const detectSituation = (
   requiredCarbsToInsulin: number | null,
   predictedSituation?: Situation | 'NO_SITUATION',
 ): Situation | 'NO_SITUATION' => {
-  const latestEntry = getLatestAnalyserEntry(analyserEntries);
-  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries);
-  const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries);
-  const currentCarbsToInsulin = calculateCurrentCarbsToInsulinRatio(carbsOnBoard, insulinOnBoard);
-  const thereIsTooMuchInsulin = isThereTooMuchInsulin(
-    requiredCarbsToInsulin,
-    currentCarbsToInsulin,
-  );
+  const latestEntry = getLatestAnalyserEntry(analyserEntries)
+  const insulinOnBoard = getInsulinOnBoard(currentTimestamp, insulinEntries)
+  const carbsOnBoard = getCarbsOnBoard(currentTimestamp, carbEntries)
+  const currentCarbsToInsulin = calculateCurrentCarbsToInsulinRatio(carbsOnBoard, insulinOnBoard)
+  const thereIsTooMuchInsulin = isThereTooMuchInsulin(requiredCarbsToInsulin, currentCarbsToInsulin)
   const thereIsTooLittleInsulin = isThereTooLittleInsulin(
     requiredCarbsToInsulin,
     currentCarbsToInsulin,
-  );
+  )
 
   /**
    * 1. CRITICAL_OUTDATED
@@ -103,7 +100,7 @@ export const detectSituation = (
    * predicted state is bad, return critical outdated immediately
    */
   if (detectCriticalOutdated(latestEntry, insulinOnBoard, currentTimestamp, predictedSituation)) {
-    return 'CRITICAL_OUTDATED';
+    return 'CRITICAL_OUTDATED'
   }
 
   /**
@@ -111,10 +108,10 @@ export const detectSituation = (
    * Most critical and simple checks, must be before low and high
    */
   if (detectBadLow(latestEntry)) {
-    return 'BAD_LOW';
+    return 'BAD_LOW'
   }
   if (detectBadHigh(activeProfile, latestEntry)) {
-    return 'BAD_HIGH';
+    return 'BAD_HIGH'
   }
 
   /**
@@ -123,7 +120,7 @@ export const detectSituation = (
    * only alarms after timeSinceBgMinutes so there is a bigger delay.
    */
   if (detectOutdated(activeProfile, latestEntry, currentTimestamp)) {
-    return 'OUTDATED';
+    return 'OUTDATED'
   }
 
   /**
@@ -131,7 +128,7 @@ export const detectSituation = (
    * Must be before LOW and FALLING
    */
   if (detectCompressionLow(activeProfile, analyserEntries, insulinOnBoard, currentTimestamp)) {
-    return 'COMPRESSION_LOW';
+    return 'COMPRESSION_LOW'
   }
 
   /**
@@ -148,7 +145,7 @@ export const detectSituation = (
       currentTimestamp,
     )
   ) {
-    return 'LOW';
+    return 'LOW'
   }
   if (
     detectHigh(
@@ -160,7 +157,7 @@ export const detectSituation = (
       currentTimestamp,
     )
   ) {
-    return 'HIGH';
+    return 'HIGH'
   }
 
   /**
@@ -177,7 +174,7 @@ export const detectSituation = (
       predictedSituation,
     )
   ) {
-    return 'FALLING';
+    return 'FALLING'
   }
   if (
     detectRising(
@@ -188,7 +185,7 @@ export const detectSituation = (
       predictedSituation,
     )
   ) {
-    return 'RISING';
+    return 'RISING'
   }
 
   /**
@@ -205,8 +202,8 @@ export const detectSituation = (
       currentTimestamp,
     )
   ) {
-    return 'PERSISTENT_HIGH';
+    return 'PERSISTENT_HIGH'
   }
 
-  return 'NO_SITUATION';
-};
+  return 'NO_SITUATION'
+}

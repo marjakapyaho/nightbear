@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/compressionLow', () => {
   it('detects COMPRESSION_LOW with sudden abnormal drop during night', () => {
@@ -19,8 +19,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('COMPRESSION_LOW');
-  });
+    ).toEqual('COMPRESSION_LOW')
+  })
 
   it('does not detect COMPRESSION_LOW during day', () => {
     expect(
@@ -36,8 +36,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect COMPRESSION_LOW with too old entries', () => {
     expect(
@@ -54,8 +54,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect COMPRESSION_LOW with too few entries', () => {
     expect(
@@ -71,8 +71,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect COMPRESSION_LOW with too much insulin on board', () => {
     expect(
@@ -94,8 +94,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect COMPRESSION_LOW with bad low values (detects BAD_LOW)', () => {
     expect(
@@ -111,8 +111,8 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('BAD_LOW');
-  });
+    ).toEqual('BAD_LOW')
+  })
 
   it('does not detect COMPRESSION_LOW with too many low values', () => {
     expect(
@@ -128,6 +128,6 @@ describe('analyser/compressionLow', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
-});
+    ).toEqual('LOW')
+  })
+})

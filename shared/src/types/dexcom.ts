@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -8,5 +8,5 @@ export const DexcomG6ShareEntry = z.object({
   bloodGlucose: z.number(),
   signalStrength: z.number(),
   noiseLevel: z.number(),
-});
-export type DexcomG6ShareEntry = z.infer<typeof DexcomG6ShareEntry>;
+})
+export type DexcomG6ShareEntry = z.infer<typeof DexcomG6ShareEntry>

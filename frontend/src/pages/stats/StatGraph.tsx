@@ -1,21 +1,29 @@
-import { useState } from 'react';
-import { DAY_IN_MS } from '@nightbear/shared';
-import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph';
-import styles from './Stats.module.scss';
-import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils';
+import { useState } from 'react'
+import { DAY_IN_MS } from '@nightbear/shared'
+import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph'
+import styles from './Stats.module.scss'
+import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils'
 
 type Props = {
-  label: string;
-  points: Point[];
-  daysToShow: number;
-  valMin: number;
-  valMax: number;
-  valStep: number;
-  decimals: number;
-};
+  label: string
+  points: Point[]
+  daysToShow: number
+  valMin: number
+  valMax: number
+  valStep: number
+  decimals: number
+}
 
-export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep, decimals }: Props) => {
-  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null);
+export const StatGraph = ({
+  label,
+  points,
+  daysToShow,
+  valMin,
+  valMax,
+  valStep,
+  decimals,
+}: Props) => {
+  const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
 
   const baseConfig: BaseGraphConfig = {
     timelineRange: daysToShow * DAY_IN_MS,
@@ -36,7 +44,7 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep, 
     timeFormat: 'dd',
     showEveryNthTimeLabel: 3,
     decimals,
-  };
+  }
 
   return (
     <div className={styles.statGraph}>
@@ -48,5 +56,5 @@ export const StatGraph = ({ label, points, daysToShow, valMin, valMax, valStep, 
         baseConfig={baseConfig}
       />
     </div>
-  );
-};
+  )
+}

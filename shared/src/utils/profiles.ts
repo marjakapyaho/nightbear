@@ -1,11 +1,11 @@
-import { Profile } from '../types';
+import { Profile } from '../types'
 
 export const DEFAULT_ALARM_SETTINGS = {
   escalationAfterMinutes: [5, 10, 10],
   snoozeMinutes: 10,
-};
+}
 
-export const DEFAULT_TARGETS = ['bear-phone', 'marjan_iphone', 'jrwNexus5'];
+export const DEFAULT_TARGETS = ['bear-phone', 'marjan_iphone', 'jrwNexus5']
 
 export const PROFILE_BASE = {
   id: 'NEW',
@@ -33,8 +33,8 @@ export const PROFILE_BASE = {
     missingDayInsulin: DEFAULT_ALARM_SETTINGS,
   },
   notificationTargets: DEFAULT_TARGETS,
-};
+}
 
 export const getActiveProfile = (profiles?: Profile[]) => {
-  return profiles?.find(profile => profile.isActive);
-};
+  return profiles?.find(profile => profile.isActive)
+}

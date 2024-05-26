@@ -1,3 +1,3 @@
-import { IUpdateResult } from './cronjobsJournal.queries';
+import { IUpdateResult } from './cronjobsJournal.queries'
 
-export type CronjobsJournal = IUpdateResult;
+export type CronjobsJournal = IUpdateResult

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * This marks model properties that are optional.
@@ -12,5 +12,5 @@ import { z } from 'zod';
  * and our validator types compatible. Maybe one day!
  */
 export function nullableOptional<T extends z.ZodTypeAny>(schema: T) {
-  return z.preprocess(val => (val === null ? undefined : val), schema.optional().nullable());
+  return z.preprocess(val => (val === null ? undefined : val), schema.optional().nullable())
 }

@@ -1,14 +1,14 @@
-import { range } from 'lodash';
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, tsToLeft } from './scrollableGraphUtils';
-import { humanReadableShortTime } from '@nightbear/shared';
+import { range } from 'lodash'
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, tsToLeft } from './scrollableGraphUtils'
+import { humanReadableShortTime } from '@nightbear/shared'
 
 type Props = {
-  config: GraphConfig;
-};
+  config: GraphConfig
+}
 
 export const GraphScaleHorizontal = ({ config }: Props) => {
-  const timeStepLines = range(config.flooredHourStart, config.timelineRangeEnd, config.timeStep);
+  const timeStepLines = range(config.flooredHourStart, config.timelineRangeEnd, config.timeStep)
 
   return timeStepLines.map((timestamp, i) => {
     return (
@@ -30,6 +30,6 @@ export const GraphScaleHorizontal = ({ config }: Props) => {
           {humanReadableShortTime(timestamp)}
         </span>
       </div>
-    );
-  });
-};
+    )
+  })
+}

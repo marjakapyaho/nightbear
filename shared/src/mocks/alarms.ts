@@ -1,5 +1,5 @@
-import { Alarm, AlarmState } from '../types';
-import { mockNow } from './dates';
+import { Alarm, AlarmState } from '../types'
+import { mockNow } from './dates'
 
 export const mockAlarmStates: AlarmState[] = [
   {
@@ -8,7 +8,7 @@ export const mockAlarmStates: AlarmState[] = [
     alarmLevel: 0,
     validAfter: mockNow,
   },
-];
+]
 
 export const mockAlarms: Alarm[] = [
   {
@@ -17,4 +17,4 @@ export const mockAlarms: Alarm[] = [
     isActive: true,
     alarmStates: mockAlarmStates,
   },
-];
+]

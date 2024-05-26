@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/criticalOutdated', () => {
   it('detects CRITICAL_OUTDATED when there is no data', () => {
@@ -16,8 +16,8 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('CRITICAL_OUTDATED');
-  });
+    ).toEqual('CRITICAL_OUTDATED')
+  })
 
   it('detects CRITICAL_OUTDATED when data is inside timeSinceBgLimit but predicted state is FALLING', () => {
     expect(
@@ -34,8 +34,8 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('CRITICAL_OUTDATED');
-  });
+    ).toEqual('CRITICAL_OUTDATED')
+  })
 
   it('detects CRITICAL_OUTDATED when data is inside timeSinceBgLimit but predicted state is LOW', () => {
     expect(
@@ -52,8 +52,8 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('CRITICAL_OUTDATED');
-  });
+    ).toEqual('CRITICAL_OUTDATED')
+  })
 
   it('detects CRITICAL_OUTDATED when data is inside timeSinceBgLimit but predicted state is BAD_LOW', () => {
     expect(
@@ -70,8 +70,8 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('CRITICAL_OUTDATED');
-  });
+    ).toEqual('CRITICAL_OUTDATED')
+  })
 
   it('does not detect CRITICAL_OUTDATED when predicted state is not bad', () => {
     expect(
@@ -88,8 +88,8 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects CRITICAL_OUTDATED when predicted state is not bad but there is insulin on board', () => {
     expect(
@@ -112,6 +112,6 @@ describe('analyser/criticalOutdated', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('CRITICAL_OUTDATED');
-  });
-});
+    ).toEqual('CRITICAL_OUTDATED')
+  })
+})

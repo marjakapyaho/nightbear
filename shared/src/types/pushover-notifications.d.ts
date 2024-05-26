@@ -1,1 +1,1 @@
-declare module 'src/types/pushover-notifications';
+declare module 'src/types/pushover-notifications'

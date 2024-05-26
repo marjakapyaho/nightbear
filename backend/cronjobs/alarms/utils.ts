@@ -1,17 +1,17 @@
-import { Situation } from '@nightbear/shared';
-import { Profile } from '@nightbear/shared';
-import { Context } from '../../utils/api';
-import { getTimeMinusTimeMs } from '@nightbear/shared';
-import { MIN_IN_MS } from '@nightbear/shared';
-import { Alarm, AlarmState } from '@nightbear/shared';
-import { findIndex, map, sum, take } from 'lodash';
-import { ALARM_FALLBACK_LEVEL, getEscalationAfterMinutes } from '@nightbear/shared';
+import { Situation } from '@nightbear/shared'
+import { Profile } from '@nightbear/shared'
+import { Context } from '../../utils/api'
+import { getTimeMinusTimeMs } from '@nightbear/shared'
+import { MIN_IN_MS } from '@nightbear/shared'
+import { Alarm, AlarmState } from '@nightbear/shared'
+import { findIndex, map, sum, take } from 'lodash'
+import { ALARM_FALLBACK_LEVEL, getEscalationAfterMinutes } from '@nightbear/shared'
 
 export type AlarmActions = {
-  remove?: Alarm;
-  keep?: Alarm;
-  create?: Situation;
-};
+  remove?: Alarm
+  keep?: Alarm
+  create?: Situation
+}
 
 export const getNeededAlarmLevel = (
   currentSituation: Situation,
@@ -21,28 +21,28 @@ export const getNeededAlarmLevel = (
 ) => {
   const hasBeenValidForMinutes = Math.round(
     getTimeMinusTimeMs(context.timestamp(), validAfter) / MIN_IN_MS,
-  );
-  const levelUpTimes = getEscalationAfterMinutes(currentSituation, activeProfile);
+  )
+  const levelUpTimes = getEscalationAfterMinutes(currentSituation, activeProfile)
 
   if (!levelUpTimes) {
-    return ALARM_FALLBACK_LEVEL;
+    return ALARM_FALLBACK_LEVEL
   }
 
-  const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)));
+  const accumulatedTimes = map(levelUpTimes, (_x, i) => sum(take(levelUpTimes, i + 1)))
 
   return (
     findIndex(accumulatedTimes, minutes => minutes > hasBeenValidForMinutes) + 1 ||
     levelUpTimes.length + 1
-  );
-};
+  )
+}
 
 export const getPushoverRecipient = (neededLevel: number, activeProfile: Profile) => {
-  const availableTargetsCount = activeProfile.notificationTargets.length;
+  const availableTargetsCount = activeProfile.notificationTargets.length
 
   return neededLevel < availableTargetsCount
     ? activeProfile.notificationTargets[neededLevel]
-    : undefined;
-};
+    : undefined
+}
 
 export const retryNotifications = async (
   states: AlarmState[],
@@ -53,14 +53,14 @@ export const retryNotifications = async (
     states.map(async state => {
       const receipt = state.notificationTarget
         ? await context.pushover.sendAlarm(situation, state.notificationTarget)
-        : undefined;
+        : undefined
 
       // Update alarm state to have receipt if we got it
       if (receipt) {
         return context.db.markAlarmAsProcessed({
           ...state,
           notificationReceipt: receipt,
-        });
+        })
       }
     }),
-  );
+  )

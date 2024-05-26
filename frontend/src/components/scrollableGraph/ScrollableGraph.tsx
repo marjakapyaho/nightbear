@@ -1,19 +1,19 @@
-import  { useEffect, useRef } from 'react';
-import styles from './ScrollableGraph.module.scss';
-import { Point, BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils';
-import { GraphScaleVertical } from './GraphScaleVertical';
-import { GraphScaleHorizontal } from './GraphScaleHorizontal';
-import { GraphMarker } from './GraphMarker';
-import { GraphLatestValue } from './GraphLatestValue';
-import { GraphSvg } from './GraphSvg';
+import { useEffect, useRef } from 'react'
+import styles from './ScrollableGraph.module.scss'
+import { Point, BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils'
+import { GraphScaleVertical } from './GraphScaleVertical'
+import { GraphScaleHorizontal } from './GraphScaleHorizontal'
+import { GraphMarker } from './GraphMarker'
+import { GraphLatestValue } from './GraphLatestValue'
+import { GraphSvg } from './GraphSvg'
 
 type Props = {
-  graphPoints: Point[];
-  baseConfig: BaseGraphConfig;
-  selectedPoint: Point | null;
-  setSelectedPoint: (point: Point | null) => void;
-  latestPointWithBg?: Point;
-};
+  graphPoints: Point[]
+  baseConfig: BaseGraphConfig
+  selectedPoint: Point | null
+  setSelectedPoint: (point: Point | null) => void
+  latestPointWithBg?: Point
+}
 
 export const ScrollableGraph = ({
   graphPoints,
@@ -22,16 +22,16 @@ export const ScrollableGraph = ({
   baseConfig,
   latestPointWithBg,
 }: Props) => {
-  const scrollingRef = useRef<HTMLDivElement | null>(null);
-  const config = getGraphConfig(baseConfig);
-  const { innerWidth, outerHeight } = config;
-  const latestPoint = graphPoints.length ? graphPoints[0] : null;
+  const scrollingRef = useRef<HTMLDivElement | null>(null)
+  const config = getGraphConfig(baseConfig)
+  const { innerWidth, outerHeight } = config
+  const latestPoint = graphPoints.length ? graphPoints[0] : null
 
   // Scroll right on mount
   useEffect(() => {
-    if (!scrollingRef.current) return;
-    scrollingRef.current.scrollLeft = scrollingRef.current.scrollWidth;
-  }, []);
+    if (!scrollingRef.current) return
+    scrollingRef.current.scrollLeft = scrollingRef.current.scrollWidth
+  }, [])
 
   return (
     <div className={styles.scrollableGraph} style={{ height: outerHeight }}>
@@ -58,5 +58,5 @@ export const ScrollableGraph = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

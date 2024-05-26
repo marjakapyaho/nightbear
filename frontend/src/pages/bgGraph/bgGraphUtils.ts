@@ -1,20 +1,20 @@
-import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils';
-import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS, highLimit, lowLimit } from '@nightbear/shared';
-import { InsulinEntryType } from '@nightbear/shared';
-import { chain } from 'lodash';
+import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils'
+import { DAY_IN_MS, HOUR_IN_MS, MIN_IN_MS, highLimit, lowLimit } from '@nightbear/shared'
+import { InsulinEntryType } from '@nightbear/shared'
+import { chain } from 'lodash'
 
 export const getFillColor = (bg: number | null) => {
   if (!bg) {
-    return 'white';
+    return 'white'
   }
   if (bg > highLimit) {
-    return '#F8CC6F';
+    return '#F8CC6F'
   }
   if (bg < lowLimit) {
-    return '#ee5a36';
+    return '#ee5a36'
   }
-  return '#54c87e';
-};
+  return '#54c87e'
+}
 
 export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
   timelineRange: DAY_IN_MS,
@@ -35,7 +35,7 @@ export const getBgGraphBaseConfig = (): BaseGraphConfig => ({
   timeFormat: 'hh:mm',
   showEveryNthTimeLabel: 1,
   decimals: 1,
-});
+})
 
 export const getNewSelectedPointWithCarbs = (newAmount: number, basePoint?: Point) =>
   basePoint
@@ -47,7 +47,7 @@ export const getNewSelectedPointWithCarbs = (newAmount: number, basePoint?: Poin
           durationFactor: 1,
         },
       }
-    : null;
+    : null
 
 export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint?: Point) =>
   basePoint
@@ -58,7 +58,7 @@ export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint?: Poi
           bloodGlucose: newBg,
         },
       }
-    : null;
+    : null
 
 export const getNewSelectedPointWithInsulin = (newAmount: number, basePoint?: Point) =>
   basePoint
@@ -70,10 +70,10 @@ export const getNewSelectedPointWithInsulin = (newAmount: number, basePoint?: Po
           type: 'FAST' as InsulinEntryType,
         },
       }
-    : null;
+    : null
 
 export const findLatestPointWithBloodGlucose = (points: Point[]) =>
   chain(points)
     .filter(point => Boolean(point.val))
     .last()
-    .value();
+    .value()

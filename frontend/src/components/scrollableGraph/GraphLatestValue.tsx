@@ -1,11 +1,11 @@
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
-import { setDecimals, getTimeMinusMinutes, isTimeLarger } from '@nightbear/shared';
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils'
+import { setDecimals, getTimeMinusMinutes, isTimeLarger } from '@nightbear/shared'
 
 type Props = {
-  latestPoint: Point | null;
-  config: GraphConfig;
-};
+  latestPoint: Point | null
+  config: GraphConfig
+}
 
 export const GraphLatestValue = ({ latestPoint, config }: Props) => {
   return (
@@ -25,5 +25,5 @@ export const GraphLatestValue = ({ latestPoint, config }: Props) => {
         {setDecimals(latestPoint.val, config.decimals)}
       </span>
     )
-  );
-};
+  )
+}

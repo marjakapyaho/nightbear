@@ -1,14 +1,14 @@
-import { range } from 'lodash';
-import { highLimit } from '@nightbear/shared';
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, valToTop } from './scrollableGraphUtils';
+import { range } from 'lodash'
+import { highLimit } from '@nightbear/shared'
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, valToTop } from './scrollableGraphUtils'
 
 type Props = {
-  config: GraphConfig;
-};
+  config: GraphConfig
+}
 
 export const GraphScaleVertical = ({ config }: Props) => {
-  const graphLines = range(config.valMin, config.valMax + config.valStep, config.valStep);
+  const graphLines = range(config.valMin, config.valMax + config.valStep, config.valStep)
 
   return (
     <div className={styles.graphScaleVertical}>
@@ -45,5 +45,5 @@ export const GraphScaleVertical = ({ config }: Props) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

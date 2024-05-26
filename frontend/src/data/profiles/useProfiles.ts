@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { callFetch } from '../fetch';
-import { Profile } from '@nightbear/shared';
-import { getActiveProfile, MIN_IN_MS } from '@nightbear/shared';
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { callFetch } from '../fetch'
+import { Profile } from '@nightbear/shared'
+import { getActiveProfile, MIN_IN_MS } from '@nightbear/shared'
 
 export const useProfiles = () => {
   const {
@@ -14,39 +14,39 @@ export const useProfiles = () => {
     queryKey: ['get-profiles'],
     queryFn: () => callFetch('/get-profiles'),
     refetchInterval: MIN_IN_MS,
-  });
+  })
 
   const { mutate: activateProfileMutation } = useMutation({
     mutationFn: (payload: { profile: Profile; validityInMs: number }) =>
       callFetch('/activate-profile', 'POST', payload),
-  });
+  })
   const activateProfile = (profile: Profile, validityInMs: number) =>
     activateProfileMutation(
       { profile, validityInMs },
       {
         onSuccess: refetch,
       },
-    );
+    )
 
   const { mutate: createProfileMutation } = useMutation({
     mutationFn: (payload: { profile: Profile; validityInMs: number }) =>
       callFetch('/create-profile', 'POST', payload),
-  });
+  })
   const createProfile = (profile: Profile, validityInMs: number) =>
     createProfileMutation(
       { profile, validityInMs },
       {
         onSuccess: refetch,
       },
-    );
+    )
 
   const { mutate: editProfileMutation } = useMutation({
     mutationFn: (profile: Profile) => callFetch('/edit-profile', 'PUT', profile),
-  });
+  })
   const editProfile = (profile: Profile) =>
     editProfileMutation(profile, {
       onSuccess: refetch,
-    });
+    })
 
   return {
     profiles: profiles || [],
@@ -57,5 +57,5 @@ export const useProfiles = () => {
     isLoading,
     isError,
     isSuccess,
-  };
-};
+  }
+}

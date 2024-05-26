@@ -1,10 +1,10 @@
-import { TimeAgo } from '../timeAgo/TimeAgo';
-import styles from './StatusBar.module.scss';
-import { Point } from '../scrollableGraph/scrollableGraphUtils';
+import { TimeAgo } from '../timeAgo/TimeAgo'
+import styles from './StatusBar.module.scss'
+import { Point } from '../scrollableGraph/scrollableGraphUtils'
 
 type Props = {
-  graphPoint?: Point;
-};
+  graphPoint?: Point
+}
 
 export const StatusBar = ({ graphPoint }: Props) => {
   return (
@@ -20,5 +20,5 @@ export const StatusBar = ({ graphPoint }: Props) => {
         <span className={styles.smallerText}>ago</span>
       </div>
     </div>
-  );
-};
+  )
+}

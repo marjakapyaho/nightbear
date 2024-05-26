@@ -1,5 +1,5 @@
-import { nullableOptional } from '../utils/types';
-import { z } from 'zod';
+import { nullableOptional } from '../utils/types'
+import { z } from 'zod'
 
 /* eslint-disable @typescript-eslint/no-redeclare */
 
@@ -10,14 +10,14 @@ export const AnalyserSettings = z.object({
   lowLevelRel: z.number(),
   lowLevelAbs: z.number(),
   timeSinceBgMinutes: z.number(),
-});
-export type AnalyserSettings = z.infer<typeof AnalyserSettings>;
+})
+export type AnalyserSettings = z.infer<typeof AnalyserSettings>
 
 export const AlarmSettings = z.object({
   escalationAfterMinutes: z.array(z.number()),
   snoozeMinutes: z.number(),
-});
-export type AlarmSettings = z.infer<typeof AlarmSettings>;
+})
+export type AlarmSettings = z.infer<typeof AlarmSettings>
 
 export const SituationSettings = z.object({
   outdated: AlarmSettings,
@@ -31,8 +31,8 @@ export const SituationSettings = z.object({
   badHigh: AlarmSettings,
   persistentHigh: AlarmSettings,
   missingDayInsulin: AlarmSettings,
-});
-export type SituationSettings = z.infer<typeof SituationSettings>;
+})
+export type SituationSettings = z.infer<typeof SituationSettings>
 
 export const Profile = z.object({
   id: z.string(),
@@ -43,8 +43,8 @@ export const Profile = z.object({
   notificationTargets: z.array(z.string()),
   analyserSettings: AnalyserSettings,
   situationSettings: SituationSettings,
-});
-export type Profile = z.infer<typeof Profile>;
+})
+export type Profile = z.infer<typeof Profile>
 
 export const ProfileActivation = z.object({
   id: z.string(),
@@ -52,5 +52,5 @@ export const ProfileActivation = z.object({
   profileName: nullableOptional(z.string()),
   activatedAt: z.string(),
   deactivatedAt: nullableOptional(z.string()),
-});
-export type ProfileActivation = z.infer<typeof ProfileActivation>;
+})
+export type ProfileActivation = z.infer<typeof ProfileActivation>

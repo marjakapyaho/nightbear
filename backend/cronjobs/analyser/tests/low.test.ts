@@ -1,8 +1,8 @@
-import { runAnalysis } from '../analyser';
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared';
-import { describe, expect, it } from 'vitest';
-import { mockNow } from '@nightbear/shared';
-import { getTimeMinusMinutes } from '@nightbear/shared';
+import { runAnalysis } from '../analyser'
+import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { describe, expect, it } from 'vitest'
+import { mockNow } from '@nightbear/shared'
+import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/low', () => {
   it('detects LOW below low limit', () => {
@@ -19,8 +19,8 @@ describe('analyser/low', () => {
         carbEntries: [],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not clear LOW below LOW_CLEARING_THRESHOLD when there is active LOW alarm', () => {
     expect(
@@ -50,8 +50,8 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('clears LOW after LOW_CLEARING_THRESHOLD even if there is alarm', () => {
     expect(
@@ -81,8 +81,8 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('does not detect LOW after BAD_LOW when we are inside BAD_LOW_QUARANTINE_WINDOW', () => {
     expect(
@@ -113,8 +113,8 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects LOW after BAD_LOW when we are outside BAD_LOW_QUARANTINE_WINDOW', () => {
     expect(
@@ -145,8 +145,8 @@ describe('analyser/low', () => {
           },
         ],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('does not detect LOW when there are carbs taken within LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
@@ -168,8 +168,8 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('NO_SITUATION');
-  });
+    ).toEqual('NO_SITUATION')
+  })
 
   it('detects LOW when there are carbs taken outside LOW_CORRECTION_SUPPRESSION_WINDOW', () => {
     expect(
@@ -191,8 +191,8 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('detects LOW even if taken carbs are inside LOW_CORRECTION_SUPPRESSION_WINDOW if there is too much insulin', () => {
     expect(
@@ -226,8 +226,8 @@ describe('analyser/low', () => {
         ],
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
+    ).toEqual('LOW')
+  })
 
   it('detects LOW when could not calculate insulin to carbs ratio', () => {
     expect(
@@ -243,6 +243,6 @@ describe('analyser/low', () => {
         carbEntries: [], // Divider is zero
         alarms: [],
       }),
-    ).toEqual('LOW');
-  });
-});
+    ).toEqual('LOW')
+  })
+})

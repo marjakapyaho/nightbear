@@ -1,28 +1,28 @@
-import styles from './ProfileEditor.module.scss';
-import { AnalyserSettings, Profile } from '@nightbear/shared';
-import { InputText } from '../inputText/InputText';
-import { InputNumber } from '../inputNumber/InputNumber';
-import { ProfileSelector } from '../profileSelector/ProfileSelector';
-import { FieldWithLabel } from '../fieldWithLabel/FieldWithLabel';
-import { ModeSettings } from './ProfileEditor';
+import styles from './ProfileEditor.module.scss'
+import { AnalyserSettings, Profile } from '@nightbear/shared'
+import { InputText } from '../inputText/InputText'
+import { InputNumber } from '../inputNumber/InputNumber'
+import { ProfileSelector } from '../profileSelector/ProfileSelector'
+import { FieldWithLabel } from '../fieldWithLabel/FieldWithLabel'
+import { ModeSettings } from './ProfileEditor'
 
 type Props = {
-  modeSettings: ModeSettings;
-  selectedProfile: Profile;
-  updateSelectedProfile: (profile: Profile) => void;
-  localProfile: Profile;
-  setLocalProfile: (profile: Profile) => void;
-  validityInHours: number;
-  setValidityInHours: (hours: number) => void;
-  profiles: Profile[];
-};
+  modeSettings: ModeSettings
+  selectedProfile: Profile
+  updateSelectedProfile: (profile: Profile) => void
+  localProfile: Profile
+  setLocalProfile: (profile: Profile) => void
+  validityInHours: number
+  setValidityInHours: (hours: number) => void
+  profiles: Profile[]
+}
 
 type EditableAnalyserSetting = {
-  key: keyof AnalyserSettings;
-  label: string;
-  decimals: number;
-  unit?: string;
-};
+  key: keyof AnalyserSettings
+  label: string
+  decimals: number
+  unit?: string
+}
 
 export const Editor = ({
   modeSettings,
@@ -42,7 +42,7 @@ export const Editor = ({
     repeatTime,
     validHours,
     analyserSettings,
-  } = modeSettings;
+  } = modeSettings
 
   const editableAnalyserSettings: EditableAnalyserSetting[] = [
     { key: 'highLevelRel', label: 'High relative', decimals: 1 },
@@ -51,7 +51,7 @@ export const Editor = ({
     { key: 'lowLevelRel', label: 'Low relative', decimals: 1 },
     { key: 'lowLevelAbs', label: 'Low absolute', decimals: 1 },
     { key: 'timeSinceBgMinutes', label: 'Outdated after', decimals: 0, unit: 'min' },
-  ];
+  ]
 
   const setAnalyserSetting = (val: number, settingKey: string) =>
     setLocalProfile({
@@ -60,7 +60,7 @@ export const Editor = ({
         ...localProfile.analyserSettings,
         [settingKey]: val,
       },
-    });
+    })
 
   return (
     <div className={styles.editor}>
@@ -117,5 +117,5 @@ export const Editor = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}

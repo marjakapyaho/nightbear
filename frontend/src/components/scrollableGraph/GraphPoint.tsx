@@ -1,17 +1,17 @@
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils';
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils'
 
 type Props = {
-  point: Point;
-  isSelected: boolean;
-  setSelected: (model: Point) => void;
-  config: GraphConfig;
-  fill?: string;
-};
+  point: Point
+  isSelected: boolean
+  setSelected: (model: Point) => void
+  config: GraphConfig
+  fill?: string
+}
 
 export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) => {
-  const { val, timestamp, meterEntry } = point;
-  const pointWidth = config.dataTimeStep * config.pixelsPerMs;
+  const { val, timestamp, meterEntry } = point
+  const pointWidth = config.dataTimeStep * config.pixelsPerMs
 
   return (
     <>
@@ -54,5 +54,5 @@ export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) =>
         onClick={() => setSelected(point)}
       />
     </>
-  );
-};
+  )
+}

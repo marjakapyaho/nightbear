@@ -1,16 +1,16 @@
-import { TimeAgo } from '../timeAgo/TimeAgo';
-import styles from './ScrollableGraph.module.scss';
-import { GraphConfig, Point, tsToLeft } from './scrollableGraphUtils';
+import { TimeAgo } from '../timeAgo/TimeAgo'
+import styles from './ScrollableGraph.module.scss'
+import { GraphConfig, Point, tsToLeft } from './scrollableGraphUtils'
 
 type Props = {
-  config: GraphConfig;
-  point: Point;
-  isSelected: boolean;
-  setSelected: (marker: Point) => void;
-};
+  config: GraphConfig
+  point: Point
+  isSelected: boolean
+  setSelected: (marker: Point) => void
+}
 
 export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) => {
-  const hasData = point.carbEntry || point.insulinEntry;
+  const hasData = point.carbEntry || point.insulinEntry
 
   return (
     <div
@@ -48,5 +48,5 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
       )}
       {point.alarms?.length ? <div className={styles.alarm}>{point.alarms[0].situation}</div> : ''}
     </div>
-  );
-};
+  )
+}

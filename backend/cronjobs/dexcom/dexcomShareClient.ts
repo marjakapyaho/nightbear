@@ -1,22 +1,28 @@
-import axios, { AxiosError } from 'axios';
-import { Logger, extendLogger } from '../../utils/logging';
-import { pick } from 'lodash';
+import axios, { AxiosError } from 'axios'
+import { Logger, extendLogger } from '../../utils/logging'
+import { pick } from 'lodash'
 
-const DEXCOM_APPLICATION_ID = 'd8665ade-9673-4e27-9ff6-92db4ce13d13';
+const DEXCOM_APPLICATION_ID = 'd8665ade-9673-4e27-9ff6-92db4ce13d13'
 
-export type DexcomShareClient = ReturnType<typeof createDexcomShareClient>;
+export type DexcomShareClient = ReturnType<typeof createDexcomShareClient>
 
-export type DexcomShareResponse = { DT: string; ST: string; Trend: number; Value: number; WT: string };
+export type DexcomShareResponse = {
+  DT: string
+  ST: string
+  Trend: number
+  Value: number
+  WT: string
+}
 
 export const NO_DEXCOM_SHARE: DexcomShareClient = {
   login: () => Promise.resolve(''),
   fetchBg: () => Promise.resolve([]),
-};
+}
 
 export function createDexcomShareClient(username: string, password: string, logger: Logger) {
-  const log = extendLogger(logger, 'dexcom-share');
+  const log = extendLogger(logger, 'dexcom-share')
 
-  log('DexcomShareClient initialized');
+  log('DexcomShareClient initialized')
 
   return {
     login(): Promise<string> {
@@ -38,16 +44,21 @@ export function createDexcomShareClient(username: string, password: string, logg
         )
         .then(res => {
           if (res.data === '00000000-0000-0000-0000-000000000000') {
-            throw new Error(`DexcomShareClient login request failed due to invalid credentials`);
+            throw new Error(`DexcomShareClient login request failed due to invalid credentials`)
           } else {
-            return res.data;
+            return res.data
           }
         })
         .catch((err: AxiosError) => {
           if (err.isAxiosError)
-            log('Login request failed:\n%O', pick(err.response, 'data', 'status', 'statusText', 'headers'));
-          return Promise.reject(new Error(`DexcomShareClient login request failed (caused by\n${err}\n)`));
-        });
+            log(
+              'Login request failed:\n%O',
+              pick(err.response, 'data', 'status', 'statusText', 'headers'),
+            )
+          return Promise.reject(
+            new Error(`DexcomShareClient login request failed (caused by\n${err}\n)`),
+          )
+        })
     },
     fetchBg(sessionId: string): Promise<Array<DexcomShareResponse>> {
       return axios
@@ -64,9 +75,14 @@ export function createDexcomShareClient(username: string, password: string, logg
         .then(res => res.data)
         .catch((err: AxiosError) => {
           if (err.isAxiosError)
-            log('BG fetch request failed:\n%O', pick(err.response, 'data', 'status', 'statusText', 'headers'));
-          return Promise.reject(new Error(`DexcomShareClient BG fetch request failed (caused by\n${err}\n)`));
-        });
+            log(
+              'BG fetch request failed:\n%O',
+              pick(err.response, 'data', 'status', 'statusText', 'headers'),
+            )
+          return Promise.reject(
+            new Error(`DexcomShareClient BG fetch request failed (caused by\n${err}\n)`),
+          )
+        })
     },
-  };
+  }
 }

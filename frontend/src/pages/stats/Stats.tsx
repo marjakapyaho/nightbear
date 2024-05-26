@@ -1,4 +1,4 @@
-import { reallyHighLimit, reallyLowLimit } from '@nightbear/shared';
+import { reallyHighLimit, reallyLowLimit } from '@nightbear/shared'
 import {
   calculateHba1c,
   countSituations,
@@ -10,42 +10,43 @@ import {
   calculateDailyAmounts,
   calculateDailyAverageBgs,
   setOneDecimal,
-    getTimeAsISOStr, getTimeInMillis
-} from '@nightbear/shared';
-import styles from './Stats.module.scss';
-import { StatLine } from './StatLine';
-import { StatGraph } from './StatGraph';
-import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries';
+  getTimeAsISOStr,
+  getTimeInMillis,
+} from '@nightbear/shared'
+import styles from './Stats.module.scss'
+import { StatLine } from './StatLine'
+import { StatGraph } from './StatGraph'
+import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
 
 export const Stats = () => {
-  const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS));
-  const { bloodGlucoseEntries, insulinEntries, carbEntries } = timelineEntries;
+  const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS))
+  const { bloodGlucoseEntries, insulinEntries, carbEntries } = timelineEntries
 
   // Override sensor entries with meter entries where necessary
-  const timeInRange = calculateTimeInRange(bloodGlucoseEntries) || '';
-  const timeLow = calculateTimeLow(bloodGlucoseEntries) || '';
-  const timeHigh = calculateTimeHigh(bloodGlucoseEntries) || '';
-  const hba1c = setOneDecimal(calculateHba1c(bloodGlucoseEntries)) || '';
+  const timeInRange = calculateTimeInRange(bloodGlucoseEntries) || ''
+  const timeLow = calculateTimeLow(bloodGlucoseEntries) || ''
+  const timeHigh = calculateTimeHigh(bloodGlucoseEntries) || ''
+  const hba1c = setOneDecimal(calculateHba1c(bloodGlucoseEntries)) || ''
 
-  const daysToShow = 28;
+  const daysToShow = 28
   const dailyInsulins = calculateDailyAmounts(insulinEntries, daysToShow).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#EE776E',
-  }));
+  }))
   const dailyCarbs = calculateDailyAmounts(carbEntries, daysToShow).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#9AD5B3',
-  }));
+  }))
   const dailyAverageBgs = calculateDailyAverageBgs(bloodGlucoseEntries, daysToShow).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.average,
     color: '#777',
-  }));
+  }))
 
   return (
     <div className={styles.stats}>
@@ -115,5 +116,5 @@ export const Stats = () => {
         color="#F8CC6F"
       />
     </div>
-  );
-};
+  )
+}

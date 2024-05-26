@@ -4,7 +4,7 @@ import {
   Profile,
   ProfileActivation,
   SituationSettings,
-} from '../types';
+} from '../types'
 
 export const mockAnalyserSettings: AnalyserSettings = {
   highLevelRel: 8,
@@ -13,12 +13,12 @@ export const mockAnalyserSettings: AnalyserSettings = {
   lowLevelRel: 6,
   lowLevelAbs: 4,
   timeSinceBgMinutes: 30,
-};
+}
 
 export const mockAlarmSettings: AlarmSettings = {
   escalationAfterMinutes: [10, 10],
   snoozeMinutes: 15,
-};
+}
 
 export const mockSituationSettings: SituationSettings = {
   outdated: mockAlarmSettings,
@@ -32,7 +32,7 @@ export const mockSituationSettings: SituationSettings = {
   badHigh: mockAlarmSettings,
   persistentHigh: mockAlarmSettings,
   missingDayInsulin: mockAlarmSettings,
-};
+}
 
 export const mockProfiles: Profile[] = [
   {
@@ -55,7 +55,7 @@ export const mockProfiles: Profile[] = [
     situationSettings: mockSituationSettings,
     notificationTargets: ['first', 'second'],
   },
-];
+]
 
 export const mockProfileActivations: ProfileActivation[] = [
   {
@@ -70,7 +70,7 @@ export const mockProfileActivations: ProfileActivation[] = [
     profileName: 'Night',
     activatedAt: '2024-04-26T20:00:00.123Z',
   },
-];
+]
 
 export const actualNightProfile = {
   profileName: 'Night',
@@ -132,7 +132,7 @@ export const actualNightProfile = {
     },
   },
   notificationTargets: ['bear-phone', 'marjan_iphone', 'jrwNexus5'],
-};
+}
 
 export const actualDayProfile = {
   profileName: 'Day',
@@ -194,4 +194,4 @@ export const actualDayProfile = {
     },
   },
   notificationTargets: ['marjan_iphone', 'jrwNexus5', 'bear-phone'],
-};
+}

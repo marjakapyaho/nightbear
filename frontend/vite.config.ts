@@ -3,9 +3,7 @@ import autoprefixer from 'autoprefixer'
 
 // https://vitejs.dev/config/
 export default {
-  plugins: [
-    react()
-  ],
+  plugins: [react()],
   css: {
     postcss: {
       plugins: [autoprefixer()],
@@ -15,5 +13,5 @@ export default {
     proxy: {
       '/api': 'http://localhost:4000',
     },
-  }
+  },
 }

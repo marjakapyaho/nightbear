@@ -1,15 +1,15 @@
-import { CronjobsJournal } from '../db/cronjobsJournal/types';
-import { extendLogger } from './logging';
-import { kebabCase } from 'lodash';
-import { DateTime } from 'luxon';
-import { MIN_IN_MS, SEC_IN_MS } from '@nightbear/shared';
-import { DEFAULT_TIMEZONE } from '@nightbear/shared';
-import { Context } from './api';
+import { CronjobsJournal } from '../db/cronjobsJournal/types'
+import { extendLogger } from './logging'
+import { kebabCase } from 'lodash'
+import { DateTime } from 'luxon'
+import { MIN_IN_MS, SEC_IN_MS } from '@nightbear/shared'
+import { DEFAULT_TIMEZONE } from '@nightbear/shared'
+import { Context } from './api'
 
 export type Cronjob = (
   context: Context,
   journal: CronjobsJournal,
-) => Promise<Partial<CronjobsJournal> | void | undefined> | void | undefined;
+) => Promise<Partial<CronjobsJournal> | void | undefined> | void | undefined
 
 /**
  * The process of running Cronjobs goes like this:
@@ -22,34 +22,34 @@ export type Cronjob = (
  * 1. We're done
  */
 export const runCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
-  const log = extendLogger(context.log, 'cron');
-  const now = Date.now();
-  const jobNames = Object.keys(cronjobs);
+  const log = extendLogger(context.log, 'cron')
+  const now = Date.now()
+  const jobNames = Object.keys(cronjobs)
 
-  log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${DEFAULT_TIMEZONE}"`);
-  log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '));
+  log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${DEFAULT_TIMEZONE}"`)
+  log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '))
 
-  let [journal] = await context.db.cronjobsJournal.load();
+  let [journal] = await context.db.cronjobsJournal.load()
 
   for (const jobName of jobNames) {
-    const jobContext = extendLogger(context, kebabCase(jobName));
+    const jobContext = extendLogger(context, kebabCase(jobName))
     try {
-      const journalUpdates = await cronjobs[jobName](jobContext, journal);
-      journal = { ...journal, ...journalUpdates }; // if a job provided updates to the journal, merge those in
+      const journalUpdates = await cronjobs[jobName](jobContext, journal)
+      journal = { ...journal, ...journalUpdates } // if a job provided updates to the journal, merge those in
     } catch (err) {
-      jobContext.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`);
+      jobContext.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`)
     }
   }
 
-  await context.db.cronjobsJournal.update({ ...journal, previousExecutionAt: new Date() }); // persist updated journal into DB for the next run
+  await context.db.cronjobsJournal.update({ ...journal, previousExecutionAt: new Date() }) // persist updated journal into DB for the next run
 
-  log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`);
-};
+  log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`)
+}
 
 /**
  * Same as runCronJobs(), but keeps them running.
  */
 export const startCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
-  await runCronJobs(context, cronjobs); // run once right away
-  setInterval(() => runCronJobs(context, cronjobs), 5 * MIN_IN_MS);
-};
+  await runCronJobs(context, cronjobs) // run once right away
+  setInterval(() => runCronJobs(context, cronjobs), 5 * MIN_IN_MS)
+}
