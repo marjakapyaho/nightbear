@@ -1,11 +1,10 @@
+import { SensorEntry, isNotNullish, isNullish } from '@nightbear/shared'
 import axios from 'axios'
+import _ from 'lodash'
+import { DateTime } from 'luxon'
 import { CronjobsJournal } from '../../db/cronjobsJournal/types'
 import { Context } from '../../utils/api'
 import { Cronjob } from '../../utils/cronjobs'
-import { DateTime } from 'luxon'
-import _ from 'lodash'
-import { SensorEntry } from '@nightbear/shared'
-import { isNotNullish, isNullish } from '@nightbear/shared'
 
 export const devDataImport: Cronjob = async (
   context,
@@ -47,12 +46,8 @@ export const devDataImport: Cronjob = async (
 const fetchTimelineEntries = async (context: Context, minutes: number) => {
   const { log, config } = context
 
-  const encode = (x: string) => encodeURIComponent(JSON.stringify(x))
-  // TODO: is this correct?
-  const startKey = encode(`timeline/${DateTime.fromJSDate(new Date()).minus({ minutes }).toISO()}`)
-  const endKey = encode(`timeline/_`)
-  const url = `${config.DEV_DATA_IMPORT_FROM_COUCHDB}/_all_docs?startkey=${startKey}&endkey=${endKey}&include_docs=true`
-
+  const startKey = 'timeline/' + DateTime.now().minus({ minutes }).toUTC().toISO().split('.')[0]
+  const url = `${config.DEV_DATA_IMPORT_FROM_COUCHDB}/_all_docs?startkey="${startKey}"&include_docs=true`
   const response = await axios.get(url)
 
   const data = (response.data.rows as unknown[]).map(row => {
