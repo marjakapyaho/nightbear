@@ -1,7 +1,6 @@
-import { getProfiles } from 'api/profiles/handler'
 import { RequestHandlerTuple } from '../utils/express'
 import { ackActiveAlarm, getActiveAlarm } from './alarms/handler'
-import { activateProfile, createProfile, editProfile } from './profiles/handler'
+import { activateProfile, createProfile, editProfile, getProfiles } from './profiles/handler'
 import { getTimelineEntries, updateTimelineEntries } from './timelineEntries/handler'
 
 export default [
