@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "yarn db:types && yarn ts:node ./index.ts",
-    "build": "rm -rf build && tsc --project . --outDir build --noEmit false --target es2020 --module commonjs",
+    "build": "rm -rf build && tsc",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "lint": "eslint --ext ts,tsx && tsc",

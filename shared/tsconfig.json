@@ -1,24 +1,11 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": false,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "lib": ["ES2021", "DOM"],
-    "esModuleInterop": true,
-    "module": "commonjs",
-    "outDir": "./dist",
-    "sourceMap": true,
     "target": "ES2021",
-    "resolveJsonModule": true
+    "lib": ["ES2021", "DOM"],
+    "module": "commonjs",
+    "baseUrl": ".",
+    "outDir": "./dist"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"],
-  "ts-node": {
-    "files": true
-  }
+  "include": ["src/**/*.ts"]
 }
