@@ -9,7 +9,7 @@ debug.log = consoleLogStream // direct log output to where we want it
 const context = createNodeContext() // create application runtime context
 
 export default async (_req: Request) => {
-  runCronJobs(context, {
+  await runCronJobs(context, {
     devDataImport,
   })
 }
