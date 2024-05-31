@@ -2,9 +2,9 @@
   "name": "api",
   "version": "1.0.0",
   "license": "AGPL-3.0",
-  "main": "index.ts",
+  "main": "entrypoints/local-dev.ts",
   "scripts": {
-    "dev": "yarn db:types && yarn ts:node ./index.ts",
+    "dev": "yarn db:types && yarn ts:node entrypoints/local-dev.ts",
     "build": "rm -rf build && tsc",
     "test": "vitest run",
     "test:watch": "vitest watch",
