@@ -1,15 +1,17 @@
+import {
+  MIN_IN_MS,
+  generateSensorEntries,
+  generateUuid,
+  getTimeMinusTime,
+  getTimestampFlooredToEveryFiveMinutes,
+  mockNow,
+  mockProfiles,
+} from '@nightbear/shared'
 import { NO_PUSHOVER } from '../cronjobs/alarms/pushoverClient'
 import { NO_DEXCOM_SHARE } from '../cronjobs/dexcom/dexcomShareClient'
-import { NO_LOGGING } from './logging'
-import { mockNow } from '@nightbear/shared'
-import { mockProfiles } from '@nightbear/shared'
-import { MIN_IN_MS } from '@nightbear/shared'
-import { generateUuid } from '@nightbear/shared'
-import { generateSensorEntries } from '@nightbear/shared'
-import { getTimeMinusTime } from '@nightbear/shared'
-import { getTimestampFlooredToEveryFiveMinutes } from '@nightbear/shared'
 import { Context, Request } from './api'
 import { createDbClient } from './db'
+import { NO_LOGGING } from './logging'
 
 export const createTestContext = (timestamp = () => mockNow): Context => {
   if (!process.env.DATABASE_URL_TEST)
@@ -22,7 +24,9 @@ export const createTestContext = (timestamp = () => mockNow): Context => {
     storage: null,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,
-    config: {},
+    config: {
+      NIGHTBEAR_API_KEY: 'TEST_ENV_MOCK_API_KEY',
+    },
   }
 }
 
