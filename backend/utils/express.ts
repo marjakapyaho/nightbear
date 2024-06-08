@@ -1,11 +1,10 @@
+import { generateUuid, getTimeMinusTimeMs } from '@nightbear/shared'
 import * as bodyParser from 'body-parser'
-import { generateUuid } from '@nightbear/shared'
-import { extendLogger, Logger } from './logging'
 import cors from 'cors'
 import express, { Request as ExpressRequest } from 'express'
 import { isString, pickBy } from 'lodash'
-import { Context, RequestHandler, Request, Headers } from './api'
-import { getTimeMinusTimeMs } from '@nightbear/shared'
+import { Context, Headers, Request, RequestHandler, hasValidApiKey } from './api'
+import { Logger, extendLogger } from './logging'
 
 export type HttpMethod = 'get' | 'post' | 'put'
 export type RequestHandlerTuple = [HttpMethod, string, RequestHandler]
@@ -22,19 +21,24 @@ export function startExpressServer(
     handlers.forEach(([method, path, handler]) => {
       app[method](path, (req, res) => {
         const requestId = req.get('X-Request-ID') || generateUuid() // use Heroku-style req-ID where available, but fall back to our own
-        Promise.resolve(normalizeRequest(requestId, req))
-          .then(request => handlerWithLogging(handler, log)(request, context))
-          .then(
-            response => {
-              const { responseBody, responseStatus } = response
-              res.status(responseStatus)
-              res.json(responseBody)
-            },
-            () =>
-              res.status(500).json({
-                errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})`,
-              }),
-          )
+        const request = normalizeRequest(requestId, req)
+        if (hasValidApiKey(request, context)) {
+          Promise.resolve()
+            .then(() => handlerWithLogging(handler, log)(request, context))
+            .then(
+              response => {
+                const { responseBody, responseStatus } = response
+                res.status(responseStatus)
+                res.json(responseBody)
+              },
+              () =>
+                res.status(500).json({
+                  errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})`,
+                }),
+            )
+        } else {
+          res.status(401).send(`Unauthorized`)
+        }
       })
     })
 

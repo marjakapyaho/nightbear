@@ -1,3 +1,6 @@
+import { API_KEY_HEADER, getTimeAsISOStr, parseNumber } from '@nightbear/shared'
+import { readFileSync } from 'fs'
+import { map } from 'lodash'
 import {
   NO_PUSHOVER,
   PushoverClient,
@@ -8,12 +11,8 @@ import {
   NO_DEXCOM_SHARE,
   createDexcomShareClient,
 } from '../cronjobs/dexcom/dexcomShareClient'
-import { Logger, createLogger } from './logging'
-import { readFileSync } from 'fs'
-import { map } from 'lodash'
-import { parseNumber } from '@nightbear/shared'
-import { getTimeAsISOStr } from '@nightbear/shared'
 import { DbClient, createDbClient } from './db'
+import { Logger, createLogger } from './logging'
 
 export type Headers = {
   [header: string]: string | string[]
@@ -46,6 +45,7 @@ export type Context = {
   config: {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES?: number
     DEV_DATA_IMPORT_FROM_COUCHDB?: string
+    NIGHTBEAR_API_KEY: string
   }
 }
 
@@ -62,18 +62,21 @@ export function createNodeContext(): Context {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES,
     PUSHOVER_DISABLED,
     DEV_DATA_IMPORT_FROM_COUCHDB,
+    NIGHTBEAR_API_KEY,
   } = process.env
 
   if (!DATABASE_URL) throw new Error(`Missing required env-var: DATABASE_URL`)
   if (!PUSHOVER_USER) throw new Error(`Missing required env-var: PUSHOVER_USER`)
   if (!PUSHOVER_TOKEN) throw new Error(`Missing required env-var: PUSHOVER_TOKEN`)
   if (!PUSHOVER_CALLBACK) throw new Error(`Missing required env-var: PUSHOVER_CALLBACK`)
+  if (!NIGHTBEAR_API_KEY) throw new Error(`Missing required env-var: NIGHTBEAR_API_KEY`)
 
   const log = createLogger()
   const config = {
     DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES:
       parseNumber(DEXCOM_SHARE_LOGIN_ATTEMPT_DELAY_MINUTES) ?? 180, // Default to 3 hours
     DEV_DATA_IMPORT_FROM_COUCHDB,
+    NIGHTBEAR_API_KEY,
   }
 
   log(`Starting Nightbear version ${getDeployedVersion()}`)
@@ -109,4 +112,12 @@ export function getDeployedVersion() {
   } catch (err) {
     return '(local dev)'
   }
+}
+
+export const hasValidApiKey = (request: Request, context: Context) => {
+  const { NIGHTBEAR_API_KEY } = context.config
+  const val = request.requestHeaders[API_KEY_HEADER.toLowerCase()]
+  const res = val === NIGHTBEAR_API_KEY
+  context.log(`Request has invalid ${API_KEY_HEADER} header: "${val}"`)
+  return res
 }

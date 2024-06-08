@@ -2,7 +2,7 @@ import type { Context as NetlifyContext } from '@netlify/functions'
 import debug from 'debug'
 import _ from 'lodash'
 import routes from '../api/routes'
-import { Request as NightbearRequest, createNodeContext } from '../utils/api'
+import { Request as NightbearRequest, createNodeContext, hasValidApiKey } from '../utils/api'
 import { handlerWithLogging } from '../utils/express'
 import { consoleLogStream, extendLogger } from '../utils/logging'
 
@@ -18,8 +18,7 @@ const log = extendLogger(context.log, 'http')
 export default async (netlifyRequest: Request, netlifyContext: NetlifyContext) => {
   const req = await normalizeRequest(netlifyRequest, netlifyContext)
 
-  if (Boolean(req)) {
-    // TODO: Add support for API key
+  if (!hasValidApiKey(req, context)) {
     return new Response(`Unauthorized`, {
       status: 401,
       headers: { 'Content-Type': 'text/plain' },
@@ -66,7 +65,7 @@ const normalizeRequest = async (
 
   const requestHeaders: { [key: string]: string } = {}
   netlifyRequest.headers.forEach((value, key) => {
-    requestHeaders[key] = value
+    requestHeaders[key.toLowerCase()] = value
   })
 
   const requestParams: { [param: string]: string } = {}
