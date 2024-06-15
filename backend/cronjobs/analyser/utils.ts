@@ -211,7 +211,7 @@ export const getPredictedSituation = (
   return detectSituation(
     getLatestAnalyserEntry(predictedEntries)?.timestamp,
     activeProfile,
-    predictedEntries,
+    [...analyserEntries, ...predictedEntries],
     insulinEntries,
     carbEntries,
     alarms,
@@ -296,7 +296,11 @@ export const isPredictedSituationAnyLowOrMissing = (
 
 export const isPredictedSituationAnyHighOrMissing = (
   predictedSituation?: Situation | 'NO_SITUATION',
-) => !predictedSituation || predictedSituation === 'HIGH' || predictedSituation === 'BAD_HIGH'
+) =>
+  !predictedSituation ||
+  predictedSituation === 'HIGH' ||
+  predictedSituation === 'BAD_HIGH' ||
+  predictedSituation === 'PERSISTENT_HIGH'
 
 export const areThereSpecificSituationsInGivenWindow = (
   currentTimestamp: string,

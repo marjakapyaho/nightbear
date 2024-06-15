@@ -197,11 +197,11 @@ export const detectSituation = (
   if (
     detectPersistentHigh(
       activeProfile,
-      latestEntry,
       analyserEntries,
       insulinOnBoard,
       thereIsTooLittleInsulin,
       currentTimestamp,
+      predictedSituation,
     )
   ) {
     return 'PERSISTENT_HIGH'

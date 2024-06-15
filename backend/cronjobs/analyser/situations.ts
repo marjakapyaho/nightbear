@@ -210,11 +210,11 @@ export const detectRising = (
 
 export const detectPersistentHigh = (
   activeProfile: Profile,
-  latestEntry: AnalyserEntry,
   entries: AnalyserEntry[],
   insulinOnBoard: number,
   thereIsTooLittleInsulinForCarbs: boolean,
   currentTimestamp: string,
+  predictedSituation?: Situation | 'NO_SITUATION',
 ) => {
   const { relevantEntries, hasEnoughData } = getRelevantEntries(
     currentTimestamp,
@@ -229,9 +229,12 @@ export const detectPersistentHigh = (
   const thereIsNotEnoughCorrectionInsulin =
     insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH || thereIsTooLittleInsulinForCarbs
 
-  const slopeIsNotDown = !slopeIsNegative(latestEntry)
+  const predictedSituationAnyHigh = isPredictedSituationAnyHighOrMissing(predictedSituation)
 
   return (
-    hasEnoughData && isAllDataRelativeHigh && thereIsNotEnoughCorrectionInsulin && slopeIsNotDown
+    hasEnoughData &&
+    isAllDataRelativeHigh &&
+    thereIsNotEnoughCorrectionInsulin &&
+    predictedSituationAnyHigh
   )
 }

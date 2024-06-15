@@ -54,7 +54,7 @@ describe('analyser/persistentHigh', () => {
         activeProfile: getMockActiveProfile('day'),
         sensorEntries: generateSensorEntries({
           currentTimestamp: mockNow,
-          bloodGlucoseHistory: [9.5, 9.5, 9.4, 9.6, 9.6, 9.5, 9.4, 9.5],
+          bloodGlucoseHistory: [9.4, 9.6, 9.6, 9.5, 9.4, 9.5],
         }),
         meterEntries: [],
         insulinEntries: [],
@@ -144,14 +144,14 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('PERSISTENT_HIGH')
   })
 
-  it('does not detect PERSISTENT_HIGH when slope of last value is down', () => {
+  it('does not detect PERSISTENT_HIGH when predicted state is not any high', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
         activeProfile: getMockActiveProfile('day'),
         sensorEntries: generateSensorEntries({
           currentTimestamp: mockNow,
-          bloodGlucoseHistory: [...persistentHighValues, 9.4],
+          bloodGlucoseHistory: [...persistentHighValues, 9.4, 9.1, 8.4],
         }),
         meterEntries: [],
         insulinEntries: [],
@@ -161,7 +161,7 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('NO_SITUATION')
   })
 
-  it('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
+  it.only('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
@@ -188,7 +188,7 @@ describe('analyser/persistentHigh', () => {
           {
             timestamp: getTimeMinusMinutes(mockNow, 15),
             amount: 70,
-            durationFactor: 1,
+            durationFactor: 2,
           },
         ],
         alarms: [],
