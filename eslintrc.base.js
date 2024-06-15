@@ -35,6 +35,7 @@ module.exports = {
     'no-console': 'off',
     'no-var': 'error',
     'import/order': 'off',
+    'import/no-unresolved': 'off',
   },
   overrides: [
     {
