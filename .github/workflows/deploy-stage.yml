@@ -33,6 +33,5 @@ jobs:
         with: { node-version: '18.16.1' }
       - run: yarn setup:local
       - run: contrib/db/migrate test
-      - run: yarn test:back
-      # - run: yarn validate
+      - run: yarn validate
       # - run: 'echo TODO: Deploy to Netlify'
