@@ -1,10 +1,10 @@
 import { sortBy } from 'lodash'
 import { HOUR_IN_MS, MIN_IN_MS } from './const'
 import { describe, expect, it } from 'vitest'
-import { mockNow, mockNowSlot, mockTimelineEntries } from '../mocks'
+import { mockNow, mockTimelineEntries } from '../mocks'
 import { MeterEntry, SensorEntry } from '../types'
 import { generateSensorEntries } from './test'
-import { getTimeInMillis, getTimeMinusMinutes, getTimeMinusTime } from './time'
+import { getTimeMinusTime } from './time'
 import { getMergedBgEntries, mapTimelineEntriesToGraphPoints } from './timelineEntries'
 
 describe('../calculations', () => {
