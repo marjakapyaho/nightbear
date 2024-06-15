@@ -14,9 +14,9 @@ jobs:
       nightbear_db_test:
         image: postgres:16
         env:
+          POSTGRES_DB: nightbear_test
           POSTGRES_USER: nightbear
-          POSTGRES_PASSWORD: nightbear_test
-          POSTGRES_DB: nightbear
+          POSTGRES_PASSWORD: nightbear
         ports:
           - 35432:5432
         options: >-

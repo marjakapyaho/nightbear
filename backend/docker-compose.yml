@@ -5,8 +5,8 @@ services:
     container_name: nightbear-db-test
     restart: always
     environment:
-      - POSTGRES_USER=nightbear
       - POSTGRES_DB=nightbear_test
+      - POSTGRES_USER=nightbear
       - POSTGRES_PASSWORD=nightbear
     ports:
       - '35432:5432'
@@ -16,8 +16,8 @@ services:
     container_name: nightbear-db-dev
     restart: always
     environment:
-      - POSTGRES_USER=nightbear
       - POSTGRES_DB=nightbear_dev
+      - POSTGRES_USER=nightbear
       - POSTGRES_PASSWORD=nightbear
     ports:
       - '25432:5432'
