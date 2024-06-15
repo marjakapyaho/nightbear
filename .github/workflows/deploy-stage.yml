@@ -32,9 +32,7 @@ jobs:
       - uses: actions/setup-node@v1
         with: { node-version: '18.16.1' }
       - run: yarn setup:local
-      # - run: yarn validate
-      - run: docker ps
-      # - run: docker exec nightbear-db-test psql -U nightbear -d nightbear -c 'SELECT true;'
       - run: contrib/db/migrate test
-      # - run: yarn test:back
+      - run: yarn test:back
+      # - run: yarn validate
       # - run: 'echo TODO: Deploy to Netlify'
