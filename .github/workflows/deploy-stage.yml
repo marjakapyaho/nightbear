@@ -7,17 +7,24 @@ on:
       - test-deploy-stage # you can push to this branch to test the stage-deploy process, without having to touch the main branch
 
 jobs:
-  main:
+  deploy-stage:
+    name: Deploy stage
     runs-on: ubuntu-latest
     services:
       nightbear_db_test:
         image: postgres:16
+        name: nightbear-db-test
         env:
           POSTGRES_USER: nightbear
           POSTGRES_PASSWORD: nightbear_test
           POSTGRES_DB: nightbear
         ports:
-          - '35432:5432'
+          - 35432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       DATABASE_URL_TEST: postgres://nightbear:nightbear@localhost:35432/nightbear_test
     steps:
@@ -27,5 +34,6 @@ jobs:
       - run: yarn setup:local
       # - run: yarn validate
       - run: docker ps
+      - run: docker exec -it nightbear-db-test psql -U nightbear -d nightbear -c 'SELECT true;'
       # - run: yarn test:back
       # - run: 'echo TODO: Deploy to Netlify'
