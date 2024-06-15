@@ -15,7 +15,7 @@ export const Timestamp = ({ ts, live }: Props) => {
   )
 
   useEffect(() => {
-    if (!live) return
+    if (!live) return undefined
     const interval = setInterval(() => setFormattedTs(getFormattedTs(ts, live)), 1000)
     return () => clearInterval(interval)
   }, [ts, live])

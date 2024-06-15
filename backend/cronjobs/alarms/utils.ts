@@ -63,8 +63,9 @@ export const retryNotifications = async (
       if (receipt) {
         return context.db.markAlarmAsProcessed({
           ...state,
-          notificationReceipt: receipt,
+          notificationReceipt: String(receipt),
         })
       }
+      return null
     }),
   )

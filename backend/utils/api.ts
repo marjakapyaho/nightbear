@@ -24,7 +24,7 @@ export type Request = {
   requestPath: string
   requestParams: { [param: string]: string }
   requestHeaders: Headers
-  requestBody: object | string
+  requestBody: unknown
 }
 
 export type ResponsePayload = {

@@ -36,7 +36,7 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
       const journalUpdates = await cronjobs[jobName](jobContext, journal)
       journal = { ...journal, ...journalUpdates } // if a job provided updates to the journal, merge those in
     } catch (err) {
-      jobContext.log(`Cronjob "${jobName}" execution failed (caused by\n${err}\n)`)
+      jobContext.log(`Cronjob "${jobName}" execution failed (caused by\n${String(err)}\n)`)
     }
   }
 
