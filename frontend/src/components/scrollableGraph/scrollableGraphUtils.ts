@@ -6,6 +6,7 @@ import {
   isNotNullish,
   ProfileActivation,
   Alarm,
+  SensorEntry,
 } from '@nightbear/shared'
 
 export type BaseGraphConfig = {
@@ -41,6 +42,7 @@ export type Point = {
   timestamp: number
   val: number | null
   color: string
+  sensorEntry?: SensorEntry
   insulinEntry?: InsulinEntry
   meterEntry?: MeterEntry
   carbEntry?: CarbEntry

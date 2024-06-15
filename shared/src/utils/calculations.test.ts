@@ -1,27 +1,24 @@
-import { HOUR_IN_MS } from 'src/utils/const'
-import { describe, expect, it } from 'vitest'
-import { mockBloodGlucoseEntries, mockCarbEntries, mockNow } from '../mocks'
-import { SensorEntry } from '../types'
+import { HOUR_IN_MS } from './const'
 import {
-  calculateCurrentCarbsToInsulinRatio,
-  calculateDailyAmounts,
-  calculateDailyAverageBgs,
   calculateHba1c,
   calculateRaw,
-  calculateRequiredCarbsToInsulinRatio,
   calculateTimeHigh,
   calculateTimeInRange,
   calculateTimeLow,
   changeBloodGlucoseUnitToMgdl,
   changeBloodGlucoseUnitToMmoll,
-  countSituations,
-  getBgAverage,
-  getCarbsOnBoard,
-  getInsulinOnBoard,
-  getPercentOfCarbsRemaining,
-  getPercentOfInsulinRemaining,
   isDexcomEntryValid,
   roundTo2Decimals,
+  getPercentOfInsulinRemaining,
+  getInsulinOnBoard,
+  getPercentOfCarbsRemaining,
+  getCarbsOnBoard,
+  calculateCurrentCarbsToInsulinRatio,
+  calculateRequiredCarbsToInsulinRatio,
+  calculateDailyAmounts,
+  calculateDailyAverageBgs,
+  countSituations,
+  getBgAverage,
 } from './calculations'
 import {
   getDateWithoutTime,
@@ -29,86 +26,9 @@ import {
   getTimeInMillis,
   getTimeMinusHours,
   getTimeMinusMinutes,
-  getTimeMinusTime,
 } from './time'
-
-const currentTimestamp = 1508672249758
-
-export const sensorEntries1: SensorEntry[] = [
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 35),
-    bloodGlucose: 6,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 30),
-    bloodGlucose: 6,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 25),
-    bloodGlucose: 6,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 20),
-    bloodGlucose: 8,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 15),
-    bloodGlucose: 7,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 10),
-    bloodGlucose: 7,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 5),
-    bloodGlucose: 8,
-    type: 'DEXCOM_G6_SHARE',
-  },
-]
-
-export const sensorEntries2: SensorEntry[] = [
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 35),
-    bloodGlucose: 14,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 30),
-    bloodGlucose: 11,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 25),
-    bloodGlucose: 11.5,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 20),
-    bloodGlucose: 12.5,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 15),
-    bloodGlucose: 13.1,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 10),
-    bloodGlucose: 12,
-    type: 'DEXCOM_G6_SHARE',
-  },
-  {
-    timestamp: getTimeMinusTime(currentTimestamp, 5),
-    bloodGlucose: 10,
-    type: 'DEXCOM_G6_SHARE',
-  },
-]
+import { describe, expect, it } from 'vitest'
+import { mockNow, mockBloodGlucoseEntries, mockCarbEntries } from '../mocks'
 
 describe('@nightbear/shared/calculations', () => {
   it('changeBloodGlucoseUnitToMmoll', () => {
@@ -176,33 +96,33 @@ describe('@nightbear/shared/calculations', () => {
   })
 
   it('calculateHba1c', () => {
-    expect(calculateHba1c(sensorEntries1)).toEqual(5.3278247884519665)
-    expect(calculateHba1c(sensorEntries2)).toEqual(8.56326530612245)
+    expect(calculateHba1c([6, 6, 6, 8, 7, 7, 8])).toEqual(5.3278247884519665)
+    expect(calculateHba1c([14, 11, 11.5, 12.5, 13.1, 12, 10])).toEqual(8.56326530612245)
   })
 
   it('calculateTimeInRange', () => {
-    expect(calculateTimeInRange(sensorEntries1)).toEqual(100)
-    expect(calculateTimeInRange(sensorEntries2)).toEqual(14)
+    expect(calculateTimeInRange([6, 6, 6, 8, 7, 7, 8])).toEqual(100)
+    expect(calculateTimeInRange([14, 11, 11.5, 12.5, 13.1, 12, 10])).toEqual(14)
   })
 
   it('calculateTimeLow', () => {
-    expect(calculateTimeLow(sensorEntries1)).toEqual(0)
-    expect(calculateTimeLow(sensorEntries2)).toEqual(0)
+    expect(calculateTimeLow([6, 6, 6, 8, 7, 7, 8])).toEqual(0)
+    expect(calculateTimeLow([14, 11, 11.5, 12.5, 13.1, 12, 10])).toEqual(0)
   })
 
   it('calculateTimeHigh', () => {
-    expect(calculateTimeHigh(sensorEntries1)).toEqual(0)
-    expect(calculateTimeHigh(sensorEntries2)).toEqual(86)
+    expect(calculateTimeHigh([6, 6, 6, 8, 7, 7, 8])).toEqual(0)
+    expect(calculateTimeHigh([14, 11, 11.5, 12.5, 13.1, 12, 10])).toEqual(86)
   })
 
   it('countSituations', () => {
-    expect(countSituations(sensorEntries1, 7.5, true)).toEqual(2)
-    expect(countSituations(sensorEntries2, 13, false)).toEqual(2)
+    expect(countSituations(['LOW', 'HIGH', 'LOW'], 'LOW')).toEqual(2)
+    expect(countSituations(['LOW', 'HIGH', 'LOW'], 'HIGH')).toEqual(1)
   })
 
   it('getBgAverage', () => {
-    expect(getBgAverage(sensorEntries1)).toEqual('6.9')
-    expect(getBgAverage(sensorEntries2)).toEqual('12.0')
+    expect(getBgAverage([6, 6, 6, 8, 7, 7, 8])).toEqual('6.9')
+    expect(getBgAverage([14, 11, 11.5, 12.5, 13.1, 12, 10])).toEqual('12.0')
   })
 
   // TODO: check these

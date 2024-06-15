@@ -1,6 +1,6 @@
 import { ScrollNumberSelector } from '../../components/scrollNumberSelector/ScrollNumberSelector'
 import { StatusBar } from '../../components/statusBar/StatusBar'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   findLatestPointWithBloodGlucose,
   getBgGraphBaseConfig,
@@ -12,31 +12,17 @@ import styles from './BgGraph.module.scss'
 import { Point } from '../../components/scrollableGraph/scrollableGraphUtils'
 import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph'
 import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
-import { getTimeAsISOStr, mapTimelineEntriesToGraphPoints } from '@nightbear/shared'
+import { getTimeAsISOStr } from '@nightbear/shared'
 import { last } from 'lodash'
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig()
 
   const now = Date.now()
-  const currentTimestamp = getTimeAsISOStr(now)
   const startTimestamp = getTimeAsISOStr(now - baseConfig.timelineRange)
 
-  const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
+  const { graphPoints, saveGraphPointData, isLoading, isError, isSuccess } =
     useTimelineEntries(startTimestamp)
-
-  const graphPoints = useMemo(
-    () =>
-      timelineEntries
-        ? mapTimelineEntriesToGraphPoints(
-            timelineEntries,
-            baseConfig.timelineRange,
-            currentTimestamp,
-          )
-        : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [timelineEntries],
-  )
 
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
   const latestPoint = last(graphPoints)
@@ -60,7 +46,7 @@ export const BgGraph = () => {
     const pointToSave = hasValueChanged
       ? getNewSelectedPointWithMeterEntry(newBg, basePoint)
       : basePoint
-        ? { ...basePoint, meterEntry: undefined }
+        ? { ...basePoint, meterEntry: undefined, val: basePoint?.sensorEntry?.bloodGlucose || null }
         : null
     setSelectedPoint(pointToSave)
     pointToSave && saveGraphPointData(pointToSave)

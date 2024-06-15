@@ -1,5 +1,12 @@
 import { fill, groupBy, reduce } from 'lodash'
-import { BloodGlucoseEntry, CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from '../types'
+import {
+  BloodGlucoseEntry,
+  CarbEntry,
+  InsulinEntry,
+  MeterEntry,
+  SensorEntry,
+  Situation,
+} from '../types'
 import { timeInRangeHighLimit, timeInRangeLowLimit } from './config'
 import { DAY_IN_MS, MIN_IN_MS, NOISE_LEVEL_LIMIT } from './const'
 import { isValidNumber, roundNumberToFixedDecimals } from './helpers'
@@ -64,80 +71,45 @@ export const roundTo2Decimals = (num: number) => {
   return Math.round(num * 100) / 100
 }
 
-export const calculateHba1c = (entries: BloodGlucoseEntry[]) => {
+export const calculateHba1c = (bgs: number[]) => {
   const sumOfEntries = reduce(
-    entries,
-    (sum, entry) => {
-      return sum + changeBloodGlucoseUnitToMgdl(entry.bloodGlucose)
+    bgs,
+    (sum, bg) => {
+      return sum + changeBloodGlucoseUnitToMgdl(bg)
     },
     0,
   )
 
-  const avgGlucose = sumOfEntries / entries.length
+  const avgGlucose = sumOfEntries / bgs.length
 
   // Base formula (avgGlucose + 46.7) / 28.7) from research, -0.6 from Nightscout
   return (avgGlucose + 46.7) / 28.7 - 0.6
 }
 
-export const calculateTimeInRange = (sensorEntries: BloodGlucoseEntry[]) => {
-  const totalCount = sensorEntries.length
-  const goodCount = sensorEntries.filter(
-    entry =>
-      entry.bloodGlucose &&
-      entry.bloodGlucose >= timeInRangeLowLimit &&
-      entry.bloodGlucose <= timeInRangeHighLimit,
-  ).length
-
+export const calculateTimeInRange = (bgs: number[]) => {
+  const totalCount = bgs.length
+  const goodCount = bgs.filter(bg => bg >= timeInRangeLowLimit && bg <= timeInRangeHighLimit).length
   return Math.round((goodCount / totalCount) * 100)
 }
 
-export const calculateTimeLow = (sensorEntries: BloodGlucoseEntry[]) => {
-  const totalCount = sensorEntries.length
-  const goodCount = sensorEntries.filter(
-    entry => entry.bloodGlucose && entry.bloodGlucose < timeInRangeLowLimit,
-  ).length
-
+export const calculateTimeLow = (bgs: number[]) => {
+  const totalCount = bgs.length
+  const goodCount = bgs.filter(bg => bg < timeInRangeLowLimit).length
   return Math.round((goodCount / totalCount) * 100)
 }
 
-export const calculateTimeHigh = (sensorEntries: BloodGlucoseEntry[]) => {
-  const totalCount = sensorEntries.length
-  const goodCount = sensorEntries.filter(
-    entry => entry.bloodGlucose && entry.bloodGlucose > timeInRangeHighLimit,
-  ).length
-
+export const calculateTimeHigh = (bgs: number[]) => {
+  const totalCount = bgs.length
+  const goodCount = bgs.filter(bg => bg > timeInRangeHighLimit).length
   return Math.round((goodCount / totalCount) * 100)
 }
 
 // Note: if there is e.g. 10 entries over limit in a row, it's categorized as one single occurrence of situation
-export const countSituations = (
-  sensorEntries: BloodGlucoseEntry[],
-  limit: number,
-  low: boolean,
-) => {
-  let counter = 0
-  let incidentBeingRecorded: boolean
+export const countSituations = (situations: Situation[], situation: Situation) =>
+  situations.filter(s => s === situation).length
 
-  sensorEntries.forEach(entry => {
-    if (entry.bloodGlucose && (low ? entry.bloodGlucose < limit : entry.bloodGlucose > limit)) {
-      if (!incidentBeingRecorded) {
-        counter++
-        incidentBeingRecorded = true
-      }
-    } else {
-      incidentBeingRecorded = false
-    }
-  })
-
-  return counter
-}
-
-export const getBgAverage = (sensorEntries: BloodGlucoseEntry[]) => {
-  const entriesWithBgs = sensorEntries.filter(entry => entry.bloodGlucose)
-  return setOneDecimal(
-    entriesWithBgs.reduce((sum, entry) => sum + (entry.bloodGlucose || 0), 0) /
-      entriesWithBgs.length,
-  )
+export const getBgAverage = (bgs: number[]) => {
+  return setOneDecimal(bgs.reduce((sum, bg) => sum + (bg || 0), 0) / bgs.length)
 }
 
 const getTotal = (dailyAmounts: (InsulinEntry | CarbEntry)[]) =>
@@ -306,4 +278,19 @@ export const calculateRequiredCarbsToInsulinRatio = (
   const ratio = sumOfCarbs / sumOfInsulins
 
   return isValidNumber(ratio) ? ratio : null
+}
+
+export const calculateAverageBgFromValues = (
+  bg1?: number | null,
+  bg2?: number | null,
+): number | null => {
+  if (!bg1) {
+    return bg2 || null
+  }
+
+  if (!bg2) {
+    return bg1 || null
+  }
+
+  return (bg1 + bg2) / 2
 }

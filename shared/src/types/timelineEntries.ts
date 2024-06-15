@@ -51,6 +51,7 @@ export type MeterEntry = z.infer<typeof MeterEntry>
 
 export const TimelineEntries = z.object({
   bloodGlucoseEntries: z.array(BloodGlucoseEntry),
+  sensorEntries: z.array(SensorEntry),
   insulinEntries: z.array(InsulinEntry),
   carbEntries: z.array(CarbEntry),
   meterEntries: z.array(MeterEntry),

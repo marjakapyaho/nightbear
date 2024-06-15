@@ -1,5 +1,12 @@
 import { Context, createResponse, Request } from '../../utils/api'
-import { HOUR_IN_MS, Point, getTimeMinusTime, getMergedBgEntries } from '@nightbear/shared'
+import {
+  HOUR_IN_MS,
+  Point,
+  getTimeMinusTime,
+  getMergedBgEntries,
+  mapTimelineEntriesToGraphPoints,
+  DAY_IN_MS,
+} from '@nightbear/shared'
 
 export const getTimelineEntries = async (request: Request, context: Context) => {
   const { start, end } = request.requestParams
@@ -36,14 +43,21 @@ export const getTimelineEntries = async (request: Request, context: Context) => 
     to: end || context.timestamp(),
   })
 
-  return createResponse({
-    bloodGlucoseEntries,
-    insulinEntries,
-    carbEntries,
-    meterEntries,
-    profileActivations,
-    alarms,
-  })
+  const graphPoints = mapTimelineEntriesToGraphPoints(
+    {
+      bloodGlucoseEntries,
+      sensorEntries,
+      insulinEntries,
+      carbEntries,
+      meterEntries,
+      profileActivations,
+      alarms,
+    },
+    DAY_IN_MS,
+    context.timestamp(),
+  )
+
+  return createResponse(graphPoints)
 }
 
 export const updateTimelineEntries = async (request: Request, context: Context) => {

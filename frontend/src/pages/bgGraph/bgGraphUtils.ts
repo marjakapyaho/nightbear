@@ -6,6 +6,7 @@ import {
   highLimit,
   lowLimit,
   InsulinEntryType,
+  calculateAverageBgFromValues,
 } from '@nightbear/shared'
 import { chain } from 'lodash'
 
@@ -59,6 +60,7 @@ export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint?: Poi
   basePoint
     ? {
         ...basePoint,
+        val: calculateAverageBgFromValues(newBg, basePoint?.sensorEntry?.bloodGlucose),
         meterEntry: {
           timestamp: basePoint.isoTimestamp,
           bloodGlucose: newBg,

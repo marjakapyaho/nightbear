@@ -36,6 +36,7 @@ export type Point = {
   timestamp: number
   val: number | null
   color: string
+  sensorEntry?: SensorEntry
   insulinEntry?: InsulinEntry
   meterEntry?: MeterEntry
   carbEntry?: CarbEntry
@@ -81,6 +82,7 @@ export const mapTimelineEntriesToGraphPoints = (
 ): Point[] => {
   const {
     bloodGlucoseEntries,
+    sensorEntries,
     insulinEntries,
     meterEntries,
     carbEntries,
@@ -102,6 +104,11 @@ export const mapTimelineEntriesToGraphPoints = (
 
       const bgEntry = getAndValidateEntry(
         bloodGlucoseEntries.filter(
+          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
+        ),
+      )
+      const sensorEntry = getAndValidateEntry(
+        sensorEntries.filter(
           entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
         ),
       )
@@ -138,6 +145,7 @@ export const mapTimelineEntriesToGraphPoints = (
         timestamp: getTimeInMillis(timestamp),
         val,
         color,
+        ...(sensorEntry && { sensorEntry }),
         ...(insulinEntry && { insulinEntry }),
         ...(meterEntry && { meterEntry }),
         ...(carbEntry && { carbEntry }),

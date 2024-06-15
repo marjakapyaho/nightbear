@@ -1,6 +1,5 @@
 import {
   reallyHighLimit,
-  reallyLowLimit,
   calculateHba1c,
   countSituations,
   calculateTimeHigh,
@@ -13,6 +12,7 @@ import {
   setOneDecimal,
   getTimeAsISOStr,
   getTimeInMillis,
+  isNotNullish,
 } from '@nightbear/shared'
 import styles from './Stats.module.scss'
 import { StatLine } from './StatLine'
@@ -20,31 +20,43 @@ import { StatGraph } from './StatGraph'
 import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
 
 export const Stats = () => {
-  const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS))
-  const bloodGlucoseEntries = timelineEntries?.bloodGlucoseEntries || []
-  const insulinEntries = timelineEntries?.insulinEntries || []
-  const carbEntries = timelineEntries?.carbEntries || []
+  const { graphPoints } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS))
 
-  // Override sensor entries with meter entries where necessary
-  const timeInRange = calculateTimeInRange(bloodGlucoseEntries) || ''
-  const timeLow = calculateTimeLow(bloodGlucoseEntries) || ''
-  const timeHigh = calculateTimeHigh(bloodGlucoseEntries) || ''
-  const hba1c = setOneDecimal(calculateHba1c(bloodGlucoseEntries)) || ''
+  const bgs = graphPoints.map(p => p.val).filter(isNotNullish)
+  const timeInRange = calculateTimeInRange(bgs) || ''
+  const timeLow = calculateTimeLow(bgs) || ''
+  const timeHigh = calculateTimeHigh(bgs) || ''
+  const hba1c = setOneDecimal(calculateHba1c(bgs)) || ''
+
+  const situations = graphPoints
+    .flatMap(p => p.alarms)
+    .filter(isNotNullish)
+    .map(alarm => alarm.situation)
 
   const daysToShow = 28
-  const dailyInsulins = calculateDailyAmounts(insulinEntries, daysToShow).map(val => ({
+  const dailyInsulins = calculateDailyAmounts(
+    graphPoints.map(p => p.insulinEntry).filter(isNotNullish),
+    daysToShow,
+  ).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#EE776E',
   }))
-  const dailyCarbs = calculateDailyAmounts(carbEntries, daysToShow).map(val => ({
+  const dailyCarbs = calculateDailyAmounts(
+    graphPoints.map(p => p.carbEntry).filter(isNotNullish),
+    daysToShow,
+  ).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.total,
     color: '#9AD5B3',
   }))
-  const dailyAverageBgs = calculateDailyAverageBgs(bloodGlucoseEntries, daysToShow).map(val => ({
+  // TODO: fix to use bg
+  const dailyAverageBgs = calculateDailyAverageBgs(
+    graphPoints.map(p => p.sensorEntry).filter(isNotNullish),
+    daysToShow,
+  ).map(val => ({
     isoTimestamp: val.timestamp,
     timestamp: getTimeInMillis(val.timestamp),
     val: val.average,
@@ -93,29 +105,24 @@ export const Stats = () => {
         decimals={0}
       />
 
-      <StatLine
-        title="Avg BG"
-        subtitle="for 7 days"
-        figure={getBgAverage(bloodGlucoseEntries)}
-        color="#54c87e"
-      />
+      <StatLine title="Avg BG" subtitle="for 7 days" figure={getBgAverage(bgs)} color="#54c87e" />
       <StatLine title="Hba1c" subtitle="for 7 days" figure={hba1c} color="#54c87e" />
       <StatLine
         title="LOW"
         subtitle="below 3.7"
-        figure={countSituations(bloodGlucoseEntries, 3.7, true)}
+        figure={countSituations(situations, 'LOW')}
         color="#ee5a36"
       />
       <StatLine
-        title="LOW"
+        title="BAD LOW"
         subtitle="below 3.0"
-        figure={countSituations(bloodGlucoseEntries, reallyLowLimit, true)}
+        figure={countSituations(situations, 'BAD_LOW')}
         color="#ee5a36"
       />
       <StatLine
-        title="HIGH"
+        title="BAD HIGH"
         subtitle={`over ${reallyHighLimit}`}
-        figure={countSituations(bloodGlucoseEntries, reallyHighLimit, false)}
+        figure={countSituations(situations, 'BAD_HIGH')}
         color="#F8CC6F"
       />
     </div>
