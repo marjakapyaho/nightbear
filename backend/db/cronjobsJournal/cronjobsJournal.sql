@@ -1,4 +1,4 @@
-/* @name update */
+/* @name updateCronjobsJournal */
 UPDATE cronjobs_journal
 SET
   previous_execution_at = :previousExecutionAt,
@@ -6,5 +6,5 @@ SET
   dexcom_share_login_attempt_at = :dexcomShareLoginAttemptAt
 RETURNING *;
 
-/* @name load */
+/* @name loadCronjobsJournal */
 SELECT * FROM cronjobs_journal LIMIT 1;

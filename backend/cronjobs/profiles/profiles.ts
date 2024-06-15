@@ -1,12 +1,12 @@
+import { DEFAULT_TIMEZONE } from '@nightbear/shared'
+import { CronjobsJournal } from '@nightbear/shared/src/types/cronjobsJournal'
+import { Context } from '../../utils/api'
+import { Cronjob } from '../../utils/cronjobs'
 import {
   findRepeatingTemplateToActivate,
   shouldNonRepeatingActivationBeDeactivated,
   shouldRepeatingActivationBeSwitched,
 } from './utils'
-import { CronjobsJournal } from '../../db/cronjobsJournal/types'
-import { Context } from '../../utils/api'
-import { Cronjob } from '../../utils/cronjobs'
-import { DEFAULT_TIMEZONE } from '@nightbear/shared'
 
 export const profiles: Cronjob = async (
   context,

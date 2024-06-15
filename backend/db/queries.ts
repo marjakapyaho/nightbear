@@ -1,9 +1,39 @@
 import {
+  ALARM_START_LEVEL,
+  Alarm,
+  AlarmState,
+  CarbEntry,
+  IdReturnType,
+  InsulinEntry,
+  MeterEntry,
+  Profile,
+  ProfileActivation,
+  SensorEntry,
+  Situation,
+  TimestampReturnType,
+} from '@nightbear/shared'
+import { Pool } from 'pg'
+import { CronjobsJournal } from '../../shared/src/types/cronjobsJournal'
+import { GenParams, bindQueryShorthands } from '../utils/db'
+import {
+  createAlarm,
+  createAlarmState,
+  deactivateAlarm,
+  getAlarmStateByAlarmId,
+  getAlarms,
+  markAlarmAsProcessed,
+  markAllAlarmStatesAsProcessed,
+} from './alarms/alarms.queries'
+import {
   createCarbEntries,
   deleteCarbEntry,
   getCarbEntriesByTimestamp,
   upsertCarbEntry,
 } from './carbEntries/carbEntries.queries'
+import {
+  loadCronjobsJournal,
+  updateCronjobsJournal,
+} from './cronjobsJournal/cronjobsJournal.queries'
 import {
   createInsulinEntries,
   deleteInsulinEntry,
@@ -17,37 +47,6 @@ import {
   upsertMeterEntry,
 } from './meterEntries/meterEntries.queries'
 import {
-  createSensorEntries,
-  createSensorEntry,
-  getLatestSensorEntry,
-  getSensorEntriesByTimestamp,
-} from './sensorEntries/sensorEntries.queries'
-import { GenParams, bindQueryShorthands } from '../utils/db'
-import { Pool } from 'pg'
-import {
-  Alarm,
-  AlarmState,
-  Situation,
-  Profile,
-  ProfileActivation,
-  IdReturnType,
-  TimestampReturnType,
-  CarbEntry,
-  InsulinEntry,
-  MeterEntry,
-  SensorEntry,
-  ALARM_START_LEVEL,
-} from '@nightbear/shared'
-import {
-  createAlarm,
-  createAlarmState,
-  deactivateAlarm,
-  getAlarmStateByAlarmId,
-  getAlarms,
-  markAlarmAsProcessed,
-  markAllAlarmStatesAsProcessed,
-} from './alarms/alarms.queries'
-import {
   createProfileActivation,
   createProfileTemplate,
   editProfileTemplate,
@@ -56,6 +55,12 @@ import {
   getProfileActivationsByTimestamp,
   getProfiles,
 } from './profiles/profiles.queries'
+import {
+  createSensorEntries,
+  createSensorEntry,
+  getLatestSensorEntry,
+  getSensorEntriesByTimestamp,
+} from './sensorEntries/sensorEntries.queries'
 
 export const queries = (pool: Pool) => {
   const { one, many, oneOrNone } = bindQueryShorthands(pool)
@@ -227,6 +232,14 @@ export const queries = (pool: Pool) => {
 
     async getAlarmStateByAlarmId(alarmId: string) {
       return one(AlarmState, getAlarmStateByAlarmId, { alarmId })
+    },
+
+    async updateCronjobsJournal(journal: CronjobsJournal) {
+      return one(CronjobsJournal, updateCronjobsJournal, journal)
+    },
+
+    async loadCronjobsJournal() {
+      return one(CronjobsJournal, loadCronjobsJournal)
     },
   }
 }

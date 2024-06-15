@@ -1,27 +1,27 @@
 /** Types generated for queries found in "db/cronjobsJournal/cronjobsJournal.sql" */
 import { PreparedQuery } from '@pgtyped/runtime';
 
-/** 'Update' parameters type */
-export interface IUpdateParams {
+/** 'UpdateCronjobsJournal' parameters type */
+export interface IUpdateCronjobsJournalParams {
   dexcomShareLoginAttemptAt?: string | Date | null | void;
   dexcomShareSessionId?: string | null | void;
   previousExecutionAt?: string | Date | null | void;
 }
 
-/** 'Update' return type */
-export interface IUpdateResult {
+/** 'UpdateCronjobsJournal' return type */
+export interface IUpdateCronjobsJournalResult {
   dexcomShareLoginAttemptAt: string | null;
   dexcomShareSessionId: string | null;
   previousExecutionAt: string | null;
 }
 
-/** 'Update' query type */
-export interface IUpdateQuery {
-  params: IUpdateParams;
-  result: IUpdateResult;
+/** 'UpdateCronjobsJournal' query type */
+export interface IUpdateCronjobsJournalQuery {
+  params: IUpdateCronjobsJournalParams;
+  result: IUpdateCronjobsJournalResult;
 }
 
-const updateIR: any = {"usedParamSet":{"previousExecutionAt":true,"dexcomShareSessionId":true,"dexcomShareLoginAttemptAt":true},"params":[{"name":"previousExecutionAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":54,"b":73}]},{"name":"dexcomShareSessionId","required":false,"transform":{"type":"scalar"},"locs":[{"a":104,"b":124}]},{"name":"dexcomShareLoginAttemptAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":161,"b":186}]}],"statement":"UPDATE cronjobs_journal\nSET\n  previous_execution_at = :previousExecutionAt,\n  dexcom_share_session_id = :dexcomShareSessionId,\n  dexcom_share_login_attempt_at = :dexcomShareLoginAttemptAt\nRETURNING *"};
+const updateCronjobsJournalIR: any = {"usedParamSet":{"previousExecutionAt":true,"dexcomShareSessionId":true,"dexcomShareLoginAttemptAt":true},"params":[{"name":"previousExecutionAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":54,"b":73}]},{"name":"dexcomShareSessionId","required":false,"transform":{"type":"scalar"},"locs":[{"a":104,"b":124}]},{"name":"dexcomShareLoginAttemptAt","required":false,"transform":{"type":"scalar"},"locs":[{"a":161,"b":186}]}],"statement":"UPDATE cronjobs_journal\nSET\n  previous_execution_at = :previousExecutionAt,\n  dexcom_share_session_id = :dexcomShareSessionId,\n  dexcom_share_login_attempt_at = :dexcomShareLoginAttemptAt\nRETURNING *"};
 
 /**
  * Query generated from SQL:
@@ -34,26 +34,26 @@ const updateIR: any = {"usedParamSet":{"previousExecutionAt":true,"dexcomShareSe
  * RETURNING *
  * ```
  */
-export const update = new PreparedQuery<IUpdateParams,IUpdateResult>(updateIR);
+export const updateCronjobsJournal = new PreparedQuery<IUpdateCronjobsJournalParams,IUpdateCronjobsJournalResult>(updateCronjobsJournalIR);
 
 
-/** 'Load' parameters type */
-export type ILoadParams = void;
+/** 'LoadCronjobsJournal' parameters type */
+export type ILoadCronjobsJournalParams = void;
 
-/** 'Load' return type */
-export interface ILoadResult {
+/** 'LoadCronjobsJournal' return type */
+export interface ILoadCronjobsJournalResult {
   dexcomShareLoginAttemptAt: string | null;
   dexcomShareSessionId: string | null;
   previousExecutionAt: string | null;
 }
 
-/** 'Load' query type */
-export interface ILoadQuery {
-  params: ILoadParams;
-  result: ILoadResult;
+/** 'LoadCronjobsJournal' query type */
+export interface ILoadCronjobsJournalQuery {
+  params: ILoadCronjobsJournalParams;
+  result: ILoadCronjobsJournalResult;
 }
 
-const loadIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT * FROM cronjobs_journal LIMIT 1"};
+const loadCronjobsJournalIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT * FROM cronjobs_journal LIMIT 1"};
 
 /**
  * Query generated from SQL:
@@ -61,6 +61,6 @@ const loadIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT * FROM cr
  * SELECT * FROM cronjobs_journal LIMIT 1
  * ```
  */
-export const load = new PreparedQuery<ILoadParams,ILoadResult>(loadIR);
+export const loadCronjobsJournal = new PreparedQuery<ILoadCronjobsJournalParams,ILoadCronjobsJournalResult>(loadCronjobsJournalIR);
 
 

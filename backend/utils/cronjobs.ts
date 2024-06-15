@@ -1,9 +1,9 @@
-import { CronjobsJournal } from '../db/cronjobsJournal/types'
-import { extendLogger } from './logging'
+import { DEFAULT_TIMEZONE, MIN_IN_MS, SEC_IN_MS } from '@nightbear/shared'
+import { CronjobsJournal } from '@nightbear/shared/src/types/cronjobsJournal'
 import { kebabCase } from 'lodash'
 import { DateTime } from 'luxon'
-import { MIN_IN_MS, SEC_IN_MS, DEFAULT_TIMEZONE } from '@nightbear/shared'
 import { Context } from './api'
+import { extendLogger } from './logging'
 
 export type Cronjob = (
   context: Context,
@@ -28,7 +28,7 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
   log(`System timezone is "${DateTime.local().zoneName}", app timezone is "${DEFAULT_TIMEZONE}"`)
   log(`Running ${jobNames.length} cronjobs sequentially: ` + jobNames.join(', '))
 
-  let [journal] = await context.db.cronjobsJournal.load()
+  let journal = await context.db.loadCronjobsJournal()
 
   for (const jobName of jobNames) {
     const jobContext = extendLogger(context, kebabCase(jobName))
@@ -40,7 +40,10 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
     }
   }
 
-  await context.db.cronjobsJournal.update({ ...journal, previousExecutionAt: new Date() }) // persist updated journal into DB for the next run
+  await context.db.updateCronjobsJournal({
+    ...journal, // persist updated journal into DB for the next run
+    previousExecutionAt: context.timestamp(),
+  })
 
   log(`Finished, run took ${((Date.now() - now) / SEC_IN_MS).toFixed(1)} sec`)
 }
