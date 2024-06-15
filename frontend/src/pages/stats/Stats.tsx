@@ -21,7 +21,9 @@ import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntrie
 
 export const Stats = () => {
   const { timelineEntries } = useTimelineEntries(getTimeAsISOStr(Date.now() - 30 * DAY_IN_MS))
-  const { bloodGlucoseEntries, insulinEntries, carbEntries } = timelineEntries
+  const bloodGlucoseEntries = timelineEntries?.bloodGlucoseEntries || []
+  const insulinEntries = timelineEntries?.insulinEntries || []
+  const carbEntries = timelineEntries?.carbEntries || []
 
   // Override sensor entries with meter entries where necessary
   const timeInRange = calculateTimeInRange(bloodGlucoseEntries) || ''

@@ -1,6 +1,6 @@
 import { ScrollNumberSelector } from '../../components/scrollNumberSelector/ScrollNumberSelector'
 import { StatusBar } from '../../components/statusBar/StatusBar'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   findLatestPointWithBloodGlucose,
   getBgGraphBaseConfig,
@@ -17,14 +17,27 @@ import { last } from 'lodash'
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig()
-  const startTimestamp = getTimeAsISOStr(Date.now() - baseConfig.timelineRange)
+
+  const now = Date.now()
+  const currentTimestamp = getTimeAsISOStr(now)
+  const startTimestamp = getTimeAsISOStr(now - baseConfig.timelineRange)
+
   const { timelineEntries, saveGraphPointData, isLoading, isError, isSuccess } =
     useTimelineEntries(startTimestamp)
-  const graphPoints = mapTimelineEntriesToGraphPoints(
-    timelineEntries,
-    baseConfig.timelineRange,
-    getTimeAsISOStr(Date.now()),
+
+  const graphPoints = useMemo(
+    () =>
+      timelineEntries
+        ? mapTimelineEntriesToGraphPoints(
+            timelineEntries,
+            baseConfig.timelineRange,
+            currentTimestamp,
+          )
+        : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [timelineEntries],
   )
+
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
   const latestPoint = last(graphPoints)
   const latestPointWithBg = findLatestPointWithBloodGlucose(graphPoints)

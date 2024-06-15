@@ -7,10 +7,16 @@ export const useTimelineEntries = (
   startTimestamp: string,
   endTimestamp = getTimeAsISOStr(Date.now()),
 ) => {
-  const { data, isLoading, isError, isSuccess, refetch } = useQuery<TimelineEntries>({
+  const {
+    data: timelineEntries,
+    isLoading,
+    isError,
+    isSuccess,
+    refetch,
+  } = useQuery<TimelineEntries>({
     queryKey: ['get-timeline-entries'],
     queryFn: () => callFetch(`/get-timeline-entries?start=${startTimestamp}&end=${endTimestamp}`),
-    refetchInterval: 15 * SEC_IN_MS,
+    refetchInterval: 30 * SEC_IN_MS,
   })
 
   const { mutate: saveGraphPointData } = useMutation({
@@ -19,14 +25,7 @@ export const useTimelineEntries = (
   })
 
   return {
-    timelineEntries: {
-      bloodGlucoseEntries: data ? data.bloodGlucoseEntries : [],
-      insulinEntries: data ? data.insulinEntries : [],
-      carbEntries: data ? data.carbEntries : [],
-      meterEntries: data ? data.meterEntries : [],
-      profileActivations: data ? data.profileActivations : [],
-      alarms: data ? data.alarms : [],
-    },
+    timelineEntries,
     saveGraphPointData,
     isLoading,
     isError,

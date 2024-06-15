@@ -123,6 +123,7 @@ export const mapTimelineEntriesToGraphPoints = (
       const profileActivationsInSlot = profileActivations?.filter(
         activation => getTimestampFlooredToEveryFiveMinutes(activation.activatedAt) === timestamp,
       )
+
       const alarmsInSlot = alarms?.filter(
         alarm =>
           getTimestampFlooredToEveryFiveMinutes(getFirstAlarmState(alarm).timestamp) === timestamp,
