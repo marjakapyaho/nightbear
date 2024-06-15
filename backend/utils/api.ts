@@ -118,6 +118,6 @@ export const hasValidApiKey = (request: Request, context: Context) => {
   const { NIGHTBEAR_API_KEY } = context.config
   const val = request.requestHeaders[API_KEY_HEADER.toLowerCase()]
   const res = val === NIGHTBEAR_API_KEY
-  context.log(`Request has invalid ${API_KEY_HEADER} header: "${val}"`)
+  context.log(`Request has invalid ${API_KEY_HEADER} header: "${String(val)}"`)
   return res
 }

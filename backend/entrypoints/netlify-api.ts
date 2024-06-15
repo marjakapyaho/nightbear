@@ -73,7 +73,7 @@ const normalizeRequest = async (
     requestParams[key] = value
   })
 
-  let requestBody: object | string = {}
+  let requestBody: unknown = {}
   if (netlifyRequest.method !== 'GET' && netlifyRequest.method !== 'HEAD') {
     const contentType = netlifyRequest.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {

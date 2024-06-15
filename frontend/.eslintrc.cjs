@@ -15,6 +15,10 @@ module.exports = {
     ...base.extends,
     'plugin:react-hooks/recommended'
   ],
+  rules: {
+    ...base.rules,
+    'no-console': 'error'
+  },
   plugins: [
     'prettier',
     'react-refresh'

@@ -77,7 +77,11 @@ export const dexcomShare: Cronjob = async (
         log(`Saved new SensorEntry: ${desc}`)
       }
     } catch (err) {
-      log(`Could not fetch BG (caused by\n${err}\n), will mark the session as needing refresh`)
+      log(
+        `Could not fetch BG (caused by\n${String(
+          err,
+        )}\n), will mark the session as needing refresh`,
+      )
       return {
         dexcomShareSessionId: null,
       }
@@ -93,7 +97,7 @@ export const dexcomShare: Cronjob = async (
           dexcomShareLoginAttemptAt: new Date().toISOString(),
         }
       } catch (err) {
-        log(`Login attempt failed (caused by\n${err}\n)`)
+        log(`Login attempt failed (caused by\n${String(err)}\n)`)
         return {
           dexcomShareLoginAttemptAt: new Date().toISOString(),
         }

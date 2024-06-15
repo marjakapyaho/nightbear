@@ -12,7 +12,7 @@ export const callFetch = async <T>(route: string, method = 'GET', bodyObj?: T) =
   return fetch(`${API_ROOT}${route}`, {
     method,
     headers: {
-      [API_KEY_HEADER]: window.localStorage[API_KEY_HEADER],
+      [API_KEY_HEADER]: String(window.localStorage[API_KEY_HEADER]),
       'Content-Type': bodyObj ? 'application/json' : 'text/plain',
     },
     body: JSON.stringify(bodyObj),

@@ -22,7 +22,6 @@ module.exports = {
   rules: {
     'prettier/prettier': ['error'],
     eqeqeq: ['error', 'allow-null'],
-    'consistent-return': 'error',
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
@@ -33,8 +32,16 @@ module.exports = {
       2,
       { allowNumber: true, allowBoolean: true, allowNullish: true },
     ],
-    'no-console': ['warn'],
+    'no-console': 'off',
     'no-var': 'error',
     'import/order': 'off',
   },
+  overrides: [
+    {
+      files: ['*.test.ts'],
+      rules: {
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+      },
+    },
+  ],
 }

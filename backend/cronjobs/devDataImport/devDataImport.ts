@@ -48,8 +48,10 @@ const fetchTimelineEntries = async (context: Context, minutes: number) => {
 
   const startKey = 'timeline/' + DateTime.now().minus({ minutes }).toUTC().toISO().split('.')[0]
   const url = `${config.DEV_DATA_IMPORT_FROM_COUCHDB}/_all_docs?startkey="${startKey}"&include_docs=true`
-  const response = await axios.get(url)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+  const response = (await axios.get(url)) as any
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const data = (response.data.rows as unknown[]).map(row => {
     const modelType = _.get(row, 'doc.modelType') as unknown
     const timestamp = _.get(row, 'doc.timestamp') as unknown

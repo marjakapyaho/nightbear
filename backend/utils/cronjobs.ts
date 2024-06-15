@@ -50,5 +50,5 @@ export const runCronJobs = async (context: Context, cronjobs: { [name: string]: 
  */
 export const startCronJobs = async (context: Context, cronjobs: { [name: string]: Cronjob }) => {
   await runCronJobs(context, cronjobs) // run once right away
-  setInterval(() => runCronJobs(context, cronjobs), 5 * MIN_IN_MS)
+  setInterval(() => void runCronJobs(context, cronjobs), 5 * MIN_IN_MS)
 }

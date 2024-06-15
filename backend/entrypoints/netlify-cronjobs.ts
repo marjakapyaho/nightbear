@@ -1,4 +1,4 @@
-import cronjobs from 'cronjobs/cronjobs'
+import cronjobs from '../cronjobs/cronjobs'
 import debug from 'debug'
 import { createNodeContext } from '../utils/api'
 import { runCronJobs } from '../utils/cronjobs'

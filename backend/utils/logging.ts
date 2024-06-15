@@ -5,7 +5,7 @@ import { Context } from './api'
 
 // We expose only a subset of the full 'debug' API
 export interface Logger {
-  (message: string, ...args: any[]): void
+  (message: string, ...args: unknown[]): void
 }
 
 // Convenience object for having no logging
