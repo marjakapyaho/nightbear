@@ -11,3 +11,4 @@ npm-debug.log
 shared/dist
 frontend/dist
 backend/build
+.node-version
