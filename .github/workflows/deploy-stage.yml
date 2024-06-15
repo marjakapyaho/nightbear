@@ -34,6 +34,6 @@ jobs:
       - run: yarn setup:local
       # - run: yarn validate
       - run: docker ps
-      - run: docker exec -it nightbear-db-test psql -U nightbear -d nightbear -c 'SELECT true;'
+      - run: docker exec nightbear-db-test psql -U nightbear -d nightbear -c 'SELECT true;'
       # - run: yarn test:back
       # - run: 'echo TODO: Deploy to Netlify'
