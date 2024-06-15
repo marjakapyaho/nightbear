@@ -161,6 +161,23 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('NO_SITUATION')
   })
 
+  it('detects PERSISTENT_HIGH even if there is small downward slope for a moment', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [...persistentHighValues, 9.4],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('PERSISTENT_HIGH')
+  })
+
   it('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
     expect(
       runAnalysis({
