@@ -30,8 +30,7 @@ import {
   getTimeMinusTime,
 } from './time'
 import { describe, expect, it } from 'vitest'
-import { mockNow } from '../mocks'
-import { mockBloodGlucoseEntries, mockCarbEntries } from '../mocks'
+import { mockNow, mockBloodGlucoseEntries, mockCarbEntries } from '../mocks'
 
 const currentTimestamp = 1508672249758
 

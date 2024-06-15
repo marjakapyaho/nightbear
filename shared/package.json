@@ -11,7 +11,7 @@
     "build": "rm -rf dist && tsc",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "lint": "eslint src --ext ts,tsx && tsc",
+    "lint": "eslint src --ext .ts --config .eslintrc.cjs",
     "link:shared": "yarn link && yarn --cwd ../backend/ link @nightbear/shared && yarn --cwd ../frontend/ link @nightbear/shared",
     "unlink:shared": "yarn --cwd ../backend/ unlink @nightbear/shared && yarn --cwd ../frontend/ unlink @nightbear/shared && yarn unlink"
   },

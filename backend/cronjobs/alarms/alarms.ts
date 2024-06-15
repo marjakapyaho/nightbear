@@ -1,6 +1,12 @@
 import { Context } from '../../utils/api'
-import { Alarm, Situation, Profile } from '@nightbear/shared'
-import { getAlarmState, isNotNullish, isTimeSmaller } from '@nightbear/shared'
+import {
+  Alarm,
+  Situation,
+  Profile,
+  getAlarmState,
+  isNotNullish,
+  isTimeSmaller,
+} from '@nightbear/shared'
 import {
   AlarmActions,
   getNeededAlarmLevel,
@@ -71,7 +77,7 @@ export const detectAlarmActions = (
 
 const deactivateAlarm = async (alarm: Alarm, context: Context) => {
   // TODO: Let's not wait for these?
-  context.pushover.ackAlarms(
+  void context.pushover.ackAlarms(
     alarm.alarmStates.map(state => state.notificationReceipt).filter(isNotNullish),
   )
 

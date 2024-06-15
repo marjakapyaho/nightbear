@@ -1,9 +1,13 @@
 import { runAnalysis } from '../analyser'
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import {
+  generateSensorEntries,
+  getMockActiveProfile,
+  mockNow,
+  getTimeMinusMinutes,
+  getTimeMinusTime,
+  MIN_IN_MS,
+} from '@nightbear/shared'
 import { describe, expect, it } from 'vitest'
-import { mockNow } from '@nightbear/shared'
-import { getTimeMinusMinutes, getTimeMinusTime } from '@nightbear/shared'
-import { MIN_IN_MS } from '@nightbear/shared'
 
 describe('analyser/high', () => {
   it('detects HIGH above high limit', () => {

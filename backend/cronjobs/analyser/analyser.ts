@@ -6,10 +6,19 @@ import {
   isThereTooMuchInsulin,
   mapSensorAndMeterEntriesToAnalyserEntries,
 } from './utils'
-import { CarbEntry, InsulinEntry } from '@nightbear/shared'
-import { AnalyserEntry, Situation } from '@nightbear/shared'
-import { Alarm } from '@nightbear/shared'
-import { Profile } from '@nightbear/shared'
+import {
+  CarbEntry,
+  InsulinEntry,
+  AnalyserEntry,
+  Situation,
+  Alarm,
+  Profile,
+  calculateCurrentCarbsToInsulinRatio,
+  calculateRequiredCarbsToInsulinRatio,
+  getCarbsOnBoard,
+  getInsulinOnBoard,
+  hourToMs,
+} from '@nightbear/shared'
 import {
   detectBadHigh,
   detectBadLow,
@@ -22,14 +31,7 @@ import {
   detectPersistentHigh,
   detectRising,
 } from './situations'
-import {
-  calculateCurrentCarbsToInsulinRatio,
-  calculateRequiredCarbsToInsulinRatio,
-  getCarbsOnBoard,
-  getInsulinOnBoard,
-} from '@nightbear/shared'
 import { getEntriesWithinTimeRange } from '../checks/utils'
-import { hourToMs } from '@nightbear/shared'
 
 export const runAnalysis = ({
   currentTimestamp,

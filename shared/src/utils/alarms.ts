@@ -1,7 +1,5 @@
 import { first, last } from 'lodash'
-import { Alarm, AlarmState } from '../types'
-import { Situation } from '../types'
-import { Profile, SituationSettings } from '../types'
+import { Alarm, AlarmState, Situation, Profile, SituationSettings } from '../types'
 
 export const ALARM_START_LEVEL = 0
 export const ALARM_FALLBACK_LEVEL = 1

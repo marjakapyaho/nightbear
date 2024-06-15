@@ -1,12 +1,6 @@
-import {
-  getRelevantEntries,
-  mapSensorAndMeterEntriesToAnalyserEntries,
-} from '../../cronjobs/analyser/utils'
-import { generateSensorEntries } from '@nightbear/shared'
-import { MIN_IN_MS } from '@nightbear/shared'
+import { getRelevantEntries, mapSensorAndMeterEntriesToAnalyserEntries } from './utils'
+import { generateSensorEntries, MIN_IN_MS, mockNow, getTimeMinusTime } from '@nightbear/shared'
 import { describe, expect, it } from 'vitest'
-import { mockNow } from '@nightbear/shared'
-import { getTimeMinusTime } from '@nightbear/shared'
 
 describe('utils/analyser-utils', () => {
   it('calculates correct slopes for analyser entries', () => {

@@ -1,10 +1,6 @@
-import { SensorEntry } from '../types'
-import { Profile } from '../types'
-import { mockProfiles } from '../mocks'
+import { SensorEntry, Profile, Alarm, Situation } from '../types'
+import { mockProfiles, mockAlarms } from '../mocks'
 import { getTimeAsISOStr, getTimeMinusTimeMs } from './time'
-import { mockAlarms } from '../mocks'
-import { Alarm } from '../types'
-import { Situation } from '../types'
 
 export const generateSensorEntries = ({
   currentTimestamp,

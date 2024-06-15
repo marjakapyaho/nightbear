@@ -1,7 +1,5 @@
-import { changeBloodGlucoseUnitToMmoll } from '@nightbear/shared'
+import { changeBloodGlucoseUnitToMmoll, SensorEntry, getTimeAsISOStr } from '@nightbear/shared'
 import { DexcomShareResponse } from './dexcomShareClient'
-import { SensorEntry } from '@nightbear/shared'
-import { getTimeAsISOStr } from '@nightbear/shared'
 
 export const mapDexcomShareResponseToSensorEntry = (val: DexcomShareResponse): SensorEntry => {
   return {

@@ -7,11 +7,11 @@ import {
   MeterEntry,
   SensorEntry,
   TimelineEntries,
+  ProfileActivation,
+  Alarm,
 } from '../types'
 import { calculateAverageBg, MIN_IN_MS } from './calculations'
 import { getTimeInMillis, getTimeMinusMinutes } from './time'
-import { ProfileActivation } from '../types'
-import { Alarm } from '../types'
 import { getFirstAlarmState } from './alarms'
 import { highLimit, lowLimit } from './config'
 

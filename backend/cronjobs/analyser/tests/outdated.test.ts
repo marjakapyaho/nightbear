@@ -1,7 +1,6 @@
 import { runAnalysis } from '../analyser'
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import { generateSensorEntries, getMockActiveProfile, mockNow } from '@nightbear/shared'
 import { describe, expect, it } from 'vitest'
-import { mockNow } from '@nightbear/shared'
 
 describe('analyser/outdated', () => {
   it('detects OUTDATED when data is outside timeSinceBgLimit', () => {

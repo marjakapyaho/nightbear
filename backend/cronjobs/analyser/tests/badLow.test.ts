@@ -1,8 +1,11 @@
 import { runAnalysis } from '../analyser'
-import { generateSensorEntries, getMockActiveProfile } from '@nightbear/shared'
+import {
+  generateSensorEntries,
+  getMockActiveProfile,
+  mockNow,
+  getTimeMinusMinutes,
+} from '@nightbear/shared'
 import { describe, expect, it } from 'vitest'
-import { mockNow } from '@nightbear/shared'
-import { getTimeMinusMinutes } from '@nightbear/shared'
 
 describe('analyser/badLow', () => {
   it('detects BAD_LOW', () => {

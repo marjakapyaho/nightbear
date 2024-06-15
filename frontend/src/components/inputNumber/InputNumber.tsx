@@ -24,6 +24,7 @@ export const InputNumber = ({ value, setValue, decimals }: Props) => {
     if (value !== toValidNumber(localValue, decimals)) {
       setLocalValue(numberToUINumber(value, decimals))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
   return (

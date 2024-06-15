@@ -1,12 +1,11 @@
 import { MeterEntry, SensorEntry } from '../types'
 import { generateSensorEntries } from './test'
-import { mockNow, mockNowSlot } from '../mocks'
+import { mockNow, mockNowSlot, mockTimelineEntries } from '../mocks'
 import { getTimeInMillis, getTimeMinusMinutes, getTimeMinusTime } from './time'
 import { HOUR_IN_MS, MIN_IN_MS } from './calculations'
 import { getMergedBgEntries, mapTimelineEntriesToGraphPoints } from './timelineEntries'
 import { describe, expect, it } from 'vitest'
 import { sortBy } from 'lodash'
-import { mockTimelineEntries } from '../mocks'
 
 describe('../calculations', () => {
   it('getMergedBgEntries', () => {

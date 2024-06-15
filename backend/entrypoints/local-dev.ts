@@ -13,7 +13,7 @@ debug.log = consoleLogStream
 const context = createNodeContext()
 
 // Start serving API requests
-startExpressServer(context, ...routes)
+void startExpressServer(context, ...routes)
 
 // Start running periodic tasks
-startCronJobs(context, cronjobs)
+void startCronJobs(context, cronjobs)

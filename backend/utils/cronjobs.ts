@@ -2,8 +2,7 @@ import { CronjobsJournal } from '../db/cronjobsJournal/types'
 import { extendLogger } from './logging'
 import { kebabCase } from 'lodash'
 import { DateTime } from 'luxon'
-import { MIN_IN_MS, SEC_IN_MS } from '@nightbear/shared'
-import { DEFAULT_TIMEZONE } from '@nightbear/shared'
+import { MIN_IN_MS, SEC_IN_MS, DEFAULT_TIMEZONE } from '@nightbear/shared'
 import { Context } from './api'
 
 export type Cronjob = (

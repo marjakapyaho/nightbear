@@ -1,27 +1,28 @@
-import { MIN_IN_MS, roundTo2Decimals, TIME_LIMIT_FOR_SLOPE } from '@nightbear/shared'
-import { reduce, slice, sum, chain, find } from 'lodash'
 import {
+  MIN_IN_MS,
+  roundTo2Decimals,
+  TIME_LIMIT_FOR_SLOPE,
   CarbEntry,
   InsulinEntry,
   MeterEntry,
   SensorEntry,
   SensorEntryType,
-} from '@nightbear/shared'
-import { AnalyserEntry, Situation } from '@nightbear/shared'
-import {
+  AnalyserEntry,
+  Situation,
   getTimeMinusTimeMs,
   getTimePlusTime,
   getTimeMinusTime,
   isTimeLargerOrEqual,
   isTimeLarger,
   minToMs,
+  Profile,
+  Alarm,
+  onlyActive,
+  getMergedBgEntries,
 } from '@nightbear/shared'
+import { reduce, slice, sum, chain, find } from 'lodash'
 import { SimpleLinearRegression } from 'ml-regression-simple-linear'
-import { Profile } from '@nightbear/shared'
-import { Alarm } from '@nightbear/shared'
 import { detectSituation } from './analyser'
-import { onlyActive } from '@nightbear/shared'
-import { getMergedBgEntries } from '@nightbear/shared'
 
 // Critical settings
 export const LOW_LEVEL_BAD = 3.0

@@ -1,8 +1,6 @@
-// @ts-ignore
-// @ts-ignore
-
+// eslint-disable @typescript-eslint/no-unsafe-assignment
+// eslint-disable @typescript-eslint/no-unsafe-call
 import axios from 'axios'
-// @ts-ignore
 import Pushover from 'pushover-notifications'
 import { Situation } from '@nightbear/shared'
 import { Logger, extendLogger } from '../../utils/logging'
@@ -20,6 +18,7 @@ export const createPushoverClient = (
   callbackUrl: string,
   logger: Logger,
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const api = new Pushover({ user, token })
   const log = extendLogger(logger, 'pushover')
 
@@ -36,17 +35,19 @@ export const createPushoverClient = (
         callback: `${callbackUrl}?ackedBy=pushover:${recipient}`,
       }
 
-      return api.send(message, (err: object, result: string) => {
-        if (err) {
-          log('Could not send alarm:', err)
-          return err
-        }
+      return new Promise((resolve, reject) =>
+        api.send(message, (err: object, result: string) => {
+          if (err) {
+            log('Could not send alarm:', err)
+            return reject(err)
+          }
 
-        const receipt: string = JSON.parse(result).receipt
-        log('Alarm sent with receipt:', receipt)
+          const receipt: string = JSON.parse(result).receipt
+          log('Alarm sent with receipt:', receipt)
 
-        return receipt
-      })
+          return resolve(receipt)
+        }),
+      )
     },
 
     async ackAlarms(receipts: string[] = []) {
