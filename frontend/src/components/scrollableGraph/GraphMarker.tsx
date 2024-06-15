@@ -1,6 +1,6 @@
 import { TimeAgo } from '../timeAgo/TimeAgo'
 import styles from './ScrollableGraph.module.scss'
-import { GraphConfig, Point, tsToLeft } from './scrollableGraphUtils'
+import { GraphConfig, Point, situationsMappedForUI, tsToLeft } from './scrollableGraphUtils'
 
 type Props = {
   config: GraphConfig
@@ -19,7 +19,7 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
       style={{
         left: tsToLeft(config, point.timestamp) - config.pixelsPerTimeStep / 2,
         width: config.pixelsPerTimeStep,
-        zIndex: 10,
+        zIndex: isSelected ? 10 : 9,
       }}
     >
       <div
@@ -46,7 +46,11 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
       ) : (
         ''
       )}
-      {point.alarms?.length ? <div className={styles.alarm}>{point.alarms[0].situation}</div> : ''}
+      {point.alarms?.length ? (
+        <div className={styles.alarm}>{situationsMappedForUI[point.alarms[0].situation]}</div>
+      ) : (
+        ''
+      )}
     </div>
   )
 }

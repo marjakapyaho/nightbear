@@ -47,9 +47,9 @@ export const GraphPoint = ({ point, isSelected, setSelected, config }: Props) =>
       )}
       <rect
         className={styles.graphPointClickArea}
-        x={tsToLeft(config, timestamp) - pointWidth / 2}
+        x={tsToLeft(config, timestamp) - (isSelected ? pointWidth : pointWidth / 2)}
         y={config.paddingTop}
-        width={pointWidth}
+        width={isSelected ? 2 * pointWidth : pointWidth}
         height={config.innerHeight}
         onClick={() => setSelected(point)}
       />

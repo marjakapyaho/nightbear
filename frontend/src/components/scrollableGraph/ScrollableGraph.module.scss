@@ -73,7 +73,7 @@
 
       .textLabel {
         white-space: nowrap;
-        margin-top: 5px;
+        margin-top: 6px;
         border: 1px solid transparent;
         border-radius: 15px;
         background: none;
@@ -145,6 +145,7 @@
 
       .graphPointClickArea {
         fill: transparent;
+        z-index: 100;
       }
     }
 

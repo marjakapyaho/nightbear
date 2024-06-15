@@ -102,3 +102,17 @@ export const mapGraphPointsForPolyline = (graphPoints: Point[], config: GraphCon
         : '',
     )
     .join(' ')
+
+export const situationsMappedForUI = {
+  CRITICAL_OUTDATED: 'C.Out',
+  BAD_LOW: 'B.low',
+  BAD_HIGH: 'B.high',
+  OUTDATED: 'Out',
+  COMPRESSION_LOW: 'Comp.',
+  LOW: 'Low',
+  HIGH: 'High',
+  FALLING: 'Fall',
+  RISING: 'Rise',
+  PERSISTENT_HIGH: 'P.High',
+  MISSING_DAY_INSULIN: 'Tresiba',
+}
