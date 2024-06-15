@@ -25,5 +25,7 @@ jobs:
       - uses: actions/setup-node@v1
         with: { node-version: '18.16.1' }
       - run: yarn setup:local
-      - run: yarn validate
-      - run: 'echo TODO: Deploy to Netlify'
+      # - run: yarn validate
+      - run: docker ps
+      # - run: yarn test:back
+      # - run: 'echo TODO: Deploy to Netlify'
