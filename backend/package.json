@@ -32,7 +32,6 @@
     "ml-regression-simple-linear": "^3.0.0",
     "node-pg-migrate": "6.2.2",
     "pg": "8.11.4",
-    "pushover-notifications": "1.2.2",
     "serverless-http": "3.2.0",
     "ts-node": "10.9.2",
     "typescript": "5.3.3",
