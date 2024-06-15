@@ -9,6 +9,17 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+    services:
+      nightbear_db_test:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nightbear
+          POSTGRES_PASSWORD: nightbear_test
+          POSTGRES_DB: nightbear
+        ports:
+          - '35432:5432'
+    env:
+      DATABASE_URL_TEST: postgres://nightbear:nightbear@localhost:35432/nightbear_test
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
