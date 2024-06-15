@@ -161,7 +161,7 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('NO_SITUATION')
   })
 
-  it.only('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
+  it('detects PERSISTENT_HIGH when insulin on board is above RELEVANT_IOB_LIMIT_FOR_HIGH but there is too much carbs', () => {
     expect(
       runAnalysis({
         currentTimestamp: mockNow,
