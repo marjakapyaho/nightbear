@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import styles from './ScrollableGraph.module.scss'
-import { GraphConfig, mapGraphPointsForPolyline, Point } from './scrollableGraphUtils'
+import { GraphConfig, mapGraphPointsForPolyline } from './scrollableGraphUtils'
 import { GraphPoint } from './GraphPoint'
+import { Point } from '@nightbear/shared'
 
 type Props = {
   graphPoints: Point[]

@@ -1,6 +1,6 @@
+import { Point } from '@nightbear/shared'
 import { TimeAgo } from '../timeAgo/TimeAgo'
 import styles from './StatusBar.module.scss'
-import { Point } from '../scrollableGraph/scrollableGraphUtils'
 
 type Props = {
   graphPoint?: Point

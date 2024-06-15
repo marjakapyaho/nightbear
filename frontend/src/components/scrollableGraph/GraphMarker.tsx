@@ -1,6 +1,7 @@
+import { Point } from '@nightbear/shared'
 import { TimeAgo } from '../timeAgo/TimeAgo'
 import styles from './ScrollableGraph.module.scss'
-import { GraphConfig, Point, situationsMappedForUI, tsToLeft } from './scrollableGraphUtils'
+import { GraphConfig, situationsMappedForUI, tsToLeft } from './scrollableGraphUtils'
 
 type Props = {
   config: GraphConfig

@@ -30,16 +30,15 @@ export const getFillColor = (bg: number | null) => {
   return '#54c87e'
 }
 
-// TODO
 export type Point = {
   isoTimestamp: string
   timestamp: number
   val: number | null
   color: string
-  sensorEntry?: SensorEntry
   insulinEntry?: InsulinEntry
   meterEntry?: MeterEntry
   carbEntry?: CarbEntry
+  sensorEntries?: SensorEntry[]
   profileActivations?: ProfileActivation[]
   alarms?: Alarm[]
 }
@@ -107,25 +106,27 @@ export const mapTimelineEntriesToGraphPoints = (
           entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
         ),
       )
-      const sensorEntry = getAndValidateEntry(
-        sensorEntries.filter(
-          entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
-        ),
-      )
+
       const insulinEntry = getAndValidateEntry(
         insulinEntries.filter(
           entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
         ),
       )
+
       const meterEntry = getAndValidateEntry(
         meterEntries.filter(
           entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
         ),
       )
+
       const carbEntry = getAndValidateEntry(
         carbEntries.filter(
           entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
         ),
+      )
+
+      const sensorEntriesInSlot = sensorEntries.filter(
+        entry => getTimestampFlooredToEveryFiveMinutes(entry.timestamp) === timestamp,
       )
 
       const profileActivationsInSlot = profileActivations?.filter(
@@ -145,10 +146,10 @@ export const mapTimelineEntriesToGraphPoints = (
         timestamp: getTimeInMillis(timestamp),
         val,
         color,
-        ...(sensorEntry && { sensorEntry }),
         ...(insulinEntry && { insulinEntry }),
         ...(meterEntry && { meterEntry }),
         ...(carbEntry && { carbEntry }),
+        ...(sensorEntriesInSlot && { sensorEntries: sensorEntriesInSlot }),
         ...(profileActivationsInSlot && { profileActivations: profileActivationsInSlot }),
         ...(alarmsInSlot && { alarms: alarmsInSlot }),
       }

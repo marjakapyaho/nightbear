@@ -62,6 +62,7 @@ describe('../calculations', () => {
         timestamp: 1714224000000,
         val: null,
         color: 'white',
+        sensorEntries: [],
         profileActivations: [],
         alarms: [],
       },
@@ -70,6 +71,7 @@ describe('../calculations', () => {
         timestamp: 1714224300000,
         val: null,
         color: 'white',
+        sensorEntries: [],
         profileActivations: [],
         alarms: [],
       },
@@ -78,6 +80,7 @@ describe('../calculations', () => {
         timestamp: 1714224600000,
         val: null,
         color: 'white',
+        sensorEntries: [],
         profileActivations: [],
         alarms: [],
       },
@@ -86,11 +89,13 @@ describe('../calculations', () => {
         timestamp: 1714224900000,
         val: 4.6,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 4.6,
-          timestamp: '2024-04-27T13:35:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 4.6,
+            timestamp: '2024-04-27T13:35:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -99,11 +104,13 @@ describe('../calculations', () => {
         timestamp: 1714225200000,
         val: 4.3,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 4.3,
-          timestamp: '2024-04-27T13:40:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 4.3,
+            timestamp: '2024-04-27T13:40:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -112,11 +119,13 @@ describe('../calculations', () => {
         timestamp: 1714225500000,
         val: 3.8,
         color: '#ee5a36',
-        sensorEntry: {
-          bloodGlucose: 3.8,
-          timestamp: '2024-04-27T13:45:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 3.8,
+            timestamp: '2024-04-27T13:45:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -125,11 +134,13 @@ describe('../calculations', () => {
         timestamp: 1714225800000,
         val: 4.3,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 2.1,
-          timestamp: '2024-04-27T13:50:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 2.1,
+            timestamp: '2024-04-27T13:50:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         meterEntry: { timestamp: '2024-04-27T13:50:00.000Z', bloodGlucose: 6.5 },
         profileActivations: [],
         alarms: [],
@@ -139,11 +150,13 @@ describe('../calculations', () => {
         timestamp: 1714226100000,
         val: 4.7,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 4.7,
-          timestamp: '2024-04-27T13:55:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 4.7,
+            timestamp: '2024-04-27T13:55:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -152,11 +165,13 @@ describe('../calculations', () => {
         timestamp: 1714226400000,
         val: 4.8,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 4.8,
-          timestamp: '2024-04-27T14:00:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 4.8,
+            timestamp: '2024-04-27T14:00:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         carbEntry: {
           timestamp: '2024-04-27T14:00:00.000Z',
           amount: 40,
@@ -170,11 +185,13 @@ describe('../calculations', () => {
         timestamp: 1714226700000,
         val: 5.9,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 5.9,
-          timestamp: '2024-04-27T14:05:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 5.9,
+            timestamp: '2024-04-27T14:05:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -183,11 +200,13 @@ describe('../calculations', () => {
         timestamp: 1714227000000,
         val: 5.3,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 5.3,
-          timestamp: '2024-04-27T14:10:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 5.3,
+            timestamp: '2024-04-27T14:10:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         profileActivations: [],
         alarms: [],
       },
@@ -196,11 +215,13 @@ describe('../calculations', () => {
         timestamp: 1714227300000,
         val: 6,
         color: '#54c87e',
-        sensorEntry: {
-          bloodGlucose: 6,
-          timestamp: '2024-04-27T14:15:00.000Z',
-          type: 'DEXCOM_G6_SHARE',
-        },
+        sensorEntries: [
+          {
+            bloodGlucose: 6,
+            timestamp: '2024-04-27T14:15:00.000Z',
+            type: 'DEXCOM_G6_SHARE',
+          },
+        ],
         insulinEntry: { timestamp: '2024-04-27T14:15:00.000Z', amount: 7, type: 'FAST' },
         profileActivations: [],
         alarms: [

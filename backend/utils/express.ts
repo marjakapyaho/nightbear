@@ -31,10 +31,12 @@ export function startExpressServer(
                 res.status(responseStatus)
                 res.json(responseBody)
               },
-              () =>
+              err => {
+                console.log(err)
                 res.status(500).json({
                   errorMessage: `Nightbear Server Error (see logs for requestId ${requestId})`,
-                }),
+                })
+              },
             )
         } else {
           res.status(401).send(`Unauthorized`)

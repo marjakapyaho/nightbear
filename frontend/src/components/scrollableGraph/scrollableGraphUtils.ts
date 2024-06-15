@@ -1,13 +1,4 @@
-import {
-  CarbEntry,
-  InsulinEntry,
-  MeterEntry,
-  roundTo1Decimals,
-  isNotNullish,
-  ProfileActivation,
-  Alarm,
-  SensorEntry,
-} from '@nightbear/shared'
+import { roundTo1Decimals, isNotNullish, Point } from '@nightbear/shared'
 
 export type BaseGraphConfig = {
   timelineRange: number // How many ms worth of graph data are we showing
@@ -35,19 +26,6 @@ export type GraphConfig = BaseGraphConfig & {
   innerWidth: number // Regardless of the outer width of the timeline, within it, there will be this many pixels to scroll
   innerHeight: number // Height of the chart area (i.e. without vertical paddings)
   pixelsPerMs: number // This is the less intuitive, but more programmatically useful version of pixelsPerTimeStep
-}
-
-export type Point = {
-  isoTimestamp: string
-  timestamp: number
-  val: number | null
-  color: string
-  sensorEntry?: SensorEntry
-  insulinEntry?: InsulinEntry
-  meterEntry?: MeterEntry
-  carbEntry?: CarbEntry
-  profileActivations?: ProfileActivation[]
-  alarms?: Alarm[]
 }
 
 export const getGraphConfig = (baseConfig: BaseGraphConfig): GraphConfig => {

@@ -1,6 +1,6 @@
 import styles from './ScrollableGraph.module.scss'
-import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils'
-import { setDecimals, getTimeMinusMinutes, isTimeLarger } from '@nightbear/shared'
+import { GraphConfig, tsToLeft, valToTop } from './scrollableGraphUtils'
+import { setDecimals, getTimeMinusMinutes, isTimeLarger, Point } from '@nightbear/shared'
 
 type Props = {
   latestPoint: Point | null

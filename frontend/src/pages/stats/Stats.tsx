@@ -52,9 +52,10 @@ export const Stats = () => {
     val: val.total,
     color: '#9AD5B3',
   }))
-  // TODO: fix to use bg
   const dailyAverageBgs = calculateDailyAverageBgs(
-    graphPoints.map(p => p.sensorEntry).filter(isNotNullish),
+    graphPoints
+      .map(p => (p.val ? { timestamp: p.isoTimestamp, bloodGlucose: p.val } : null))
+      .filter(isNotNullish),
     daysToShow,
   ).map(val => ({
     isoTimestamp: val.timestamp,

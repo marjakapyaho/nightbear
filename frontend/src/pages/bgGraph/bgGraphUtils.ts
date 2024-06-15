@@ -1,4 +1,4 @@
-import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils'
+import { BaseGraphConfig } from '../../components/scrollableGraph/scrollableGraphUtils'
 import {
   DAY_IN_MS,
   HOUR_IN_MS,
@@ -6,7 +6,9 @@ import {
   highLimit,
   lowLimit,
   InsulinEntryType,
-  calculateAverageBgFromValues,
+  calculateAverageBg,
+  Point,
+  MeterEntry,
 } from '@nightbear/shared'
 import { chain } from 'lodash'
 
@@ -56,17 +58,20 @@ export const getNewSelectedPointWithCarbs = (newAmount: number, basePoint?: Poin
       }
     : null
 
-export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint?: Point) =>
-  basePoint
-    ? {
-        ...basePoint,
-        val: calculateAverageBgFromValues(newBg, basePoint?.sensorEntry?.bloodGlucose),
-        meterEntry: {
-          timestamp: basePoint.isoTimestamp,
-          bloodGlucose: newBg,
-        },
-      }
-    : null
+export const getNewSelectedPointWithMeterEntry = (newBg: number, basePoint: Point) => {
+  const meterEntry: MeterEntry = {
+    timestamp: basePoint.isoTimestamp,
+    bloodGlucose: newBg,
+  }
+
+  return {
+    ...basePoint,
+    val: basePoint.sensorEntries
+      ? calculateAverageBg([meterEntry, ...basePoint.sensorEntries])
+      : newBg,
+    meterEntry,
+  }
+}
 
 export const getNewSelectedPointWithInsulin = (newAmount: number, basePoint?: Point) =>
   basePoint

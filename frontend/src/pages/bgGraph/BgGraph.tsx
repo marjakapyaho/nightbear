@@ -9,10 +9,9 @@ import {
   getNewSelectedPointWithMeterEntry,
 } from './bgGraphUtils'
 import styles from './BgGraph.module.scss'
-import { Point } from '../../components/scrollableGraph/scrollableGraphUtils'
 import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph'
 import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
-import { getTimeAsISOStr } from '@nightbear/shared'
+import { Point, getTimeAsISOStr, calculateAverageBg } from '@nightbear/shared'
 import { last } from 'lodash'
 
 export const BgGraph = () => {
@@ -43,11 +42,16 @@ export const BgGraph = () => {
   const onChangeMeterEntry = (newBg: number) => {
     const hasValueChanged = newBg !== selectedPoint?.meterEntry?.bloodGlucose
     const basePoint = selectedPoint || latestPoint
-    const pointToSave = hasValueChanged
-      ? getNewSelectedPointWithMeterEntry(newBg, basePoint)
-      : basePoint
-        ? { ...basePoint, meterEntry: undefined, val: basePoint?.sensorEntry?.bloodGlucose || null }
-        : null
+    const pointToSave =
+      hasValueChanged && basePoint
+        ? getNewSelectedPointWithMeterEntry(newBg, basePoint)
+        : basePoint
+          ? {
+              ...basePoint,
+              meterEntry: undefined,
+              val: basePoint.sensorEntries ? calculateAverageBg(basePoint.sensorEntries) : null,
+            }
+          : null
     setSelectedPoint(pointToSave)
     pointToSave && saveGraphPointData(pointToSave)
   }

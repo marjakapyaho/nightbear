@@ -1,5 +1,6 @@
+import { Point } from '@nightbear/shared'
 import styles from './ScrollableGraph.module.scss'
-import { GraphConfig, Point, tsToLeft, valToTop } from './scrollableGraphUtils'
+import { GraphConfig, tsToLeft, valToTop } from './scrollableGraphUtils'
 
 type Props = {
   point: Point

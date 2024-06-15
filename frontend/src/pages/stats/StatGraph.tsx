@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { DAY_IN_MS } from '@nightbear/shared'
+import { DAY_IN_MS, Point } from '@nightbear/shared'
 import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGraph'
 import styles from './Stats.module.scss'
-import { BaseGraphConfig, Point } from '../../components/scrollableGraph/scrollableGraphUtils'
+import { BaseGraphConfig } from '../../components/scrollableGraph/scrollableGraphUtils'
 
 type Props = {
   label: string

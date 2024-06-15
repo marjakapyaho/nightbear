@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
 import styles from './ScrollableGraph.module.scss'
-import { Point, BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils'
+import { BaseGraphConfig, getGraphConfig } from './scrollableGraphUtils'
 import { GraphScaleVertical } from './GraphScaleVertical'
 import { GraphScaleHorizontal } from './GraphScaleHorizontal'
 import { GraphMarker } from './GraphMarker'
 import { GraphLatestValue } from './GraphLatestValue'
 import { GraphSvg } from './GraphSvg'
+import { Point } from '@nightbear/shared'
 
 type Props = {
   graphPoints: Point[]
