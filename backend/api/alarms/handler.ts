@@ -1,6 +1,6 @@
-import { Context, createResponse, Request } from '../../utils/api'
 import { getTimePlusMinutes } from '@nightbear/shared'
-import { getSnoozeMinutesFromActiveProfile, isThereNothingToAck } from './utils'
+import { Context, createResponse, Request } from '../../utils/api'
+import { getSnoozeMinutesFromActiveProfile, nothingToAck } from './utils'
 
 export const getActiveAlarm = async (_request: Request, context: Context) => {
   const activeAlarm = await context.db.getActiveAlarm()
@@ -14,7 +14,7 @@ export const ackActiveAlarm = async (request: Request, context: Context) => {
   const activeAlarm = await context.db.getActiveAlarm()
 
   // If we have nothing to ack, return
-  if (isThereNothingToAck(activeAlarm, context)) {
+  if (!activeAlarm || nothingToAck(activeAlarm, context)) {
     return createResponse('Nothing to ack')
   }
 

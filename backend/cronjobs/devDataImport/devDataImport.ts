@@ -1,8 +1,8 @@
 import { SensorEntry, isNotNullish, isNullish } from '@nightbear/shared'
+import { CronjobsJournal } from '@nightbear/shared/src/types/cronjobsJournal'
 import axios from 'axios'
 import _ from 'lodash'
 import { DateTime } from 'luxon'
-import { CronjobsJournal } from '../../db/cronjobsJournal/types'
 import { Context } from '../../utils/api'
 import { Cronjob } from '../../utils/cronjobs'
 

@@ -1,8 +1,3 @@
-import { DexcomShareResponse, NO_DEXCOM_SHARE } from './dexcomShareClient'
-import { mapDexcomShareResponseToSensorEntry } from './utils'
-import { CronjobsJournal } from '../../db/cronjobsJournal/types'
-import { Cronjob } from '../../utils/cronjobs'
-import { isArray } from 'lodash'
 import {
   MIN_IN_MS,
   getTimeAsISOStr,
@@ -10,6 +5,11 @@ import {
   humanReadableLongTime,
   isTimeLarger,
 } from '@nightbear/shared'
+import { CronjobsJournal } from '@nightbear/shared/src/types/cronjobsJournal'
+import { isArray } from 'lodash'
+import { Cronjob } from '../../utils/cronjobs'
+import { DexcomShareResponse, NO_DEXCOM_SHARE } from './dexcomShareClient'
+import { mapDexcomShareResponseToSensorEntry } from './utils'
 
 export const dexcomShare: Cronjob = async (
   context,

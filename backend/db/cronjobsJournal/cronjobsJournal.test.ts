@@ -1,5 +1,5 @@
-import { createTestContext, truncateDb } from '../../utils/test'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { createTestContext, truncateDb } from '../../utils/test'
 
 describe('db/cronjobsJournal', () => {
   const context = createTestContext()
@@ -16,13 +16,13 @@ describe('db/cronjobsJournal', () => {
         dexcomShareSessionId: '123-123-123',
       }
 
-      const res = await context.db.cronjobsJournal.update(row)
+      const res = await context.db.updateCronjobsJournal(row)
 
       expect(res).toEqual([row])
     })
 
     it.skip('allows nulls', async () => {
-      const [row] = await context.db.cronjobsJournal.update({
+      const row = await context.db.updateCronjobsJournal({
         dexcomShareSessionId: '123-123-123',
       })
 

@@ -1,12 +1,12 @@
-import { createTestContext, generateSeedData, truncateDb } from '../../utils/test'
 import {
-  mockNow,
   Alarm,
   MIN_IN_MS,
   generateSensorEntries,
   getTimePlusTime,
+  mockNow,
 } from '@nightbear/shared'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { createTestContext, generateSeedData, truncateDb } from '../../utils/test'
 import { checks } from './checks'
 
 describe('cronjobs/checks', () => {
@@ -23,13 +23,13 @@ describe('cronjobs/checks', () => {
 
     // Current timestamp = mockNow
     alarm = await context.db.getActiveAlarm()
-    expect(alarm.situation).toBe('LOW')
+    expect(alarm?.situation).toBe('LOW')
 
     await checks({ ...context, timestamp: () => currentTimestamp })
 
     // Keeps LOW alarm
     alarm = await context.db.getActiveAlarm()
-    expect(alarm.situation).toBe('LOW')
+    expect(alarm?.situation).toBe('LOW')
 
     currentTimestamp = getTimePlusTime(mockNow, 5 * MIN_IN_MS)
     await context.db.createSensorEntries(
@@ -44,7 +44,7 @@ describe('cronjobs/checks', () => {
 
     // Does not yet remove LOW alarm as we're not enough above limit
     alarm = await context.db.getActiveAlarm()
-    expect(alarm.situation).toBe('LOW')
+    expect(alarm?.situation).toBe('LOW')
 
     currentTimestamp = getTimePlusTime(mockNow, 10 * MIN_IN_MS)
     await context.db.createSensorEntries(
@@ -73,8 +73,8 @@ describe('cronjobs/checks', () => {
 
     // Adds RISING alarm
     alarm = await context.db.getActiveAlarm()
-    expect(alarm.situation).toBe('RISING')
-    const risingAlarmId = alarm.id
+    expect(alarm?.situation).toBe('RISING')
+    const risingAlarmId = alarm?.id
 
     currentTimestamp = getTimePlusTime(mockNow, 40 * MIN_IN_MS)
     await context.db.createSensorEntries(
@@ -89,7 +89,7 @@ describe('cronjobs/checks', () => {
 
     // Removes RISING alarm and adds new HIGH alarm
     alarm = await context.db.getActiveAlarm()
-    expect(alarm.situation).toBe('HIGH')
-    expect(alarm.id).not.toEqual(risingAlarmId)
+    expect(alarm?.situation).toBe('HIGH')
+    expect(alarm?.id).not.toEqual(risingAlarmId)
   })
 })

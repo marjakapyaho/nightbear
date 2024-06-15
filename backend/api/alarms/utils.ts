@@ -1,8 +1,8 @@
-import { isTimeSmaller, getAlarmState, getSnoozeMinutes, Alarm } from '@nightbear/shared'
+import { Alarm, getAlarmState, getSnoozeMinutes, isTimeSmaller } from '@nightbear/shared'
 import { Context } from '../../utils/api'
 
-export const isThereNothingToAck = (activeAlarm: Alarm, context: Context) =>
-  !activeAlarm || isTimeSmaller(context.timestamp(), getAlarmState(activeAlarm).validAfter)
+export const nothingToAck = (activeAlarm: Alarm, context: Context) =>
+  isTimeSmaller(context.timestamp(), getAlarmState(activeAlarm).validAfter)
 
 export const getSnoozeMinutesFromActiveProfile = async (activeAlarm: Alarm, context: Context) => {
   const activeProfile = await context.db.getActiveProfile()
