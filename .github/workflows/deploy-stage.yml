@@ -13,7 +13,7 @@ jobs:
     services:
       nightbear_db_test:
         image: postgres:16
-        name: nightbear-db-test
+        container_name: nightbear-db-test
         env:
           POSTGRES_USER: nightbear
           POSTGRES_PASSWORD: nightbear_test
