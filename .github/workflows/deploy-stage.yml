@@ -1,0 +1,18 @@
+name: Deploy stage
+
+on:
+  push:
+    branches:
+      - next # we deploy the main branch automatically to the stage env
+      - test-deploy-stage # you can push to this branch to test the stage-deploy process, without having to touch the main branch
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with: { node-version: '18.16.1' }
+      - run: yarn setup:local
+      - run: yarn validate
+      - run: 'echo TODO: Deploy to Netlify'
