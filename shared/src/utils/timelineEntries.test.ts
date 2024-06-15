@@ -1,11 +1,11 @@
+import { sortBy } from 'lodash'
+import { HOUR_IN_MS, MIN_IN_MS } from 'src/utils/const'
+import { describe, expect, it } from 'vitest'
+import { mockNow, mockNowSlot, mockTimelineEntries } from '../mocks'
 import { MeterEntry, SensorEntry } from '../types'
 import { generateSensorEntries } from './test'
-import { mockNow, mockNowSlot, mockTimelineEntries } from '../mocks'
 import { getTimeInMillis, getTimeMinusMinutes, getTimeMinusTime } from './time'
-import { HOUR_IN_MS, MIN_IN_MS } from './calculations'
 import { getMergedBgEntries, mapTimelineEntriesToGraphPoints } from './timelineEntries'
-import { describe, expect, it } from 'vitest'
-import { sortBy } from 'lodash'
 
 describe('../calculations', () => {
   it('getMergedBgEntries', () => {
@@ -56,7 +56,7 @@ describe('../calculations', () => {
   })
 
   it('mapTimelineEntriesToGraphPoints', () => {
-    expect(mapTimelineEntriesToGraphPoints(mockTimelineEntries, HOUR_IN_MS, mockNow)).toEqual([
+    expect(mapTimelineEntriesToGraphPoints(mockTimelineEntries(), HOUR_IN_MS, mockNow)).toEqual([
       {
         isoTimestamp: getTimeMinusMinutes(mockNowSlot, 55),
         timestamp: getTimeInMillis(getTimeMinusMinutes(mockNowSlot, 55)),

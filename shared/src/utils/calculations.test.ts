@@ -1,7 +1,14 @@
+import { HOUR_IN_MS } from 'src/utils/const'
+import { describe, expect, it } from 'vitest'
+import { mockBloodGlucoseEntries, mockCarbEntries, mockNow } from '../mocks'
 import { SensorEntry } from '../types'
 import {
+  calculateCurrentCarbsToInsulinRatio,
+  calculateDailyAmounts,
+  calculateDailyAverageBgs,
   calculateHba1c,
   calculateRaw,
+  calculateRequiredCarbsToInsulinRatio,
   calculateTimeHigh,
   calculateTimeInRange,
   calculateTimeLow,
@@ -9,17 +16,12 @@ import {
   changeBloodGlucoseUnitToMmoll,
   countSituations,
   getBgAverage,
-  isDexcomEntryValid,
-  roundTo2Decimals,
-  getPercentOfInsulinRemaining,
+  getCarbsOnBoard,
   getInsulinOnBoard,
   getPercentOfCarbsRemaining,
-  getCarbsOnBoard,
-  calculateCurrentCarbsToInsulinRatio,
-  calculateRequiredCarbsToInsulinRatio,
-  HOUR_IN_MS,
-  calculateDailyAmounts,
-  calculateDailyAverageBgs,
+  getPercentOfInsulinRemaining,
+  isDexcomEntryValid,
+  roundTo2Decimals,
 } from './calculations'
 import {
   getDateWithoutTime,
@@ -29,8 +31,6 @@ import {
   getTimeMinusMinutes,
   getTimeMinusTime,
 } from './time'
-import { describe, expect, it } from 'vitest'
-import { mockNow, mockBloodGlucoseEntries, mockCarbEntries } from '../mocks'
 
 const currentTimestamp = 1508672249758
 
@@ -207,7 +207,7 @@ describe('@nightbear/shared/calculations', () => {
 
   // TODO: check these
   it('calculateDailyAmounts', () => {
-    expect(calculateDailyAmounts(mockCarbEntries, 2, getTimeInMillis(mockNow))).toEqual([
+    expect(calculateDailyAmounts(mockCarbEntries(), 2, getTimeInMillis(mockNow))).toEqual([
       { timestamp: getDateWithoutTimeMs(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS), total: null },
       { timestamp: getDateWithoutTime(mockNow), total: 40 },
     ])
@@ -215,7 +215,9 @@ describe('@nightbear/shared/calculations', () => {
 
   // TODO: check these
   it('calculateDailyAverageBgs', () => {
-    expect(calculateDailyAverageBgs(mockBloodGlucoseEntries, 2, getTimeInMillis(mockNow))).toEqual([
+    expect(
+      calculateDailyAverageBgs(mockBloodGlucoseEntries(), 2, getTimeInMillis(mockNow)),
+    ).toEqual([
       {
         timestamp: getDateWithoutTimeMs(getTimeInMillis(mockNow) - 24 * HOUR_IN_MS),
         average: null,

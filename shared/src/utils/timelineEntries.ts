@@ -1,19 +1,20 @@
 import { chain, fill } from 'lodash'
 import { DateTime } from 'luxon'
 import {
+  Alarm,
   BloodGlucoseEntry,
   CarbEntry,
   InsulinEntry,
   MeterEntry,
+  ProfileActivation,
   SensorEntry,
   TimelineEntries,
-  ProfileActivation,
-  Alarm,
 } from '../types'
-import { calculateAverageBg, MIN_IN_MS } from './calculations'
-import { getTimeInMillis, getTimeMinusMinutes } from './time'
 import { getFirstAlarmState } from './alarms'
+import { calculateAverageBg } from './calculations'
 import { highLimit, lowLimit } from './config'
+import { MIN_IN_MS } from './const'
+import { getTimeInMillis, getTimeMinusMinutes } from './time'
 
 // TODO
 export const getFillColor = (bg: number | null) => {

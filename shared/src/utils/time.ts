@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { HOUR_IN_MS, MIN_IN_MS } from './calculations'
+import { HOUR_IN_MS, MIN_IN_MS } from './const'
 
 // TODO: Make this configurable via env (or just use env.DEFAULT_TIMEZONE as-is)
 export const DEFAULT_TIMEZONE = 'Europe/Helsinki'

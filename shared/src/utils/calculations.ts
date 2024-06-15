@@ -1,6 +1,8 @@
 import { fill, groupBy, reduce } from 'lodash'
 import { BloodGlucoseEntry, CarbEntry, InsulinEntry, MeterEntry, SensorEntry } from '../types'
 import { timeInRangeHighLimit, timeInRangeLowLimit } from './config'
+import { DAY_IN_MS, MIN_IN_MS, NOISE_LEVEL_LIMIT } from './const'
+import { isValidNumber, roundNumberToFixedDecimals } from './helpers'
 import {
   getDateWithoutTime,
   getDateWithoutTimeMs,
@@ -8,14 +10,6 @@ import {
   hourToMs,
   isTimeSmaller,
 } from './time'
-import { isValidNumber, roundNumberToFixedDecimals } from './helpers'
-
-export const SEC_IN_MS = 1000
-export const MIN_IN_MS = 60 * SEC_IN_MS
-export const HOUR_IN_MS = 60 * MIN_IN_MS
-export const DAY_IN_MS = 24 * HOUR_IN_MS
-export const TIME_LIMIT_FOR_SLOPE = 15 * MIN_IN_MS
-export const NOISE_LEVEL_LIMIT = 4
 
 // Conversion from mg/dL to mmol/L (rounds to 1 decimal)
 export const changeBloodGlucoseUnitToMmoll = (glucoseInMgdl: number): number => {
