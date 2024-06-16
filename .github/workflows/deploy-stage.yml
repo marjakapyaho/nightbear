@@ -34,4 +34,4 @@ jobs:
       - run: contrib/db/migrate test
       - run: yarn validate
       - name: "Netlify: Deploy to stage"
-        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK_STAGE }}?trigger_title=CI+passed
+        run: curl -X POST --data-urlencode "trigger_title=${{ steps.trigger_title.outputs.message }}" "https://api.netlify.com/build_hooks/${{ secrets.NETLIFY_BUILD_HOOK_STAGE }}"
