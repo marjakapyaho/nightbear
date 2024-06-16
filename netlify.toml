@@ -1,12 +1,20 @@
-[functions]
-    node_bundler = "esbuild"
-    directory = "backend/entrypoints"
+[build]
+  # This prevents pushes to GitHub from triggering builds, but still lets us trigger one via hooks
+  # The other way of achieving the same is setting the production branch of the site to something
+  # that doesn't exist (e.g. "NONE"), but that seems to disable scheduled functions.
+  # See: https://answers.netlify.com/t/build-deploy-via-webhook-only/2516/13
+  # See: https://docs.netlify.com/configure-builds/ignore-builds/
+  ignore = "exit 0"
 
-    [functions."netlify-cronjobs"]
-        schedule = "*/3 * * * *" # once every 3 minutes
+[functions]
+  node_bundler = "esbuild"
+  directory = "backend/entrypoints"
+
+  [functions."netlify-cronjobs"]
+    schedule = "*/3 * * * *" # once every 3 minutes
 
 [[redirects]]
-    force = true
-    from = "/api/*"
-    status = 200
-    to = "/.netlify/functions/netlify-api" # can also use ":splat" to refer to what "*" matched
+  force = true
+  from = "/api/*"
+  status = 200
+  to = "/.netlify/functions/netlify-api" # can also use ":splat" to refer to what "*" matched
