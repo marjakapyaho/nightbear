@@ -34,4 +34,7 @@ jobs:
       - run: contrib/db/migrate test
       - run: yarn validate
       - name: "Netlify: Deploy to stage"
-        run: curl -X POST --data-urlencode "trigger_title=${{ github.event.head_commit.message }}" "https://api.netlify.com/build_hooks/${{ secrets.NETLIFY_BUILD_HOOK_STAGE }}"
+        run:  >-
+          curl -X POST \
+            --data-urlencode "trigger_title=From GitHub Actions: ${{ github.event.head_commit.message }}" \
+            "https://api.netlify.com/build_hooks/${{ secrets.NETLIFY_BUILD_HOOK_STAGE }}"
