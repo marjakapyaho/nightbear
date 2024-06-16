@@ -11,12 +11,12 @@ services:
     ports:
       - '35432:5432'
 
-  nightbear_db_dev:
+  nightbear_db_local:
     image: postgres:16
-    container_name: nightbear-db-dev
+    container_name: nightbear-db-local
     restart: always
     environment:
-      - POSTGRES_DB=nightbear_dev
+      - POSTGRES_DB=nightbear_local
       - POSTGRES_USER=nightbear
       - POSTGRES_PASSWORD=nightbear
     ports:

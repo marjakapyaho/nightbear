@@ -1,7 +1,7 @@
 import { API_KEY_HEADER } from '@nightbear/shared'
 
 const API_ROOT = window.location.host.startsWith('localhost')
-  ? 'http://localhost:4000' // this is where we can reach API in local dev
+  ? 'http://localhost:4000' // this is where we can reach API when running locally
   : '/api' // ...and here when actually deployed somewhere
 
 if (!window.localStorage[API_KEY_HEADER]) {

@@ -7,7 +7,7 @@
   "types": "./src/index.ts",
   "private": true,
   "scripts": {
-    "dev": "tsc -w --preserveWatchOutput",
+    "start": "tsc -w --preserveWatchOutput",
     "build": "rm -rf dist && tsc",
     "test": "vitest run",
     "test:watch": "vitest watch",

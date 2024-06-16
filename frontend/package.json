@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "AGPL-3.0",
   "scripts": {
-    "dev": "vite --port=3000",
+    "start": "vite --port=3000",
     "build": "tsc && vite build",
     "test": "vitest",
     "lint": "eslint src --ext ts,tsx --config .eslintrc.cjs",

@@ -2,15 +2,14 @@
   "name": "api",
   "version": "1.0.0",
   "license": "AGPL-3.0",
-  "main": "entrypoints/local-dev.ts",
   "scripts": {
-    "dev": "yarn db:types && yarn ts:node entrypoints/local-dev.ts",
+    "start": "yarn db:types && yarn ts:node entrypoints/local.ts",
     "build": "rm -rf build && tsc",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "lint": "eslint . --ext .ts --config .eslintrc.cjs",
     "db:reset": "docker-compose stop && docker-compose rm -f && docker-compose up -d && sleep 5 && yarn db:migrate",
-    "db:migrate": "contrib/db/migrate test && contrib/db/migrate dev",
+    "db:migrate": "contrib/db/migrate test && contrib/db/migrate local",
     "db:types": "pgtyped --config pgtyped-config.json",
     "ts:node": "ts-node --compiler-options '{\"module\":\"commonjs\"}'"
   },

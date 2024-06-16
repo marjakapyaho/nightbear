@@ -110,7 +110,7 @@ export function getDeployedVersion() {
   try {
     return readFileSync('.nightbear-deploy-version').toString().trim()
   } catch (err) {
-    return '(local dev)'
+    return '(unknown)'
   }
 }
 
