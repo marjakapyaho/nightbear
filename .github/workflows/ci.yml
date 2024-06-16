@@ -27,7 +27,7 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL_TEST: "postgres://nightbear:nightbear@localhost:35432/nightbear_test"
-      NETLIFY_BUILD_HOOK: "${{ github.ref == 'refs/heads/prod' ? secrets.NETLIFY_BUILD_HOOK_PROD : secrets.NETLIFY_BUILD_HOOK_DEV }}"
+      NETLIFY_BUILD_HOOK: "${{ github.ref == 'refs/heads/prod' && secrets.NETLIFY_BUILD_HOOK_PROD || secrets.NETLIFY_BUILD_HOOK_DEV }}"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
