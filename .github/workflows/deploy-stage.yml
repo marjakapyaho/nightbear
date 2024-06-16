@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - next # we deploy the main branch automatically to the stage env
-      - test-deploy-stage # you can push to this branch to test the stage-deploy process, without having to touch the main branch
 
 jobs:
   deploy-stage:
@@ -34,4 +33,5 @@ jobs:
       - run: yarn setup:local
       - run: contrib/db/migrate test
       - run: yarn validate
-      # - run: 'echo TODO: Deploy to Netlify'
+      - name: "Netlify: Deploy to stage"
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK_STAGE }}?trigger_title=CI+passed
