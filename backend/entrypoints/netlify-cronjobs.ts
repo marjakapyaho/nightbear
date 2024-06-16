@@ -9,6 +9,6 @@ debug.log = consoleLogStream // direct log output to where we want it
 const context = createNodeContext() // create application runtime context
 
 export default async (_req: Request) => {
-  console.log('Deploy test C')
+  console.log('Deploy test D')
   await runCronJobs(context, cronjobs)
 }
