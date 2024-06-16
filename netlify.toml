@@ -25,7 +25,13 @@
 # This is more of a "rewrite" than a "redirect", and just makes our functions available under a more
 # pleasant path (the default is pretty verbose)
 [[redirects]]
-  force = true
   from = "/api/*"
-  status = 200
   to = "/.netlify/functions/netlify-api" # can also use ":splat" to refer to what "*" matched
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
