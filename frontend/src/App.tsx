@@ -10,7 +10,7 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="nb-App">
-        <pre style={{ textAlign: 'center' }}>Deploy test B</pre>
+        <pre style={{ textAlign: 'center' }}>Deploy test C</pre>
         <Router>
           <Routes>
             <Route path="/" element={<BgGraph />} />
