@@ -2,6 +2,7 @@ import { Point } from '@nightbear/shared'
 import { TimeAgo } from '../timeAgo/TimeAgo'
 import styles from './ScrollableGraph.module.scss'
 import { GraphConfig, situationsMappedForUI, tsToLeft } from './scrollableGraphUtils'
+import { AiFillSun, AiFillMoon, AiFillSetting } from 'react-icons/ai'
 
 type Props = {
   config: GraphConfig
@@ -43,7 +44,12 @@ export const GraphMarker = ({ config, point, isSelected, setSelected }: Props) =
       {point.carbEntry && <div className={styles.numberBubbleBottom}>{point.carbEntry.amount}</div>}
 
       {point.profileActivations?.length ? (
-        <div className={styles.profileName}>{point.profileActivations[0].profileName}</div>
+        <div className={styles.profileName}>
+          {/* {point.profileActivations[0].profileName}*/}
+          {point.profileActivations[0].profileName === 'Day' && <AiFillSun />}
+          {point.profileActivations[0].profileName === 'Night' && <AiFillMoon />}
+          {!point.profileActivations[0].profileName && <AiFillSetting />}
+        </div>
       ) : (
         ''
       )}
