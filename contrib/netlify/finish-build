@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail # exit on error; treat unset variables as errors; exit on errors in piped commands
+
+DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" # figure out current script path
+
+# The symlinked version left in place by `yarn setup:local` won't work on Netlify → replace with the real thing
+rm -rf backend/node_modules/@nightbear/shared
+cp -r shared/dist backend/node_modules/@nightbear/shared
+
+# Netlify would turn everything in here to functions → we only want the `netlify-*` ones
+find $DIR/../../backend/entrypoints -type f ! -name 'netlify-*' -delete

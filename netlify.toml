@@ -1,6 +1,6 @@
 [build]
   # Builds all of front/back/shared, and installs shared to backend
-  command = "yarn setup:local && yarn build && yarn build:back:netlify"
+  command = "yarn setup:local && yarn build && contrib/netlify/finish-build"
 
   # Directory that contains the deploy-ready web assets (doesn't affect functions in any way)
   publish = "frontend/dist"
