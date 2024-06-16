@@ -1,4 +1,10 @@
 [build]
+  # Builds all of front/back/shared, and installs shared to backend
+  command = "yarn setup:local && yarn build && yarn build:back:netlify"
+
+  # Directory that contains the deploy-ready web assets (doesn't affect functions in any way)
+  publish = "frontend/dist"
+
   # This prevents pushes to GitHub from triggering builds, but still lets us trigger one via hooks
   # The other way of achieving the same is setting the production branch of the site to something
   # that doesn't exist (e.g. "NONE"), but that seems to disable scheduled functions.
@@ -10,9 +16,14 @@
   node_bundler = "esbuild"
   directory = "backend/entrypoints"
 
+  # Run our cronjobs on a schedule. Note that scheduled functions only run on published deploys.
+  # They don’t run on Deploy Previews or branch deploys.
+  # See: https://docs.netlify.com/functions/scheduled-functions/
   [functions."netlify-cronjobs"]
     schedule = "*/3 * * * *" # once every 3 minutes
 
+# This is more of a "rewrite" than a "redirect", and just makes our functions available under a more
+# pleasant path (the default is pretty verbose)
 [[redirects]]
   force = true
   from = "/api/*"
