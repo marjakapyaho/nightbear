@@ -30,6 +30,7 @@
   status = 200
   force = true
 
+# This lets us do routing on the frontend, even when the initial request isn't just "/"
 [[redirects]]
   from = "/*"
   to = "/index.html"
