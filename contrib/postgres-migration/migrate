@@ -9,6 +9,6 @@ for file in $(ls contrib/postgres-migration/*.sql); do
 done
 
 contrib/db/dump test dump.sql
-contrib/db/sql prod DROP DATABASE nightbear_stage # use the other DB because can't drop the active DB
-contrib/db/sql prod CREATE DATABASE nightbear_stage
-contrib/db/sql stage dump.sql
+contrib/db/sql prod DROP DATABASE nightbear_dev # use the other DB because can't drop the active DB
+contrib/db/sql prod CREATE DATABASE nightbear_dev
+contrib/db/sql dev dump.sql

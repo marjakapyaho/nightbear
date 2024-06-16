@@ -2,15 +2,41 @@ name: CI
 
 on:
   push:
-    branches-ignore:
-      - next # pushes to the main branch are handled by the CD workflow
+    branches:
+      - dev
+      - prod
 
 jobs:
-  main:
+  ci:
+    name: CI
     runs-on: ubuntu-latest
+    services:
+      nightbear_db_test:
+        image: postgres:16
+        env:
+          POSTGRES_DB: nightbear_test
+          POSTGRES_USER: nightbear
+          POSTGRES_PASSWORD: nightbear
+        ports:
+          - 35432:5432
+        options: >-
+          --name nightbear-db-test
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL_TEST: "postgres://nightbear:nightbear@localhost:35432/nightbear_test"
+      NETLIFY_BUILD_HOOK: "${{ github.ref == 'refs/heads/prod' ? secrets.NETLIFY_BUILD_HOOK_PROD : secrets.NETLIFY_BUILD_HOOK_DEV }}"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with: { node-version: '18.16.1' }
       - run: yarn setup:local
+      - run: contrib/db/migrate test
       - run: yarn validate
+      - name: Deploy to Netlify
+        run:  >-
+          curl -X POST \
+            --data-urlencode "trigger_title=GitHub Actions deploy: ${{ github.event.head_commit.message }}" \
+            "https://api.netlify.com/build_hooks/$NETLIFY_BUILD_HOOK"
