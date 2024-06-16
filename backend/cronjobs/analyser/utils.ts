@@ -42,6 +42,7 @@ export const LOW_CLEARING_THRESHOLD = 0.5
 export const RELEVANT_IOB_LIMIT_FOR_LOW = 0.5
 export const RELEVANT_IOB_LIMIT_FOR_HIGH = 1
 export const CARBS_TO_INSULIN_MULTIPLIER = 1.5
+export const PERSISTENT_HIGH_AREA = 1.5
 
 export const slopeLimits = {
   SLOW: 0.3,
@@ -286,6 +287,10 @@ export const isBloodGlucoseRelativeLow = (latestEntry: AnalyserEntry, activeProf
 
 export const isBloodGlucoseRelativeHigh = (latestEntry: AnalyserEntry, activeProfile: Profile) =>
   latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelRel &&
+  latestEntry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs
+
+export const isBloodGlucoseAlmostHigh = (latestEntry: AnalyserEntry, activeProfile: Profile) =>
+  latestEntry.bloodGlucose > activeProfile.analyserSettings.highLevelAbs - PERSISTENT_HIGH_AREA &&
   latestEntry.bloodGlucose <= activeProfile.analyserSettings.highLevelAbs
 
 // If predictedSituation is not defined, we're doing the "predictedSituation" detection

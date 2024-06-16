@@ -81,6 +81,23 @@ describe('analyser/persistentHigh', () => {
     ).toEqual('NO_SITUATION')
   })
 
+  it('detects PERSISTENT_HIGH even if there are some values below limit', () => {
+    expect(
+      runAnalysis({
+        currentTimestamp: mockNow,
+        activeProfile: getMockActiveProfile('day'),
+        sensorEntries: generateSensorEntries({
+          currentTimestamp: mockNow,
+          bloodGlucoseHistory: [...persistentHighValues, 9.5, 9.0, 8.4, 9.0, 9.2, 9.5, 9.5],
+        }),
+        meterEntries: [],
+        insulinEntries: [],
+        carbEntries: [],
+        alarms: [],
+      }),
+    ).toEqual('PERSISTENT_HIGH')
+  })
+
   it('does not detect PERSISTENT_HIGH when there is even one normal value', () => {
     expect(
       runAnalysis({

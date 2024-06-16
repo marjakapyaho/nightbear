@@ -10,6 +10,7 @@ import {
 import {
   getRelevantEntries,
   isBloodGlucoseRelativeHigh,
+  isBloodGlucoseAlmostHigh,
   isBloodGlucoseRelativeLow,
   isSituationCritical,
   isSlopeFalling,
@@ -222,9 +223,15 @@ export const detectPersistentHigh = (
     PERSISTENT_HIGH_TIME_WINDOW,
   )
 
-  const isAllDataRelativeHigh =
-    relevantEntries.filter(entry => isBloodGlucoseRelativeHigh(entry, activeProfile)).length ===
-    relevantEntries.length
+  const isAlmostAllDataHighEnough =
+    relevantEntries.filter(entry => isBloodGlucoseAlmostHigh(entry, activeProfile)).length /
+      relevantEntries.length >
+    0.9
+
+  const noBloodGlucoseIsHigh =
+    relevantEntries.filter(
+      entry => entry.bloodGlucose > activeProfile.analyserSettings.highLevelAbs,
+    ).length === 0
 
   const thereIsNotEnoughCorrectionInsulin =
     insulinOnBoard < RELEVANT_IOB_LIMIT_FOR_HIGH || thereIsTooLittleInsulinForCarbs
@@ -233,7 +240,8 @@ export const detectPersistentHigh = (
 
   return (
     hasEnoughData &&
-    isAllDataRelativeHigh &&
+    isAlmostAllDataHighEnough &&
+    noBloodGlucoseIsHigh &&
     thereIsNotEnoughCorrectionInsulin &&
     predictedSituationAnyHigh
   )
