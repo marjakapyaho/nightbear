@@ -7,7 +7,12 @@
 
   .error,
   .loading {
-    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 30px;
+    color: rgb(202, 231, 188);
   }
 
   .graphBottom {

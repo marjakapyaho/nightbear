@@ -13,6 +13,8 @@ import { ScrollableGraph } from '../../components/scrollableGraph/ScrollableGrap
 import { useTimelineEntries } from '../../data/timelineEntries/useTimelineEntries'
 import { Point, getTimeAsISOStr, calculateAverageBg } from '@nightbear/shared'
 import { last } from 'lodash'
+import { RiBearSmileFill } from 'react-icons/ri'
+import { TfiFaceSad } from 'react-icons/tfi'
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig()
@@ -70,7 +72,7 @@ export const BgGraph = () => {
 
   return (
     <div className={styles.bgGraph}>
-      <StatusBar graphPoint={latestPointWithBg} />
+      <StatusBar point={latestPointWithBg} />
 
       <div style={{ height: baseConfig.outerHeight }}>
         {isSuccess && (
@@ -82,8 +84,16 @@ export const BgGraph = () => {
             latestPointWithBg={latestPointWithBg}
           />
         )}
-        {isLoading && <div className={styles.loading}>Loading...</div>}
-        {isError && <div className={styles.error}>Error</div>}
+        {isLoading && (
+          <div className={styles.loading}>
+            <RiBearSmileFill />
+          </div>
+        )}
+        {isError && (
+          <div className={styles.error}>
+            <TfiFaceSad />
+          </div>
+        )}
       </div>
 
       <div className={styles.graphBottom}>

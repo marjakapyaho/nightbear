@@ -115,15 +115,31 @@
       }
 
       .profileName {
-        font-size: 10px;
+        font-size: 12px;
         position: absolute;
         top: 0;
+
+        .sunIcon {
+          color: #fcbc26;
+        }
+        .moonIcon {
+          color: #10546e;
+        }
+        .settingsIcon {
+          color: #b0b0b0;
+        }
       }
 
       .alarm {
-        font-size: 10px;
+        font-size: 12px;
         position: absolute;
         top: 0;
+        color: #ff6e07;
+
+        .situation {
+          font-size: 10px;
+          background: white;
+        }
       }
     }
 
