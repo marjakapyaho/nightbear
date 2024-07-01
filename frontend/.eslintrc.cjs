@@ -2,7 +2,6 @@ const base = require('../eslintrc.base.js')
 
 module.exports = {
   ...base,
-  root: true,
   parserOptions: {
     ...base.parserOptions,
     project: __dirname + '/tsconfig.json',
