@@ -15,6 +15,7 @@ import { Point, getTimeAsISOStr, calculateAverageBg } from '@nightbear/shared'
 import { last } from 'lodash'
 import { RiBearSmileFill } from 'react-icons/ri'
 import { TfiFaceSad } from 'react-icons/tfi'
+import { TimeAgo } from '../../components/timeAgo/TimeAgo'
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig()
@@ -22,8 +23,15 @@ export const BgGraph = () => {
   const now = Date.now()
   const startTimestamp = getTimeAsISOStr(now - baseConfig.timelineRange)
 
-  const { graphPoints, saveGraphPointData, isLoading, isError, isSuccess } =
-    useTimelineEntries(startTimestamp)
+  const {
+    graphPoints,
+    saveGraphPointData,
+    isLoading,
+    isError,
+    isSuccess,
+    lastLoaded,
+    lastRefetched,
+  } = useTimelineEntries(startTimestamp)
 
   const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
   const latestPoint = last(graphPoints)
@@ -72,7 +80,7 @@ export const BgGraph = () => {
 
   return (
     <div className={styles.bgGraph}>
-      <StatusBar point={latestPointWithBg} />
+      <StatusBar point={latestPointWithBg} lastLoaded={lastLoaded} lastRefetched={lastRefetched} />
 
       <div style={{ height: baseConfig.outerHeight }}>
         {isSuccess && (

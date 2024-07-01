@@ -1,7 +1,7 @@
+import { Point, SEC_IN_MS, getTimeAsISOStr } from '@nightbear/shared'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { callFetch } from '../fetch'
-import { getTimeAsISOStr, Point, SEC_IN_MS } from '@nightbear/shared'
 import { useEffect, useState } from 'react'
+import { callFetch } from '../fetch'
 
 export const useTimelineEntries = (
   startTimestamp: string,
@@ -14,12 +14,23 @@ export const useTimelineEntries = (
     isLoading,
     isError,
     isSuccess,
+    isRefetching,
     refetch,
   } = useQuery<Point[]>({
     queryKey: ['get-timeline-entries'],
     queryFn: () => callFetch(`/get-timeline-entries?start=${startTimestamp}&end=${endTimestamp}`),
     refetchInterval: 30 * SEC_IN_MS,
   })
+
+  const [lastLoaded, setLastLoaded] = useState(0)
+  const [lastRefetched, setLastRefetched] = useState(0)
+
+  useEffect(() => {
+    if (!isLoading) setLastLoaded(Date.now())
+  }, [isLoading])
+  useEffect(() => {
+    if (!isRefetching) setLastRefetched(Date.now())
+  }, [isRefetching])
 
   const { mutate: updateTimelineEntries } = useMutation({
     mutationFn: (point: Point) => callFetch('/update-timeline-entries', 'PUT', point),
@@ -43,5 +54,7 @@ export const useTimelineEntries = (
     isLoading,
     isError,
     isSuccess,
+    lastLoaded,
+    lastRefetched,
   }
 }
