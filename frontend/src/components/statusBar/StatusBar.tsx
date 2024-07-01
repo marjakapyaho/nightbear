@@ -2,7 +2,6 @@ import { getTimeInMillis, Point } from '@nightbear/shared'
 import { TimeAgo } from '../timeAgo/TimeAgo'
 import styles from './StatusBar.module.scss'
 import { chain } from 'lodash'
-import { ReactNode } from 'react'
 
 type Props = {
   point?: Point

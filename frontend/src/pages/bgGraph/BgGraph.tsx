@@ -15,7 +15,6 @@ import { Point, getTimeAsISOStr, calculateAverageBg } from '@nightbear/shared'
 import { last } from 'lodash'
 import { RiBearSmileFill } from 'react-icons/ri'
 import { TfiFaceSad } from 'react-icons/tfi'
-import { TimeAgo } from '../../components/timeAgo/TimeAgo'
 
 export const BgGraph = () => {
   const baseConfig = getBgGraphBaseConfig()
