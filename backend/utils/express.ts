@@ -79,12 +79,12 @@ export function handlerWithLogging(handler: RequestHandler, log: Logger): Reques
     return handler(request, context).then(
       res => {
         debug(`Outgoing ${res.responseStatus} response:\n%O`, res.responseBody)
-        log(`${request.requestMethod} ${request.requestPath} (${duration()}) => SUCCESS`)
+        log(`${request.requestMethod} ${request.requestPath} (${duration()}) → SUCCESS`)
         return res
       },
       err => {
         debug(`Outgoing error:\n%O`, err)
-        log(`${request.requestMethod} ${request.requestPath} (${duration()}) => FAILURE`)
+        log(`${request.requestMethod} ${request.requestPath} (${duration()}) → FAILURE`)
         return Promise.reject(err)
       },
     )
