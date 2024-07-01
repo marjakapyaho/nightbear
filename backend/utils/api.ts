@@ -86,7 +86,7 @@ export function createNodeContext(): Context {
     httpPort: 4000,
     timestamp: () => getTimeAsISOStr(Date.now()),
     log,
-    db: createDbClient(DATABASE_URL),
+    db: createDbClient(DATABASE_URL, log),
     storage: null, // TODO
     pushover: PUSHOVER_DISABLED
       ? NO_PUSHOVER

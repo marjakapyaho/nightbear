@@ -20,7 +20,7 @@ export const createTestContext = (timestamp = () => mockNow): Context => {
     httpPort: 80,
     timestamp,
     log: NO_LOGGING,
-    db: createDbClient(process.env.DATABASE_URL_TEST),
+    db: createDbClient(process.env.DATABASE_URL_TEST, NO_LOGGING),
     storage: null,
     pushover: NO_PUSHOVER,
     dexcomShare: NO_DEXCOM_SHARE,

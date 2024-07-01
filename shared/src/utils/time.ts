@@ -82,3 +82,8 @@ export const getTimePlusMinutes = (time1: string | number, minutes: number) =>
 
 export const getTimePlusTimeMs = (time1: string | number, time2: string | number) =>
   getTimeInMillis(time1) + getTimeInMillis(time2)
+
+export const measure = () => {
+  const then = Date.now()
+  return () => (getTimeMinusTimeMs(Date.now(), then) / 1000).toFixed(3) + ' sec'
+}

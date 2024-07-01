@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
+import { measure } from '@nightbear/shared'
 import { PreparedQuery } from '@pgtyped/runtime'
-import { camelCase, mapKeys } from 'lodash'
+import _, { camelCase, mapKeys } from 'lodash'
 import { Pool, types } from 'pg'
 import { z } from 'zod'
 import { queries } from '../db/queries'
+import { Logger, extendLogger } from './logging'
 
 /**
  * @see https://pgtyped.dev/docs/typing
@@ -17,10 +19,11 @@ export type DbClient = ReturnType<typeof createDbClient>
 /**
  * Creates a Postgres wrapper for talking to the database.
  */
-export function createDbClient(connectionString: string) {
+export function createDbClient(connectionString: string, logger: Logger) {
+  const log = extendLogger(logger, 'db')
   const pool = new Pool({ connectionString })
   return {
-    ...queries(pool),
+    ...queries(pool, log),
     async query(query: string) {
       return await pool.query(query)
     },
@@ -42,13 +45,18 @@ export const runQueryAndValidateResult = async <
         : never,
 >(
   pool: Pool,
+  log: Logger,
   count: Count,
   schema: Schema,
   method: PreparedQuery<Params, z.infer<Schema>>,
   params?: Params,
 ): Promise<Return> => {
+  const duration = measure()
+  const queryName = getQueryName(method)
   const raw = await method.run((params ?? {}) as Params, pool)
   const mapped = raw.map(row => mapKeys(row as object, (_val, key) => camelCase(key)))
+
+  log(`${queryName} (${duration()}) → ${raw.length} rows`)
 
   switch (count) {
     case 'one':
@@ -75,13 +83,13 @@ export const runQueryAndValidateResult = async <
   }
 }
 
-export const bindQueryShorthands = (pool: Pool) => {
+export const bindQueryShorthands = (pool: Pool, logger: Logger) => {
   const one = async <Schema extends z.ZodTypeAny, Params extends object | void>(
     schema: Schema,
     method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>> => {
-    return runQueryAndValidateResult(pool, 'one', schema, method, params as Params)
+    return runQueryAndValidateResult(pool, logger, 'one', schema, method, params as Params)
   }
 
   const oneOrNone = async <Schema extends z.ZodTypeAny, Params extends object | void>(
@@ -89,7 +97,7 @@ export const bindQueryShorthands = (pool: Pool) => {
     method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema> | undefined> => {
-    return runQueryAndValidateResult(pool, 'oneOrNone', schema, method, params as Params)
+    return runQueryAndValidateResult(pool, logger, 'oneOrNone', schema, method, params as Params)
   }
 
   const many = async <Schema extends z.ZodTypeAny, Params extends object | void>(
@@ -97,7 +105,7 @@ export const bindQueryShorthands = (pool: Pool) => {
     method: PreparedQuery<Params, z.infer<Schema>>,
     params?: Params extends object ? Params : undefined,
   ): Promise<z.infer<Schema>[]> => {
-    return runQueryAndValidateResult(pool, 'many', schema, method, params as Params)
+    return runQueryAndValidateResult(pool, logger, 'many', schema, method, params as Params)
   }
 
   return {
@@ -105,4 +113,37 @@ export const bindQueryShorthands = (pool: Pool) => {
     oneOrNone,
     many,
   }
+}
+
+const queryName = Symbol('queryName')
+
+/**
+ * @see https://github.com/adelsz/pgtyped/issues/522 for what could eventually replace this
+ */
+export const patchQueryNames = <
+  T extends Array<
+    Record<
+      string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      PreparedQuery<any, any>
+    >
+  >,
+>(
+  modules: T,
+) => {
+  for (const module of modules) {
+    _.forEach(module, (val, key) => {
+      _.set(val, queryName, key)
+    })
+  }
+  return modules
+}
+
+export const getQueryName = (
+  method: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PreparedQuery<any, any>,
+) => {
+  const res = _.get(method, queryName) as string | undefined
+  if (!res) throw new Error(`Query module has not been prepared with patchQueryNames()`)
+  return res
 }
